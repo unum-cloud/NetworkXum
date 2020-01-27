@@ -1,6 +1,6 @@
 # PYthon + OpenCL + workER = pycler
 
-Access the power of GPU with simplicity of Python and portability of OpenCL.
+Access the power of GPU with simplicity of Python and portability of OpenCL.<br/>
 We implement the most essential operations as stream-processing operations on GPU.
 
 Apps:
@@ -13,7 +13,8 @@ Apps:
 - Graph Analysis.
   - PageRank & Personalized PR.
   - Linearized Belief Propagation.
-  - Graphical non0linear neural nets.
+  - Graphical non-linear neural nets.
+  - Node embeddings.
 - Probabilistic tasks.
   - Percentile estimation.
   - HyperLogLog counters.
