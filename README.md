@@ -14,5 +14,13 @@ Apps:
   - PageRank & Personalized PR.
   - Linearized Belief Propagation.
   - Graphical non0linear neural nets.
+- Probabilistic tasks.
+  - Percentile estimation.
+  - HyperLogLog counters.
+- Machine learning.
+  - Stream dimesnion reduction.
+  - Stream clustering.
+  - Locality Sensitive hashing.
+  
 
 We provide a C API and binding for Apache Arrow datatypes to be automatically pushed onto GPU.
