@@ -1,5 +1,7 @@
 # PYthon + OpenCL + workER = pycler
 
+[![pipeline status](http://gitlab.ashvardanian.com/unum/pycler/badges/master/pipeline.svg)](http://gitlab.ashvardanian.com/unum/pycler/commits/master)
+
 Access the power of GPU with simplicity of Python and portability of OpenCL.<br/>
 We implement the most essential operations as stream-processing operations on GPU.
 

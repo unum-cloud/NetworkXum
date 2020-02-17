@@ -1,0 +1,16 @@
+image: arcatdmz/docker-compose-git
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+before_script:
+  - docker info
+
+simple:
+  stage: build
+  script:
+    - docker build -t unum/pycler/simple ./simple
+    - docker run --gpus all unum/pycler/simple
+  tags:
+    - docker
