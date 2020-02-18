@@ -14,3 +14,11 @@ simple:
     - docker run --gpus all unum/pycler/simple
   tags:
     - docker
+
+nvidia:
+  stage: build
+  script:
+    - docker build -t unum/pycler/nvidia ./nvidia
+    - docker run --gpus all unum/pycler/nvidia
+  tags:
+    - docker
