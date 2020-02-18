@@ -1,7 +1,12 @@
 # Compute images will be both slimmer and faster 
 # with Ubuntu base image instead of Alpine linus:
 # https://pythonspeed.com/articles/alpine-docker-python/
-FROM python:3.7-slim
+FROM nvidia/opencl:latest
+RUN apt update
+RUN apt install software-properties-common
+RUN apt install python3.7
+RUN apt install python3-pip
+
 RUN pip3 install pymongo~=3.10.0 urllib3~=1.24.3 fire~=0.2.1
 
 # Install OpenCL driver before the lib:
