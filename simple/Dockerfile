@@ -3,9 +3,11 @@
 # https://pythonspeed.com/articles/alpine-docker-python/
 FROM nvidia/opencl:latest
 RUN apt update
-RUN apt install software-properties-common
-RUN apt install python3.7
-RUN apt install python3-pip
+# We may have to answer installation questions.
+# https://stackoverflow.com/a/52260554
+RUN echo "Y" | apt install software-properties-common
+RUN echo "Y" | apt install python3.7
+RUN echo "Y" | apt install python3-pip
 
 RUN pip3 install pymongo~=3.10.0 urllib3~=1.24.3 fire~=0.2.1
 
