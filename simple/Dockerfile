@@ -1,17 +1,9 @@
-FROM python:3.7-slim
-RUN pip3 install pymongo~=3.10.0 urllib3~=1.24.3 fire~=0.2.1
-
-ENV PATH="/root/miniconda3/bin:${PATH}"
-ARG PATH="/root/miniconda3/bin:${PATH}"
-
-RUN apt-get update
-RUN apt-get install -y wget && rm -rf /var/lib/apt/lists/*
-RUN wget \
-    https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-    && mkdir /root/.conda \
-    && bash Miniconda3-latest-Linux-x86_64.sh -b \
-    && rm -f Miniconda3-latest-Linux-x86_64.sh \
-RUN conda --version
+FROM continuumio/miniconda3:latest
+# https://anaconda.org/anaconda/pymongo
+RUN conda install -c anaconda pymongo=3.9.0
+# https://anaconda.org/anaconda/urllib3
+RUN conda install -c anaconda urllib3=1.25.8
+RUN conda install -c conda-forge fire=0.1.1
 
 # More GPGPU packages:
 # https://docs.anaconda.com/anaconda/user-guide/tasks/gpu-packages/
@@ -20,7 +12,6 @@ RUN conda install -c anaconda cudatoolkit
 RUN conda install -c conda-forge pocl
 # RUN conda install -c conda-forge khronos-opencl-icd-loader
 RUN conda install -c conda-forge pyopencl
-
 
 # Prepare files.
 COPY main.py /main.py
