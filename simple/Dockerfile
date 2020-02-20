@@ -13,6 +13,12 @@ RUN wget \
     && rm -f Miniconda3-latest-Linux-x86_64.sh \
 RUN conda --version
 
+# More GPGPU packages:
+# https://docs.anaconda.com/anaconda/user-guide/tasks/gpu-packages/
+# RUN conda install -c hcc cuda-driver
+RUN conda install -c anaconda cudatoolkit 
+RUN conda install -c conda-forge pocl
+RUN conda install -c conda-forge khronos-opencl-icd-loader
 RUN conda install -c conda-forge pyopencl
 
 

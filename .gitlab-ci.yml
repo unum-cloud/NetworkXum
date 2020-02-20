@@ -26,20 +26,20 @@ deploy-with-gpus:
     url: ashvardanian.com
   script:
     - ssh av@109.167.128.35 -p 7022 "cd ~/apps/PyCler && git pull && docker build -t unum/pycler/simple ./simple && docker run -d --gpus all --rm --name test-simple unum/pycler/simple"
-  when: manual
   tags:
     - docker
   only:
     - master
+  # when: manual
     
-stage-with-gpus:
-  type: deploy
-  environment:
-    name: staging
-    url: ashvardanian.com
-  script:
-    - ssh av@109.167.128.35 -p 7022 "docker run --gpus all --name test-nvidia nvidia/cuda nvidia-smi"
-  tags:
-    - docker
-  only:
-    - master
+# stage-with-gpus:
+#   type: deploy
+#   environment:
+#     name: staging
+#     url: ashvardanian.com
+#   script:
+#     - ssh av@109.167.128.35 -p 7022 "docker run --gpus all --name test-nvidia nvidia/cuda nvidia-smi"
+#   tags:
+#     - docker
+#   only:
+#     - master
