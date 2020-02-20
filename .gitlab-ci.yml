@@ -1,4 +1,4 @@
-image: arcatdmz/docker-compose-git
+image: ubuntu:18.04
 
 variables:
   DOCKER_DRIVER: overlay2
@@ -19,14 +19,6 @@ before_script:
   - mkdir -p ~/.ssh
   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   
-simple:
-  stage: build
-  script:
-    - docker build -t unum/pycler/simple ./simple
-    - docker run --gpus all unum/pycler/simple
-  tags:
-    - docker
-
 deploy-with-gpus:
   type: deploy
   environment:
