@@ -12,6 +12,7 @@ RUN conda install -c anaconda cudatoolkit
 RUN conda install -c conda-forge pocl
 # RUN conda install -c conda-forge khronos-opencl-icd-loader
 RUN conda install -c conda-forge pyopencl
+RUN conda install -c conda-forge binutils
 
 # Prepare files.
 COPY main.py /main.py
