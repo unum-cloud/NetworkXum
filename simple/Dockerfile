@@ -1,9 +1,9 @@
 FROM continuumio/miniconda3:latest
 # https://anaconda.org/anaconda/pymongo
-RUN conda install -c anaconda pymongo=3.9.0
+RUN conda install -c anaconda pymongo
 # https://anaconda.org/anaconda/urllib3
-RUN conda install -c anaconda urllib3=1.25.8
-RUN conda install -c conda-forge fire=0.1.1
+RUN conda install -c anaconda urllib3
+RUN conda install -c conda-forge fire
 
 # More GPGPU packages:
 # https://docs.anaconda.com/anaconda/user-guide/tasks/gpu-packages/
