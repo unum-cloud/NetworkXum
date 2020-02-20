@@ -9,6 +9,7 @@ RUN conda install pymongo urllib3 fire
 # https://gitlab.com/nvidia/container-images/opencl/
 RUN conda install cudatoolkit pocl intel-compute-runtime beignet ocl-icd-system ocl-icd
 RUN conda install pyopencl binutils
+RUN conda install clinfo
 
 # Prepare files.
 COPY main.py /main.py
