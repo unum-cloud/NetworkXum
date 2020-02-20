@@ -42,3 +42,4 @@ validate-bearmetal:
     - docker
   only:
     - master
+#  when: manual
