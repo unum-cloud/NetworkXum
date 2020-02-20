@@ -15,8 +15,16 @@ RUN conda install -c conda-forge pocl
 RUN conda install -c conda-forge pyopencl
 RUN conda install -c conda-forge binutils
 RUN conda install -c conda-forge nvidia-ml
+RUN conda install -c conda-forge clinfo 
 
-# Source: https://github.com/pkienzle/opencl_docker/blob/master/Dockerfile
+# Sources: 
+# https://github.com/pkienzle/opencl_docker/blob/master/Dockerfile
+# https://gitlab.com/nvidia/container-images/opencl/-/blob/ubuntu16.04/runtime/Dockerfile
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ocl-icd-libopencl1 \
+        clinfo && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /etc/OpenCL/vendors && \
     echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd
 ENV NVIDIA_VISIBLE_DEVICES all
