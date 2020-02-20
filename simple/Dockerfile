@@ -18,7 +18,7 @@ RUN conda --version
 # RUN conda install -c hcc cuda-driver
 RUN conda install -c anaconda cudatoolkit 
 RUN conda install -c conda-forge pocl
-RUN conda install -c conda-forge khronos-opencl-icd-loader
+# RUN conda install -c conda-forge khronos-opencl-icd-loader
 RUN conda install -c conda-forge pyopencl
 
 
