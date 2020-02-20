@@ -33,8 +33,6 @@ RUN conda install -c conda-forge eigen
 RUN conda install -c conda-forge opencv
 RUN conda install -c conda-forge halide
 RUN conda install -c conda-forge dlib
-RUN conda install -c anaconda tensorflow-gpu
-RUN conda install -c pytorch pytorch
 
 # Algorithms & Data Structures
 RUN conda install -c conda-forge xgboost

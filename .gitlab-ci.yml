@@ -43,3 +43,27 @@ validate-bearmetal:
   only:
     - master
 #  when: manual
+
+validate-tf:
+  type: deploy
+  environment:
+    name: production
+    url: ashvardanian.com
+  script:
+    - ssh av@109.167.128.35 -p 7022 "/bin/bash -s " < tf/deploy.sh
+  tags:
+    - docker
+  only:
+    - master
+
+validate-pytorch:
+  type: deploy
+  environment:
+    name: production
+    url: ashvardanian.com
+  script:
+    - ssh av@109.167.128.35 -p 7022 "/bin/bash -s " < pytorch/deploy.sh
+  tags:
+    - docker
+  only:
+    - master

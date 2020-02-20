@@ -41,7 +41,6 @@ def print_device(device):
   context = cl.Context([device])
   program = cl.Program(context, CODE).build()
 
-  print("Platform: " + platform.name)
   print("Device: " + device.name + " (" + cl.device_type.to_string(device.type) + ")")
   print("\tGlobal memory: \t\t" + str(device.global_mem_size / 2**30) + " GB")
   print("\tGlobal cache: \t\t" + str(device.global_mem_cache_size / 2**10) + " KB (" + cl.device_mem_cache_type.to_string(device.global_mem_cache_type) + ")")
@@ -60,6 +59,7 @@ def print_device(device):
 def print_devices():
   for platform in cl.get_platforms():
     for device in platform.get_devices():
+      print("----Platform: " + platform.name + "\n\n")
       print_device(device)
 
 print('Listing available devices!')
