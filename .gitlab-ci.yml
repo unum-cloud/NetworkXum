@@ -38,7 +38,7 @@ stage-with-gpus:
     name: staging
     url: ashvardanian.com
   script:
-    - ssh av@109.167.128.35 -p 7022 "docker run -d --gpus all --name test-simple nvidia/opencl:latest nvidia-smi"
+    - ssh av@109.167.128.35 -p 7022 "docker run --gpus all nvidia/cuda:10 nvidia-smi"
   tags:
     - docker
   only:
