@@ -25,7 +25,7 @@ deploy-with-gpus:
     name: production
     url: ashvardanian.com
   script:
-    - ssh av@109.167.128.35 -p 7022 "cd ~/apps/PyCler && git pull && docker build -t unum/pycler/simple ./simple && docker run -d --gpus all --rm --name test-simple unum/pycler/simple"
+    - ssh av@109.167.128.35 -p 7022 "cd ~/apps/PyCler && git pull && docker build -t unum/pycler/simple ./simple && docker run --gpus all unum/pycler/simple"
   tags:
     - docker
   only:
@@ -43,3 +43,4 @@ deploy-with-gpus:
 #     - docker
 #   only:
 #     - master
+
