@@ -42,7 +42,7 @@ validate-bearmetal:
     - docker
   only:
     - master
-#  when: manual
+  when: manual
 
 validate-tf:
   type: deploy
@@ -55,6 +55,7 @@ validate-tf:
     - docker
   only:
     - master
+  when: manual
 
 validate-pytorch:
   type: deploy
@@ -67,3 +68,4 @@ validate-pytorch:
     - docker
   only:
     - master
+  when: manual
