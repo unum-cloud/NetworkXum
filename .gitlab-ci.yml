@@ -4,9 +4,21 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
 
+# We need to configure the runner to use `SSH_PRIVATE_KEY`
+# environment variable from GitLab server. Links:
+# https://medium.com/@hfally/a-gitlab-ci-config-to-deploy-to-your-server-via-ssh-43bf3cf93775
+# https://docs.gitlab.com/ee/ci/ssh_keys/
+# https://gitlab.com/gitlab-org/gitlab-runner/issues/2365
 before_script:
-  - docker info
-
+  - apt-get update -qq
+  - apt-get install -qq git
+  # Setup SSH deploy keys
+  - 'which ssh-agent || ( apt-get install -qq openssh-client )'
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$SSH_PRIVATE_KEY")
+  - mkdir -p ~/.ssh
+  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  
 simple:
   stage: build
   script:
@@ -15,10 +27,27 @@ simple:
   tags:
     - docker
 
-nvidia:
-  stage: build
+deploy-with-gpus:
+  type: deploy
+  environment:
+    name: production
+    url: ashvardanian.com
   script:
-    - docker build -t unum/pycler/nvidia ./nvidia
-    - docker run --gpus all unum/pycler/nvidia
+    - ssh av@109.167.128.35 -p 7022 "cd ~/apps/PyCler && git pull && docker build -t unum/pycler/simple ./simple && docker run -d --gpus all --name test-simple unum/pycler/simple"
+  when: manual
   tags:
     - docker
+  only:
+    - master
+    
+stage-with-gpus:
+  type: deploy
+  environment:
+    name: staging
+    url: ashvardanian.com
+  script:
+    - ssh av@109.167.128.35 -p 7022 "docker run -d --gpus all --name test-simple nvidia/opencl:latest nvidia-smi"
+  tags:
+    - docker
+  only:
+    - master
