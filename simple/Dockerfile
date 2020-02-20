@@ -14,7 +14,7 @@ RUN wget \
 RUN conda --version
 
 RUN conda install -c conda-forge pyopencl
-RUN conda install -c rapidsai rapids
+
 
 # Prepare files.
 COPY main.py /main.py
