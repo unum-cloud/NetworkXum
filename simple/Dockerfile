@@ -14,6 +14,7 @@ RUN conda install -c conda-forge pyopencl
 RUN conda install -c conda-forge binutils
 RUN conda install -c conda-forge nvidia-ml
 RUN conda install -c conda-forge clinfo
+RUN conda install -c conda-forge ocl-icd
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ocl-icd-libopencl1 \
