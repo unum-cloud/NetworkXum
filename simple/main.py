@@ -62,9 +62,6 @@ def print_devices():
       print("----Platform: " + platform.name + "\n\n")
       print_device(device)
 
-print('Listing available devices!')
-print_devices()
-
-
 if __name__ == '__main__':
     print('Hi! We are in main!')
+    print_devices()
