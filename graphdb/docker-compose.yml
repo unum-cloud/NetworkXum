@@ -1,0 +1,12 @@
+version: '3.5'
+services:
+      
+  graphdb-orkut:
+    container_name: graphdb-orkut
+    image: 'unum/graphdb/bench:latest'
+    network_mode: host
+    volumes:
+      - '/home/av/Downloads/orkut.csv:/graph.csv'
+      - '/home/av/tmp/graphdb/orkut/:/db'
+    environment: 
+      GPU_RAM_SIZE: '4'
