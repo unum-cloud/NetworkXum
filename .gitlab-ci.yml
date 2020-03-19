@@ -1,71 +1,28 @@
-image: ubuntu:18.04
+image: arcatdmz/docker-compose-git
 
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
 
-# We need to configure the runner to use `SSH_PRIVATE_KEY`
-# environment variable from GitLab server. Links:
-# https://medium.com/@hfally/a-gitlab-ci-config-to-deploy-to-your-server-via-ssh-43bf3cf93775
-# https://docs.gitlab.com/ee/ci/ssh_keys/
-# https://gitlab.com/gitlab-org/gitlab-runner/issues/2365
 before_script:
-  - apt-get update -qq
-  - apt-get install -qq git
-  # Setup SSH deploy keys
-  - 'which ssh-agent || ( apt-get install -qq openssh-client )'
-  - eval $(ssh-agent -s)
-  - ssh-add <(echo "$SSH_PRIVATE_KEY")
-  - mkdir -p ~/.ssh
-  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  - docker info
   
-validate-simple:
-  type: deploy
-  environment:
-    name: production
-    url: ashvardanian.com
+build-simple:
+  stage: build
   script:
-    - ssh av@109.167.128.35 -p 7022 "/bin/bash -s " < simple/deploy.sh
+    - docker build -t unum/pycler/simple .
   tags:
     - docker
   only:
     - master
+    - tags
 
-validate-bearmetal:
-  type: deploy
-  environment:
-    name: production
-    url: ashvardanian.com
+bench-simple-on-gpus:
+  stage: deploy
   script:
-    - ssh av@109.167.128.35 -p 7022 "/bin/bash -s " < bearmetal/deploy.sh
+    - docker run --gpus=all -name="bench-simple-on-gpus" -d unum/pycler/simple
   tags:
     - docker
   only:
     - master
-  when: manual
-
-validate-tf:
-  type: deploy
-  environment:
-    name: production
-    url: ashvardanian.com
-  script:
-    - ssh av@109.167.128.35 -p 7022 "/bin/bash -s " < tf/deploy.sh
-  tags:
-    - docker
-  only:
-    - master
-  when: manual
-
-validate-pytorch:
-  type: deploy
-  environment:
-    name: production
-    url: ashvardanian.com
-  script:
-    - ssh av@109.167.128.35 -p 7022 "/bin/bash -s " < pytorch/deploy.sh
-  tags:
-    - docker
-  only:
-    - master
-  when: manual
+    - tags
