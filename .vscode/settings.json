@@ -1,16 +1,19 @@
 {
-    "python.pythonPath": "/usr/bin/python3",
-    
-    "gitlab.instanceUrl": "https://gitlab.ashvardanian.com",
+    // CI/CD.
+    "gitlab.instanceUrl": "https://gitlab.ashvardanian.com/unum/pybot",
     "gitlab.showStatusBarLinks": true,
-
+    // Language-specific.
+    "python.pythonPath": "~/miniconda3/bin/python",
+    // Environment:
     "workbench.editor.highlightModifiedTabs": true,
     "workbench.editor.limit.perEditorGroup": true,
     "workbench.editor.limit.value": 3,
-    "editor.formatOnPaste": false,
-    "editor.formatOnSave": false,
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
     "explorer.sortOrder": "type",
-    "_font_info_source": "https://github.com/tonsky/FiraCode/wiki/VS-Code-Instructions",
+    // Appearence:
+    // https://github.com/tonsky/FiraCode/wiki/VS-Code-Instructions
     "editor.fontFamily": "Fira Code",
-    "editor.fontLigatures": true
+    "editor.fontLigatures": true,
+    "workbench.preferredDarkColorTheme": "Default Light+",
 }
