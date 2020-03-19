@@ -6,15 +6,7 @@ print('Starting NumPy!')
 a_np = np.random.rand(50000).astype(np.float32)
 b_np = np.random.rand(50000).astype(np.float32)
 c_np = (a_np + b_np)
-
-CODE = """
-__kernel void sum(
-    __global const float *a_g, __global const float *b_g, __global float *res_g)
-{
-  int gid = get_global_id(0);
-  res_g[gid] = a_g[gid] + b_g[gid];
-}
-"""
+kernel_source = open('summation.cl', 'r').read()
 
 def execute_kernel(ctx, prg):
   print('Starting OpenCL queue!') 
@@ -39,7 +31,7 @@ def execute_kernel(ctx, prg):
 
 def print_device(device):
   context = cl.Context([device])
-  program = cl.Program(context, CODE).build()
+  program = cl.Program(context, kernel_source).build()
 
   print("Device: " + device.name + " (" + cl.device_type.to_string(device.type) + ")")
   print("\tGlobal memory: \t\t" + str(device.global_mem_size / 2**30) + " GB")
