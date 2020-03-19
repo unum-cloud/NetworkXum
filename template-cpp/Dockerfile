@@ -1,4 +1,5 @@
 FROM continuumio/miniconda3:latest
+RUN conda config --add channels conda-forge activisiongamescience
 
 # Compilers
 RUN conda install -c conda-forge clang
