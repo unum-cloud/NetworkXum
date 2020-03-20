@@ -3,7 +3,9 @@
     "gitlab.instanceUrl": "https://gitlab.ashvardanian.com/unum/pybot",
     "gitlab.showStatusBarLinks": true,
     // Language-specific.
+    // https://code.visualstudio.com/docs/python/settings-reference
     "python.pythonPath": "~/miniconda3/bin/python",
+    "python.condaPath": "~/miniconda3/bin/conda",
     // Environment:
     "workbench.editor.highlightModifiedTabs": true,
     "workbench.editor.limit.perEditorGroup": true,

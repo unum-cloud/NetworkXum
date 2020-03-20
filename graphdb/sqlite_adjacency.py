@@ -1,1 +1,0 @@
-# Columns are: "from_id", "to_id", "weight"
