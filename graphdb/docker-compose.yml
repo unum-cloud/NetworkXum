@@ -2,15 +2,32 @@ version: '3.5'
 services:
   
   # Separate application for every dataset:
-  # graphdb-orkut:
-  #   container_name: graphdb-orkut
-  #   image: 'unum/graphdb/bench:latest'
-  #   volumes:
-  #     - '~/Datasets/:/graph.csv'
-  #     - '~/benchmarks/rocksdb:/var/lib/rocksdb'
-  #     - '~/benchmarks/sqlite:/var/lib/sqlite'
-  #   environment: 
-  #     GPU_RAM_SIZE: '4'
+  graphdb-orkut:
+    container_name: graphdb-orkut
+    image: 'unum/graphdb/bench:latest'
+    volumes:
+      - '~/benchmarks/rocksdb:/var/lib/rocksdb'
+      - '~/benchmarks/sqlite:/var/lib/sqlite'
+    environment: 
+      FILE_URL: 'http://nrvis.com/download/data/heter/orkut.zip'
+
+  graphdb-friendster:
+    container_name: graphdb-friendster
+    image: 'unum/graphdb/bench:latest'
+    volumes:
+      - '~/benchmarks/rocksdb:/var/lib/rocksdb'
+      - '~/benchmarks/sqlite:/var/lib/sqlite'
+    environment: 
+      FILE_URL: 'http://nrvis.com/download/data/heter/orkut.zip'
+
+  graphdb-twitter:
+    container_name: graphdb-twitter
+    image: 'unum/graphdb/bench:latest'
+    volumes:
+      - '~/benchmarks/rocksdb:/var/lib/rocksdb'
+      - '~/benchmarks/sqlite:/var/lib/sqlite'
+    environment: 
+      FILE_URL: 'http://nrvis.com/download/data/heter/orkut.zip'
 
   # The infrastructure required for all of that to work:
   # https://hub.docker.com/_/mongo

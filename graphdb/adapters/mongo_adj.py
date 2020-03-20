@@ -35,14 +35,14 @@ class GraphMongoAdjacency(GraphBase):
         })
         return result.deleted_count >= 1
 
-    def edge_directed(self, v_from, v_to) -> Optional[object]:
+    def find_directed(self, v_from, v_to) -> Optional[object]:
         result = self.table.find_one(filter={
             'from': v_from,
             'to': v_to,
         })
         return result
 
-    def edge_undirected(self, v1, v2) -> Optional[object]:
+    def find_undirected(self, v1, v2) -> Optional[object]:
         result = self.table.find_one(filter={
             '$or': [{
                 'from': v1,
@@ -64,7 +64,7 @@ class GraphMongoAdjacency(GraphBase):
         result = self.table.find(filter={'to': v})
         return list(result)
 
-    def edges_friends(self, v: int) -> List[object]:
+    def edges_related(self, v: int) -> List[object]:
         result = self.table.find(filter={
             '$or': [{
                 'from': v,
@@ -74,9 +74,9 @@ class GraphMongoAdjacency(GraphBase):
         })
         return list(result)
 
-    def vertexes_friends(self, v: int) -> Set[int]:
+    def vertexes_related(self, v: int) -> Set[int]:
         vs_unique = set()
-        for e in self.edges_friends(v):
+        for e in self.edges_related(v):
             vs_unique.insert(e['from'])
             vs_unique.insert(e['to'])
         vs_unique.remove(v)
@@ -84,15 +84,15 @@ class GraphMongoAdjacency(GraphBase):
 
     # Wider range of neighbours
 
-    def vertexes_friends_of_friends(self, v: int) -> Set[int]:
+    def vertexes_related_to_related(self, v: int) -> Set[int]:
         pass
 
-    def vertexes_friends_of_group(self, vs) -> Set[int]:
+    def vertexes_related_to_group(self, vs) -> Set[int]:
         pass
 
     # Metadata
 
-    def count_degree(self, v: int) -> (int, float):
+    def count_related(self, v: int) -> (int, float):
         result = self.table.aggregate(pipeline=[
             {
                 '$match': {
@@ -152,6 +152,9 @@ class GraphMongoAdjacency(GraphBase):
         return result['count'], result['weight']
 
     # Bulk methods
+
+    def delete_many(self, es: List[object]) -> int:
+        pass
 
     def insert_many(self, es: List[object]) -> int:
         '''Supports up to 1000 operations'''

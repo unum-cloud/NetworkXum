@@ -3,8 +3,12 @@ from itertools import chain, islice
 import csv
 
 
-def neighbours(edges: list, known_id) -> list:
-    pass
+def chunks(iterable, size):
+    # Borrowed from here:
+    # https://stackoverflow.com/a/24527424
+    iterator = iter(iterable)
+    for first in iterator:
+        yield chain([first], islice(iterator, size - 1))
 
 
 def yield_edges_from(filepath: str):
@@ -24,14 +28,6 @@ def yield_edges_from(filepath: str):
             yield e
 
 
-def chunks(iterable, size):
-    # Borrowed from here:
-    # https://stackoverflow.com/a/24527424
-    iterator = iter(iterable)
-    for first in iterator:
-        yield chain([first], islice(iterator, size - 1))
-
-
 class StatsCounter:
     def __init__(self):
         self.time_elapsed = 0
@@ -46,3 +42,7 @@ class StatsCounter:
 
     def time_average(self):
         return self.time_elapsed / self.count_operations
+
+
+def neighbours(edges: list, known_id) -> list:
+    pass
