@@ -1,26 +1,42 @@
-# Benchmarks for different variants of Graph Storage
+# PyGraphDB
 
-# Environment variables:
+A library (and benchmark) of graph-like adaptors for conventional persistent storage engines. <br/>
+Supports both SQL and NoSQL backends, embedded databases and full scale servers. <br/>
+Was benchmarked with MongoDB, RocksDB, ArangoDB, SQLite, PostgreSQL and MySQL backends. <br/>
+Implements the same [interface](adapters/base.py) for every one of those backends.
+
+## Project Structure
+
+* [adapters](adapters) - contains Pythonic wrappers for DBs.
+* [Dockerfile](Dockerfile) - contains Docker image of benchmark application.
+* [docker-compose.yml](docker-compose.yml) - instantiates that image for selected datasets and alse spins up infrastructure for testing. Comment out the second part of it if you don't want to create new DB containers.
+
+## Environment Variables
 
 ```sh
-GPU_RAM_SIZE 4
-URI_MONGO_DB localhost:27017
-URI_POSTGRE_SQL localhost:5432
-URI_MY_SQL localhost:3306
+URI_FILE=http://networkrepository.com/orkut.php # Can be a local CSV file or archeive.
+URI_MONGO_DB=mongodb://localhost:27017 # Clear to disable Mongo benchmarks.
+URI_POSTGRES=localhost:5432 # Clear to disable Postgres benchmarks.
+URI_MY_SQL=localhost:3306 # Clear to disable MySQL benchmarks.
+URI_ROCKS_DB="/var/lib/rocksdb/" # Clear to disable RocksDB benchmarks.
+URI_SQLITE="/var/lib/sqlite/" # Clear to disable SQLite benchmarks.
 ```
+Remainging can be found listed in the [Dockerfile](Dockerfile).
 
-# Tested datasets:
+## Datasets
 
-http://networkrepository.com/orkut.php
-http://networkrepository.com/soc-friendster.php
-http://networkrepository.com/soc-sinaweibo.php
-http://networkrepository.com/web-wikipedia-link-en13-all.php
-http://networkrepository.com/web-ClueWeb09.php
-http://networkrepository.com/soc-twitter.php
+This application accepts data in a shape of adjacency list. <br/>
+The Docker image will download the file from `${FILE_URL}` and unpack it if it's an archeive. <br/>
+Here are some relatively big graphs you can use for benchmarks:
 
-## Related notes:
+* Orkut social network. 2Gb. `|V|`=3M, `|E|`=117M. [Source](http://networkrepository.com/orkut.php).
+* Sina Weibo social network. 2Gb. `|V|`=21M, `|E|`=261M. [Source](http://networkrepository.com/soc-sinaweibo.php).
+* Twitter social network. 6Gb. `|V|`=58M, `|E|`=265M. [Source](http://networkrepository.com/soc-twitter.php).
+* Friendster social network. 9Gb. `|V|`=65M, `|E|`=1.8B. [Source](http://networkrepository.com/soc-friendster.php).
+* ClueWeb 2009 network. 40Gb. `|V|`=1.7B, `|E|`=7.8B. [Source](http://networkrepository.com/web-ClueWeb09.php).
+
+## Related notes
 
 * Alternative Graph Storage Approaches
 * Untouched datasets
 * PyCler Graph DBs benchmark
-* [Emulating standard python containers](https://stackoverflow.com/a/21380728)
