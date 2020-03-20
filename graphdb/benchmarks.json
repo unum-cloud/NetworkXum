@@ -1,0 +1,9 @@
+[
+    {
+        "device": "Macbook Pro 2019",
+        "disk": "NVMe",
+        "dataset": "Orkut",
+        "duration": 20,
+        "operation": "friends-of-friends"
+    }
+]

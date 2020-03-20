@@ -1,12 +1,74 @@
 version: '3.5'
 services:
-      
-  graphdb-orkut:
-    container_name: graphdb-orkut
-    image: 'unum/graphdb/bench:latest'
-    network_mode: host
+  
+  # Separate application for every dataset:
+  # graphdb-orkut:
+  #   container_name: graphdb-orkut
+  #   image: 'unum/graphdb/bench:latest'
+  #   volumes:
+  #     - '~/Datasets/:/graph.csv'
+  #     - '~/benchmarks/rocksdb:/var/lib/rocksdb'
+  #     - '~/benchmarks/sqlite:/var/lib/sqlite'
+  #   environment: 
+  #     GPU_RAM_SIZE: '4'
+
+  # The infrastructure required for all of that to work:
+  # https://hub.docker.com/_/mongo
+  graphdb-mongo:
+    container_name: graphdb-mongo
+    image: 'mongo'
     volumes:
-      - '/home/av/Downloads/orkut.csv:/graph.csv'
-      - '/home/av/tmp/graphdb/orkut/:/db'
+      - '~/benchmarks/mongo:/data/db'
+    ports:
+      - '27017:27017'
     environment: 
-      GPU_RAM_SIZE: '4'
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: 'temptemp'
+
+  graphdb-postgres:
+    container_name: graphdb-postgres
+    image: 'postgres'
+    volumes:
+      - '~/benchmarks/postgres:/var/lib/postgresql/data'
+    ports:
+      - '5432:5432'
+    environment: 
+      POSTGRES_USER: 'root'
+      POSTGRES_PASSWORD: 'temptemp'
+
+  # https://hub.docker.com/_/mysql
+  graphdb-mysql:
+    container_name: graphdb-mysql
+    image: 'mysql'
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - '~/benchmarks/mysql:/var/lib/mysql'
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: 'temptemp'
+      MYSQL_USER: 'root'
+      MYSQL_PASSWORD: 'temptemp'
+
+  # https://hub.docker.com/_/arangodb
+  graphdb-arangodb:
+    container_name: graphdb-arangodb
+    image: 'arangodb'
+    volumes:
+      - '~/benchmarks/arangodb:/var/lib/arangodb3'
+    ports:
+      - '8529:8529'
+    environment:
+      ARANGO_STORAGE_ENGINE: 'mmfiles' # 'rocksdb'
+      ARANGO_ROOT_PASSWORD: 'temptemp'
+
+  graphdb-neo4j:
+    container_name: graphdb-neo4j
+    image: 'neo4j'
+    volumes:
+      - '~/benchmarks/neo4j:/data'
+    ports:
+      - '7474:7474' # http
+      - '7687:7687' # bolt
+    environment:
+      NEO4J_AUTH: 'none'
