@@ -23,10 +23,10 @@ class GraphNeo4j(GraphBase):
     def __iter__(self):
         pass
 
-    def edge_directed(self, v_from, v_to) -> Optional[object]:
+    def find_directed(self, v_from, v_to) -> Optional[object]:
         pass
 
-    def edge_undirected(self, v1, v2) -> Optional[object]:
+    def find_undirected(self, v1, v2) -> Optional[object]:
         pass
 
     # Relatives
@@ -37,23 +37,23 @@ class GraphNeo4j(GraphBase):
     def edges_to(self, v: int) -> List[object]:
         pass
 
-    def edges_friends(self, v: int) -> List[object]:
+    def edges_related(self, v: int) -> List[object]:
         pass
 
-    def vertexes_friends(self, v: int) -> Set[int]:
+    def vertexes_related(self, v: int) -> Set[int]:
         pass
 
     # Wider range of neighbours
 
-    def vertexes_friends_of_friends(self, v: int) -> Set[int]:
+    def vertexes_related_to_related(self, v: int) -> Set[int]:
         pass
 
-    def vertexes_friends_of_group(self, vs) -> Set[int]:
+    def vertexes_related_to_group(self, vs) -> Set[int]:
         pass
 
     # Metadata
 
-    def count_degree(self, v: int) -> (int, float):
+    def count_related(self, v: int) -> (int, float):
         pass
 
     def count_followers(self, v: int) -> (int, float):

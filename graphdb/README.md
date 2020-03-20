@@ -8,6 +8,8 @@ Implements the same [interface](adapters/base.py) for every one of those backend
 ## Project Structure
 
 * [adapters](adapters) - contains Pythonic wrappers for DBs.
+* [benchmarks.json](benchmarks.json) - contains machine-readable results of previous benchmarks.
+* [benchmarks.md](benchmarks.md) - contains human-readable results of previous benchmarks.
 * [Dockerfile](Dockerfile) - contains Docker image of benchmark application.
 * [docker-compose.yml](docker-compose.yml) - instantiates that image for selected datasets and alse spins up infrastructure for testing. Comment out the second part of it if you don't want to create new DB containers.
 
@@ -21,7 +23,7 @@ URI_MY_SQL=localhost:3306 # Clear to disable MySQL benchmarks.
 URI_ROCKS_DB="/var/lib/rocksdb/" # Clear to disable RocksDB benchmarks.
 URI_SQLITE="/var/lib/sqlite/" # Clear to disable SQLite benchmarks.
 ```
-Remainging can be found listed in the [Dockerfile](Dockerfile).
+Remaining can be found listed in the [Dockerfile](Dockerfile).
 
 ## Datasets
 
