@@ -13,9 +13,9 @@ class GraphMongoAdjacency(GraphBase):
         self.db = MongoClient(url)
         self.table = self.db[db_name][collection_name]
 
-    def create_index(self):
-        self.table.create_index('from', background=True, sparse=True)
-        self.table.create_index('to', background=True, sparse=True)
+    def create_index(self, background=False):
+        self.table.create_index('from', background=background, sparse=True)
+        self.table.create_index('to', background=background, sparse=True)
 
     def insert(self, e: object) -> bool:
         result = self.table.update_one(
@@ -28,35 +28,12 @@ class GraphMongoAdjacency(GraphBase):
         )
         return result.modified_count >= 1
 
-    def insert_many(self, es: List[object]) -> int:
-        '''Supports up to 1000 operations'''
-        ops = list()
-        for e in es:
-            op = UpdateOne(
-                filter={
-                    'from': e['from'],
-                    'to': e['to'],
-                },
-                update=e,
-                upsert=True,
-            )
-            ops.append(op)
-        result = table.bulk_write(requests=ops, ordered=False)
-        return int(result.bulk_api_result['upserted'])
-
     def delete(self, e: object) -> bool:
         result = self.table.delete_one(filter={
             'from': e['from'],
             'to': e['to'],
         })
         return result.deleted_count >= 1
-
-    def __iter__(self):
-        # Yield all edges.
-        pass
-
-    def __len__(self):
-        pass
 
     def edge_directed(self, v_from, v_to) -> Optional[object]:
         result = self.table.find_one(filter={
@@ -173,3 +150,25 @@ class GraphMongoAdjacency(GraphBase):
         if len(result) == 0:
             return 0, 0
         return result['count'], result['weight']
+
+    # Bulk methods
+
+    def insert_many(self, es: List[object]) -> int:
+        '''Supports up to 1000 operations'''
+        ops = list()
+        for e in es:
+            op = UpdateOne(
+                filter={
+                    'from': e['from'],
+                    'to': e['to'],
+                },
+                update=e,
+                upsert=True,
+            )
+            ops.append(op)
+        result = table.bulk_write(requests=ops, ordered=False)
+        return int(result.bulk_api_result['upserted'])
+
+    def import_file(self, filepath: str):
+        for es in chunks(yield_edges_from(filepath), 1000):
+            self.insert_many(list(es))
