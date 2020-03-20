@@ -1,83 +1,84 @@
-# Columns are: "from_id", "to_id", "weight"
-# Allowed databases:
-# - PostgreSQL
-# - SQLite
-# - MySQL
-from shared import *
+from abc import ABC, abstractmethod
 
 
-class GraphSQL(GraphBase):
+class GraphBase(object):
 
-    def __init__(self, url, table_name: str):
+    def __init__(self):
         super().__init__()
-        self.table_name = table_name
-        pass
-
-    def create_index(self):
-        f'''
-        CREATE INDEX index_from
-        ON {self.table_name}(from); 
-        CREATE INDEX index_to
-        ON {self.table_name}(to); 
-        '''
-        pass
-
-    def insert(self, e: object) -> bool:
-        pass
-
-    def delete(self, e: object) -> bool:
         pass
 
     def __iter__(self):
         pass
 
+    def __len__(self):
+        pass
+
+    @abstractmethod
+    def create_index(self):
+        pass
+
+    @abstractmethod
+    def insert(self, e: object) -> bool:
+        pass
+
+    @abstractmethod
+    def delete(self, e: object) -> bool:
+        pass
+
+    @abstractmethod
     def edge_directed(self, v_from, v_to) -> Optional[object]:
         pass
 
+    @abstractmethod
     def edge_undirected(self, v1, v2) -> Optional[object]:
         pass
 
     # Relatives
 
+    @abstractmethod
     def edges_from(self, v: int) -> List[object]:
-        f'''
-        SELECT * FROM {self.table_name}
-        WHERE from='{v}';
-        '''
         pass
 
+    @abstractmethod
     def edges_to(self, v: int) -> List[object]:
-        f'''
-        SELECT * FROM {self.table_name}
-        WHERE to='{v}';
-        '''
         pass
 
+    @abstractmethod
     def edges_friends(self, v: int) -> List[object]:
-        f'''
-        SELECT * FROM {self.table_name}
-        WHERE from={v} OR to='{v}';
-        '''
         pass
 
+    @abstractmethod
     def vertexes_friends(self, v: int) -> Set[int]:
         pass
 
     # Wider range of neighbours
 
+    @abstractmethod
     def vertexes_friends_of_friends(self, v: int) -> Set[int]:
         pass
 
+    @abstractmethod
     def vertexes_friends_of_group(self, vs) -> Set[int]:
         pass
 
     # Metadata
 
+    @abstractmethod
     def count_degree(self, v: int) -> (int, float):
         pass
 
+    @abstractmethod
     def count_followers(self, v: int) -> (int, float):
         pass
 
+    @abstractmethod
     def count_following(self, v: int) -> (int, float):
+        pass
+
+    @abstractmethod
+    def count_vertexes(self) -> int:
+        pass
+
+    @abstractmethod
+    def count_edges(self) -> int:
         pass

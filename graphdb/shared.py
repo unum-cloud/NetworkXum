@@ -1,89 +1,48 @@
-from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Generator, Set, Tuple
+from itertools import chain, islice
+import csv
 
 
 def neighbours(edges: list, known_id) -> list:
     pass
 
 
-class GraphBase(object):
+def yield_edges_from(filepath: str):
+    e = {
+        'from': None,
+        'to': None,
+        'weight': 1.0,
+    }
+    with open(filepath, 'r') as f:
+        reader = csv.reader(f, delimiter=',')
+        for i, columns in enumerate(reader):
+            if len(columns) < 2:
+                continue
+            e['from'] = int(columns[0])
+            e['to'] = int(columns[1])
+            e['weight'] = float(columns[2]) if len(columns) > 2 else 1.0
+            yield e
 
+
+def chunks(iterable, size):
+    # Borrowed from here:
+    # https://stackoverflow.com/a/24527424
+    iterator = iter(iterable)
+    for first in iterator:
+        yield chain([first], islice(iterator, size - 1))
+
+
+class StatsCounter:
     def __init__(self):
-        super().__init__()
-        pass
+        self.time_elapsed = 0
+        self.count_operations = 0
 
-    def __iter__(self):
-        pass
+    def handle(self, func):
+        before = time.time()
+        func()
+        elapsed = before - time.time()
+        self.time_elapsed += elapsed
+        self.count_operations += 1
 
-    def __len__(self):
-        pass
-
-    @abstractmethod
-    def create_index(self):
-        pass
-
-    @abstractmethod
-    def insert(self, e: object) -> bool:
-        pass
-
-    @abstractmethod
-    def delete(self, e: object) -> bool:
-        pass
-
-    @abstractmethod
-    def edge_directed(self, v_from, v_to) -> Optional[object]:
-        pass
-
-    @abstractmethod
-    def edge_undirected(self, v1, v2) -> Optional[object]:
-        pass
-
-    # Relatives
-
-    @abstractmethod
-    def edges_from(self, v: int) -> List[object]:
-        pass
-
-    @abstractmethod
-    def edges_to(self, v: int) -> List[object]:
-        pass
-
-    @abstractmethod
-    def edges_friends(self, v: int) -> List[object]:
-        pass
-
-    @abstractmethod
-    def vertexes_friends(self, v: int) -> Set[int]:
-        pass
-
-    # Wider range of neighbours
-
-    @abstractmethod
-    def vertexes_friends_of_friends(self, v: int) -> Set[int]:
-        pass
-
-    @abstractmethod
-    def vertexes_friends_of_group(self, vs) -> Set[int]:
-        pass
-
-    # Metadata
-
-    @abstractmethod
-    def count_degree(self, v: int) -> (int, float):
-        pass
-
-    @abstractmethod
-    def count_followers(self, v: int) -> (int, float):
-        pass
-
-    @abstractmethod
-    def count_following(self, v: int) -> (int, float):
-        pass
-
-    @abstractmethod
-    def count_vertexes(self) -> int:
-        pass
-
-    @abstractmethod
-    def count_edges(self) -> int:
-        pass
+    def time_average(self):
+        return self.time_elapsed / self.count_operations
