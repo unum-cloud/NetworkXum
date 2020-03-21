@@ -12,7 +12,10 @@
     "workbench.editor.limit.value": 3,
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
+    "editor.minimap.size": "fit",
+    "editor.unfoldOnClickAfterEndOfLine": true,
     "explorer.sortOrder": "type",
+    "timeline.showView": true,
     // Appearence:
     // https://github.com/tonsky/FiraCode/wiki/VS-Code-Instructions
     "editor.fontFamily": "Fira Code",

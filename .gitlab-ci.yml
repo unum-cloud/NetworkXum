@@ -10,7 +10,7 @@ before_script:
 build-simple:
   stage: build
   script:
-    - docker build -t unum/pycler/simple .
+    - docker build --no-cache -t unum/pycler/simple .
   tags:
     - docker
   only:

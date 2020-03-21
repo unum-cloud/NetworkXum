@@ -8,6 +8,7 @@ Implements the same [interface](adapters/base.py) for every one of those backend
 ## Project Structure
 
 * [adapters](adapters) - contains Pythonic wrappers for DBs.
+* [known_datasets.json](known_datasets.json) - contains estimated lower bounds on the number of unique nodes and edges in each dataset.
 * [benchmarks.json](benchmarks.json) - contains machine-readable results of previous benchmarks.
 * [benchmarks.md](benchmarks.md) - contains human-readable results of previous benchmarks.
 * [Dockerfile](Dockerfile) - contains Docker image of benchmark application.

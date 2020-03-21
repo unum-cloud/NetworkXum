@@ -2,8 +2,10 @@
     {
         "device": "Macbook Pro 2019",
         "disk": "NVMe",
-        "dataset": "Orkut",
-        "duration": 20,
-        "operation": "friends-of-friends"
+        "dataset": "orkut",
+        "time_elapsed": 20,
+        "count_operations": 10,
+        "adapter_class": "GraphMongoAdjacency",
+        "operation": "find-e-directed"
     }
 ]
