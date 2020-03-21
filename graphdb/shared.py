@@ -17,21 +17,30 @@ def yield_edges_from(filepath: str):
         'to': None,
         'weight': 1.0,
     }
+    lines_to_skip = 0
+    if filepath.endswith('.mtx'):
+        lines_to_skip = 2
     with open(filepath, 'r') as f:
         reader = csv.reader(f, delimiter=',')
         for i, columns in enumerate(reader):
+            if i < lines_to_skip:
+                continue
             if len(columns) < 2:
                 continue
             e['from'] = int(columns[0])
+            if e['from'] is None:
+                continue
             e['to'] = int(columns[1])
+            if e['to'] is None:
+                continue
             e['weight'] = float(columns[2]) if len(columns) > 2 else 1.0
             yield e
 
 
 class StatsCounter:
-    def __init__(self):
-        self.time_elapsed = 0
-        self.count_operations = 0
+    def __init__(self, time_elapsed=0, count_operations=0):
+        self.time_elapsed = time_elapsed
+        self.count_operations = count_operations
 
     def handle(self, func):
         before = time.time()
