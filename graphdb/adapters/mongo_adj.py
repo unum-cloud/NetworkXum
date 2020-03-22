@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from pymongo import UpdateOne
 
 from shared import *
+from adapters.base import GraphBase
 
 
 class GraphMongoAdjacency(GraphBase):

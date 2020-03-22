@@ -7,22 +7,3 @@ variables:
 before_script:
   - docker info
   
-build-simple:
-  stage: build
-  script:
-    - docker build --no-cache -t unum/pycler/simple .
-  tags:
-    - docker
-  only:
-    - master
-    - tags
-
-bench-simple-on-gpus:
-  stage: deploy
-  script:
-    - docker run --gpus=all -name="bench-simple-on-gpus" -d unum/pycler/simple
-  tags:
-    - docker
-  only:
-    - master
-    - tags

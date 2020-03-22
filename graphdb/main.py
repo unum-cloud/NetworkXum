@@ -1,4 +1,5 @@
 import time
+import random
 from random import SystemRandom
 from copy import copy
 import json
@@ -16,12 +17,14 @@ from shared import *
 print('Welcome to GraphDB benchmarks!')
 print('- Reading settings')
 sampling_ratio = float(os.getenv('SAMPLING_RATIO', '0.01'))
+sample_from_real_data = os.getenv('SAMPLE_FROM_REAL_DATA', '1') == '1'
 count_nodes = int(os.getenv('COUNT_NODES', '0'))
 count_edges = int(os.getenv('COUNT_EDGES', '0'))
-count_finds = int(os.getenv('COUNT_FINDS', '0'))
-count_analytics = int(os.getenv('COUNT_ANALYTICS', '0'))
-count_changes = int(os.getenv('COUNT_CHANGES', '0'))
-file_path = os.getenv('FILE_PATH', '0')
+count_finds = int(os.getenv('COUNT_FINDS', '10000'))
+count_analytics = int(os.getenv('COUNT_ANALYTICS', '1000'))
+count_changes = int(os.getenv('COUNT_CHANGES', '10000'))
+file_path = os.getenv('FILE_PATH',
+                      '/Users/av/Datasets/graph-communities/fb-pages-company.edges')
 
 print('- Preparing global variables')
 edges_to_query = []
@@ -30,12 +33,13 @@ nodes_to_analyze = []
 edges_to_remove = []
 edges_to_insert = []
 stats_per_adapter_per_operation = dict()
-known_datasets = json.load('known_datasets.json')
+benchmarks = []
+# known_datasets = json.load(open('known_datasets.json', 'r'))
 
 
-def restore_previous_stats(file_path='benchmarks.json'):
+def restore_previous_stats():
     print('- Resting previous benchmarks')
-    benchmarks = json.load(file_path)
+    benchmarks = json.load(open('benchmarks.json', 'r'))
     device_name = platform.node()
     for bench in benchmarks:
         if bench['device'] != device_name:
@@ -46,6 +50,11 @@ def restore_previous_stats(file_path='benchmarks.json'):
         c = bench['count_operations']
         s = StatsCounter(time_elapsed=t, count_operations=c)
         stats_per_adapter_per_operation[a][o] = s
+
+
+def dump_updated_results():
+    stats_per_adapter_per_operation
+    json.dump(benchmarks, open('benchmarks.json', 'w'))
 
 
 def select_tasks(
@@ -64,7 +73,7 @@ def select_tasks(
     # Sample edges and node IDs.
     select_edges = list()
     select_nodes = set()
-    if count_nodes == 0:
+    if count_nodes == 0 or sample_from_real_data:
         # Sample from the actual file.
         rnd = SystemRandom()
         for e in yield_edges_from(file_path):
@@ -253,6 +262,7 @@ def benchmark(file_path: str, db: GraphBase, stats: dict):
 
 
 filename = file_path
+restore_previous_stats()
 select_tasks(file_path)
 dbs = [
     GraphMongoAdjacency(
@@ -261,15 +271,16 @@ dbs = [
         collection_name=filename,
     ),
     # GraphSQL(
-    #     url='mysql://localhost:27017',
-    #     table_name=filename
+    #     url='mysql://localhost:3306',
+    #     table_name=filename,
     # ),
     # GraphSQL(
-    #     url='postgres://localhost:27017',
-    #     table_name=filename
+    #     url='postgres://localhost:5432',
+    #     table_name=filename,
     # ),
 ]
 for db in dbs:
-    class_name = type(db).__str__
+    class_name = str(type(db))
     counters = stats_per_adapter_per_operation[class_name]
     benchmark(file_path, db, counters)
+dump_updated_results()

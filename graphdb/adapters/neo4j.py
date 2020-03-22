@@ -1,6 +1,7 @@
 from neo4j import GraphDatabase
 
 from shared import *
+from adapters.base import GraphBase
 
 
 class GraphNeo4j(GraphBase):
