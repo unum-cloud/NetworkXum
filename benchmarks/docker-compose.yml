@@ -1,7 +1,11 @@
 version: '3.5'
 services:
   
+  # --------------------------
   # Separate application for every dataset:
+  # --------------------------
+
+  # http://networkrepository.com/fb-pages-company.php
   graphdb-task-communities:
     container_name: graphdb-task-communities
     image: 'unum/pycler/graphdb:latest'
@@ -14,6 +18,7 @@ services:
       COUNT_EDGES: '52309'
       SAMPLE_FROM_REAL_DATA: '1'
       
+  # http://networkrepository.com/orkut.php
   graphdb-task-orkut:
     container_name: graphdb-task-orkut
     image: 'unum/pycler/graphdb:latest'
@@ -25,6 +30,7 @@ services:
       COUNT_NODES: '2783196'
       COUNT_EDGES: '444222386'
 
+  # http://networkrepository.com/soc-sinaweibo.php
   graphdb-task-sinaweibo:
     container_name: graphdb-task-sinaweibo
     image: 'unum/pycler/graphdb:latest'
@@ -36,6 +42,7 @@ services:
       COUNT_NODES: '58655849'
       COUNT_EDGES: '261321071'
 
+  # http://networkrepository.com/soc-twitter.php
   graphdb-task-twitter:
     container_name: graphdb-task-twitter
     image: 'unum/pycler/graphdb:latest'
@@ -47,6 +54,7 @@ services:
       COUNT_NODES: '16751863'
       COUNT_EDGES: '1468365182'
 
+  # http://networkrepository.com/soc-friendster.php
   graphdb-task-friendster:
     container_name: graphdb-task-friendster
     image: 'unum/pycler/graphdb:latest'
@@ -58,7 +66,10 @@ services:
       COUNT_NODES: '65608366'
       COUNT_EDGES: '1806067135'
 
+  # --------------------------
   # The infrastructure required for all of that to work:
+  # --------------------------
+
   # https://hub.docker.com/_/mongo
   graphdb-store-mongo:
     container_name: graphdb-store-mongo
