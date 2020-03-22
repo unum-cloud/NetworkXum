@@ -4,6 +4,7 @@
 # - SQLite
 # - MySQL
 from shared import *
+from adapters.base import GraphBase
 
 
 class GraphSQL(GraphBase):
