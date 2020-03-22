@@ -1,8 +1,6 @@
 # PYthon + OpenCL + workER = pycler
 
-A set of libraries and their benchmarks, that harness the power of GPUs via OpenCL, but pack it into simple Python lib. <br/>
-
-[![pipeline status](http://gitlab.ashvardanian.com/unum/pycler/badges/master/pipeline.svg)](http://gitlab.ashvardanian.com/unum/pycler/commits/master)
+A set of libraries and their benchmarks, that harness the power of GPUs via OpenCL, but pack it into simple Python lib.
 
 ## Project Structure
 
