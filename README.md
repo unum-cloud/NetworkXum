@@ -24,6 +24,7 @@ URI_MY_SQL=localhost:3306 # Clear to disable MySQL benchmarks.
 URI_ROCKS_DB="/var/lib/rocksdb/" # Clear to disable RocksDB benchmarks.
 URI_SQLITE="/var/lib/sqlite/" # Clear to disable SQLite benchmarks.
 ```
+
 Remaining can be found listed in the [Dockerfile](Dockerfile).
 
 ## Datasets

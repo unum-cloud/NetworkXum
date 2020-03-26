@@ -13,7 +13,7 @@ services:
       - '~/benchmarks/rocksdb/communities/:/var/lib/rocksdb'
       - '~/benchmarks/sqlite/communities/:/var/lib/sqlite'
     environment: 
-      FILE_PATH: '/Users/av/Datasets/graph-communities/fb-pages-company.edges'
+      URI_FILE: '/Users/av/Datasets/graph-communities/fb-pages-company.edges'
       COUNT_NODES: '14092'
       COUNT_EDGES: '52309'
       SAMPLE_FROM_REAL_DATA: '1'
@@ -26,7 +26,7 @@ services:
       - '~/benchmarks/rocksdb/orkut/:/var/lib/rocksdb'
       - '~/benchmarks/sqlite/orkut/:/var/lib/sqlite'
     environment: 
-      FILE_PATH: '/Users/av/Datasets/graph-friendster/orkut.edges'
+      URI_FILE: '/Users/av/Datasets/graph-friendster/orkut.edges'
       COUNT_NODES: '2783196'
       COUNT_EDGES: '444222386'
 
@@ -38,7 +38,7 @@ services:
       - '~/benchmarks/rocksdb/sinaweibo:/var/lib/rocksdb'
       - '~/benchmarks/sqlite/sinaweibo:/var/lib/sqlite'
     environment: 
-      FILE_PATH: '/Users/av/Datasets/graph-sinaweibo/soc-sinaweibo.mtx'
+      URI_FILE: '/Users/av/Datasets/graph-sinaweibo/soc-sinaweibo.mtx'
       COUNT_NODES: '58655849'
       COUNT_EDGES: '261321071'
 
@@ -50,7 +50,7 @@ services:
       - '~/benchmarks/rocksdb/twitter:/var/lib/rocksdb'
       - '~/benchmarks/sqlite/twitter:/var/lib/sqlite'
     environment: 
-      FILE_PATH: '/Users/av/Datasets/graph-twitter/soc-twitter-konect.edges'
+      URI_FILE: '/Users/av/Datasets/graph-twitter/soc-twitter-konect.edges'
       COUNT_NODES: '16751863'
       COUNT_EDGES: '1468365182'
 
@@ -62,7 +62,7 @@ services:
       - '~/benchmarks/rocksdb/friendster:/var/lib/rocksdb'
       - '~/benchmarks/sqlite/friendster:/var/lib/sqlite'
     environment: 
-      FILE_PATH: '/Users/av/Datasets/graph-friendster/soc-friendster.mtx'
+      URI_FILE: '/Users/av/Datasets/graph-friendster/soc-friendster.mtx'
       COUNT_NODES: '65608366'
       COUNT_EDGES: '1806067135'
 
