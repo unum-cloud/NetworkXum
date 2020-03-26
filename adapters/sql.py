@@ -1,81 +1,211 @@
-# Columns are: "from_id", "to_id", "weight"
-# Allowed databases:
-# - PostgreSQL
-# - SQLite
-# - MySQL
-from shared import *
+from enum import Enum
+import sqlite3
+
+import sqlalchemy as sa
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, Float, Boolean
+from sqlalchemy.sql import func
+from sqlalchemy import or_, and_
+
 from adapters.base import GraphBase
+from helpers.shared import *
+
+BaseEntitySQL = declarative_base()
+
+
+class EdgeSQL(BaseEntitySQL):
+    __tablename__ = 'edges'
+    _id = Column(Integer, primary_key=True)
+    v_from = Column(Integer, index=True)
+    v_to = Column(Integer, index=True)
+    weight = Column(Float)
+    # directed = Column(Boolean)
+    # attribute = Column(String)
+
+    def __init__(self, v_from, v_to, weight=1, attribute='', directed=True):
+        super().__init__()
+        self.v_from = v_from
+        self.v_to = v_to
+        self.weight = weight
+        # self.directed = directed
+        # self.attribute = attribute
+
+    def __repr__(self):
+        return f'<EdgeSQL(_id={self._id}, v_from={self.v_from}, v_to={self.v_to}, weight={self.weight})>'
 
 
 class GraphSQL(GraphBase):
+    '''
+        A generic SQL-compatiable wrapper for Graph-shaped data.
+        It's built on top of SQLAlchemy which supports following engines: 
+        *   SQLite, 
+        *   PostgreSQL, 
+        *   MySQL, 
+        *   Oracle, 
+        *   MS-SQL, 
+        *   Firebird, 
+        *   Sybase. 
+        Other dialects are published as external projects.
+        This wrapper does not only emit the query results, 
+        but can export the serialized quaery itself to be used 
+        with other SQL-compatible systems.
+        Docs: https://docs.python.org/3/library/sqlite3.html
 
-    def __init__(self, url, table_name: str):
+        Queries can be exported without execution with `str(query)`, 
+        but if you want to compile them for a specific dialect use following snippet:
+        >>> str(query.statement.compile(dialect=postgresql.dialect()))
+        Source: http://nicolascadou.com/blog/2014/01/printing-actual-sqlalchemy-queries/
+    '''
+
+    def __init__(self, url='sqlite://:memory:'):
         super().__init__()
-        self.table_name = table_name
-        pass
+        self.engine = sa.create_engine(url)
+        self.table_name = EdgeSQL.__tablename__
+        self.session_maker = sessionmaker(bind=self.engine)
+        self.session = self.session_maker()
+        BaseEntitySQL.metadata.create_all(self.engine)
 
-    def create_index(self):
-        f'''
-        CREATE INDEX index_from
-        ON {self.table_name}(from); 
-        CREATE INDEX index_to
-        ON {self.table_name}(to); 
-        '''
-        pass
+    def insert(self, e: EdgeSQL, check_uniqness=True) -> bool:
+        if check_uniqness:
+            if e['_id'] is None:
+                # First make sure we don't have such row.
+                pass
 
-    def insert(self, e: object) -> bool:
-        pass
+        if not isinstance(e, EdgeSQL):
+            e = EdgeSQL(e['v_from'], e['v_to'], e['weight'])
+        self.session.add(e)
+        self.session.commit()
 
-    def delete(self, e: object) -> bool:
-        pass
+    def delete(self, e: EdgeSQL) -> bool:
+        if e['_id'] is not None:
+            EdgeSQL.query.filter_by(id=e['_id']).delete()
+        else:
+            EdgeSQL.query.filter_by(
+                v_from=e['v_from'],
+                v_to=e['v_to'],
+            ).delete()
 
-    def find_directed(self, v_from, v_to) -> Optional[object]:
-        pass
+    def find_directed(self, v_from, v_to) -> Optional[EdgeSQL]:
+        return self.session.query(EdgeSQL).filter(and_(
+            EdgeSQL.v_from == v_from,
+            EdgeSQL.v_to == v_to,
+        )).first()
 
-    def find_undirected(self, v1, v2) -> Optional[object]:
-        pass
+    def find_undirected(self, v1, v2) -> Optional[EdgeSQL]:
+        return self.session.query(EdgeSQL).filter(or_(
+            and_(
+                EdgeSQL.v_from == v1,
+                EdgeSQL.v_to == v2,
+            ),
+            and_(
+                EdgeSQL.v_from == v2,
+                EdgeSQL.v_to == v1,
+            )
+        )).all()
+
+    def all_vertexes(self) -> Set[int]:
+        all_froms = self.session.query(EdgeSQL.v_from).distinct().all()
+
+        all_tos = self.session.query(EdgeSQL.v_to).distinct().all()
+        return set(all_froms).union(all_tos)
+
+    def count_vertexes(self) -> int:
+        return len(self.all_vertexes())
+
+    def count_edges(self) -> int:
+        return self.session.query(EdgeSQL).count()
 
     # Relatives
 
-    def edges_from(self, v: int) -> List[object]:
-        f'''
-        SELECT * FROM {self.table_name}
-        WHERE from='{v}';
-        '''
-        pass
+    def edges_from(self, v: int) -> List[EdgeSQL]:
+        return self.session.query(EdgeSQL).filter_by(v_from=v).all()
 
-    def edges_to(self, v: int) -> List[object]:
-        f'''
-        SELECT * FROM {self.table_name}
-        WHERE to='{v}';
-        '''
-        pass
+    def edges_to(self, v: int) -> List[EdgeSQL]:
+        return self.session.query(EdgeSQL).filter_by(v_to=v).all()
 
-    def edges_related(self, v: int) -> List[object]:
-        f'''
-        SELECT * FROM {self.table_name}
-        WHERE from={v} OR to='{v}';
-        '''
-        pass
+    def edges_related(self, v: int) -> List[EdgeSQL]:
+        return self.session.query(EdgeSQL).filter_by(or_(
+            EdgeSQL.v_from == v,
+            EdgeSQL.v_to == v,
+        )).all()
 
     def vertexes_related(self, v: int) -> Set[int]:
-        pass
+        # This is hard in SQL, so we just export the
+        # edges and perform the rest in Python.
+        result = set()
+        for e in self.edges_related(v):
+            result.add(e.v_from)
+            result.add(e.v_to)
+        result.remove(v)
+        return result
 
     # Wider range of neighbours
 
     def vertexes_related_to_related(self, v: int) -> Set[int]:
-        pass
+        related = self.vertexes_related(v)
+        return self.vertexes_related_to_group(related)
 
     def vertexes_related_to_group(self, vs) -> Set[int]:
-        pass
+        edges = self.session.query(EdgeSQL).filter(or_(
+            EdgeSQL.v_from.in_(vs),
+            EdgeSQL.v_to.in_(vs),
+        )).all()
+        result = set()
+        for e in edges:
+            if (e.v_from not in vs):
+                result.add(e.v_from)
+            elif (e.v_to not in vs):
+                result.add(e.v_to)
+        return result
 
     # Metadata
 
     def count_related(self, v: int) -> (int, float):
-        pass
+        return self.session.query(
+            func.count(EdgeSQL.weight).label("count"),
+            func.sum(EdgeSQL.weight).label("sum"),
+        ).filter_by(or_(
+            EdgeSQL.v_from == v,
+            EdgeSQL.v_to == v,
+        )).first()
 
     def count_followers(self, v: int) -> (int, float):
-        pass
+        return self.session.query(
+            func.count(EdgeSQL.weight).label("count"),
+            func.sum(EdgeSQL.weight).label("sum"),
+        ).filter_by(v_to=v).first()
 
     def count_following(self, v: int) -> (int, float):
-        pass
+        return self.session.query(
+            func.count(EdgeSQL.weight).label("count"),
+            func.sum(EdgeSQL.weight).label("sum"),
+        ).filter_by(v_from=v).first()
+
+
+if __name__ == "__main__":
+    wrap = GraphSQL()
+    edges = [
+        {'v_from': 1, 'v_to': 3, 'weight': 25},
+        {'v_from': 2, 'v_to': 33, 'weight': 5},
+        {'v_from': 3, 'v_to': 33, 'weight': 5},
+        {'v_from': 1, 'v_to': 39, 'weight': 1},
+        {'v_from': 1, 'v_to': 23, 'weight': 33},
+        {'v_from': 1, 'v_to': 113, 'weight': 21},
+        {'v_from': 1, 'v_to': 4, 'weight': 29},
+    ]
+    es_last = 0
+    vs_last = 0
+    for e in edges:
+        wrap.insert(e)
+        assert wrap.find_directed(
+            e['v_from'], e['v_to']), f'No directed edge: {e}'
+        assert wrap.find_undirected(
+            e['v_from'], e['v_to']), f'No undirected edge: {e}'
+        es_count = wrap.count_edges()
+        assert es_count > es_last, 'Didnt update number of edges'
+        es_last = es_count
+        vs_count = wrap.count_vertexes()
+        assert vs_count >= vs_last, 'Problems in counting nodes'
+        vs_last = vs_count
+    print(f'-- added {vs_last} nodes, {es_last} edges')

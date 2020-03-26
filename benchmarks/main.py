@@ -1,6 +1,7 @@
 import time
 import random
 from random import SystemRandom
+from typing import List
 from copy import copy
 import json
 import platform
@@ -12,7 +13,7 @@ from adapters.mongo_adj import *
 from adapters.rocks_nested import *
 from adapters.rocks_adj import *
 from adapters.neo4j import *
-from shared import *
+from helpers.shared import *
 
 print('Welcome to GraphDB benchmarks!')
 print('- Reading settings')
@@ -23,7 +24,8 @@ count_edges = int(os.getenv('COUNT_EDGES', '0'))
 count_finds = int(os.getenv('COUNT_FINDS', '10000'))
 count_analytics = int(os.getenv('COUNT_ANALYTICS', '1000'))
 count_changes = int(os.getenv('COUNT_CHANGES', '10000'))
-file_path = os.getenv('FILE_PATH',
+mongo_url = os.getenv('URI_MONGO', 'mongodb://localhost:27017')
+file_path = os.getenv('URI_FILE',
                       '/Users/av/Datasets/graph-communities/fb-pages-company.edges')
 
 print('- Preparing global variables')
@@ -38,7 +40,7 @@ benchmarks = []
 
 
 def restore_previous_stats():
-    print('- Resting previous benchmarks')
+    print('- Restoring previous benchmarks')
     benchmarks = json.load(open('benchmarks.json', 'r'))
     device_name = platform.node()
     for bench in benchmarks:
@@ -52,8 +54,39 @@ def restore_previous_stats():
         stats_per_adapter_per_operation[a][o] = s
 
 
+def bench_matches(
+    bench: obj,
+    adapter_class: str,
+    operation: str,
+) -> bool:
+    device_name = platform.node()
+    if bench['device'] != device_name:
+        return False
+    if bench['adapter_class'] != adapter_class:
+        return False
+    if bench['operation'] != operation:
+        return False
+    return True
+
+
+def update_stats(
+    benchmarks: List[obj],
+    adapter_class: str,
+    operation: str,
+    stats: StatsCounter,
+) -> bool:
+    device_name = platform.node()
+    for bench in benchmarks:
+        if bench_matches(bench, adapter_class, operation):
+            bench = stats
+            return True
+    return False
+
+
 def dump_updated_results():
-    stats_per_adapter_per_operation
+    for a, stats_per_opertion in stats_per_adapter_per_operation:
+        for o, stats in stats_per_opertion:
+            update_stats(benchmarks, a, o, stats)
     json.dump(benchmarks, open('benchmarks.json', 'w'))
 
 
@@ -79,7 +112,7 @@ def select_tasks(
         for e in yield_edges_from(file_path):
             if rnd.random() < sampling_ratio:
                 select_edges.append(e)
-                select_nodes.add(e['from'])
+                select_nodes.add(e['v_from'])
         select_nodes = list(select_nodes)
         random.shuffle(select_edges)
         random.shuffle(select_nodes)
@@ -98,8 +131,8 @@ def select_tasks(
                 continue
             select_nodes.add(v_from)
             select_edges.append({
-                'from': v_from,
-                'to': v_to,
+                'v_from': v_from,
+                'v_to': v_to,
             })
 
     # Split query operations into groups.
@@ -120,10 +153,10 @@ def find_edges_directed(db) -> int:
     half = len(edges_to_query) / 2
     cnt = 0
     for e in edges_to_query[:half]:
-        e = db.find_directed(e['from'], e['to'])
+        e = db.find_directed(e['v_from'], e['v_to'])
         cnt += 1
     for e in edges_to_query[half:]:
-        e = db.find_directed(e['to'], e['from'])
+        e = db.find_directed(e['v_to'], e['v_from'])
         cnt += 1
     return cnt
 
@@ -131,7 +164,7 @@ def find_edges_directed(db) -> int:
 def find_edges_undirected(db) -> int:
     cnt = 0
     for e in edges_to_query:
-        db.find_directed(e['from'], e['to'])
+        db.find_directed(e['v_from'], e['v_to'])
         cnt += 1
     return cnt
 
@@ -194,7 +227,7 @@ def count_following(db) -> int:
 
 def find_vertexes_related2(db) -> int:
     cnt = 0
-    for v in nodes_to_query:
+    for v in nodes_to_analyze:
         db.vertexes_related_to_related(v)
         cnt += 1
     return cnt
