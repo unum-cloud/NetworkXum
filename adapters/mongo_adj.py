@@ -3,8 +3,8 @@
 from pymongo import MongoClient
 from pymongo import UpdateOne
 
-from shared import *
 from adapters.base import GraphBase
+from helpers.shared import chunks, yield_edges_from
 
 
 class GraphMongoAdjacency(GraphBase):
@@ -15,14 +15,14 @@ class GraphMongoAdjacency(GraphBase):
         self.table = self.db[db_name][collection_name]
 
     def create_index(self, background=False):
-        self.table.create_index('from', background=background, sparse=True)
-        self.table.create_index('to', background=background, sparse=True)
+        self.table.create_index('v_from', background=background, sparse=True)
+        self.table.create_index('v_to', background=background, sparse=True)
 
     def insert(self, e: object) -> bool:
         result = self.table.update_one(
             filter={
-                'from': e['from'],
-                'to': e['to'],
+                'v_from': e['v_from'],
+                'v_to': e['v_to'],
             },
             update=e,
             upsert=True,
@@ -31,26 +31,26 @@ class GraphMongoAdjacency(GraphBase):
 
     def delete(self, e: object) -> bool:
         result = self.table.delete_one(filter={
-            'from': e['from'],
-            'to': e['to'],
+            'v_from': e['v_from'],
+            'v_to': e['v_to'],
         })
         return result.deleted_count >= 1
 
     def find_directed(self, v_from, v_to) -> Optional[object]:
         result = self.table.find_one(filter={
-            'from': v_from,
-            'to': v_to,
+            'v_from': v_from,
+            'v_to': v_to,
         })
         return result
 
     def find_undirected(self, v1, v2) -> Optional[object]:
         result = self.table.find_one(filter={
             '$or': [{
-                'from': v1,
-                'to': v2,
+                'v_from': v1,
+                'v_to': v2,
             }, {
-                'from': v2,
-                'to': v1,
+                'v_from': v2,
+                'v_to': v1,
             }],
         })
         return result
@@ -58,19 +58,19 @@ class GraphMongoAdjacency(GraphBase):
     # Relatives
 
     def edges_from(self, v: int) -> List[object]:
-        result = self.table.find(filter={'from': v})
+        result = self.table.find(filter={'v_from': v})
         return list(result)
 
     def edges_to(self, v: int) -> List[object]:
-        result = self.table.find(filter={'to': v})
+        result = self.table.find(filter={'v_to': v})
         return list(result)
 
     def edges_related(self, v: int) -> List[object]:
         result = self.table.find(filter={
             '$or': [{
-                'from': v,
+                'v_from': v,
             }, {
-                'to': v,
+                'v_to': v,
             }],
         })
         return list(result)
@@ -78,8 +78,8 @@ class GraphMongoAdjacency(GraphBase):
     def vertexes_related(self, v: int) -> Set[int]:
         vs_unique = set()
         for e in self.edges_related(v):
-            vs_unique.insert(e['from'])
-            vs_unique.insert(e['to'])
+            vs_unique.insert(e['v_from'])
+            vs_unique.insert(e['v_to'])
         vs_unique.remove(v)
         return vs_unique
 
@@ -98,8 +98,8 @@ class GraphMongoAdjacency(GraphBase):
             {
                 '$match': {
                     '$or': [
-                        {'from': v},
-                        {'to': v}
+                        {'v_from': v},
+                        {'v_to': v}
                     ],
                 }
             },
@@ -119,7 +119,7 @@ class GraphMongoAdjacency(GraphBase):
     def count_followers(self, v: int) -> (int, float):
         result = self.table.aggregate(pipeline=[
             {
-                '$match': {'to': v}
+                '$match': {'v_to': v}
             },
             {
                 '$group': {
@@ -137,7 +137,7 @@ class GraphMongoAdjacency(GraphBase):
     def count_following(self, v: int) -> (int, float):
         result = self.table.aggregate(pipeline=[
             {
-                '$match': {'from': v}
+                '$match': {'v_from': v}
             },
             {
                 '$group': {
@@ -163,8 +163,8 @@ class GraphMongoAdjacency(GraphBase):
         for e in es:
             op = UpdateOne(
                 filter={
-                    'from': e['from'],
-                    'to': e['to'],
+                    'v_from': e['v_from'],
+                    'v_to': e['v_to'],
                 },
                 update=e,
                 upsert=True,

@@ -13,8 +13,8 @@ def chunks(iterable, size):
 
 def yield_edges_from(filepath: str):
     e = {
-        'from': None,
-        'to': None,
+        'v_from': None,
+        'v_to': None,
         'weight': 1.0,
     }
     lines_to_skip = 0
@@ -27,11 +27,11 @@ def yield_edges_from(filepath: str):
                 continue
             if len(columns) < 2:
                 continue
-            e['from'] = int(columns[0])
-            if e['from'] is None:
+            e['v_from'] = int(columns[0])
+            if e['v_from'] is None:
                 continue
-            e['to'] = int(columns[1])
-            if e['to'] is None:
+            e['v_to'] = int(columns[1])
+            if e['v_to'] is None:
                 continue
             e['weight'] = float(columns[2]) if len(columns) > 2 else 1.0
             yield e
