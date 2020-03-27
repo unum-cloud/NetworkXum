@@ -49,14 +49,14 @@ class GraphMongoAdjacency(GraphBase):
         })
         return result.deleted_count >= 1
 
-    def find_directed(self, v_from, v_to) -> Optional[object]:
+    def find_directed(self, v_from: int, v_to: int) -> Optional[object]:
         result = self.table.find_one(filter={
             'v_from': v_from,
             'v_to': v_to,
         })
         return result
 
-    def find_undirected(self, v1, v2) -> Optional[object]:
+    def find_directed(self, v1: int, v2: int) -> Optional[object]:
         result = self.table.find_one(filter={
             '$or': [{
                 'v_from': v1,

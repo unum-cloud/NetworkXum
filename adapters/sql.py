@@ -1,6 +1,3 @@
-from enum import Enum
-import sqlite3
-
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -9,41 +6,22 @@ from sqlalchemy.sql import func
 from sqlalchemy import or_, and_
 
 from adapters.base import GraphBase
+from adapters.edge import Edge
 from helpers.shared import *
 
 BaseEntitySQL = declarative_base()
 
 
-class EdgeSQL(BaseEntitySQL):
+class EdgeSQL(BaseEntitySQL, Edge):
     __tablename__ = 'edges'
     _id = Column(Integer, primary_key=True)
     v_from = Column(Integer, index=True)
     v_to = Column(Integer, index=True)
     weight = Column(Float)
-    # directed = Column(Boolean)
-    # attribute = Column(String)
 
-    def __init__(self, v_from, v_to, weight=1, attribute='', directed=True):
-        super().__init__()
-        self._id = None
-        self.v_from = v_from
-        self.v_to = v_to
-        self.weight = weight
-        # self.directed = directed
-        # self.attribute = attribute
-
-    def __repr__(self):
-        return f'<EdgeSQL(_id={self._id}, v_from={self.v_from}, v_to={self.v_to}, weight={self.weight})>'
-
-    def __getitem__(self, key):
-        if key == '_id':
-            return self._id
-        elif key == 'v_from':
-            return self.v_from
-        elif key == 'v_to':
-            return self.v_to
-        elif key == 'weight':
-            return self.weight
+    def __init__(self, *args, **kwargs):
+        BaseEntitySQL.__init__(self)
+        Edge.__init__(self, *args, **kwargs)
 
 
 class GraphSQL(GraphBase):
@@ -89,7 +67,7 @@ class GraphSQL(GraphBase):
         self.session.commit()
 
     def delete(self, e: EdgeSQL) -> bool:
-        if e['_id'] is not None:
+        if '_id' in e:
             EdgeSQL.query.filter_by(id=e['_id']).delete()
         else:
             EdgeSQL.query.filter_by(
@@ -97,13 +75,13 @@ class GraphSQL(GraphBase):
                 v_to=e['v_to'],
             ).delete()
 
-    def find_directed(self, v_from, v_to) -> Optional[EdgeSQL]:
+    def find_directed(self, v_from: int, v_to: int) -> Optional[EdgeSQL]:
         return self.session.query(EdgeSQL).filter(and_(
             EdgeSQL.v_from == v_from,
             EdgeSQL.v_to == v_to,
         )).first()
 
-    def find_undirected(self, v1, v2) -> Optional[EdgeSQL]:
+    def find_directed(self, v1: int, v2: int) -> Optional[EdgeSQL]:
         return self.session.query(EdgeSQL).filter(or_(
             and_(
                 EdgeSQL.v_from == v1,
