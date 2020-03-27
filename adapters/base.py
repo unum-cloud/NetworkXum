@@ -15,10 +15,6 @@ class GraphBase(object):
         pass
 
     @abstractmethod
-    def create_index(self):
-        pass
-
-    @abstractmethod
     def insert(self, e: object) -> bool:
         pass
 
@@ -56,11 +52,16 @@ class GraphBase(object):
 
     @abstractmethod
     def vertexes_related_to_related(self, v: int) -> Set[int]:
-        pass
+        related = self.vertexes_related(v)
+        related_to_related = self.vertexes_related_to_group(related.union({v}))
+        return related.union(related_to_related).difference({v})
 
     @abstractmethod
     def vertexes_related_to_group(self, vs) -> Set[int]:
-        pass
+        results = set()
+        for v in vs:
+            results = results.union(self.vertexes_related(v))
+        return results.difference(set(vs))
 
     # Metadata
 
