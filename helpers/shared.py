@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict, Generator, Set, Tuple
+from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 from itertools import chain, islice
 import csv
 

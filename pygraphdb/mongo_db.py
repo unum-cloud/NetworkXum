@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict, Generator, Set, Tuple
+from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 
 # Properties of every entry are: 'from_id', 'to_id', 'weight'
 # There are indexes by all keys.
@@ -56,7 +56,7 @@ class MongoDB(GraphBase):
         })
         return result
 
-    def find_directed(self, v1: int, v2: int) -> Optional[object]:
+    def find_undirected(self, v1: int, v2: int) -> Optional[object]:
         result = self.table.find_one(filter={
             '$or': [{
                 'v_from': v1,
@@ -88,17 +88,9 @@ class MongoDB(GraphBase):
         })
         return list(result)
 
-    def vertexes_related(self, v: int) -> Set[int]:
-        vs_unique = set()
-        for e in self.edges_related(v):
-            vs_unique.add(e['v_from'])
-            vs_unique.add(e['v_to'])
-        vs_unique.remove(v)
-        return vs_unique
-
     # Wider range of neighbours
 
-    def vertexes_related_to_group(self, vs) -> Set[int]:
+    def vertexes_related_to_group(self, vs: Sequence[int]) -> Set[int]:
         vs = list(vs)
         result = self.table.find(filter={
             '$or': [{
@@ -183,7 +175,7 @@ class MongoDB(GraphBase):
         pass
 
     def insert_many(self, es: List[object]) -> int:
-        '''Supports up to 1000 operations'''
+        """Supports up to 1000 operations"""
         ops = list()
         for e in es:
             op = UpdateOne(

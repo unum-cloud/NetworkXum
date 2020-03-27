@@ -94,11 +94,11 @@ def select_tasks(
     count_analytics=1000,
     count_changes=10000,
 ):
-    '''
+    """
         Select this data beforehand to:
         - avoid affecting the runtime of benchmark.
         - perform same "random" operations on different DBs.
-    '''
+    """
 
     # Sample edges and node IDs.
     select_edges = list()
