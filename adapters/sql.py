@@ -25,6 +25,7 @@ class EdgeSQL(BaseEntitySQL):
 
     def __init__(self, v_from, v_to, weight=1, attribute='', directed=True):
         super().__init__()
+        self._id = None
         self.v_from = v_from
         self.v_to = v_to
         self.weight = weight
@@ -33,6 +34,16 @@ class EdgeSQL(BaseEntitySQL):
 
     def __repr__(self):
         return f'<EdgeSQL(_id={self._id}, v_from={self.v_from}, v_to={self.v_to}, weight={self.weight})>'
+
+    def __getitem__(self, key):
+        if key == '_id':
+            return self._id
+        elif key == 'v_from':
+            return self.v_from
+        elif key == 'v_to':
+            return self.v_to
+        elif key == 'weight':
+            return self.weight
 
 
 class GraphSQL(GraphBase):
@@ -58,7 +69,7 @@ class GraphSQL(GraphBase):
         Source: http://nicolascadou.com/blog/2014/01/printing-actual-sqlalchemy-queries/
     '''
 
-    def __init__(self, url='sqlite://:memory:'):
+    def __init__(self, url='sqlite:///:memory:'):
         super().__init__()
         self.engine = sa.create_engine(url)
         self.table_name = EdgeSQL.__tablename__
@@ -68,7 +79,7 @@ class GraphSQL(GraphBase):
 
     def insert(self, e: EdgeSQL, check_uniqness=True) -> bool:
         if check_uniqness:
-            if e['_id'] is None:
+            if '_id' not in e:
                 # First make sure we don't have such row.
                 pass
 
@@ -125,7 +136,7 @@ class GraphSQL(GraphBase):
         return self.session.query(EdgeSQL).filter_by(v_to=v).all()
 
     def edges_related(self, v: int) -> List[EdgeSQL]:
-        return self.session.query(EdgeSQL).filter_by(or_(
+        return self.session.query(EdgeSQL).filter(or_(
             EdgeSQL.v_from == v,
             EdgeSQL.v_to == v,
         )).all()
@@ -141,10 +152,6 @@ class GraphSQL(GraphBase):
         return result
 
     # Wider range of neighbours
-
-    def vertexes_related_to_related(self, v: int) -> Set[int]:
-        related = self.vertexes_related(v)
-        return self.vertexes_related_to_group(related)
 
     def vertexes_related_to_group(self, vs) -> Set[int]:
         edges = self.session.query(EdgeSQL).filter(or_(
@@ -165,7 +172,7 @@ class GraphSQL(GraphBase):
         return self.session.query(
             func.count(EdgeSQL.weight).label("count"),
             func.sum(EdgeSQL.weight).label("sum"),
-        ).filter_by(or_(
+        ).filter(or_(
             EdgeSQL.v_from == v,
             EdgeSQL.v_to == v,
         )).first()
@@ -181,31 +188,3 @@ class GraphSQL(GraphBase):
             func.count(EdgeSQL.weight).label("count"),
             func.sum(EdgeSQL.weight).label("sum"),
         ).filter_by(v_from=v).first()
-
-
-if __name__ == "__main__":
-    wrap = GraphSQL()
-    edges = [
-        {'v_from': 1, 'v_to': 3, 'weight': 25},
-        {'v_from': 2, 'v_to': 33, 'weight': 5},
-        {'v_from': 3, 'v_to': 33, 'weight': 5},
-        {'v_from': 1, 'v_to': 39, 'weight': 1},
-        {'v_from': 1, 'v_to': 23, 'weight': 33},
-        {'v_from': 1, 'v_to': 113, 'weight': 21},
-        {'v_from': 1, 'v_to': 4, 'weight': 29},
-    ]
-    es_last = 0
-    vs_last = 0
-    for e in edges:
-        wrap.insert(e)
-        assert wrap.find_directed(
-            e['v_from'], e['v_to']), f'No directed edge: {e}'
-        assert wrap.find_undirected(
-            e['v_from'], e['v_to']), f'No undirected edge: {e}'
-        es_count = wrap.count_edges()
-        assert es_count > es_last, 'Didnt update number of edges'
-        es_last = es_count
-        vs_count = wrap.count_vertexes()
-        assert vs_count >= vs_last, 'Problems in counting nodes'
-        vs_last = vs_count
-    print(f'-- added {vs_last} nodes, {es_last} edges')
