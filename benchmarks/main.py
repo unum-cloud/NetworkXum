@@ -7,12 +7,9 @@ import json
 import platform
 import os
 
-from adapters.base import GraphBase
-from adapters.sql import *
-from adapters.mongo_adj import *
-from adapters.rocks_nested import *
-from adapters.rocks_adj import *
-from adapters.neo4j import *
+from pygraphdb.graph_base import GraphBase
+from pygraphdb.plain_sql import *
+from pygraphdb.mongo_db import *
 from helpers.shared import *
 
 print('Welcome to GraphDB benchmarks!')
@@ -298,16 +295,16 @@ filename = file_path
 restore_previous_stats()
 select_tasks(file_path)
 dbs = [
-    GraphMongoAdjacency(
+    MongoDB(
         url='mongodb://localhost:27017',
         db_name='graphdb',
         collection_name=filename,
     ),
-    # GraphSQL(
+    # PlainSQL(
     #     url='mysql://localhost:3306',
     #     table_name=filename,
     # ),
-    # GraphSQL(
+    # PlainSQL(
     #     url='postgres://localhost:5432',
     #     table_name=filename,
     # ),

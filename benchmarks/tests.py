@@ -1,8 +1,8 @@
 
-from adapters.edge import Edge
-from adapters.base import GraphBase
-from adapters.sql import *
-from adapters.mongo_adj import *
+from pygraphdb.edge import Edge
+from pygraphdb.graph_base import GraphBase
+from pygraphdb.plain_sql import *
+from pygraphdb.mongo_db import *
 
 
 def validate(wrap):
@@ -50,8 +50,8 @@ def validate(wrap):
 
 if __name__ == "__main__":
     for g in [
-        GraphSQL(),
-        GraphMongoAdjacency(
+        PlainSQL(),
+        MongoDB(
             url='mongodb://localhost:27017',
             db_name='graphdb',
             collection_name='tests',

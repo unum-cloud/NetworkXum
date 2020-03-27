@@ -1,4 +1,4 @@
 {
     // CI/CD.
-    "gitlab.instanceUrl": "https://gitlab.ashvardanian.com/unum/pybot"
+    "gitlab.instanceUrl": "https://gitlab.ashvardanian.com/unum/pygraphdb"
 }

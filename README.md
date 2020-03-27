@@ -17,12 +17,13 @@ Implements the same [interface](adapters/base.py) for every one of those backend
 ## Environment Variables
 
 ```sh
-URI_FILE=http://networkrepository.com/orkut.php # Can be a local CSV file or archeive.
-URI_MONGO_DB=mongodb://localhost:27017 # Clear to disable Mongo benchmarks.
-URI_POSTGRES=localhost:5432 # Clear to disable Postgres benchmarks.
-URI_MY_SQL=localhost:3306 # Clear to disable MySQL benchmarks.
+URI_FILE="~/Downloads/archieve.edges" # Can be a local CSV file or archeive.
+URI_MONGO_DB="mongodb://localhost:27017" # Clear to disable Mongo benchmarks.
+URI_POSTGRES="postgres://localhost:5432" # Clear to disable Postgres benchmarks.
+URI_MY_SQL="mysql://localhost:3306" # Clear to disable MySQL benchmarks.
 URI_ROCKS_DB="/var/lib/rocksdb/" # Clear to disable RocksDB benchmarks.
 URI_SQLITE="/var/lib/sqlite/" # Clear to disable SQLite benchmarks.
+URI_SQLITE_MEM="sqlite:///:memory:"  # Clear to disable in-memory SQLite benchmarks.
 ```
 
 Remaining can be found listed in the [Dockerfile](Dockerfile).
