@@ -50,7 +50,9 @@ def validate(wrap):
 
 if __name__ == "__main__":
     for g in [
+        PlainSQL(url='mysql://root:temptemp@127.0.0.1:3306/mysql'),
         PlainSQL(),
+        PlainSQL(url='postgres://root:temptemp@localhost:5432'),
         MongoDB(
             url='mongodb://localhost:27017',
             db_name='graphdb',
