@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Generator, Set, Tuple
 
+from adapters.edge import Edge
+
 
 class GraphBase(object):
 
@@ -12,10 +14,10 @@ class GraphBase(object):
         pass
 
     def __len__(self):
-        pass
+        return self.count_edges()
 
     @abstractmethod
-    def insert(self, e: object) -> bool:
+    def insert(self, e: Edge) -> bool:
         pass
 
     @abstractmethod
@@ -23,11 +25,11 @@ class GraphBase(object):
         pass
 
     @abstractmethod
-    def find_directed(self, v_from, v_to) -> Optional[object]:
+    def find_directed(self, v_from: int, v_to: int) -> Optional[object]:
         pass
 
     @abstractmethod
-    def find_undirected(self, v1, v2) -> Optional[object]:
+    def find_directed(self, v1: int, v2: int) -> Optional[object]:
         pass
 
     # Relatives
