@@ -21,33 +21,7 @@ class MongoDB(GraphBase):
         self.table.create_index('v_from', background=background, sparse=True)
         self.table.create_index('v_to', background=background, sparse=True)
 
-    def count_vertexes(self) -> int:
-        froms = set(self.table.distinct('v_from'))
-        tos = set(self.table.distinct('v_to'))
-        return len(froms.union(tos))
-
-    def count_edges(self) -> int:
-        return self.table.count_documents(filter={})
-
-    def insert(self, e: object) -> bool:
-        result = self.table.update_one(
-            filter={
-                'v_from': e['v_from'],
-                'v_to': e['v_to'],
-            },
-            update={
-                '$set': e,
-            },
-            upsert=True,
-        )
-        return result.modified_count >= 1
-
-    def delete(self, e: object) -> bool:
-        result = self.table.delete_one(filter={
-            'v_from': e['v_from'],
-            'v_to': e['v_to'],
-        })
-        return result.deleted_count >= 1
+    # Relatives
 
     def find_directed(self, v_from: int, v_to: int) -> Optional[object]:
         result = self.table.find_one(filter={
@@ -67,8 +41,6 @@ class MongoDB(GraphBase):
             }],
         })
         return result
-
-    # Relatives
 
     def edges_from(self, v: int) -> List[object]:
         result = self.table.find(filter={'v_from': v})
@@ -109,6 +81,14 @@ class MongoDB(GraphBase):
         return vs_unique.difference(set(vs))
 
     # Metadata
+
+    def count_vertexes(self) -> int:
+        froms = set(self.table.distinct('v_from'))
+        tos = set(self.table.distinct('v_to'))
+        return len(froms.union(tos))
+
+    def count_edges(self) -> int:
+        return self.table.count_documents(filter={})
 
     def count_related(self, v: int) -> (int, float):
         result = self.table.aggregate(pipeline=[
@@ -169,7 +149,27 @@ class MongoDB(GraphBase):
             return 0, 0
         return result[0]['count'], result[0]['weight']
 
-    # Bulk methods
+    # Modifications
+
+    def insert(self, e: object) -> bool:
+        result = self.table.update_one(
+            filter={
+                'v_from': e['v_from'],
+                'v_to': e['v_to'],
+            },
+            update={
+                '$set': e.__dict__,
+            },
+            upsert=True,
+        )
+        return result.modified_count >= 1
+
+    def delete(self, e: object) -> bool:
+        result = self.table.delete_one(filter={
+            'v_from': e['v_from'],
+            'v_to': e['v_to'],
+        })
+        return result.deleted_count >= 1
 
     def delete_many(self, es: List[object]) -> int:
         pass
@@ -183,7 +183,7 @@ class MongoDB(GraphBase):
                     'v_from': e['v_from'],
                     'v_to': e['v_to'],
                 },
-                update=e,
+                update=e.__dict__,
                 upsert=True,
             )
             ops.append(op)
