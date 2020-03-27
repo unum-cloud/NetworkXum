@@ -1,11 +1,11 @@
 
 class Edge(object):
-    '''
+    """
         Shared Edge class with ID hashing for simpler collision avoidance.
         Advanced DBs can preserve object uniqness by comparing multiple keys/columns. 
         Others only support 1 primary key, so we implement hashing and type 
         checking in this class to simplify queries in pygraphdb.
-    '''
+    """
 
     def __init__(self, v_from: int, v_to: int, weight=1):
         super().__init__()

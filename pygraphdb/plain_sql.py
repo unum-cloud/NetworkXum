@@ -25,7 +25,7 @@ class EdgeSQL(BaseEntitySQL, Edge):
 
 
 class PlainSQL(GraphBase):
-    '''
+    """
         A generic SQL-compatiable wrapper for Graph-shaped data.
         It's built on top of SQLAlchemy which supports following engines: 
         *   SQLite, 
@@ -45,7 +45,7 @@ class PlainSQL(GraphBase):
         but if you want to compile them for a specific dialect use following snippet:
         >>> str(query.statement.compile(dialect=postgresql.dialect()))
         Source: http://nicolascadou.com/blog/2014/01/printing-actual-sqlalchemy-queries/
-    '''
+    """
 
     def __init__(self, url='sqlite:///:memory:'):
         super().__init__()
@@ -81,7 +81,7 @@ class PlainSQL(GraphBase):
             EdgeSQL.v_to == v_to,
         )).first()
 
-    def find_directed(self, v1: int, v2: int) -> Optional[EdgeSQL]:
+    def find_undirected(self, v1: int, v2: int) -> Optional[EdgeSQL]:
         return self.session.query(EdgeSQL).filter(or_(
             and_(
                 EdgeSQL.v_from == v1,
@@ -119,19 +119,9 @@ class PlainSQL(GraphBase):
             EdgeSQL.v_to == v,
         )).all()
 
-    def vertexes_related(self, v: int) -> Set[int]:
-        # This is hard in SQL, so we just export the
-        # edges and perform the rest in Python.
-        result = set()
-        for e in self.edges_related(v):
-            result.add(e.v_from)
-            result.add(e.v_to)
-        result.remove(v)
-        return result
-
     # Wider range of neighbours
 
-    def vertexes_related_to_group(self, vs) -> Set[int]:
+    def vertexes_related_to_group(self, vs: Sequence[int]) -> Set[int]:
         edges = self.session.query(EdgeSQL).filter(or_(
             EdgeSQL.v_from.in_(vs),
             EdgeSQL.v_to.in_(vs),
