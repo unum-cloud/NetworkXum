@@ -1,11 +1,11 @@
 from neo4j import GraphDatabase
 
 from helpers.shared import *
-from adapters.base import GraphBase
-from adapters.sql import GraphSQL
+from pygraphdb.graph_base import GraphBase
+from pygraphdb.plain_sql import PlainSQL
 
 
-class GraphNeo4j(GraphBase):
+class Neo4j(GraphBase):
     '''
         Uses Bolt API for Neo4j graph database.
     '''
@@ -29,9 +29,9 @@ class Cayley(GraphBase):
     pass
 
 
-class GraphPostgreSQL(GraphSQL):
+class PostgreSQL(PlainSQL):
     '''
-        Extends GraphSQL functionality with optimized operations:
+        Extends PlainSQL functionality with optimized operations:
         *   Bulk imports and exports via:
             https://github.com/jmcarp/sqlalchemy-postgres-copy
         *   Async operations through less mature ORM: Gino (only PostgreSQL).
@@ -43,7 +43,7 @@ class GraphPostgreSQL(GraphSQL):
     pass
 
 
-class BlazingSQL(GraphSQL):
+class BlazingSQL(PlainSQL):
     '''
         Redirects SQL queries generated for actual DBs
         to GPU-accelerated single-file analytics enginge.

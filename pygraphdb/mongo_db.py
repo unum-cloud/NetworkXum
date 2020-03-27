@@ -5,11 +5,11 @@ from typing import List, Optional, Dict, Generator, Set, Tuple
 from pymongo import MongoClient
 from pymongo import UpdateOne
 
-from adapters.base import GraphBase
+from pygraphdb.graph_base import GraphBase
 from helpers.shared import chunks, yield_edges_from
 
 
-class GraphMongoAdjacency(GraphBase):
+class MongoDB(GraphBase):
 
     def __init__(self, url, db_name, collection_name):
         super().__init__()

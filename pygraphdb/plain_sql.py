@@ -5,8 +5,8 @@ from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy import or_, and_
 
-from adapters.base import GraphBase
-from adapters.edge import Edge
+from pygraphdb.graph_base import GraphBase
+from pygraphdb.edge import Edge
 from helpers.shared import *
 
 BaseEntitySQL = declarative_base()
@@ -24,7 +24,7 @@ class EdgeSQL(BaseEntitySQL, Edge):
         Edge.__init__(self, *args, **kwargs)
 
 
-class GraphSQL(GraphBase):
+class PlainSQL(GraphBase):
     '''
         A generic SQL-compatiable wrapper for Graph-shaped data.
         It's built on top of SQLAlchemy which supports following engines: 

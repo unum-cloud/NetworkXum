@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Generator, Set, Tuple
 
-from adapters.edge import Edge
+from pygraphdb.edge import Edge
 
 
 class GraphBase(object):
