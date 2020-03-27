@@ -55,25 +55,7 @@ class PlainSQL(GraphBase):
         self.session = self.session_maker()
         BaseEntitySQL.metadata.create_all(self.engine)
 
-    def insert(self, e: EdgeSQL, check_uniqness=True) -> bool:
-        if check_uniqness:
-            if '_id' not in e:
-                # First make sure we don't have such row.
-                pass
-
-        if not isinstance(e, EdgeSQL):
-            e = EdgeSQL(e['v_from'], e['v_to'], e['weight'])
-        self.session.add(e)
-        self.session.commit()
-
-    def delete(self, e: EdgeSQL) -> bool:
-        if '_id' in e:
-            EdgeSQL.query.filter_by(id=e['_id']).delete()
-        else:
-            EdgeSQL.query.filter_by(
-                v_from=e['v_from'],
-                v_to=e['v_to'],
-            ).delete()
+    # Relatives
 
     def find_directed(self, v_from: int, v_to: int) -> Optional[EdgeSQL]:
         return self.session.query(EdgeSQL).filter(and_(
@@ -93,20 +75,6 @@ class PlainSQL(GraphBase):
             )
         )).all()
 
-    def all_vertexes(self) -> Set[int]:
-        all_froms = self.session.query(EdgeSQL.v_from).distinct().all()
-
-        all_tos = self.session.query(EdgeSQL.v_to).distinct().all()
-        return set(all_froms).union(all_tos)
-
-    def count_vertexes(self) -> int:
-        return len(self.all_vertexes())
-
-    def count_edges(self) -> int:
-        return self.session.query(EdgeSQL).count()
-
-    # Relatives
-
     def edges_from(self, v: int) -> List[EdgeSQL]:
         return self.session.query(EdgeSQL).filter_by(v_from=v).all()
 
@@ -118,6 +86,11 @@ class PlainSQL(GraphBase):
             EdgeSQL.v_from == v,
             EdgeSQL.v_to == v,
         )).all()
+
+    def all_vertexes(self) -> Set[int]:
+        all_froms = self.session.query(EdgeSQL.v_from).distinct().all()
+        all_tos = self.session.query(EdgeSQL.v_to).distinct().all()
+        return set(all_froms).union(all_tos)
 
     # Wider range of neighbours
 
@@ -135,6 +108,12 @@ class PlainSQL(GraphBase):
         return result
 
     # Metadata
+
+    def count_vertexes(self) -> int:
+        return len(self.all_vertexes())
+
+    def count_edges(self) -> int:
+        return self.session.query(EdgeSQL).count()
 
     def count_related(self, v: int) -> (int, float):
         return self.session.query(
@@ -156,3 +135,36 @@ class PlainSQL(GraphBase):
             func.count(EdgeSQL.weight).label("count"),
             func.sum(EdgeSQL.weight).label("sum"),
         ).filter_by(v_from=v).first()
+
+    # Modifications
+
+    def insert(self, e: EdgeSQL, check_uniqness=True) -> bool:
+        if not isinstance(e, EdgeSQL):
+            e = EdgeSQL(e['v_from'], e['v_to'], e['weight'])
+        copies = []
+        if check_uniqness:
+            if '_id' in e:
+                copies = self.session.query(EdgeSQL).filter_by(
+                    _id=e['_id']
+                ).all()
+            else:
+                copies = self.session.query(EdgeSQL).filter_by(
+                    v_from=e['v_from'],
+                    v_to=e['v_to'],
+                ).all()
+        if len(copies) == 0:
+            self.session.add(e)
+        else:
+            copies[0]['weight'] = e['weight']
+        self.session.flush()
+
+    def delete(self, e: EdgeSQL) -> bool:
+        if '_id' in e:
+            self.session.query(EdgeSQL).filter_by(
+                _id=e['_id']
+            ).delete()
+        else:
+            self.session.query(EdgeSQL).filter_by(
+                v_from=e['v_from'],
+                v_to=e['v_to'],
+            ).delete()
