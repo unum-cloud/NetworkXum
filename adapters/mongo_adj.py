@@ -1,3 +1,5 @@
+from typing import List, Optional, Dict, Generator, Set, Tuple
+
 # Properties of every entry are: 'from_id', 'to_id', 'weight'
 # There are indexes by all keys.
 from pymongo import MongoClient
@@ -13,10 +15,19 @@ class GraphMongoAdjacency(GraphBase):
         super().__init__()
         self.db = MongoClient(url)
         self.table = self.db[db_name][collection_name]
+        self.create_index()
 
     def create_index(self, background=False):
         self.table.create_index('v_from', background=background, sparse=True)
         self.table.create_index('v_to', background=background, sparse=True)
+
+    def count_vertexes(self) -> int:
+        froms = set(self.table.distinct('v_from'))
+        tos = set(self.table.distinct('v_to'))
+        return len(froms.union(tos))
+
+    def count_edges(self) -> int:
+        return self.table.count_documents(filter={})
 
     def insert(self, e: object) -> bool:
         result = self.table.update_one(
@@ -24,7 +35,9 @@ class GraphMongoAdjacency(GraphBase):
                 'v_from': e['v_from'],
                 'v_to': e['v_to'],
             },
-            update=e,
+            update={
+                '$set': e,
+            },
             upsert=True,
         )
         return result.modified_count >= 1
@@ -78,18 +91,30 @@ class GraphMongoAdjacency(GraphBase):
     def vertexes_related(self, v: int) -> Set[int]:
         vs_unique = set()
         for e in self.edges_related(v):
-            vs_unique.insert(e['v_from'])
-            vs_unique.insert(e['v_to'])
+            vs_unique.add(e['v_from'])
+            vs_unique.add(e['v_to'])
         vs_unique.remove(v)
         return vs_unique
 
     # Wider range of neighbours
 
-    def vertexes_related_to_related(self, v: int) -> Set[int]:
-        pass
-
     def vertexes_related_to_group(self, vs) -> Set[int]:
-        pass
+        vs = list(vs)
+        result = self.table.find(filter={
+            '$or': [{
+                'v_from': {'$in': vs},
+            }, {
+                'v_to': {'$in': vs},
+            }],
+        }, projection={
+            'v_from': 1,
+            'v_to': 1,
+        })
+        vs_unique = set()
+        for e in result:
+            vs_unique.add(e['v_from'])
+            vs_unique.add(e['v_to'])
+        return vs_unique.difference(set(vs))
 
     # Metadata
 
@@ -114,7 +139,7 @@ class GraphMongoAdjacency(GraphBase):
         result = list(result)
         if len(result) == 0:
             return 0, 0
-        return result['count'], result['weight']
+        return result[0]['count'], result[0]['weight']
 
     def count_followers(self, v: int) -> (int, float):
         result = self.table.aggregate(pipeline=[
@@ -132,7 +157,7 @@ class GraphMongoAdjacency(GraphBase):
         result = list(result)
         if len(result) == 0:
             return 0, 0
-        return result['count'], result['weight']
+        return result[0]['count'], result[0]['weight']
 
     def count_following(self, v: int) -> (int, float):
         result = self.table.aggregate(pipeline=[
@@ -150,7 +175,7 @@ class GraphMongoAdjacency(GraphBase):
         result = list(result)
         if len(result) == 0:
             return 0, 0
-        return result['count'], result['weight']
+        return result[0]['count'], result[0]['weight']
 
     # Bulk methods
 
