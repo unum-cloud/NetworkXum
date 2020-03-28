@@ -55,22 +55,10 @@ def validate(wrap):
         f'count_followers: {wrap.count_followers(5)}'
     assert wrap.count_following(5) == (1, 2.0), \
         f'count_following: {wrap.count_following(5)}'
-    # Clear the DB.
-
-
-if __name__ == "__main__":
-    for g in [
-        PlainSQL(url='mysql://root:temptemp@0.0.0.0:3306/mysql'),
-        PlainSQL(),
-        PlainSQL(url='postgres://root:temptemp@0.0.0.0:5432'),
-        Neo4j(url='bolt://0.0.0.0:7687', enterprise_edition=False),
-        MongoDB(
-            url='mongodb://0.0.0.0:27017',
-            db_name='graphdb',
-            collection_name='tests',
-        ),
-    ]:
-        try:
-            validate(g)
-        except Exception as e:
-            print(f'Failed for {g}: {str(e)}')
+    assert wrap.shortest_path(4, 3) == ([4, 5, 3], 5.0), \
+        f'shortest_path: {wrap.shortest_path(4, 3)}'
+    # Remove elements one by one.
+    for e in edges:
+        wrap.delete(e)
+    # Bulk load data again.
+    # Clear all the data at once.
