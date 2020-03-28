@@ -5,6 +5,7 @@ from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 from pymongo import MongoClient
 from pymongo import UpdateOne
 
+from pygraphdb.edge import Edge
 from pygraphdb.graph_base import GraphBase
 from helpers.shared import chunks, yield_edges_from
 
@@ -23,14 +24,14 @@ class MongoDB(GraphBase):
 
     # Relatives
 
-    def find_directed(self, v_from: int, v_to: int) -> Optional[object]:
+    def edge_directed(self, v_from: int, v_to: int) -> Optional[object]:
         result = self.table.find_one(filter={
             'v_from': v_from,
             'v_to': v_to,
         })
         return result
 
-    def find_undirected(self, v1: int, v2: int) -> Optional[object]:
+    def edge_undirected(self, v1: int, v2: int) -> Optional[object]:
         result = self.table.find_one(filter={
             '$or': [{
                 'v_from': v1,

@@ -19,7 +19,7 @@ class GraphBase(object):
     # Relatives
 
     @abstractmethod
-    def find_directed(self, v_from: int, v_to: int) -> Optional[object]:
+    def edge_directed(self, v_from: int, v_to: int) -> Optional[object]:
         """
             Given 2 vertexes that are stored in DB as 
             outgoing from `v_from` into `v_to`.
@@ -27,7 +27,7 @@ class GraphBase(object):
         pass
 
     @abstractmethod
-    def find_undirected(self, v1: int, v2: int) -> Optional[object]:
+    def edge_undirected(self, v1: int, v2: int) -> Optional[object]:
         """
             Given 2 vertexes search for an edge 
             that goes in any direction.
@@ -81,10 +81,13 @@ class GraphBase(object):
         return results.difference(set(vs))
 
     @abstractmethod
-    def vertexes_related_to_related(self, v: int) -> Set[int]:
+    def vertexes_related_to_related(self, v: int, include_related=False) -> Set[int]:
         related = self.vertexes_related(v)
         related_to_related = self.vertexes_related_to_group(related.union({v}))
-        return related.union(related_to_related).difference({v})
+        if include_related:
+            return related_to_related.union(related).difference({v})
+        else:
+            return related_to_related.difference(related).difference({v})
 
     @abstractmethod
     def shortest_path(self, v_from, v_to) -> List[int]:
