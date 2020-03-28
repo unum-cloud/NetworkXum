@@ -150,10 +150,10 @@ def find_edges_directed(db) -> int:
     half = len(edges_to_query) / 2
     cnt = 0
     for e in edges_to_query[:half]:
-        e = db.find_directed(e['v_from'], e['v_to'])
+        e = db.edge_directed(e['v_from'], e['v_to'])
         cnt += 1
     for e in edges_to_query[half:]:
-        e = db.find_directed(e['v_to'], e['v_from'])
+        e = db.edge_directed(e['v_to'], e['v_from'])
         cnt += 1
     return cnt
 
@@ -161,7 +161,7 @@ def find_edges_directed(db) -> int:
 def find_edges_undirected(db) -> int:
     cnt = 0
     for e in edges_to_query:
-        db.find_directed(e['v_from'], e['v_to'])
+        db.edge_directed(e['v_from'], e['v_to'])
         cnt += 1
     return cnt
 
