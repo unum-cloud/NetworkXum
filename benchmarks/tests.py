@@ -1,8 +1,9 @@
 
 from pygraphdb.edge import Edge
 from pygraphdb.graph_base import GraphBase
-from pygraphdb.plain_sql import *
-from pygraphdb.mongo_db import *
+from pygraphdb.plain_sql import PlainSQL
+from pygraphdb.mongo_db import MongoDB
+from pygraphdb.neo4j import Neo4j
 
 
 def validate(wrap):
@@ -23,9 +24,9 @@ def validate(wrap):
     vs_last = 0
     for e in edges:
         wrap.insert(e)
-        assert wrap.find_directed(e['v_from'], e['v_to']), \
+        assert wrap.edge_directed(e['v_from'], e['v_to']), \
             f'No directed edge: {e}'
-        assert wrap.find_undirected(e['v_from'], e['v_to']), \
+        assert wrap.edge_undirected(e['v_from'], e['v_to']), \
             f'No undirected edge: {e}'
         # Make sure the size of the DB isn't getting smaller.
         # It may remain unchanged for persistent stores.
@@ -36,27 +37,40 @@ def validate(wrap):
         assert vs_count >= vs_last, 'Problems in counting nodes'
         vs_last = vs_count
     # Validate the queries.
-    assert vs_last == 8, 'Wrong number of nodes!'
-    assert es_last == 10, 'Wrong number of edges!'
-    assert wrap.count_followers(1) == (3, 10.0)
-    assert wrap.count_following(1) == (1, 4.0)
-    assert wrap.count_related(1) == (4, 14.0)
-    assert wrap.vertexes_related(1) == {2, 4, 6, 7}
-    assert wrap.vertexes_related_to_related(8) == {1, 6, 7}
-    assert wrap.count_followers(5) == (1, 3.0)
-    assert wrap.count_following(5) == (1, 2.0)
+    assert vs_last == 8, \
+        f'count_nodes: {vs_last}'
+    assert es_last == 10, \
+        f'count_edges: {es_last}'
+    assert wrap.count_followers(1) == (3, 10.0), \
+        f'count_followers: {wrap.count_followers(1)}'
+    assert wrap.count_following(1) == (1, 4.0), \
+        f'count_following: {wrap.count_following(1)}'
+    assert wrap.count_related(1) == (4, 14.0), \
+        f'count_related: {wrap.count_related(1)}'
+    assert wrap.vertexes_related(1) == {2, 4, 6, 7}, \
+        f'vertexes_related: {wrap.vertexes_related(1)}'
+    assert wrap.vertexes_related_to_related(8) == {1}, \
+        f'vertexes_related_to_related: {wrap.vertexes_related_to_related(8)}'
+    assert wrap.count_followers(5) == (1, 3.0), \
+        f'count_followers: {wrap.count_followers(5)}'
+    assert wrap.count_following(5) == (1, 2.0), \
+        f'count_following: {wrap.count_following(5)}'
     # Clear the DB.
 
 
 if __name__ == "__main__":
     for g in [
-        PlainSQL(url='mysql://root:temptemp@127.0.0.1:3306/mysql'),
+        PlainSQL(url='mysql://root:temptemp@0.0.0.0:3306/mysql'),
         PlainSQL(),
-        PlainSQL(url='postgres://root:temptemp@localhost:5432'),
+        PlainSQL(url='postgres://root:temptemp@0.0.0.0:5432'),
+        Neo4j(url='bolt://0.0.0.0:7687', enterprise_edition=False),
         MongoDB(
-            url='mongodb://localhost:27017',
+            url='mongodb://0.0.0.0:27017',
             db_name='graphdb',
             collection_name='tests',
         ),
     ]:
-        validate(g)
+        try:
+            validate(g)
+        except Exception as e:
+            print(f'Failed for {g}: {str(e)}')
