@@ -41,6 +41,13 @@ class PlainSQL(GraphBase):
         with other SQL-compatible systems.
         Docs: https://docs.python.org/3/library/sqlite3.html
 
+        CAUTION:
+        Implementations of analytical queries are suboptimal, 
+        as implementing them in SQL dialects is troublesome and 
+        often results in excessive memory consumption, 
+        when temporary tables are created.
+
+        CAUTION:
         Queries can be exported without execution with `str(query)`, 
         but if you want to compile them for a specific dialect use following snippet:
         >>> str(query.statement.compile(dialect=postgresql.dialect()))
