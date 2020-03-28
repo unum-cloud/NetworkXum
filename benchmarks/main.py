@@ -1,6 +1,4 @@
 import time
-import random
-from random import SystemRandom
 from typing import List
 from copy import copy
 import json
@@ -13,6 +11,12 @@ from pygraphdb.plain_sql import PlainSQL
 from pygraphdb.mongo_db import MongoDB
 from pygraphdb.neo4j import Neo4j
 from helpers.shared import *
+
+from benchmarks.tests import FullTest
+from benchmarks.benchmark import FullBenchmark
+from benchmarks.stats import Stats
+from benchmarks.tasks import Tasks
+
 
 print('Welcome to GraphDB benchmarks!')
 print('- Reading settings')
@@ -27,15 +31,11 @@ mongo_url = os.getenv('URI_MONGO', 'mongodb://localhost:27017')
 file_path = os.getenv('URI_FILE',
                       '/Users/av/Datasets/graph-communities/fb-pages-company.edges')
 
-print('- Preparing global variables')
-stats_per_adapter_per_operation = dict()
-benchmarks = []
-
-
 if __name__ == "__main__":
     # Preprocessing
-    restore_previous_stats()
-    select_tasks(file_path)
+    stats = Stats()
+    tasks = Tasks()
+    tasks.sample_from_file(file_path, sampling_ratio)
     gs = [
         PlainSQL(url='sqlite:///:memory:'),
         PlainSQL(url='sqlite:////Users/av/sqlite/pygraphdb.db'),
@@ -54,13 +54,9 @@ if __name__ == "__main__":
     # Analysis
     for g in gs:
         try:
-            # Test before benchmarking.
-            validate(g)
-            # Benchmarking.
-            class_name = str(type(g))
-            counters = stats_per_adapter_per_operation[class_name]
-            benchmark(file_path, g, counters)
+            FullTest(graph=g).run()
+            FullBenchmark(graph=g, stats=stats, tasks=tasks).run()
         except Exception as e:
             print(f'Failed for {g}: {str(e)}')
     # Postprocessing
-    dump_updated_results()
+    stats.dump_to_file()

@@ -1,3 +1,8 @@
+import random
+from random import SystemRandom
+
+from helpers.shared import yield_edges_from
+
 
 class Tasks(object):
     """
@@ -18,9 +23,9 @@ class Tasks(object):
         self._select_edges = list()
         self._select_nodes = set()
 
-    def sample_from_file(self, filename: str):
+    def sample_from_file(self, filename: str, sampling_ratio: float):
         rnd = SystemRandom()
-        for e in yield_edges_from(file_path):
+        for e in yield_edges_from(filename):
             if rnd.random() < sampling_ratio:
                 self._select_edges.append(e)
                 self._select_nodes.add(e['v_from'])

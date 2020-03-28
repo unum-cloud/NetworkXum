@@ -1,9 +1,10 @@
 from pygraphdb.graph_base import GraphBase
 from benchmarks.stats import Stats
 from benchmarks.tasks import Tasks
+from helpers.shared import StatsCounter
 
 
-class GraphBenchmark(object):
+class FullBenchmark(object):
 
     def __init__(self, graph: GraphBase, stats: Stats, tasks: Tasks):
         self.graph = graph
