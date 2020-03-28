@@ -57,13 +57,13 @@ class PlainSQL(GraphBase):
 
     # Relatives
 
-    def find_directed(self, v_from: int, v_to: int) -> Optional[EdgeSQL]:
+    def edge_directed(self, v_from: int, v_to: int) -> Optional[EdgeSQL]:
         return self.session.query(EdgeSQL).filter(and_(
             EdgeSQL.v_from == v_from,
             EdgeSQL.v_to == v_to,
         )).first()
 
-    def find_undirected(self, v1: int, v2: int) -> Optional[EdgeSQL]:
+    def edge_undirected(self, v1: int, v2: int) -> Optional[EdgeSQL]:
         return self.session.query(EdgeSQL).filter(or_(
             and_(
                 EdgeSQL.v_from == v1,
