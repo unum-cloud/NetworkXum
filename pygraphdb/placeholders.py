@@ -1,19 +1,6 @@
-from neo4j import GraphDatabase
-
 from helpers.shared import *
 from pygraphdb.graph_base import GraphBase
 from pygraphdb.plain_sql import PlainSQL
-
-
-class Neo4j(GraphBase):
-    """
-        Uses Bolt API for Neo4j graph database.
-    """
-
-    def __init__(self, url='bolt://localhost:7687', collection_name=''):
-        super().__init__()
-        self.driver = GraphDatabase.driver(url, auth=("neo4j", "password"))
-        pass
 
 
 class Cayley(GraphBase):

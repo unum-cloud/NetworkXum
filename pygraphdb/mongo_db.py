@@ -151,7 +151,7 @@ class MongoDB(GraphBase):
 
     # Modifications
 
-    def insert(self, e: object) -> bool:
+    def insert(self, e: Edge) -> bool:
         result = self.table.update_one(
             filter={
                 'v_from': e['v_from'],
