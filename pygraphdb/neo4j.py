@@ -115,7 +115,7 @@ class Neo4j(GraphBase):
         '''
         group_members = ','.join([str(v) for v in vs])
         task = (pattern % (group_members, group_members))
-        return {int(r['_id'])`` for r in self.session.run(task).records()}
+        return {int(r['_id']) for r in self.session.run(task).records()}
 
     def vertexes_related(self, v: int) -> Set[int]:
         pattern = '''
@@ -123,7 +123,7 @@ class Neo4j(GraphBase):
         RETURN v_related._id as _id
         '''
         task = (pattern % (v))
-        return {int(r['_id'])`` for r in self.session.run(task).records()}
+        return {int(r['_id']) for r in self.session.run(task).records()}
 
     def vertexes_related_to_related(self, v: int, include_related=False) -> Set[int]:
         if include_related:
@@ -142,7 +142,7 @@ class Neo4j(GraphBase):
             RETURN v_unrelated._id as _id
             '''
             task = (pattern % v)
-        return {int(r['_id'])`` for r in self.session.run(task).records()}
+        return {int(r['_id']) for r in self.session.run(task).records()}
 
     def shortest_path(self, v_from, v_to) -> (List[int], float):
         pattern = '''
