@@ -86,6 +86,10 @@ class GraphBase(object):
         related_to_related = self.vertexes_related_to_group(related.union({v}))
         return related.union(related_to_related).difference({v})
 
+    @abstractmethod
+    def shortest_path(self, v_from, v_to) -> List[int]:
+        pass
+
     # Metadata
 
     @abstractmethod
