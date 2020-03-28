@@ -115,7 +115,7 @@ class Neo4j(GraphBase):
         '''
         group_members = ','.join([str(v) for v in vs])
         task = (pattern % (group_members, group_members))
-        return {r['_id'] for r in self.session.run(task).records()}
+        return {int(r['_id'])`` for r in self.session.run(task).records()}
 
     def vertexes_related(self, v: int) -> Set[int]:
         pattern = '''
@@ -123,7 +123,7 @@ class Neo4j(GraphBase):
         RETURN v_related._id as _id
         '''
         task = (pattern % (v))
-        return {r['_id'] for r in self.session.run(task).records()}
+        return {int(r['_id'])`` for r in self.session.run(task).records()}
 
     def vertexes_related_to_related(self, v: int, include_related=False) -> Set[int]:
         if include_related:
@@ -142,7 +142,20 @@ class Neo4j(GraphBase):
             RETURN v_unrelated._id as _id
             '''
             task = (pattern % v)
-        return {r['_id'] for r in self.session.run(task).records()}
+        return {int(r['_id'])`` for r in self.session.run(task).records()}
+
+    def shortest_path(self, v_from, v_to) -> (List[int], float):
+        pattern = '''
+        MATCH (v_from:Vertex {_id: %d}), (v_to:Vertex {_id: %d})
+        CALL algo.shortestPath.stream(v_from, v_to, "weight")
+        YIELD nodeId, weight
+        MATCH (v_on_path:Loc) WHERE id(v_on_path) = nodeId
+        RETURN v_on_path._id AS _id, weight
+        '''
+        rs = list(self.session.run(task).records())
+        path = [int(r['_id']) for r in rs]
+        weight = sum([float(r['weight']) for r in rs])
+        return path, weight
 
     # Metadata
 
@@ -152,7 +165,7 @@ class Neo4j(GraphBase):
         WITH count(v) as result
         RETURN result
         '''
-        return self._first_record(self.session.run(task), 'result')
+        return int(self._first_record(self.session.run(task), 'result'))
 
     def count_edges(self) -> int:
         task = '''
@@ -160,7 +173,7 @@ class Neo4j(GraphBase):
         WITH count(e) as result
         RETURN result
         '''
-        return self._first_record(self.session.run(task), 'result')
+        return int(self._first_record(self.session.run(task), 'result'))
 
     def count_related(self, v: int) -> (int, float):
         pattern = '''
@@ -170,8 +183,8 @@ class Neo4j(GraphBase):
         '''
         task = (pattern % v)
         rs = list(self.session.run(task).records())
-        c = self._first_record(rs, 'c')
-        s = self._first_record(rs, 's')
+        c = int(self._first_record(rs, 'c'))
+        s = float(self._first_record(rs, 's'))
         return c, s
 
     def count_followers(self, v: int) -> (int, float):
@@ -182,8 +195,8 @@ class Neo4j(GraphBase):
         '''
         task = (pattern % v)
         rs = list(self.session.run(task).records())
-        c = self._first_record(rs, 'c')
-        s = self._first_record(rs, 's')
+        c = int(self._first_record(rs, 'c'))
+        s = float(self._first_record(rs, 's'))
         return c, s
 
     def count_following(self, v: int) -> (int, float):
@@ -194,8 +207,8 @@ class Neo4j(GraphBase):
         '''
         task = (pattern % v)
         rs = list(self.session.run(task).records())
-        c = self._first_record(rs, 'c')
-        s = self._first_record(rs, 's')
+        c = int(self._first_record(rs, 'c'))
+        s = float(self._first_record(rs, 's'))
         return c, s
 
     # Modifications
