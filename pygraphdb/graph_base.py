@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 
 from pygraphdb.edge import Edge
+from helpers.shared import chunks, yield_edges_from
 
 
 class GraphBase(object):
@@ -63,7 +64,7 @@ class GraphBase(object):
         for e in self.edges_related(v):
             vs_unique.add(e['v_from'])
             vs_unique.add(e['v_to'])
-        vs_unique.remove(v)
+        vs_unique.discard(v)
         return vs_unique
 
     @abstractmethod
@@ -142,18 +143,43 @@ class GraphBase(object):
     # Modifications
 
     @abstractmethod
-    def insert(self, e: Edge) -> bool:
+    def insert_edge(self, e: Edge) -> bool:
         """
             Inserts an `Edge` with automatically precomputed ID.
         """
         pass
 
     @abstractmethod
-    def delete(self, e: object) -> bool:
+    def insert_edges(self, es: List[Edge]) -> int:
+        cnt = 0
+        for e in es:
+            self.insert_edge(e)
+            cnt += 1
+        return cnt
+
+    @abstractmethod
+    def insert_dump(self, filepath: str):
+        for es in chunks(yield_edges_from(filepath), 1000):
+            self.insert_edges(list(es))
+
+    @abstractmethod
+    def remove_vertex(self, v: int) -> int:
+        cnt = 0
+        for e in self.edges_related(v):
+            self.remove_edge(e)
+            cnt += 1
+        return cnt
+
+    @abstractmethod
+    def remove_edge(self, e: object) -> bool:
         """
             Can delete edges with known ID and without.
             In the second case we only delete 1 edge, that has 
             matching `v_from` and `v_to` vertexes without 
             searching for reverse edge.
         """
+        return False
+
+    @abstractmethod
+    def remove_all(self):
         pass

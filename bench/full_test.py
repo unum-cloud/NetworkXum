@@ -39,10 +39,10 @@ class FullTest(object):
             assert vs_count >= vs_last, 'Problems in counting nodes'
             vs_last = vs_count
         # Validate the queries.
-        assert vs_last == 8, \
-            f'count_nodes: {vs_last}'
-        assert es_last == 10, \
-            f'count_edges: {es_last}'
+        assert g.count_nodes() == 8, \
+            f'count_nodes: {g.count_nodes()}'
+        assert g.count_edges() == 10, \
+            f'count_edges: {g.count_edges()}'
         assert g.count_followers(1) == (3, 10.0), \
             f'count_followers: {g.count_followers(1)}'
         assert g.count_following(1) == (1, 4.0), \
@@ -61,6 +61,16 @@ class FullTest(object):
         #     f'shortest_path: {g.shortest_path(4, 3)}'
         # Remove elements one by one.
         for e in edges:
-            g.delete(e)
+            g.remove(e)
         # Bulk load data again.
+        g.import_dump('test.csv')
+        assert g.count_nodes() == 8, \
+            f'count_nodes after dump imports: {g.count_nodes()}'
+        assert g.count_edges() == 10, \
+            f'count_edges after dump imports: {g.count_edges()}'
         # Clear all the data at once.
+        g.remove_all()
+        assert g.count_nodes() == 8, \
+            f'count_nodes after clearing: {g.count_nodes()}'
+        assert g.count_edges() == 10, \
+            f'count_edges after clearing: {g.count_edges()}'

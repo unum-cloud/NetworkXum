@@ -7,7 +7,6 @@ from pymongo import UpdateOne
 
 from pygraphdb.edge import Edge
 from pygraphdb.graph_base import GraphBase
-from helpers.shared import chunks, yield_edges_from
 
 
 class MongoDB(GraphBase):
@@ -152,31 +151,44 @@ class MongoDB(GraphBase):
 
     # Modifications
 
-    def insert(self, e: Edge) -> bool:
+    def insert_edge(self, e: Edge) -> bool:
+        if not isinstance(e, dict):
+            e = e.__dict__
         result = self.table.update_one(
             filter={
                 'v_from': e['v_from'],
                 'v_to': e['v_to'],
             },
             update={
-                '$set': e.__dict__,
+                '$set': e,
             },
             upsert=True,
         )
         return result.modified_count >= 1
 
-    def delete(self, e: object) -> bool:
+    def remove_edge(self, e: object) -> bool:
         result = self.table.delete_one(filter={
             'v_from': e['v_from'],
             'v_to': e['v_to'],
         })
         return result.deleted_count >= 1
 
-    def delete_many(self, es: List[object]) -> int:
-        pass
+    def remove_vertex(self, v: int) -> int:
+        result = self.table.delete(filter={
+            '$or': [
+                {'v_from': v},
+                {'v_to': v},
+            ]
+        })
+        return result.deleted_count >= 1
 
-    def insert_many(self, es: List[object]) -> int:
+    def remove_all(self):
+        self.table.drop()
+
+    def insert_edges(self, es: List[object]) -> int:
         """Supports up to 1000 operations"""
+        if not isinstance(e, dict):
+            e = e.__dict__
         ops = list()
         for e in es:
             op = UpdateOne(
@@ -184,13 +196,9 @@ class MongoDB(GraphBase):
                     'v_from': e['v_from'],
                     'v_to': e['v_to'],
                 },
-                update=e.__dict__,
+                update=e,
                 upsert=True,
             )
             ops.append(op)
         result = table.bulk_write(requests=ops, ordered=False)
         return int(result.bulk_api_result['upserted'])
-
-    def import_file(self, filepath: str):
-        for es in chunks(yield_edges_from(filepath), 1000):
-            self.insert_many(list(es))

@@ -2,8 +2,8 @@
 class Edge(object):
     """
         Shared Edge class with ID hashing for simpler collision avoidance.
-        Advanced DBs can preserve object uniqness by comparing multiple keys/columns. 
-        Others only support 1 primary key, so we implement hashing and type 
+        Advanced DBs can preserve object uniqness by comparing multiple keys/columns.
+        Others only support 1 primary key, so we implement hashing and type
         checking in this class to simplify queries in pygraphdb.
     """
 
@@ -15,12 +15,12 @@ class Edge(object):
         self.v_from = v_from
         self.v_to = v_to
         self.weight = weight
-        self._update_hash()
+        self._id = Edge.combine_ids(self.v_from, self.v_to)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<EdgeSQL(_id={self._id}, v_from={self.v_from}, v_to={self.v_to}, weight={self.weight})>'
 
-    def __contains__(self, key):
+    def __contains__(self, key) -> bool:
         if key == '_id':
             return self._id is not None
         return key in ['weight', 'v_from', 'v_to']
@@ -31,6 +31,11 @@ class Edge(object):
     def __setitem__(self, key, val):
         return setattr(self, key, val)
 
-    def _update_hash(self):
-        self._id = (self.v_from + self.v_to) * \
-            (self.v_from + self.v_to + 1) // 2 + self.v_to
+    @staticmethod
+    def combine_ids(v_from: int, v_to: int) -> int:
+        # Source: https://stackoverflow.com/a/919661
+        return (v_from + v_to) * (v_from + v_to + 1) // 2 + v_to
+
+
+assert (Edge.combine_ids(10, 20) != Edge.combine_ids(20, 10)), \
+    'The node IDs transformation must be order-dependant.'

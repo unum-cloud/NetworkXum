@@ -6,7 +6,7 @@ import platform
 from helpers.shared import StatsCounter
 
 
-class Stats(object):
+class StatsFile(object):
 
     def __init__(self, filename='bench/stats.json'):
         self.filename = filename
@@ -17,8 +17,8 @@ class Stats(object):
     # def __del__(self):
     #     self.dump_to_file(self.filename)
 
-    @staticmethod
     def bench_matches(
+        self,
         bench: object,
         wrapper_name: str,
         operation_name: str,
@@ -38,8 +38,8 @@ class Stats(object):
     ) -> Optional[StatsCounter]:
         def predicate(b):
             wrapper_name = str(wrapper_class)
-            return bench_matches(b, wrapper_name, operation_name)
-        return next(filter(predicate, benchmarks), None)
+            return self.bench_matches(b, wrapper_name, operation_name)
+        return next(filter(predicate, self.results), None)
 
     def insert(
         self,
@@ -49,8 +49,13 @@ class Stats(object):
     ):
         bench = self.find(wrapper_class, operation_name)
         stats_serialized = {
+            'device': self.device_name,
             'time_elapsed': stats.time_elapsed,
-            'count_operation_names': stats.count_operation_names,
+            'count_operations': stats.count_operations,
+            'msecs_per_operation': stats.msecs_per_op(),
+            'operations_per_second': stats.ops_per_sec(),
+            'operation_name': operation_name,
+            'wrapper_name': str(wrapper_class),
         }
         if bench is None:
             self.results.append(stats_serialized)

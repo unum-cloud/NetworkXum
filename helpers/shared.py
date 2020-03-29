@@ -45,14 +45,18 @@ class StatsCounter:
 
     def handle(self, func):
         before = time.time()
-        func()
-        elapsed = before - time.time()
+        ops = func()
+        elapsed = time.time() - before
         self.time_elapsed += elapsed
-        self.count_operations += 1
+        assert isinstance(ops, int), \
+            'Return value must contain the number of operations'
+        self.count_operations += ops
 
-    def time_average(self):
+    def secs_per_op(self) -> float:
         return self.time_elapsed / self.count_operations
 
+    def msecs_per_op(self) -> float:
+        return self.secs_per_op() / 1000.0
 
-def neighbours(edges: list, known_id) -> list:
-    pass
+    def ops_per_sec(self) -> float:
+        return self.count_operations / self.time_elapsed

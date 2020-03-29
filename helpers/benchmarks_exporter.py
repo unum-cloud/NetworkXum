@@ -1,1 +1,1 @@
-# Exports data from `benchmarks.json` to `benchmarks.md` in human-readable form.
+# Exports data from `bench.json` to `bench.md` in human-readable form.
