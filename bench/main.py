@@ -22,7 +22,7 @@ print('Welcome to GraphDB benchmarks!')
 print('- Reading settings')
 sampling_ratio = float(os.getenv('SAMPLING_RATIO', '0.01'))
 sample_from_real_data = os.getenv('SAMPLE_FROM_REAL_DATA', '1') == '1'
-count_nodes = int(os.getenv('COUNT_NODES', '0'))
+count_vertexes = int(os.getenv('COUNT_NODES', '0'))
 count_edges = int(os.getenv('COUNT_EDGES', '0'))
 count_finds = int(os.getenv('COUNT_FINDS', '10000'))
 count_analytics = int(os.getenv('COUNT_ANALYTICS', '1000'))
@@ -37,14 +37,14 @@ if __name__ == "__main__":
     tasks = TasksSampler()
     tasks.sample_from_file(file_path, sampling_ratio)
     gs = [
-        # PlainSQL(url='sqlite:///:memory:'),
-        # PlainSQL(url='sqlite:////Users/av/sqlite/pygraphdb.db'),
-        # PlainSQL(url='mysql://root:temptemp@0.0.0.0:3306/mysql'),
-        # PlainSQL(url='postgres://root:temptemp@0.0.0.0:5432'),
-        # Neo4j(
-        #     url='bolt://0.0.0.0:7687/pygraphdb',
-        #     enterprise_edition=False,
-        # ),
+        PlainSQL(url='sqlite:///:memory:'),
+        PlainSQL(url='sqlite:////Users/av/sqlite/pygraphdb.db'),
+        PlainSQL(url='mysql://root:temptemp@0.0.0.0:3306/mysql'),
+        PlainSQL(url='postgres://root:temptemp@0.0.0.0:5432'),
+        Neo4j(
+            url='bolt://0.0.0.0:7687/pygraphdb',
+            enterprise_edition=False,
+        ),
         MongoDB(
             url='mongodb://0.0.0.0:27017/',
             db_name='pygraphdb',

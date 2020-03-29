@@ -73,4 +73,4 @@ class StatsFile(object):
     def dump_to_file(self, filename=None):
         if filename is None:
             filename = self.filename
-        json.dump(self.results, open(filename, 'w'))
+        json.dump(self.results, open(filename, 'w'), indent=4)
