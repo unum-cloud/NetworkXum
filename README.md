@@ -7,12 +7,11 @@ Implements the same [interface](adapters/base.py) for every one of those backend
 
 ## Project Structure
 
-* [adapters](adapters) - contains Pythonic wrappers for DBs.
-* [known_datasets.json](known_datasets.json) - contains estimated lower bounds on the number of unique nodes and edges in each dataset.
-* [benchmarks.json](benchmarks.json) - contains machine-readable results of previous benchmarks.
-* [benchmarks.md](benchmarks.md) - contains human-readable results of previous benchmarks.
-* [Dockerfile](Dockerfile) - contains Docker image of benchmark application.
-* [docker-compose.yml](docker-compose.yml) - instantiates that image for selected datasets and alse spins up infrastructure for testing. Comment out the second part of it if you don't want to create new DB containers.
+* [pygraphdb](pygraphdb) - contains Pythonic wrappers for DBs.
+* [bench/stats.json](bench/stats.json) - contains machine-readable results of previous benchmarks.
+* [bench/stats.md](bench/stats.md) - contains human-readable results of previous benchmarks.
+* [bench/Dockerfile](bench/Dockerfile) - contains Docker image of benchmark application.
+* [bench/docker-compose.yml](bench/docker-compose.yml) - instantiates that image for selected datasets and alse spins up infrastructure for testing. Comment out the second part of it if you don't want to create new DB containers.
 
 ## Environment Variables
 

@@ -12,10 +12,10 @@ from pygraphdb.mongo_db import MongoDB
 from pygraphdb.neo4j import Neo4j
 from helpers.shared import *
 
-from benchmarks.tests import FullTest
-from benchmarks.benchmark import FullBenchmark
-from benchmarks.stats import Stats
-from benchmarks.tasks import Tasks
+from bench.full_test import FullTest
+from bench.full_bench import FullBench
+from bench.stats_file import StatsFile
+from bench.tasks_sampler import TasksSampler
 
 
 print('Welcome to GraphDB benchmarks!')
@@ -33,18 +33,18 @@ file_path = os.getenv('URI_FILE',
 
 if __name__ == "__main__":
     # Preprocessing
-    stats = Stats()
-    tasks = Tasks()
+    stats = StatsFile()
+    tasks = TasksSampler()
     tasks.sample_from_file(file_path, sampling_ratio)
     gs = [
-        PlainSQL(url='sqlite:///:memory:'),
-        PlainSQL(url='sqlite:////Users/av/sqlite/pygraphdb.db'),
-        PlainSQL(url='mysql://root:temptemp@0.0.0.0:3306/mysql'),
-        PlainSQL(url='postgres://root:temptemp@0.0.0.0:5432'),
-        Neo4j(
-            url='bolt://0.0.0.0:7687/pygraphdb',
-            enterprise_edition=False,
-        ),
+        # PlainSQL(url='sqlite:///:memory:'),
+        # PlainSQL(url='sqlite:////Users/av/sqlite/pygraphdb.db'),
+        # PlainSQL(url='mysql://root:temptemp@0.0.0.0:3306/mysql'),
+        # PlainSQL(url='postgres://root:temptemp@0.0.0.0:5432'),
+        # Neo4j(
+        #     url='bolt://0.0.0.0:7687/pygraphdb',
+        #     enterprise_edition=False,
+        # ),
         MongoDB(
             url='mongodb://0.0.0.0:27017/',
             db_name='pygraphdb',
@@ -53,10 +53,12 @@ if __name__ == "__main__":
     ]
     # Analysis
     for g in gs:
-        try:
-            FullTest(graph=g).run()
-            FullBenchmark(graph=g, stats=stats, tasks=tasks).run()
-        except Exception as e:
-            print(f'Failed for {g}: {str(e)}')
+        # try:
+        #     FullTest(graph=g).run()
+        #     FullBench(graph=g, stats=stats, tasks=tasks).run()
+        # except Exception as e:
+        #     print(f'Failed for {g}: {str(e)}')
+        FullTest(graph=g).run()
+        FullBench(graph=g, stats=stats, tasks=tasks).run()
     # Postprocessing
     stats.dump_to_file()

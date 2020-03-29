@@ -4,7 +4,7 @@ from random import SystemRandom
 from helpers.shared import yield_edges_from
 
 
-class Tasks(object):
+class TasksSampler(object):
     """
         Select this data beforehand to:
         - avoid affecting the runtime of benchmark.

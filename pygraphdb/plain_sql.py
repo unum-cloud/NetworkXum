@@ -145,7 +145,7 @@ class PlainSQL(GraphBase):
 
     # Modifications
 
-    def insert(self, e: EdgeSQL, check_uniqness=True) -> bool:
+    def insert_edge(self, e: EdgeSQL, check_uniqness=True) -> bool:
         if not isinstance(e, EdgeSQL):
             e = EdgeSQL(e['v_from'], e['v_to'], e['weight'])
         copies = []
@@ -163,9 +163,9 @@ class PlainSQL(GraphBase):
             self.session.add(e)
         else:
             copies[0]['weight'] = e['weight']
-        self.session.flush()
+        self.session.commit()
 
-    def delete(self, e: EdgeSQL) -> bool:
+    def remove_edge(self, e: EdgeSQL) -> bool:
         if '_id' in e:
             self.session.query(EdgeSQL).filter_by(
                 _id=e['_id']
@@ -175,3 +175,35 @@ class PlainSQL(GraphBase):
                 v_from=e['v_from'],
                 v_to=e['v_to'],
             ).delete()
+        self.session.commit()
+
+    def insert_edges(self, es: List[Edge]) -> int:
+        for e in es:
+            if not isinstance(e, EdgeSQL):
+                e = EdgeSQL(e['v_from'], e['v_to'], e['weight'])
+            self.session.add(e)
+        try:
+            self.session.commit()
+            return len(es)
+        except:
+            return 0
+
+    def remove_vertex(self, v: int) -> int:
+        try:
+            count = self.session.query(EdgeSQL).filter(or_(
+                EdgeSQL.v_from == v,
+                EdgeSQL.v_to == v,
+            )).delete()
+            self.session.commit()
+            return count
+        except:
+            self.session.rollback()
+            return 0
+
+    def remove_all(self) -> int:
+        try:
+            count = self.session.query(EdgeSQL).delete()
+            self.session.commit()
+            return count
+        except:
+            self.session.rollback()

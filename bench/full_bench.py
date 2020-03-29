@@ -1,15 +1,22 @@
 from pygraphdb.graph_base import GraphBase
-from benchmarks.stats import Stats
-from benchmarks.tasks import Tasks
+from bench.stats_file import StatsFile
+from bench.tasks_sampler import TasksSampler
 from helpers.shared import StatsCounter
 
 
-class FullBenchmark(object):
+class FullBench(object):
 
-    def __init__(self, graph: GraphBase, stats: Stats, tasks: Tasks):
+    def __init__(
+        self,
+        graph: GraphBase,
+        stats: StatsFile,
+        tasks: TasksSampler,
+        datasource: str
+    ):
         self.graph = graph
         self.stats = stats
         self.tasks = tasks
+        self.datasource = datasource
 
     def run(self):
         # Benchmark groups in self.tasks.chronological order:
@@ -25,17 +32,15 @@ class FullBenchmark(object):
         # - optional node removals
         # --
         def micro(operation_name, f):
-            counter = StatsCounter().handle(f)
-            class_name = str(type(self.graph))
+            counter = StatsCounter()
+            counter.handle(f)
+            class_name = self.graph.__class__.__name__
+            print(f'Importing stats {class_name}, {operation_name}: {counter}')
             self.stats.insert(class_name, operation_name, counter)
             return
 
         # Bulk write operations.
-        # micro('bulk-load', self.db.port_file(file_pat)
-        # micro('bulk-index', self.db.eate_index)
-        # This operation will alter the state of database,
-        # changing the results on future runs.
-        # micro('remove-v', self.find_e_directed)
+        micro('insert-bulk', self.db.insert_dump(self.datasource))
 
         # Queries returning single object.
         micro('find-e-directed', self.find_e_directed)
@@ -54,8 +59,12 @@ class FullBenchmark(object):
         micro('count-v-following', self.count_v_following)
 
         # Write operations.
-        micro('remove-e', self.remove_e)
-        micro('insert-e', self.insert_e)
+        micro('remove-e', self.remove_e)  # Single edge removals
+        micro('insert-e', self.insert_e)  # Single edge inserts
+        micro('remove-es', self.remove_es)  # Batched edge removals
+        micro('insert-es', self.insert_e)  # Batched edge inserts
+        micro('remove-v', self.remove_v)  # Single node removals
+        micro('remove-bulk', self.remove_v)  # Removing the table
 
     # ---
     # Operations
@@ -63,7 +72,7 @@ class FullBenchmark(object):
 
     def find_e_directed(self) -> int:
         # Try both existing and potentially missing edges
-        half = len(edges_to_query) / 2
+        half = int(len(self.tasks.edges_to_query) / 2)
         cnt = 0
         for e in self.tasks.edges_to_query[:half]:
             e = self.graph.edge_directed(e['v_from'], e['v_to'])
@@ -139,7 +148,7 @@ class FullBenchmark(object):
     def remove_e(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_remove:
-            self.graph.delete(e)
+            self.graph.remove(e)
             cnt += 1
         return cnt
 
