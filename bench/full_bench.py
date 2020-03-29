@@ -1,3 +1,5 @@
+import os
+
 from pygraphdb.graph_base import GraphBase
 from bench.stats_file import StatsFile
 from bench.tasks_sampler import TasksSampler
@@ -35,18 +37,29 @@ class FullBench(object):
         # --
         def micro(operation_name, f):
             counter = StatsCounter()
-            counter.handle(f)
+            dataset_name = os.path.basename(self.datasource)
             class_name = self.graph.__class__.__name__
+            print(f'-- {class_name}: {operation_name} @ {dataset_name}')
             if not self.repeat_existing:
-                if self.stats.find(class_name, operation_name) is not None:
-                    print(f'Reusing stats {class_name}, {operation_name}')
+                old_results = self.stats.find(
+                    class_name,
+                    operation_name,
+                    dataset_name
+                )
+                if old_results is not None:
+                    print('--- Skipping!')
                     return
-            print(f'Importing stats {class_name}, {operation_name}: {counter}')
-            self.stats.insert(class_name, operation_name, counter)
-            return
+            counter.handle(f)
+            print(f'--- Importing new stats!')
+            self.stats.insert(
+                class_name,
+                operation_name,
+                dataset_name,
+                counter
+            )
 
         # Bulk write operations.
-        micro('insert-bulk', lambda: self.graph.insert_dump(self.datasource))
+        micro('insert-bulk', self.insert_bulk)
 
         # Queries returning single object.
         micro('find-e-directed', self.find_e_directed)
@@ -72,7 +85,7 @@ class FullBench(object):
         micro('remove-v', self.remove_v)  # Single node removals
 
         # Cleaning
-        micro('remove-bulk', lambda: self.graph.remove_all())
+        micro('remove-bulk', self.remove_bulk)
 
     # ---
     # Operations
@@ -187,3 +200,12 @@ class FullBench(object):
             self.graph.remove_vertex(v)
             cnt += 1
         return cnt
+
+    def insert_bulk(self) -> int:
+        self.graph.insert_dump(self.datasource)
+        return self.graph.count_edges()
+
+    def remove_bulk(self) -> int:
+        c = self.graph.count_edges()
+        self.graph.remove_all()
+        return c - self.graph.count_edges()

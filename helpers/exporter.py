@@ -4,6 +4,7 @@ from typing import List, Optional
 from enum import Enum
 import os
 import json
+import re
 
 
 class AggregationPolicy(Enum):
@@ -79,7 +80,10 @@ class StatsExporter(object):
         # Define filtering predicate.
         def matches(s) -> bool:
             for k, v in kwargs.items():
-                if s.get(k, None) != v:
+                if isinstance(v, re.Pattern):
+                    if not v.search(s.get(k, '')):
+                        return False
+                elif s.get(k, None) != v:
                     return False
             return True
         # Filter.
@@ -183,7 +187,7 @@ class StatsExporter(object):
         best_bracket_smalest_val = value_biggest - diff/3
         worst_bracket_biggest_val = value_smallest + diff/3
 
-        table[0][numeric_column] = 'Result'
+        table[0].append('Result')
         for row in table[1:]:
             val = float(row[numeric_column])
             if val >= best_bracket_smalest_val:
@@ -216,5 +220,28 @@ class StatsExporter(object):
 
 StatsExporter().\
     load('bench/stats.json').\
-    correlate('wrapper_name', 'operation_name', 'time_elapsed').\
-    export('Simple Queries', overwrite=True)
+    limit_to(operation_name=re.compile('find-e(.*)')).\
+    correlate('operation_name', 'wrapper_name', 'operations_per_second').\
+    compare_by('find-e-directed').\
+    export('Simple Search Queries', overwrite=True)
+
+StatsExporter().\
+    load('bench/stats.json').\
+    limit_to(operation_name=re.compile('(find-v|count-v)')).\
+    correlate('operation_name', 'wrapper_name', 'operations_per_second').\
+    compare_by('find-vs-related-related').\
+    export('Complex Search Queries', overwrite=False)
+
+StatsExporter().\
+    load('bench/stats.json').\
+    limit_to(operation_name=re.compile('insert-(.*)')).\
+    correlate('operation_name', 'wrapper_name', 'operations_per_second').\
+    compare_by('insert-e').\
+    export('Insertions', overwrite=False)
+
+StatsExporter().\
+    load('bench/stats.json').\
+    limit_to(operation_name=re.compile('remove-(.*)')).\
+    correlate('operation_name', 'wrapper_name', 'operations_per_second').\
+    compare_by('remove-e').\
+    export('Removals', overwrite=False)

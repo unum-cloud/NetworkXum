@@ -174,7 +174,7 @@ class MongoDB(GraphBase):
         return result.deleted_count >= 1
 
     def remove_vertex(self, v: int) -> int:
-        result = self.table.delete(filter={
+        result = self.table.delete_many(filter={
             '$or': [
                 {'v_from': v},
                 {'v_to': v},
@@ -187,18 +187,21 @@ class MongoDB(GraphBase):
 
     def insert_edges(self, es: List[object]) -> int:
         """Supports up to 1000 operations"""
-        if not isinstance(e, dict):
-            e = e.__dict__
         ops = list()
         for e in es:
+            if not isinstance(e, dict):
+                e = e.__dict__
             op = UpdateOne(
                 filter={
+                    '_id': e['_id'],
                     'v_from': e['v_from'],
                     'v_to': e['v_to'],
                 },
-                update=e,
+                update={
+                    '$set': e
+                },
                 upsert=True,
             )
             ops.append(op)
-        result = table.bulk_write(requests=ops, ordered=False)
-        return int(result.bulk_api_result['upserted'])
+        result = self.table.bulk_write(requests=ops, ordered=False)
+        return len(result.bulk_api_result['upserted'])
