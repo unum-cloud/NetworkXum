@@ -11,12 +11,14 @@ class FullBench(object):
         graph: GraphBase,
         stats: StatsFile,
         tasks: TasksSampler,
-        datasource: str
+        datasource: str,
+        repeat_existing=False,
     ):
         self.graph = graph
         self.stats = stats
         self.tasks = tasks
         self.datasource = datasource
+        self.repeat_existing = repeat_existing
 
     def run(self):
         # Benchmark groups in self.tasks.chronological order:
@@ -35,12 +37,16 @@ class FullBench(object):
             counter = StatsCounter()
             counter.handle(f)
             class_name = self.graph.__class__.__name__
+            if not self.repeat_existing:
+                if self.stats.find(class_name, operation_name) is not None:
+                print(f'Reusing stats {class_name}, {operation_name}')
+                return
             print(f'Importing stats {class_name}, {operation_name}: {counter}')
             self.stats.insert(class_name, operation_name, counter)
             return
 
         # Bulk write operations.
-        micro('insert-bulk', self.db.insert_dump(self.datasource))
+        micro('insert-bulk', lambda: self.graph.insert_dump(self.datasource))
 
         # Queries returning single object.
         micro('find-e-directed', self.find_e_directed)
@@ -62,9 +68,11 @@ class FullBench(object):
         micro('remove-e', self.remove_e)  # Single edge removals
         micro('insert-e', self.insert_e)  # Single edge inserts
         micro('remove-es', self.remove_es)  # Batched edge removals
-        micro('insert-es', self.insert_e)  # Batched edge inserts
+        micro('insert-es', self.insert_es)  # Batched edge inserts
         micro('remove-v', self.remove_v)  # Single node removals
-        micro('remove-bulk', self.remove_v)  # Removing the table
+
+        # Cleaning
+        micro('remove-bulk', lambda: self.graph.remove_all())
 
     # ---
     # Operations
@@ -147,14 +155,35 @@ class FullBench(object):
 
     def remove_e(self) -> int:
         cnt = 0
-        for e in self.tasks.edges_to_remove:
-            self.graph.remove(e)
+        for e in self.tasks.edges_to_change_by_one:
+            self.graph.remove_edge(e)
             cnt += 1
         return cnt
 
     def insert_e(self) -> int:
         cnt = 0
-        for e in self.tasks.edges_to_insert:
-            self.graph.insert(e)
+        for e in self.tasks.edges_to_change_by_one:
+            self.graph.insert_edge(e)
+            cnt += 1
+        return cnt
+
+    def remove_es(self) -> int:
+        cnt = 0
+        for es in self.tasks.edges_to_change_batched:
+            self.graph.remove_edges(es)
+            cnt += len(es)
+        return cnt
+
+    def insert_es(self) -> int:
+        cnt = 0
+        for es in self.tasks.edges_to_change_batched:
+            self.graph.insert_edges(es)
+            cnt += len(es)
+        return cnt
+
+    def remove_v(self) -> int:
+        cnt = 0
+        for v in self.tasks.nodes_to_change_by_one:
+            self.graph.remove_vertex(v)
             cnt += 1
         return cnt
