@@ -39,8 +39,8 @@ class FullBench(object):
             class_name = self.graph.__class__.__name__
             if not self.repeat_existing:
                 if self.stats.find(class_name, operation_name) is not None:
-                print(f'Reusing stats {class_name}, {operation_name}')
-                return
+                    print(f'Reusing stats {class_name}, {operation_name}')
+                    return
             print(f'Importing stats {class_name}, {operation_name}: {counter}')
             self.stats.insert(class_name, operation_name, counter)
             return

@@ -25,7 +25,7 @@ class FullTest(object):
         es_last = 0
         vs_last = 0
         for e in edges:
-            g.insert(e)
+            g.insert_edge(e)
             assert g.edge_directed(e['v_from'], e['v_to']), \
                 f'No directed edge: {e}'
             assert g.edge_undirected(e['v_from'], e['v_to']), \
@@ -39,8 +39,8 @@ class FullTest(object):
             assert vs_count >= vs_last, 'Problems in counting nodes'
             vs_last = vs_count
         # Validate the queries.
-        assert g.count_nodes() == 8, \
-            f'count_nodes: {g.count_nodes()}'
+        assert g.count_vertexes() == 8, \
+            f'count_vertexes: {g.count_vertexes()}'
         assert g.count_edges() == 10, \
             f'count_edges: {g.count_edges()}'
         assert g.count_followers(1) == (3, 10.0), \
@@ -61,16 +61,16 @@ class FullTest(object):
         #     f'shortest_path: {g.shortest_path(4, 3)}'
         # Remove elements one by one.
         for e in edges:
-            g.remove(e)
+            g.remove_edge(e)
         # Bulk load data again.
-        g.import_dump('test.csv')
-        assert g.count_nodes() == 8, \
-            f'count_nodes after dump imports: {g.count_nodes()}'
+        g.insert_dump('bench/test.csv')
+        assert g.count_vertexes() == 8, \
+            f'count_vertexes after dump imports: {g.count_vertexes()}'
         assert g.count_edges() == 10, \
             f'count_edges after dump imports: {g.count_edges()}'
         # Clear all the data at once.
         g.remove_all()
-        assert g.count_nodes() == 8, \
-            f'count_nodes after clearing: {g.count_nodes()}'
+        assert g.count_vertexes() == 8, \
+            f'count_vertexes after clearing: {g.count_vertexes()}'
         assert g.count_edges() == 10, \
             f'count_edges after clearing: {g.count_edges()}'

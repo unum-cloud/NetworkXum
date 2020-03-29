@@ -47,13 +47,13 @@ class TasksSampler(object):
         )
         self._split_samples()
 
-    def sample_from_distribution(self, count_nodes):
+    def sample_from_distribution(self, count_vertexes):
         count_max = max(self.count_finds,
                         self.count_analytics,
                         self.count_changes)
         while len(self._select_edges) < count_max:
-            v_from = random.randrange(1, count_nodes)
-            v_to = random.randrange(1, count_nodes)
+            v_from = random.randrange(1, count_vertexes)
+            v_to = random.randrange(1, count_vertexes)
             if v_from == v_to:
                 continue
             if v_from in self._select_nodes:
