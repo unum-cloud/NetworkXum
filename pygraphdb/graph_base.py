@@ -151,24 +151,18 @@ class GraphBase(object):
 
     @abstractmethod
     def insert_edges(self, es: List[Edge]) -> int:
-        cnt = 0
         for e in es:
             self.insert_edge(e)
-            cnt += 1
-        return cnt
+        return len(es)
 
     @abstractmethod
     def insert_dump(self, filepath: str):
-        for es in chunks(yield_edges_from(filepath), 1000):
-            self.insert_edges(list(es))
+        for es in chunks(yield_edges_from(filepath), 500):
+            self.insert_edges(es)
 
     @abstractmethod
     def remove_vertex(self, v: int) -> int:
-        cnt = 0
-        for e in self.edges_related(v):
-            self.remove_edge(e)
-            cnt += 1
-        return cnt
+        return self.remove_edges(self.edges_related(v))
 
     @abstractmethod
     def remove_edge(self, e: object) -> bool:
@@ -179,6 +173,12 @@ class GraphBase(object):
             searching for reverse edge.
         """
         return False
+
+    @abstractmethod
+    def remove_edges(self, es: List[object]) -> int:
+        for e in es:
+            self.remove_edge(e)
+        return len(es)
 
     @abstractmethod
     def remove_all(self):

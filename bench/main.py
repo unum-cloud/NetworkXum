@@ -7,7 +7,7 @@ import os
 
 from pygraphdb.edge import Edge
 from pygraphdb.graph_base import GraphBase
-from pygraphdb.plain_sql import PlainSQL
+from pygraphdb.plain_sql import PlainSQL, SQLite, SQLiteMem, MySQL, PostgreSQL
 from pygraphdb.mongo_db import MongoDB
 from pygraphdb.neo4j import Neo4j
 from helpers.shared import *
@@ -37,10 +37,10 @@ if __name__ == "__main__":
     tasks = TasksSampler()
     tasks.sample_from_file(file_path, sampling_ratio)
     gs = [
-        PlainSQL(url='sqlite:///:memory:'),
-        PlainSQL(url='sqlite:////Users/av/sqlite/pygraphdb.db'),
-        PlainSQL(url='mysql://root:temptemp@0.0.0.0:3306/mysql'),
-        PlainSQL(url='postgres://root:temptemp@0.0.0.0:5432'),
+        SQLiteMem(url='sqlite:///:memory:'),
+        SQLite(url='sqlite:////Users/av/sqlite/pygraphdb.db'),
+        MySQL(url='mysql://root:temptemp@0.0.0.0:3306/mysql'),
+        PostgreSQL(url='postgres://root:temptemp@0.0.0.0:5432'),
         Neo4j(
             url='bolt://0.0.0.0:7687/pygraphdb',
             enterprise_edition=False,
@@ -59,6 +59,7 @@ if __name__ == "__main__":
         # except Exception as e:
         #     print(f'Failed for {g}: {str(e)}')
         FullTest(graph=g).run()
-        FullBench(graph=g, stats=stats, tasks=tasks).run()
-    # Postprocessing
-    stats.dump_to_file()
+        FullBench(graph=g, stats=stats, tasks=tasks,
+                  datasource=file_path).run()
+        # Postprocessing
+        stats.dump_to_file()

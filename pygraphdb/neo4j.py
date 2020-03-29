@@ -73,7 +73,7 @@ class Neo4j(GraphBase):
         MATCH (v_from:Vertex {_id: %d})-[e:Edge]->(v_to:Vertex {_id: %d})
         RETURN v_from._id, v_to._id, e.weight
         '''
-        task = (pattern % (v_from, v_to))
+        task = pattern % (v_from, v_to)
         return self._records_to_edges(self.session.run(task))
 
     def edge_undirected(self, v1: int, v2: int) -> Optional[object]:
@@ -81,7 +81,7 @@ class Neo4j(GraphBase):
         MATCH (v_from:Vertex {_id: %d})-[e:Edge]-(v_to:Vertex {_id: %d})
         RETURN v_from._id, v_to._id, e.weight
         '''
-        task = (pattern % (v1, v2))
+        task = pattern % (v1, v2)
         return self._records_to_edges(self.session.run(task))
 
     def edges_from(self, v: int) -> List[object]:
@@ -89,7 +89,7 @@ class Neo4j(GraphBase):
         MATCH (v_from:Vertex {_id: %d})-[e:Edge]->(v_to:Vertex)
         RETURN v_from._id, v_to._id, e.weight
         '''
-        task = (pattern % (v))
+        task = pattern % (v)
         return self._records_to_edges(self.session.run(task))
 
     def edges_to(self, v: int) -> List[object]:
@@ -97,7 +97,7 @@ class Neo4j(GraphBase):
         MATCH (v_from:Vertex)-[e:Edge]->(v_to:Vertex {_id: %d})
         RETURN v_from._id, v_to._id, e.weight
         '''
-        task = (pattern % (v))
+        task = pattern % (v)
         return self._records_to_edges(self.session.run(task))
 
     def edges_related(self, v: int) -> List[object]:
@@ -105,7 +105,7 @@ class Neo4j(GraphBase):
         MATCH (v_from:Vertex {_id: %d})-[e:Edge]-(v_to:Vertex)
         RETURN v_from._id, v_to._id, e.weight
         '''
-        task = (pattern % (v))
+        task = pattern % (v)
         return self._records_to_edges(self.session.run(task))
 
     # Wider range of neighbours
@@ -117,7 +117,7 @@ class Neo4j(GraphBase):
         RETURN v_from._id, v_to._id, e.weight
         '''
         group_members = ','.join([str(v) for v in vs])
-        task = (pattern % (group_members, group_members))
+        task = pattern % (group_members, group_members)
         return self._records_to_edges(self.session.run(task))
 
     def vertexes_related_to_group(self, vs: Sequence[int]) -> Set[int]:
@@ -127,7 +127,7 @@ class Neo4j(GraphBase):
         RETURN v_to._id as _id
         '''
         group_members = ','.join([str(v) for v in vs])
-        task = (pattern % (group_members, group_members))
+        task = pattern % (group_members, group_members)
         return {int(r['_id']) for r in self.session.run(task).records()}
 
     def vertexes_related(self, v: int) -> Set[int]:
@@ -135,7 +135,7 @@ class Neo4j(GraphBase):
         MATCH (:Vertex {_id: %d})-[:Edge]-(v_related:Vertex)
         RETURN v_related._id as _id
         '''
-        task = (pattern % (v))
+        task = pattern % (v)
         return {int(r['_id']) for r in self.session.run(task).records()}
 
     def vertexes_related_to_related(self, v: int, include_related=False) -> Set[int]:
@@ -145,7 +145,7 @@ class Neo4j(GraphBase):
             WHERE NOT (v._id = v_unrelated._id)
             RETURN v_unrelated._id as _id
             '''
-            task = (pattern % v)
+            task = pattern % v
         else:
             pattern = '''
             MATCH (v:Vertex {_id: %d})-[:Edge]-(:Vertex)-[:Edge]-(v_unrelated:Vertex)
@@ -154,7 +154,7 @@ class Neo4j(GraphBase):
             } AND NOT (v._id = v_unrelated._id)
             RETURN v_unrelated._id as _id
             '''
-            task = (pattern % v)
+            task = pattern % v
         return {int(r['_id']) for r in self.session.run(task).records()}
 
     def shortest_path(self, v_from, v_to) -> (List[int], float):
@@ -194,7 +194,7 @@ class Neo4j(GraphBase):
         WITH count(e) as c, sum(e.weight) as s
         RETURN c, s
         '''
-        task = (pattern % v)
+        task = pattern % v
         rs = list(self.session.run(task).records())
         c = int(self._first_record(rs, 'c'))
         s = float(self._first_record(rs, 's'))
@@ -206,7 +206,7 @@ class Neo4j(GraphBase):
         WITH count(e) as c, sum(e.weight) as s
         RETURN c, s
         '''
-        task = (pattern % v)
+        task = pattern % v
         rs = list(self.session.run(task).records())
         c = int(self._first_record(rs, 'c'))
         s = float(self._first_record(rs, 's'))
@@ -218,7 +218,7 @@ class Neo4j(GraphBase):
         WITH count(e) as c, sum(e.weight) as s
         RETURN c, s
         '''
-        task = (pattern % v)
+        task = pattern % v
         rs = list(self.session.run(task).records())
         c = int(self._first_record(rs, 'c'))
         s = float(self._first_record(rs, 's'))
@@ -232,7 +232,7 @@ class Neo4j(GraphBase):
         MERGE (v2:Vertex {_id: %d})
         MERGE (v1)-[:Edge {_id: %d, weight: %d}]->(v2)
         '''
-        task = (pattern % (e['v_from'], e['v_to'], e['_id'], e['weight']))
+        task = pattern % (e['v_from'], e['v_to'], e['_id'], e['weight'])
         return self.session.run(task)
 
     def insert_many(self, es: List[Edge]) -> int:
@@ -260,7 +260,7 @@ class Neo4j(GraphBase):
         MATCH (v:Vertex {_id: %d})
         DETACH DELETE v
         '''
-        task = (pattern % v)
+        task = pattern % v
 
     def remove_edge(self, e: object) -> bool:
         task = str()
@@ -273,7 +273,7 @@ class Neo4j(GraphBase):
             MATCH (v1)-[e:Edge {_id: %d}]->(v2)
             DELETE e
             '''
-            task = (pattern % e['_id'])
+            task = pattern % (e['v_from'], e['v_to'], e['_id'])
         else:
             pattern = '''
             MATCH (v1:Vertex {_id: %d})
@@ -281,7 +281,7 @@ class Neo4j(GraphBase):
             MERGE (v1)-[e:Edge]->(v2)
             DELETE e
             '''
-            task = (pattern % (e['v_from'], e['v_to']))
+            task = pattern % (e['v_from'], e['v_to'])
         return self.session.run(task)
 
     def remove_all(self):
@@ -307,7 +307,7 @@ class Neo4j(GraphBase):
     #     MERGE (v2:Vertex {_id: id_to})
     #     MERGE (v1)-[:Edge {_id: (floor((id_from + id_to) * (id_from + id_to + 1) / 2.0)+id_to), weight: w}]->(v2)
     #     '''
-    #     task = (pattern % filepath)
+    #     task = pattern % filepath
     #     self.session.run(task)
 
     # ---
@@ -327,7 +327,7 @@ class Neo4j(GraphBase):
         return records[0][key]
 
 
-wrap = Neo4j()
+# wrap = Neo4j()
 # print(wrap.insert(Edge(1, 3, 30)))
 # print(wrap.insert(Edge(1, 4, 40)))
 # print(wrap.insert(Edge(1, 5, 50)))
@@ -335,20 +335,20 @@ wrap = Neo4j()
 # print(wrap.insert(Edge(6, 7, 3)))
 # print(wrap.insert(Edge(7, 8, 3)))
 # wrap.insert_dump('file:///Users/av/Code/PyGraphDB/bench/test.csv')
-print(wrap.insert_many([
-    Edge(1, 3, 30),
-    Edge(1, 4, 40),
-    Edge(1, 5, 50),
-    Edge(1, 6, 60),
-    Edge(6, 7, 3),
-    Edge(7, 8, 3),
-]))
-print(wrap.edge_directed(1, 3))
-print(wrap.edges_related(1))
-print(wrap.count_vertexes())
-print(wrap.count_edges())
-print(wrap.count_related(1))
-print(wrap.count_followers(1))
-print(wrap.count_following(1))
-print(wrap.vertexes_related_to_group([7, 8]))
-print(wrap.vertexes_related_to_related(8))
+# print(wrap.insert_many([
+#     Edge(1, 3, 30),
+#     Edge(1, 4, 40),
+#     Edge(1, 5, 50),
+#     Edge(1, 6, 60),
+#     Edge(6, 7, 3),
+#     Edge(7, 8, 3),
+# ]))
+# print(wrap.edge_directed(1, 3))
+# print(wrap.edges_related(1))
+# print(wrap.count_vertexes())
+# print(wrap.count_edges())
+# print(wrap.count_related(1))
+# print(wrap.count_followers(1))
+# print(wrap.count_following(1))
+# print(wrap.vertexes_related_to_group([7, 8]))
+# print(wrap.vertexes_related_to_related(8))

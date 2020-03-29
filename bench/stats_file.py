@@ -22,12 +22,15 @@ class StatsFile(object):
         bench: object,
         wrapper_name: str,
         operation_name: str,
+        datasource: str,
     ) -> bool:
-        if bench['device'] != self.device_name:
+        if bench.get('device', None) != self.device_name:
             return False
-        if bench['wrapper_name'] != wrapper_name:
+        if bench.get('wrapper_name', None) != wrapper_name:
             return False
-        if bench['operation_name'] != operation_name:
+        if bench.get('operation_name', None) != operation_name:
+            return False
+        if bench.get('datasource', None) != datasource:
             return False
         return True
 
@@ -35,19 +38,21 @@ class StatsFile(object):
         self,
         wrapper_class: type,
         operation_name: str,
+        datasource: str = '',
     ) -> Optional[StatsCounter]:
         def predicate(b):
             wrapper_name = str(wrapper_class)
-            return self.bench_matches(b, wrapper_name, operation_name)
+            return self.bench_matches(b, wrapper_name, operation_name, datasource)
         return next(filter(predicate, self.results), None)
 
     def insert(
         self,
         wrapper_class: type,
         operation_name: str,
+        datasource: str,
         stats: StatsCounter,
     ):
-        bench = self.find(wrapper_class, operation_name)
+        bench = self.find(wrapper_class, operation_name, datasource)
         stats_serialized = {
             'device': self.device_name,
             'time_elapsed': stats.time_elapsed,
@@ -56,6 +61,7 @@ class StatsFile(object):
             'operations_per_second': stats.ops_per_sec(),
             'operation_name': operation_name,
             'wrapper_name': str(wrapper_class),
+            'datasource': datasource,
         }
         if bench is None:
             self.results.append(stats_serialized)

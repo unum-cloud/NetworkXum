@@ -1,23 +1,23 @@
 from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
-from itertools import chain, islice
+from itertools import groupby, count
 import csv
 import time
 
-
-def chunks(iterable, size):
-    # Borrowed from here:
-    # https://stackoverflow.com/a/24527424
-    iterator = iter(iterable)
-    for first in iterator:
-        yield chain([first], islice(iterator, size - 1))
+from pygraphdb.edge import Edge
 
 
-def yield_edges_from(filepath: str):
-    e = {
-        'v_from': None,
-        'v_to': None,
-        'weight': 1.0,
-    }
+def chunks(iterable, size) -> Generator[list, None, None]:
+    current = list()
+    for v in iterable:
+        if len(current) == size:
+            yield current
+            current = list()
+        current.append(v)
+    if len(current) > 0:
+        yield current
+
+
+def yield_edges_from(filepath: str) -> Generator[Edge, None, None]:
     lines_to_skip = 0
     if filepath.endswith('.mtx'):
         lines_to_skip = 2
@@ -28,14 +28,10 @@ def yield_edges_from(filepath: str):
                 continue
             if len(columns) < 2:
                 continue
-            e['v_from'] = int(columns[0])
-            if e['v_from'] is None:
-                continue
-            e['v_to'] = int(columns[1])
-            if e['v_to'] is None:
-                continue
-            e['weight'] = float(columns[2]) if len(columns) > 2 else 1.0
-            yield e
+            v1 = int(columns[0])
+            v2 = int(columns[1])
+            w = float(columns[2]) if len(columns) > 2 else 1.0
+            yield Edge(v1, v2, w)
 
 
 class StatsCounter:
@@ -60,3 +56,6 @@ class StatsCounter:
 
     def ops_per_sec(self) -> float:
         return self.count_operations / self.time_elapsed
+
+    def __repr__(self) -> str:
+        return f'<StatsCounter (#{self.count_operations} ops averaging ~{self.msecs_per_op()} msecs)>'

@@ -9,6 +9,15 @@ class FullTest(object):
 
     def run(self):
         g = self.graph
+
+        # Clear the DB before run.
+        g.remove_all()
+        assert g.count_vertexes() == 0, \
+            f'count_vertexes before initialization: {g.count_vertexes()}'
+        assert g.count_edges() == 0, \
+            f'count_edges before initialization: {g.count_edges()}'
+
+        # Fill the DB.
         edges = [
             Edge(1, 2, weight=4),
             Edge(2, 3, weight=20),
@@ -21,7 +30,6 @@ class FullTest(object):
             Edge(6, 1, weight=3),
             Edge(7, 1, weight=2),
         ]
-        # Fill the DB.
         es_last = 0
         vs_last = 0
         for e in edges:
@@ -70,7 +78,7 @@ class FullTest(object):
             f'count_edges after dump imports: {g.count_edges()}'
         # Clear all the data at once.
         g.remove_all()
-        assert g.count_vertexes() == 8, \
+        assert g.count_vertexes() == 0, \
             f'count_vertexes after clearing: {g.count_vertexes()}'
-        assert g.count_edges() == 10, \
+        assert g.count_edges() == 0, \
             f'count_edges after clearing: {g.count_edges()}'

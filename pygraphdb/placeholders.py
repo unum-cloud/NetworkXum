@@ -16,20 +16,6 @@ class Cayley(GraphBase):
     pass
 
 
-class PostgreSQL(PlainSQL):
-    """
-        Extends PlainSQL functionality with optimized operations:
-        *   Bulk imports and exports via:
-            https://github.com/jmcarp/sqlalchemy-postgres-copy
-        *   Async operations through less mature ORM: Gino (only PostgreSQL).
-            https://github.com/python-gino/gino
-        *   Allows natively quering JSON subproperties via:
-            https://sqlalchemy-utils.readthedocs.io/en/latest/data_types.html#module-sqlalchemy_utils.types.json        
-
-    """
-    pass
-
-
 class BlazingSQL(PlainSQL):
     """
         Redirects SQL queries generated for actual DBs
