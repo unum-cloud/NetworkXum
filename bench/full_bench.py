@@ -59,33 +59,33 @@ class FullBench(object):
             )
 
         # Bulk write operations.
-        micro('insert-bulk', self.insert_bulk)
+        micro('Import Dump', self.insert_bulk)
 
         # Queries returning single object.
-        micro('find-e-directed', self.find_e_directed)
-        micro('find-e-undirected', self.find_e_undirected)
+        micro('Retrieve Directed Edge', self.find_e_directed)
+        micro('Retrieve Undirected Edge', self.find_e_undirected)
 
         # Queries returning collections.
-        micro('find-es-from', self.find_es_from)
-        micro('find-es-to', self.find_es_to)
-        micro('find-es-related', self.find_es_related)
-        micro('find-vs-related', self.find_vs_related)
-        micro('find-vs-related-related', self.find_vs_related_related)
+        micro('Retrieve Outgoing Edges', self.find_es_from)
+        micro('Retrieve Incoming Edges', self.find_es_to)
+        micro('Retrieve Connected Edges', self.find_es_related)
+        micro('Retrieve Friends', self.find_vs_related)
+        micro('Retrieve Friends of Friends', self.find_vs_related_related)
 
         # Queries returning stats.
-        micro('count-v-related', self.count_v_related)
-        micro('count-v-followers', self.count_v_followers)
-        micro('count-v-following', self.count_v_following)
+        micro('Count Friends', self.count_v_related)
+        micro('Count Followers', self.count_v_followers)
+        micro('Count Followers', self.count_v_following)
 
         # Write operations.
-        micro('remove-e', self.remove_e)  # Single edge removals
-        micro('insert-e', self.insert_e)  # Single edge inserts
-        micro('remove-es', self.remove_es)  # Batched edge removals
-        micro('insert-es', self.insert_es)  # Batched edge inserts
-        micro('remove-v', self.remove_v)  # Single node removals
+        micro('Remove Edge', self.remove_e)  # Single edge removals
+        micro('Insert Edge', self.insert_e)  # Single edge inserts
+        micro('Remove Edges Batch', self.remove_es)  # Batched edge removals
+        micro('Insert Edges Batch', self.insert_es)  # Batched edge inserts
+        micro('Remove Vertex', self.remove_v)  # Single node removals
 
         # Cleaning
-        micro('remove-bulk', self.remove_bulk)
+        micro('Remove All', self.remove_bulk)
 
     # ---
     # Operations
