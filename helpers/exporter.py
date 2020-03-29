@@ -166,7 +166,7 @@ class StatsExporter(object):
         assert len(col_names) == len(strings[0]), 'Mismatch in cols number'
         result = list()
         result.append(list())
-        result[0].append('*')
+        result[0].append('')
         result[0].extend(col_names)
         for idx_row in range(len(row_names)):
             result.append(list())
@@ -222,26 +222,26 @@ StatsExporter().\
     load('bench/stats.json').\
     limit_to(operation_name=re.compile('find-e(.*)')).\
     correlate('operation_name', 'wrapper_name', 'operations_per_second').\
-    compare_by('find-e-directed').\
-    export('Simple Search Queries', overwrite=True)
+    compare_by('Retrieve Directed Edge').\
+    export('Simple Queries (ops/sec)', overwrite=True)
 
 StatsExporter().\
     load('bench/stats.json').\
     limit_to(operation_name=re.compile('(find-v|count-v)')).\
     correlate('operation_name', 'wrapper_name', 'operations_per_second').\
-    compare_by('find-vs-related-related').\
-    export('Complex Search Queries', overwrite=False)
+    compare_by('Retrieve Friends of Friends').\
+    export('Complex Queries (ops/sec)', overwrite=False)
 
 StatsExporter().\
     load('bench/stats.json').\
     limit_to(operation_name=re.compile('insert-(.*)')).\
     correlate('operation_name', 'wrapper_name', 'operations_per_second').\
-    compare_by('insert-e').\
-    export('Insertions', overwrite=False)
+    compare_by('Insert Edge ()').\
+    export('Insertions (ops/sec)', overwrite=False)
 
 StatsExporter().\
     load('bench/stats.json').\
     limit_to(operation_name=re.compile('remove-(.*)')).\
     correlate('operation_name', 'wrapper_name', 'operations_per_second').\
-    compare_by('remove-e').\
-    export('Removals', overwrite=False)
+    compare_by('Remove Edge').\
+    export('Removals (ops/sec)', overwrite=False)
