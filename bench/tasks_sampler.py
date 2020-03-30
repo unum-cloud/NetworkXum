@@ -1,7 +1,7 @@
 import random
 from random import SystemRandom
 
-from helpers.shared import yield_edges_from, chunks
+from pygraphdb.helpers import yield_edges_from, chunks
 
 
 class TasksSampler(object):

@@ -71,7 +71,7 @@ class FullTest(object):
         for e in edges:
             g.remove_edge(e)
         # Bulk load data again.
-        g.insert_dump('bench/test.csv')
+        g.insert_dump('artifacts/test.csv')
         assert g.count_vertexes() == 8, \
             f'count_vertexes after dump imports: {g.count_vertexes()}'
         assert g.count_edges() == 10, \

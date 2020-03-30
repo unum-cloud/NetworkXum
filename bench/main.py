@@ -10,7 +10,7 @@ from pygraphdb.graph_base import GraphBase
 from pygraphdb.plain_sql import PlainSQL, SQLite, SQLiteMem, MySQL, PostgreSQL
 from pygraphdb.mongo_db import MongoDB
 from pygraphdb.neo4j import Neo4j
-from helpers.shared import *
+from pygraphdb.helpers import *
 
 from bench.full_test import FullTest
 from bench.full_bench import FullBench
@@ -60,6 +60,6 @@ if __name__ == "__main__":
         #     print(f'Failed for {g}: {str(e)}')
         FullTest(graph=g).run()
         FullBench(graph=g, stats=stats, tasks=tasks,
-                  datasource=file_path).run()
+                  dataset=file_path).run()
         # Postprocessing
         stats.dump_to_file()

@@ -279,7 +279,7 @@ out = StatsExporter()
 cores = psutil.cpu_count(logical=False)
 threads = psutil.cpu_count(logical=True)
 frequency = psutil.cpu_freq().min
-datasource = 'fb-pages-company.edges'
+dataset = 'fb-pages-company.edges'
 ram_gbs = psutil.virtual_memory().total / (2 ** 30)
 disk_gbs = psutil.disk_usage('/').total / (2 ** 30)
 persistent_dbs = [
@@ -294,7 +294,7 @@ out.\
     add_title(f'PyGraphDB Benchmark').\
     add_text(f'Following tests compare the performance of various databases in classical graph operations.').\
     add_text(f'Many DBs werent opptimizied for such use case, but still perform better than actual Graph DBs.').\
-    add_text(f'Following results are **specific to `{datasource}` dataset and device** described below.')\
+    add_text(f'Following results are **specific to `{dataset}` dataset and device** described below.')\
 
 out.\
     add_title(f'Device').\
@@ -305,8 +305,8 @@ out.\
 
 out.\
     add_title('Simple Queries (ops/sec)').\
-    reload_stats('bench/stats.json').\
-    filter_stats(datasource=datasource).\
+    reload_stats('artifacts/stats.json').\
+    filter_stats(dataset=dataset).\
     correlate(
         'operation_name', 'wrapper_name', 'operations_per_second',
         allowed_rows=persistent_dbs,
@@ -323,8 +323,8 @@ out.\
 
 out.\
     add_title('Complex Queries (ops/sec)').\
-    reload_stats('bench/stats.json').\
-    filter_stats(datasource=datasource).\
+    reload_stats('artifacts/stats.json').\
+    filter_stats(dataset=dataset).\
     correlate(
         'operation_name', 'wrapper_name', 'operations_per_second',
         allowed_rows=persistent_dbs,
@@ -341,8 +341,8 @@ out.\
 
 out.\
     add_title('Insertions (ops/sec)').\
-    reload_stats('bench/stats.json').\
-    filter_stats(datasource=datasource).\
+    reload_stats('artifacts/stats.json').\
+    filter_stats(dataset=dataset).\
     correlate(
         'operation_name', 'wrapper_name', 'operations_per_second',
         allowed_rows=persistent_dbs,
@@ -357,8 +357,8 @@ out.\
 
 out.\
     add_title('Removals (ops/sec)').\
-    reload_stats('bench/stats.json').\
-    filter_stats(datasource=datasource).\
+    reload_stats('artifacts/stats.json').\
+    filter_stats(dataset=dataset).\
     correlate(
         'operation_name', 'wrapper_name', 'operations_per_second',
         allowed_rows=persistent_dbs,
@@ -372,4 +372,4 @@ out.\
     compare_by('Remove Edge').\
     add_last_table()
 
-out.export_to('bench/stats_mbp2019.md', overwrite=True)
+out.export_to('artifacts/stats_mbp2019.md', overwrite=True)

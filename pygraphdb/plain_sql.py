@@ -7,7 +7,7 @@ from sqlalchemy import or_, and_
 
 from pygraphdb.graph_base import GraphBase
 from pygraphdb.edge import Edge
-from helpers.shared import *
+from pygraphdb.helpers import *
 
 BaseEntitySQL = declarative_base()
 
