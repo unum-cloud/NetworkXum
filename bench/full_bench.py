@@ -3,7 +3,7 @@ import os
 from pygraphdb.graph_base import GraphBase
 from bench.stats_file import StatsFile
 from bench.tasks_sampler import TasksSampler
-from helpers.shared import StatsCounter
+from pygraphdb.helpers import StatsCounter
 
 
 class FullBench(object):
@@ -13,13 +13,13 @@ class FullBench(object):
         graph: GraphBase,
         stats: StatsFile,
         tasks: TasksSampler,
-        datasource: str,
+        dataset: str,
         repeat_existing=False,
     ):
         self.graph = graph
         self.stats = stats
         self.tasks = tasks
-        self.datasource = datasource
+        self.dataset = dataset
         self.repeat_existing = repeat_existing
 
     def run(self):
@@ -37,7 +37,7 @@ class FullBench(object):
         # --
         def micro(operation_name, f):
             counter = StatsCounter()
-            dataset_name = os.path.basename(self.datasource)
+            dataset_name = os.path.basename(self.dataset)
             class_name = self.graph.__class__.__name__
             print(f'-- {class_name}: {operation_name} @ {dataset_name}')
             if not self.repeat_existing:
@@ -202,7 +202,7 @@ class FullBench(object):
         return cnt
 
     def insert_bulk(self) -> int:
-        self.graph.insert_dump(self.datasource)
+        self.graph.insert_dump(self.dataset)
         return self.graph.count_edges()
 
     def remove_bulk(self) -> int:

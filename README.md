@@ -8,8 +8,8 @@ Implements the same [interface](adapters/base.py) for every one of those backend
 ## Project Structure
 
 * [pygraphdb](pygraphdb) - contains Pythonic wrappers for DBs.
-* [bench/stats.json](bench/stats.json) - contains machine-readable results of previous benchmarks.
-* [bench/stats.md](bench/stats.md) - contains human-readable results of previous benchmarks.
+* [artifacts/stats.json](artifacts/stats.json) - contains machine-readable results of previous benchmarks.
+* [artifacts/stats.md](artifacts/stats.md) - contains human-readable results of previous benchmarks.
 * [bench/Dockerfile](bench/Dockerfile) - contains Docker image of benchmark application.
 * [bench/docker-compose.yml](bench/docker-compose.yml) - instantiates that image for selected datasets and alse spins up infrastructure for testing. Comment out the second part of it if you don't want to create new DB containers.
 

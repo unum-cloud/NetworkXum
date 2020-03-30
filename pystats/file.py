@@ -3,12 +3,12 @@ from typing import Optional
 from os import path
 import platform
 
-from helpers.shared import StatsCounter
+from pygraphdb.helpers import StatsCounter
 
 
 class StatsFile(object):
 
-    def __init__(self, filename='bench/stats.json'):
+    def __init__(self, filename='artifacts/stats.json'):
         self.filename = filename
         self.device_name = platform.node()
         self.results = []
@@ -22,7 +22,7 @@ class StatsFile(object):
         bench: object,
         wrapper_name: str,
         operation_name: str,
-        datasource: str,
+        dataset: str,
     ) -> bool:
         if bench.get('device', None) != self.device_name:
             return False
@@ -30,7 +30,7 @@ class StatsFile(object):
             return False
         if bench.get('operation_name', None) != operation_name:
             return False
-        if bench.get('datasource', None) != datasource:
+        if bench.get('dataset', None) != dataset:
             return False
         return True
 
@@ -38,21 +38,21 @@ class StatsFile(object):
         self,
         wrapper_class: type,
         operation_name: str,
-        datasource: str = '',
+        dataset: str = '',
     ) -> Optional[StatsCounter]:
         def predicate(b):
             wrapper_name = str(wrapper_class)
-            return self.bench_matches(b, wrapper_name, operation_name, datasource)
+            return self.bench_matches(b, wrapper_name, operation_name, dataset)
         return next(filter(predicate, self.results), None)
 
     def insert(
         self,
         wrapper_class: type,
         operation_name: str,
-        datasource: str,
+        dataset: str,
         stats: StatsCounter,
     ):
-        bench = self.find(wrapper_class, operation_name, datasource)
+        bench = self.find(wrapper_class, operation_name, dataset)
         stats_serialized = {
             'device': self.device_name,
             'time_elapsed': stats.time_elapsed,
@@ -61,7 +61,7 @@ class StatsFile(object):
             'operations_per_second': stats.ops_per_sec(),
             'operation_name': operation_name,
             'wrapper_name': str(wrapper_class),
-            'datasource': datasource,
+            'dataset': dataset,
         }
         if bench is None:
             self.results.append(stats_serialized)

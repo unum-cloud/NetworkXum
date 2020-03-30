@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 
 from pygraphdb.edge import Edge
-from helpers.shared import chunks, yield_edges_from
+from pygraphdb.helpers import chunks, yield_edges_from
 
 
 class GraphBase(object):

@@ -334,7 +334,7 @@ class Neo4j(GraphBase):
 # print(wrap.insert(Edge(1, 6, 60)))
 # print(wrap.insert(Edge(6, 7, 3)))
 # print(wrap.insert(Edge(7, 8, 3)))
-# wrap.insert_dump('file:///Users/av/Code/PyGraphDB/bench/test.csv')
+# wrap.insert_dump('file:///Users/av/Code/PyGraphDB/artifacts/test.csv')
 # print(wrap.insert_many([
 #     Edge(1, 3, 30),
 #     Edge(1, 4, 40),

@@ -1,4 +1,4 @@
-from helpers.shared import *
+from pygraphdb.helpers import *
 from pygraphdb.graph_base import GraphBase
 from pygraphdb.plain_sql import PlainSQL
 
