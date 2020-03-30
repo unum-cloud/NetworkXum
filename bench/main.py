@@ -14,8 +14,8 @@ from pygraphdb.helpers import *
 
 from bench.full_test import FullTest
 from bench.full_bench import FullBench
-from bench.stats_file import StatsFile
 from bench.tasks_sampler import TasksSampler
+from pystats.file import StatsFile
 
 
 print('Welcome to GraphDB benchmarks!')
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     tasks = TasksSampler()
     tasks.sample_from_file(file_path, sampling_ratio)
     gs = [
-        SQLiteMem(url='sqlite:///:memory:'),
+        # SQLiteMem(url='sqlite:///:memory:'),
         SQLite(url='sqlite:////Users/av/sqlite/pygraphdb.db'),
         MySQL(url='mysql://root:temptemp@0.0.0.0:3306/mysql'),
         PostgreSQL(url='postgres://root:temptemp@0.0.0.0:5432'),
