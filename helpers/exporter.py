@@ -5,6 +5,9 @@ from enum import Enum
 import os
 import json
 import re
+import locale
+
+import psutil
 
 
 class AggregationPolicy(Enum):
@@ -16,18 +19,65 @@ class AggregationPolicy(Enum):
 class StatsExporter(object):
 
     def __init__(self):
-        self.stats = []
-        self.table = []
+        self.filtered_stats = []
+        self.current_table = []
+        self.full_content = ''
 
-    def load(self, filename) -> StatsExporter:
+    def reload_stats(self, filename: str) -> StatsExporter:
+        self.filtered_stats = []
+        return self.import_stats(filename)
+
+    def import_stats(self, filename: str) -> StatsExporter:
         contents = json.load(open(filename, 'r'))
         assert isinstance(contents, list), 'Must be a list!'
-        self.stats.extend(contents)
-        self.filename = filename
+        assert len(contents) > 0, 'Shouldnt be empty!'
+        self.filtered_stats.extend(contents)
         return self
 
-    def limit_to(self, **kwargs) -> StatsExporter:
-        self.stats = StatsExporter.filter(self.stats, **kwargs)
+    def export_to(self, filename: str, overwrite=True) -> StatsExporter:
+        text_file = open(filename, 'w' if overwrite else 'a')
+        text_file.write(self.full_content)
+        text_file.close()
+        self.full_content = ''
+        return self
+
+    def add_title(self, text: str) -> StatsExporter:
+        if len(self.full_content) == 0:
+            self.full_content += f'# {text}\n\n'
+        else:
+            self.full_content += f'## {text}\n\n'
+        return self
+
+    def add_text(self, text: str) -> StatsExporter:
+        self.full_content += f'{text}\n'
+        return self
+
+    def add_last_table(self) -> StatsExporter:
+        content = StatsExporter.render_table(self.current_table)
+        self.full_content += content
+        self.full_content += '\n\n'
+        self.current_table = []
+        return self
+
+    def filter_stats(self, **kwargs) -> StatsExporter:
+        self.filtered_stats = StatsExporter.filter(
+            self.filtered_stats,
+            **kwargs
+        )
+        return self
+
+    def correlate_all_values(
+        self,
+        field_col: str,
+        field_row: str,
+        field_cell: str,
+    ) -> StatsExporter:
+        self.current_table = StatsExporter.to_table(
+            stats=self.filtered_stats,
+            field_col=field_col,
+            field_row=field_row,
+            field_cell=field_cell,
+        )
         return self
 
     def correlate(
@@ -35,38 +85,27 @@ class StatsExporter(object):
         field_col: str,
         field_row: str,
         field_cell: str,
+        allowed_rows: List[str],
+        allowed_cols: List[str],
     ) -> StatsExporter:
-        self.table = StatsExporter.to_table(
-            stats=self.stats,
+        self.current_table = StatsExporter.to_table(
+            stats=self.filtered_stats,
             field_col=field_col,
             field_row=field_row,
             field_cell=field_cell,
+            allowed_rows=allowed_rows,
+            allowed_cols=allowed_cols,
         )
         return self
 
     def compare_by(self, column) -> StatsExporter:
         column_idx = column
         if isinstance(column, str):
-            column_idx = self.table[0].index(column)
-        self.table = StatsExporter.add_emoji_column(self.table, column_idx)
-        return self
-
-    def export(
-        self,
-        title: str,
-        filename=None,
-        overwrite=False,
-    ) -> StatsExporter:
-        if filename is None:
-            base = os.path.splitext(self.filename)[0]
-            filename = base + '.md'
-        content = StatsExporter.render_table(self.table)
-        text_file = open(filename, 'w' if overwrite else 'a')
-        text_file.write(f'## {title}\n\n')
-        text_file.write(content)
-        text_file.write('\n\n')
-        text_file.close()
-        self.table = []
+            column_idx = self.current_table[0].index(column)
+        self.current_table = StatsExporter.add_emoji_column(
+            self.current_table,
+            column_idx
+        )
         return self
 
     @staticmethod
@@ -92,6 +131,23 @@ class StatsExporter(object):
             if matches(s):
                 result.append(s)
         return result
+
+    @staticmethod
+    def num2str(num: float) -> str:
+        if num is None:
+            return ''
+        if isinstance(num, str):
+            return num
+        return '{:,.2f}'.format(num)
+
+    @staticmethod
+    def str2num(str_: str) -> float:
+        if str_ is None:
+            return 0.0
+        if isinstance(str_, float):
+            return str_
+        str_ = str_.replace(',', '')
+        return float(str_)
 
     @staticmethod
     def to_table(
@@ -146,12 +202,12 @@ class StatsExporter(object):
             floats[idx_row][idx_col] = new_val
 
         # Generate readable strings.
-        strings = [[str('%.2f' % cell) for cell in row] for row in floats]
+        strings = [[StatsExporter.num2str(c) for c in r] for r in floats]
         if add_headers:
             strings = StatsExporter.add_headers(
                 strings=strings,
                 col_names=allowed_cols,
-                row_names=allowed_rows
+                row_names=allowed_rows,
             )
         return strings
 
@@ -177,10 +233,10 @@ class StatsExporter(object):
     @staticmethod
     def add_emoji_column(
         table: List[List[str]],
-        numeric_column: int,
+        col_idx: int,
         log_scale=False,
     ) -> List[List[str]]:
-        values = [float(row[numeric_column]) for row in table[1:]]
+        values = [StatsExporter.str2num(r[col_idx]) for r in table[1:]]
         value_smallest = min(values)
         value_biggest = max(values)
         diff = (value_biggest-value_smallest)
@@ -188,14 +244,14 @@ class StatsExporter(object):
         worst_bracket_biggest_val = value_smallest + diff/3
 
         table[0].append('Result')
-        for row in table[1:]:
-            val = float(row[numeric_column])
+        for r in table[1:]:
+            val = StatsExporter.str2num(r[col_idx])
             if val >= best_bracket_smalest_val:
-                row.append(':thumbsup:')
+                r.append(':thumbsup:')
             elif val < worst_bracket_biggest_val:
-                row.append(':thumbsdown:')
+                r.append(':thumbsdown:')
             else:
-                row.append('')
+                r.append('')
         return table
 
     @staticmethod
@@ -213,35 +269,107 @@ class StatsExporter(object):
             cells = table[idx_row]
             lines.append(render_line(cells))
             if idx_row == 0:
-                delimeters = ['---'] * len(cells)
+                delimeters = [':---'] + [':---:'] * (len(cells) - 1)
                 lines.append(render_line(delimeters))
         return '\n'.join(lines)
 
 
-StatsExporter().\
-    load('bench/stats.json').\
-    limit_to(operation_name=re.compile('find-e(.*)')).\
-    correlate('operation_name', 'wrapper_name', 'operations_per_second').\
+out = StatsExporter()
+
+cores = psutil.cpu_count(logical=False)
+threads = psutil.cpu_count(logical=True)
+frequency = psutil.cpu_freq().min
+datasource = 'fb-pages-company.edges'
+ram_gbs = psutil.virtual_memory().total / (2 ** 30)
+disk_gbs = psutil.disk_usage('/').total / (2 ** 30)
+persistent_dbs = [
+    'SQLite',
+    'MySQL',
+    'PostgreSQL',
+    'Neo4j',
+    'MongoDB',
+]
+
+out.\
+    add_title(f'PyGraphDB Benchmark').\
+    add_text(f'Following tests compare the performance of various databases in classical graph operations.').\
+    add_text(f'Many DBs werent opptimizied for such use case, but still perform better than actual Graph DBs.').\
+    add_text(f'Following results are **specific to `{datasource}` dataset and device** described below.')\
+
+out.\
+    add_title(f'Device').\
+    add_text(f'* CPU: {cores} cores, {threads} threads @ {frequency:.2f}Mhz.').\
+    add_text(f'* RAM: {ram_gbs:.2f} Gb').\
+    add_text(f'* Disk: {disk_gbs:.2f} Gb').\
+    add_text('')
+
+out.\
+    add_title('Simple Queries (ops/sec)').\
+    reload_stats('bench/stats.json').\
+    filter_stats(datasource=datasource).\
+    correlate(
+        'operation_name', 'wrapper_name', 'operations_per_second',
+        allowed_rows=persistent_dbs,
+        allowed_cols=[
+            'Retrieve Directed Edge',
+            'Retrieve Undirected Edge',
+            'Retrieve Connected Edges',
+            'Retrieve Ingoing Edges',
+            'Retrieve Outgoing Edges',
+        ]
+    ).\
     compare_by('Retrieve Directed Edge').\
-    export('Simple Queries (ops/sec)', overwrite=True)
+    add_last_table()
 
-StatsExporter().\
-    load('bench/stats.json').\
-    limit_to(operation_name=re.compile('(find-v|count-v)')).\
-    correlate('operation_name', 'wrapper_name', 'operations_per_second').\
+out.\
+    add_title('Complex Queries (ops/sec)').\
+    reload_stats('bench/stats.json').\
+    filter_stats(datasource=datasource).\
+    correlate(
+        'operation_name', 'wrapper_name', 'operations_per_second',
+        allowed_rows=persistent_dbs,
+        allowed_cols=[
+            'Count Friends',
+            'Count Followers',
+            'Count Following',
+            'Retrieve Friends',
+            'Retrieve Friends of Friends',
+        ]
+    ).\
     compare_by('Retrieve Friends of Friends').\
-    export('Complex Queries (ops/sec)', overwrite=False)
+    add_last_table()
 
-StatsExporter().\
-    load('bench/stats.json').\
-    limit_to(operation_name=re.compile('insert-(.*)')).\
-    correlate('operation_name', 'wrapper_name', 'operations_per_second').\
-    compare_by('Insert Edge ()').\
-    export('Insertions (ops/sec)', overwrite=False)
+out.\
+    add_title('Insertions (ops/sec)').\
+    reload_stats('bench/stats.json').\
+    filter_stats(datasource=datasource).\
+    correlate(
+        'operation_name', 'wrapper_name', 'operations_per_second',
+        allowed_rows=persistent_dbs,
+        allowed_cols=[
+            'Insert Edge',
+            'Insert Edges Batch',
+            'Import Dump',
+        ]
+    ).\
+    compare_by('Insert Edge').\
+    add_last_table()
 
-StatsExporter().\
-    load('bench/stats.json').\
-    limit_to(operation_name=re.compile('remove-(.*)')).\
-    correlate('operation_name', 'wrapper_name', 'operations_per_second').\
+out.\
+    add_title('Removals (ops/sec)').\
+    reload_stats('bench/stats.json').\
+    filter_stats(datasource=datasource).\
+    correlate(
+        'operation_name', 'wrapper_name', 'operations_per_second',
+        allowed_rows=persistent_dbs,
+        allowed_cols=[
+            'Remove Edge',
+            'Remove Edges Batch',
+            'Remove Vertex',
+            'Remove All',
+        ]
+    ).\
     compare_by('Remove Edge').\
-    export('Removals (ops/sec)', overwrite=False)
+    add_last_table()
+
+out.export_to('bench/stats_mbp2019.md', overwrite=True)
