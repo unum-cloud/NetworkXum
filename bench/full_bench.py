@@ -1,12 +1,15 @@
 import os
 
 from pygraphdb.graph_base import GraphBase
-from bench.stats_file import StatsFile
+from pystats.file import StatsFile
 from bench.tasks_sampler import TasksSampler
 from pygraphdb.helpers import StatsCounter
 
 
 class FullBench(object):
+    """
+
+    """
 
     def __init__(
         self,
@@ -14,15 +17,17 @@ class FullBench(object):
         stats: StatsFile,
         tasks: TasksSampler,
         dataset: str,
-        repeat_existing=False,
     ):
         self.graph = graph
         self.stats = stats
         self.tasks = tasks
         self.dataset = dataset
-        self.repeat_existing = repeat_existing
 
-    def run(self):
+    def run(
+        self,
+        repeat_existing=False,
+        clear_afterwards=False,
+    ):
         # Benchmark groups in self.tasks.chronological order:
         # --
         # - bulk load
@@ -40,7 +45,7 @@ class FullBench(object):
             dataset_name = os.path.basename(self.dataset)
             class_name = self.graph.__class__.__name__
             print(f'-- {class_name}: {operation_name} @ {dataset_name}')
-            if not self.repeat_existing:
+            if not repeat_existing:
                 old_results = self.stats.find(
                     class_name,
                     operation_name,
@@ -58,8 +63,8 @@ class FullBench(object):
                 counter
             )
 
-        # Bulk write operations.
-        micro('Import Dump', self.insert_bulk)
+        if self.graph.count_edges() == 0:
+            micro('Import Dump', self.insert_bulk)
 
         # Queries returning single object.
         micro('Retrieve Directed Edge', self.find_e_directed)
@@ -75,17 +80,17 @@ class FullBench(object):
         # Queries returning stats.
         micro('Count Friends', self.count_v_related)
         micro('Count Followers', self.count_v_followers)
-        micro('Count Followers', self.count_v_following)
+        micro('Count Following', self.count_v_following)
 
-        # Write operations.
+        # Reversable write operations.
         micro('Remove Edge', self.remove_e)  # Single edge removals
         micro('Insert Edge', self.insert_e)  # Single edge inserts
         micro('Remove Edges Batch', self.remove_es)  # Batched edge removals
         micro('Insert Edges Batch', self.insert_es)  # Batched edge inserts
-        micro('Remove Vertex', self.remove_v)  # Single node removals
 
-        # Cleaning
-        micro('Remove All', self.remove_bulk)
+        if clear_afterwards:
+            micro('Remove Vertex', self.remove_v)
+            micro('Remove All', self.remove_bulk)
 
     # ---
     # Operations
@@ -194,16 +199,16 @@ class FullBench(object):
             cnt += len(es)
         return cnt
 
+    def insert_bulk(self) -> int:
+        self.graph.insert_dump(self.dataset)
+        return self.graph.count_edges()
+
     def remove_v(self) -> int:
         cnt = 0
         for v in self.tasks.nodes_to_change_by_one:
             self.graph.remove_vertex(v)
             cnt += 1
         return cnt
-
-    def insert_bulk(self) -> int:
-        self.graph.insert_dump(self.dataset)
-        return self.graph.count_edges()
 
     def remove_bulk(self) -> int:
         c = self.graph.count_edges()

@@ -261,6 +261,7 @@ class Neo4j(GraphBase):
         DETACH DELETE v
         '''
         task = pattern % v
+        return self.session.run(task)
 
     def remove_edge(self, e: object) -> bool:
         task = str()

@@ -26,9 +26,9 @@ class StatsFile(object):
     ) -> bool:
         if bench.get('device', None) != self.device_name:
             return False
-        if bench.get('wrapper_name', None) != wrapper_name:
+        if bench.get('database', None) != wrapper_name:
             return False
-        if bench.get('operation_name', None) != operation_name:
+        if bench.get('operation', None) != operation_name:
             return False
         if bench.get('dataset', None) != dataset:
             return False
@@ -59,8 +59,8 @@ class StatsFile(object):
             'count_operations': stats.count_operations,
             'msecs_per_operation': stats.msecs_per_op(),
             'operations_per_second': stats.ops_per_sec(),
-            'operation_name': operation_name,
-            'wrapper_name': str(wrapper_class),
+            'operation': operation_name,
+            'database': str(wrapper_class),
             'dataset': dataset,
         }
         if bench is None:

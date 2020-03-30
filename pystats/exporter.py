@@ -308,7 +308,7 @@ out.\
     reload_stats('artifacts/stats.json').\
     filter_stats(dataset=dataset).\
     correlate(
-        'operation_name', 'wrapper_name', 'operations_per_second',
+        'operation', 'database', 'operations_per_second',
         allowed_rows=persistent_dbs,
         allowed_cols=[
             'Retrieve Directed Edge',
@@ -326,7 +326,7 @@ out.\
     reload_stats('artifacts/stats.json').\
     filter_stats(dataset=dataset).\
     correlate(
-        'operation_name', 'wrapper_name', 'operations_per_second',
+        'operation', 'database', 'operations_per_second',
         allowed_rows=persistent_dbs,
         allowed_cols=[
             'Count Friends',
@@ -344,7 +344,7 @@ out.\
     reload_stats('artifacts/stats.json').\
     filter_stats(dataset=dataset).\
     correlate(
-        'operation_name', 'wrapper_name', 'operations_per_second',
+        'operation', 'database', 'operations_per_second',
         allowed_rows=persistent_dbs,
         allowed_cols=[
             'Insert Edge',
@@ -360,7 +360,7 @@ out.\
     reload_stats('artifacts/stats.json').\
     filter_stats(dataset=dataset).\
     correlate(
-        'operation_name', 'wrapper_name', 'operations_per_second',
+        'operation', 'database', 'operations_per_second',
         allowed_rows=persistent_dbs,
         allowed_cols=[
             'Remove Edge',

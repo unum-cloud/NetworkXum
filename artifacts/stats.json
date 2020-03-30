@@ -1,1022 +1,1012 @@
 [
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 3.117953062057495,
         "count_operations": 52310,
         "msecs_per_operation": 5.960529654095766e-08,
         "operations_per_second": 16777.03254630823,
-        "operation_name": "Import Dump",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Import Dump",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.25742101669311523,
         "count_operations": 488,
         "msecs_per_operation": 5.275020833875313e-07,
         "operations_per_second": 1895.7271098877284,
-        "operation_name": "Retrieve Directed Edge",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Retrieve Directed Edge",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.27274584770202637,
         "count_operations": 488,
         "msecs_per_operation": 5.589054256189065e-07,
         "operations_per_second": 1789.211473287534,
-        "operation_name": "Retrieve Undirected Edge",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Retrieve Undirected Edge",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.2526209354400635,
         "count_operations": 488,
         "msecs_per_operation": 5.176658513116055e-07,
         "operations_per_second": 1931.748052274085,
-        "operation_name": "Retrieve Outgoing Edges",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Retrieve Outgoing Edges",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.23329901695251465,
         "count_operations": 488,
         "msecs_per_operation": 4.780717560502349e-07,
         "operations_per_second": 2091.7362034977064,
-        "operation_name": "Retrieve Incoming Edges",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Retrieve Incoming Edges",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.3088703155517578,
         "count_operations": 488,
         "msecs_per_operation": 6.32930974491307e-07,
         "operations_per_second": 1579.9511167923329,
-        "operation_name": "Retrieve Connected Edges",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Retrieve Connected Edges",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.32881999015808105,
         "count_operations": 488,
         "msecs_per_operation": 6.738114552419694e-07,
         "operations_per_second": 1484.0946858656396,
-        "operation_name": "Retrieve Friends",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Retrieve Friends",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 3.153036117553711,
         "count_operations": 488,
         "msecs_per_operation": 6.461139585151047e-06,
         "operations_per_second": 154.77145893863585,
-        "operation_name": "Retrieve Friends of Friends",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Retrieve Friends of Friends",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.33051085472106934,
         "count_operations": 488,
         "msecs_per_operation": 6.772763416415356e-07,
         "operations_per_second": 1476.5021875358427,
-        "operation_name": "Count Friends",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Count Friends",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.2822110652923584,
         "count_operations": 488,
         "msecs_per_operation": 5.78301363304013e-07,
         "operations_per_second": 1729.2022178310167,
-        "operation_name": "Count Followers",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Count Followers",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.2876319885253906,
         "count_operations": 488,
         "msecs_per_operation": 5.894098125520299e-07,
         "operations_per_second": 1696.6124056710123,
-        "operation_name": "Count Followers",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Count Followers",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.18119096755981445,
         "count_operations": 515,
         "msecs_per_operation": 3.518271214753679e-07,
         "operations_per_second": 2842.3050383567775,
-        "operation_name": "Remove Edge",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Remove Edge",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.3986978530883789,
         "count_operations": 515,
         "msecs_per_operation": 7.741705885211241e-07,
         "operations_per_second": 1291.7049741068972,
-        "operation_name": "Insert Edge",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Insert Edge",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.1836080551147461,
         "count_operations": 515,
         "msecs_per_operation": 3.56520495368439e-07,
         "operations_per_second": 2804.8878339142043,
-        "operation_name": "Remove Edges Batch",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Remove Edges Batch",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.0316469669342041,
         "count_operations": 515,
         "msecs_per_operation": 6.145042123146428e-08,
         "operations_per_second": 16273.281451290899,
-        "operation_name": "Insert Edges Batch",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Insert Edges Batch",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.2626478672027588,
         "count_operations": 488,
         "msecs_per_operation": 5.382128426286041e-07,
         "operations_per_second": 1858.001000340406,
-        "operation_name": "Remove Vertex",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Remove Vertex",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.0044667720794677734,
         "count_operations": 42727,
         "msecs_per_operation": 1.0454214149057443e-10,
         "operations_per_second": 9565520.523512144,
-        "operation_name": "Remove All",
-        "wrapper_name": "SQLiteMem"
+        "operation": "Remove All",
+        "database": "SQLiteMem"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 4.097034931182861,
         "count_operations": 52310,
         "msecs_per_operation": 7.83222124103013e-08,
         "operations_per_second": 12767.770077297706,
-        "operation_name": "Import Dump",
-        "wrapper_name": "SQLite"
+        "operation": "Import Dump",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.38178086280822754,
         "count_operations": 488,
         "msecs_per_operation": 7.82337833623417e-07,
         "operations_per_second": 1278.2201716724796,
-        "operation_name": "Retrieve Directed Edge",
-        "wrapper_name": "SQLite"
+        "operation": "Retrieve Directed Edge",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.4489719867706299,
         "count_operations": 488,
         "msecs_per_operation": 9.200245630545694e-07,
         "operations_per_second": 1086.9275018918022,
-        "operation_name": "Retrieve Undirected Edge",
-        "wrapper_name": "SQLite"
+        "operation": "Retrieve Undirected Edge",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.34380483627319336,
         "count_operations": 488,
         "msecs_per_operation": 7.045181071171995e-07,
         "operations_per_second": 1419.4099341064145,
-        "operation_name": "Retrieve Outgoing Edges",
-        "wrapper_name": "SQLite"
+        "operation": "Retrieve Outgoing Edges",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.2405562400817871,
         "count_operations": 488,
         "msecs_per_operation": 4.929431149216949e-07,
         "operations_per_second": 2028.6316407093996,
-        "operation_name": "Retrieve Incoming Edges",
-        "wrapper_name": "SQLite"
+        "operation": "Retrieve Incoming Edges",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.41698789596557617,
         "count_operations": 488,
         "msecs_per_operation": 8.544833933720823e-07,
         "operations_per_second": 1170.297758571597,
-        "operation_name": "Retrieve Connected Edges",
-        "wrapper_name": "SQLite"
+        "operation": "Retrieve Connected Edges",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.3980121612548828,
         "count_operations": 488,
         "msecs_per_operation": 8.155986910960714e-07,
         "operations_per_second": 1226.0931888648747,
-        "operation_name": "Retrieve Friends",
-        "wrapper_name": "SQLite"
+        "operation": "Retrieve Friends",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 3.243273973464966,
         "count_operations": 488,
         "msecs_per_operation": 6.646053224313455e-06,
         "operations_per_second": 150.4652409856831,
-        "operation_name": "Retrieve Friends of Friends",
-        "wrapper_name": "SQLite"
+        "operation": "Retrieve Friends of Friends",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.33564019203186035,
         "count_operations": 488,
         "msecs_per_operation": 6.877872787538121e-07,
         "operations_per_second": 1453.9379120414667,
-        "operation_name": "Count Friends",
-        "wrapper_name": "SQLite"
+        "operation": "Count Friends",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.29985713958740234,
         "count_operations": 488,
         "msecs_per_operation": 6.144613516135294e-07,
         "operations_per_second": 1627.441656621812,
-        "operation_name": "Count Followers",
-        "wrapper_name": "SQLite"
+        "operation": "Count Followers",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.2970612049102783,
         "count_operations": 488,
         "msecs_per_operation": 6.087319772751605e-07,
         "operations_per_second": 1642.759108000626,
-        "operation_name": "Count Followers",
-        "wrapper_name": "SQLite"
+        "operation": "Count Followers",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.6136529445648193,
         "count_operations": 515,
         "msecs_per_operation": 1.1915591156598433e-06,
         "operations_per_second": 839.2365824386609,
-        "operation_name": "Remove Edge",
-        "wrapper_name": "SQLite"
+        "operation": "Remove Edge",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 1.0117969512939453,
         "count_operations": 515,
         "msecs_per_operation": 1.9646542743571755e-06,
         "operations_per_second": 508.9954059867326,
-        "operation_name": "Insert Edge",
-        "wrapper_name": "SQLite"
+        "operation": "Insert Edge",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.7226438522338867,
         "count_operations": 515,
         "msecs_per_operation": 1.403191946085217e-06,
         "operations_per_second": 712.6608749358295,
-        "operation_name": "Remove Edges Batch",
-        "wrapper_name": "SQLite"
+        "operation": "Remove Edges Batch",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.07175421714782715,
         "count_operations": 515,
         "msecs_per_operation": 1.3932857698607212e-07,
         "operations_per_second": 7177.278499729199,
-        "operation_name": "Insert Edges Batch",
-        "wrapper_name": "SQLite"
+        "operation": "Insert Edges Batch",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 1.2827672958374023,
         "count_operations": 488,
         "msecs_per_operation": 2.6286215078635292e-06,
         "operations_per_second": 380.4275347395952,
-        "operation_name": "Remove Vertex",
-        "wrapper_name": "SQLite"
+        "operation": "Remove Vertex",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.02338099479675293,
         "count_operations": 42727,
         "msecs_per_operation": 5.472182647214391e-10,
         "operations_per_second": 1827424.383411341,
-        "operation_name": "Remove All",
-        "wrapper_name": "SQLite"
+        "operation": "Remove All",
+        "database": "SQLite"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 5.922773122787476,
         "count_operations": 52310,
         "msecs_per_operation": 1.1322449097280588e-07,
         "operations_per_second": 8832.0114438861,
-        "operation_name": "Import Dump",
-        "wrapper_name": "MySQL"
+        "operation": "Import Dump",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.8258647918701172,
         "count_operations": 488,
         "msecs_per_operation": 1.6923458849797485e-06,
         "operations_per_second": 590.8957553390255,
-        "operation_name": "Retrieve Directed Edge",
-        "wrapper_name": "MySQL"
+        "operation": "Retrieve Directed Edge",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.7936100959777832,
         "count_operations": 488,
         "msecs_per_operation": 1.6262501966757853e-06,
         "operations_per_second": 614.9115320902638,
-        "operation_name": "Retrieve Undirected Edge",
-        "wrapper_name": "MySQL"
+        "operation": "Retrieve Undirected Edge",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.8259437084197998,
         "count_operations": 488,
         "msecs_per_operation": 1.6925075992209011e-06,
         "operations_per_second": 590.839296946331,
-        "operation_name": "Retrieve Outgoing Edges",
-        "wrapper_name": "MySQL"
+        "operation": "Retrieve Outgoing Edges",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.7639930248260498,
         "count_operations": 488,
         "msecs_per_operation": 1.565559477102561e-06,
         "operations_per_second": 638.7492871562677,
-        "operation_name": "Retrieve Incoming Edges",
-        "wrapper_name": "MySQL"
+        "operation": "Retrieve Incoming Edges",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.9215660095214844,
         "count_operations": 488,
         "msecs_per_operation": 1.8884549375440255e-06,
         "operations_per_second": 529.5334191561492,
-        "operation_name": "Retrieve Connected Edges",
-        "wrapper_name": "MySQL"
+        "operation": "Retrieve Connected Edges",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.9265937805175781,
         "count_operations": 488,
         "msecs_per_operation": 1.8987577469622504e-06,
         "operations_per_second": 526.6601290237586,
-        "operation_name": "Retrieve Friends",
-        "wrapper_name": "MySQL"
+        "operation": "Retrieve Friends",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 5.518092155456543,
         "count_operations": 488,
         "msecs_per_operation": 1.1307565892328982e-05,
         "operations_per_second": 88.43636283193335,
-        "operation_name": "Retrieve Friends of Friends",
-        "wrapper_name": "MySQL"
+        "operation": "Retrieve Friends of Friends",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 1.2334120273590088,
         "count_operations": 488,
         "msecs_per_operation": 2.5274836626209194e-06,
         "operations_per_second": 395.6504308174368,
-        "operation_name": "Count Friends",
-        "wrapper_name": "MySQL"
+        "operation": "Count Friends",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.993675947189331,
         "count_operations": 488,
         "msecs_per_operation": 2.036221203256826e-06,
         "operations_per_second": 491.1057788812699,
-        "operation_name": "Count Followers",
-        "wrapper_name": "MySQL"
+        "operation": "Count Followers",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.992851972579956,
         "count_operations": 488,
         "msecs_per_operation": 2.0345327306966313e-06,
         "operations_per_second": 491.51335090961965,
-        "operation_name": "Count Followers",
-        "wrapper_name": "MySQL"
+        "operation": "Count Followers",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 2.4521069526672363,
         "count_operations": 515,
         "msecs_per_operation": 4.761372723625702e-06,
         "operations_per_second": 210.02346550986195,
-        "operation_name": "Remove Edge",
-        "wrapper_name": "MySQL"
+        "operation": "Remove Edge",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 3.5312161445617676,
         "count_operations": 515,
         "msecs_per_operation": 6.85673037778984e-06,
         "operations_per_second": 145.84210620840167,
-        "operation_name": "Insert Edge",
-        "wrapper_name": "MySQL"
+        "operation": "Insert Edge",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 2.5333058834075928,
         "count_operations": 515,
         "msecs_per_operation": 4.919040550306005e-06,
         "operations_per_second": 203.29167645056143,
-        "operation_name": "Remove Edges Batch",
-        "wrapper_name": "MySQL"
+        "operation": "Remove Edges Batch",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.08302807807922363,
         "count_operations": 515,
         "msecs_per_operation": 1.6121956908587112e-07,
         "operations_per_second": 6202.720957946273,
-        "operation_name": "Insert Edges Batch",
-        "wrapper_name": "MySQL"
+        "operation": "Insert Edges Batch",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 2.9681177139282227,
         "count_operations": 488,
         "msecs_per_operation": 6.082208430180783e-06,
         "operations_per_second": 164.41396434851816,
-        "operation_name": "Remove Vertex",
-        "wrapper_name": "MySQL"
+        "operation": "Remove Vertex",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.5532090663909912,
         "count_operations": 42727,
         "msecs_per_operation": 1.2947528878484126e-08,
         "operations_per_second": 77234.81518251522,
-        "operation_name": "Remove All",
-        "wrapper_name": "MySQL"
+        "operation": "Remove All",
+        "database": "MySQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 52.89374589920044,
         "count_operations": 52310,
         "msecs_per_operation": 1.0111593557484313e-06,
         "operations_per_second": 988.9638011209703,
-        "operation_name": "Import Dump",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Import Dump",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 1.495992660522461,
         "count_operations": 488,
         "msecs_per_operation": 3.0655587305788135e-06,
         "operations_per_second": 326.20480893908314,
-        "operation_name": "Retrieve Directed Edge",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Retrieve Directed Edge",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 1.598984956741333,
         "count_operations": 488,
         "msecs_per_operation": 3.276608517912568e-06,
         "operations_per_second": 305.19361545121996,
-        "operation_name": "Retrieve Undirected Edge",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Retrieve Undirected Edge",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 1.6416800022125244,
         "count_operations": 488,
         "msecs_per_operation": 3.3640983651895994e-06,
         "operations_per_second": 297.2564685823746,
-        "operation_name": "Retrieve Outgoing Edges",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Retrieve Outgoing Edges",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 1.6501359939575195,
         "count_operations": 488,
         "msecs_per_operation": 3.3814262171260644e-06,
         "operations_per_second": 295.7332012555099,
-        "operation_name": "Retrieve Incoming Edges",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Retrieve Incoming Edges",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 1.6559028625488281,
         "count_operations": 488,
         "msecs_per_operation": 3.393243570796779e-06,
         "operations_per_second": 294.7032770079593,
-        "operation_name": "Retrieve Connected Edges",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Retrieve Connected Edges",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 1.6654150485992432,
         "count_operations": 488,
         "msecs_per_operation": 3.412735755326318e-06,
         "operations_per_second": 293.02004951285255,
-        "operation_name": "Retrieve Friends",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Retrieve Friends",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 6.110290288925171,
         "count_operations": 488,
         "msecs_per_operation": 1.2521086657633547e-05,
         "operations_per_second": 79.86527266707675,
-        "operation_name": "Retrieve Friends of Friends",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Retrieve Friends of Friends",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 1.5301530361175537,
         "count_operations": 488,
         "msecs_per_operation": 3.1355595002408887e-06,
         "operations_per_second": 318.92234860259396,
-        "operation_name": "Count Friends",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Count Friends",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 1.3405470848083496,
         "count_operations": 488,
         "msecs_per_operation": 2.7470227147712084e-06,
         "operations_per_second": 364.0304809358983,
-        "operation_name": "Count Followers",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Count Followers",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 1.345919132232666,
         "count_operations": 488,
         "msecs_per_operation": 2.758031008673496e-06,
         "operations_per_second": 362.57750433377487,
-        "operation_name": "Count Followers",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Count Followers",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 2.6689727306365967,
         "count_operations": 515,
         "msecs_per_operation": 5.18247132162446e-06,
         "operations_per_second": 192.95813482409147,
-        "operation_name": "Remove Edge",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Remove Edge",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 3.0090551376342773,
         "count_operations": 515,
         "msecs_per_operation": 5.84282550996947e-06,
         "operations_per_second": 171.15007085077664,
-        "operation_name": "Insert Edge",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Insert Edge",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 2.3387980461120605,
         "count_operations": 515,
         "msecs_per_operation": 4.541355429343807e-06,
         "operations_per_second": 220.19857629696534,
-        "operation_name": "Remove Edges Batch",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Remove Edges Batch",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.48388099670410156,
         "count_operations": 515,
         "msecs_per_operation": 9.395747508817507e-07,
         "operations_per_second": 1064.3112738625032,
-        "operation_name": "Insert Edges Batch",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Insert Edges Batch",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 2.4496288299560547,
         "count_operations": 488,
         "msecs_per_operation": 5.019731208926342e-06,
         "operations_per_second": 199.21385396527788,
-        "operation_name": "Remove Vertex",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Remove Vertex",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "dataset": "fb-pages-company.edges",
         "time_elapsed": 0.06598901748657227,
         "count_operations": 42727,
         "msecs_per_operation": 1.5444336716027865e-09,
         "operations_per_second": 647486.5307502764,
-        "operation_name": "Remove All",
-        "wrapper_name": "PostgreSQL"
+        "operation": "Remove All",
+        "database": "PostgreSQL"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 533.8254070281982,
-        "count_operations": 52310,
-        "msecs_per_operation": 1.0205035500443476e-05,
-        "operations_per_second": 97.9908399100173,
-        "operation_name": "Import Dump",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 5.907896995544434,
-        "count_operations": 488,
-        "msecs_per_operation": 1.2106346302345152e-05,
-        "operations_per_second": 82.60130472282025,
-        "operation_name": "Retrieve Directed Edge",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 6.2438740730285645,
-        "count_operations": 488,
-        "msecs_per_operation": 1.2794823920140501e-05,
-        "operations_per_second": 78.15660506479396,
-        "operation_name": "Retrieve Undirected Edge",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 6.3417181968688965,
-        "count_operations": 488,
-        "msecs_per_operation": 1.2995324173911673e-05,
-        "operations_per_second": 76.950754488104,
-        "operation_name": "Retrieve Outgoing Edges",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 6.273411989212036,
-        "count_operations": 488,
-        "msecs_per_operation": 1.285535243690991e-05,
-        "operations_per_second": 77.78861022346065,
-        "operation_name": "Retrieve Incoming Edges",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 6.473196744918823,
-        "count_operations": 488,
-        "msecs_per_operation": 1.3264747428112343e-05,
-        "operations_per_second": 75.38779048899737,
-        "operation_name": "Retrieve Connected Edges",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 4.362421989440918,
-        "count_operations": 488,
-        "msecs_per_operation": 8.939389322624832e-06,
-        "operations_per_second": 111.86446455230283,
-        "operation_name": "Retrieve Friends",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 9.867877721786499,
-        "count_operations": 488,
-        "msecs_per_operation": 2.02210609053002e-05,
-        "operations_per_second": 49.453389447923925,
-        "operation_name": "Retrieve Friends of Friends",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 5.009617805480957,
-        "count_operations": 488,
-        "msecs_per_operation": 1.0265610257133109e-05,
-        "operations_per_second": 97.41262087221217,
-        "operation_name": "Count Friends",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 4.414104223251343,
-        "count_operations": 488,
-        "msecs_per_operation": 9.045295539449473e-06,
-        "operations_per_second": 110.55470721091147,
-        "operation_name": "Count Followers",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 4.711781978607178,
-        "count_operations": 488,
-        "msecs_per_operation": 9.655290939768806e-06,
-        "operations_per_second": 103.5701571540572,
-        "operation_name": "Count Followers",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 2.2341620922088623,
-        "count_operations": 515,
-        "msecs_per_operation": 4.338178819823034e-06,
-        "operations_per_second": 230.51147532936247,
-        "operation_name": "Remove Edge",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 2.367034912109375,
-        "count_operations": 515,
-        "msecs_per_operation": 4.596184295358009e-06,
-        "operations_per_second": 217.57178035919188,
-        "operation_name": "Insert Edge",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 3.0687286853790283,
-        "count_operations": 515,
-        "msecs_per_operation": 5.958696476464132e-06,
-        "operations_per_second": 167.8219395718233,
-        "operation_name": "Remove Edges Batch",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 3.0925991535186768,
-        "count_operations": 515,
-        "msecs_per_operation": 6.005046900036265e-06,
-        "operations_per_second": 166.52659282210783,
-        "operation_name": "Insert Edges Batch",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 0.00020694732666015625,
-        "count_operations": 488,
-        "msecs_per_operation": 4.2407239069704154e-10,
-        "operations_per_second": 2358087.9631336406,
-        "operation_name": "Remove Vertex",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
-        "dataset": "fb-pages-company.edges",
-        "time_elapsed": 11.307640075683594,
-        "count_operations": 52310,
-        "msecs_per_operation": 2.1616593530268768e-07,
-        "operations_per_second": 4626.075790340155,
-        "operation_name": "Remove All",
-        "wrapper_name": "Neo4j"
-    },
-    {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 6.11878514289856,
         "count_operations": 52310,
         "msecs_per_operation": 1.1697161427831312e-07,
         "operations_per_second": 8549.082665651498,
-        "operation_name": "Import Dump",
-        "wrapper_name": "MongoDB",
+        "operation": "Import Dump",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 8.365369081497192,
         "count_operations": 472,
         "msecs_per_operation": 1.7723239579443205e-05,
         "operations_per_second": 56.42309327916991,
-        "operation_name": "Retrieve Directed Edge",
-        "wrapper_name": "MongoDB",
+        "operation": "Retrieve Directed Edge",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 5.8334503173828125,
         "count_operations": 472,
         "msecs_per_operation": 1.2359004909709349e-05,
         "operations_per_second": 80.91266305868936,
-        "operation_name": "Retrieve Undirected Edge",
-        "wrapper_name": "MongoDB",
+        "operation": "Retrieve Undirected Edge",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 10.84507703781128,
         "count_operations": 472,
         "msecs_per_operation": 2.29768581309561e-05,
         "operations_per_second": 43.522051374496975,
-        "operation_name": "Retrieve Outgoing Edges",
-        "wrapper_name": "MongoDB",
+        "operation": "Retrieve Outgoing Edges",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 10.113933801651001,
         "count_operations": 472,
         "msecs_per_operation": 2.1427825850955513e-05,
         "operations_per_second": 46.66829042552667,
-        "operation_name": "Retrieve Incoming Edges",
-        "wrapper_name": "MongoDB",
+        "operation": "Retrieve Incoming Edges",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 13.17181396484375,
         "count_operations": 472,
         "msecs_per_operation": 2.7906385518736756e-05,
         "operations_per_second": 35.83409249931652,
-        "operation_name": "Retrieve Connected Edges",
-        "wrapper_name": "MongoDB",
+        "operation": "Retrieve Connected Edges",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 13.486783027648926,
         "count_operations": 472,
         "msecs_per_operation": 2.85736928551884e-05,
         "operations_per_second": 34.9972264721961,
-        "operation_name": "Retrieve Friends",
-        "wrapper_name": "MongoDB",
+        "operation": "Retrieve Friends",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 30.816253900527954,
         "count_operations": 472,
         "msecs_per_operation": 6.528867351806771e-05,
         "operations_per_second": 15.3165923906122,
-        "operation_name": "Retrieve Friends of Friends",
-        "wrapper_name": "MongoDB",
+        "operation": "Retrieve Friends of Friends",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 13.44691014289856,
         "count_operations": 472,
         "msecs_per_operation": 2.8489216404446098e-05,
         "operations_per_second": 35.101000526077556,
-        "operation_name": "Count Friends",
-        "wrapper_name": "MongoDB",
+        "operation": "Count Friends",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 10.78798222541809,
         "count_operations": 472,
         "msecs_per_operation": 2.285589454537731e-05,
         "operations_per_second": 43.75238947723679,
-        "operation_name": "Count Followers",
-        "wrapper_name": "MongoDB",
+        "operation": "Count Followers",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 10.347095012664795,
         "count_operations": 472,
         "msecs_per_operation": 2.192181146751016e-05,
         "operations_per_second": 45.61666819742877,
-        "operation_name": "Count Followers",
-        "wrapper_name": "MongoDB",
+        "operation": "Count Followers",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 6.135514974594116,
         "count_operations": 505,
         "msecs_per_operation": 1.2149534603156665e-05,
         "operations_per_second": 82.30767948429747,
-        "operation_name": "Remove Edge",
-        "wrapper_name": "MongoDB",
+        "operation": "Remove Edge",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 12.21125316619873,
         "count_operations": 505,
         "msecs_per_operation": 2.4180699339007388e-05,
         "operations_per_second": 41.35529688286715,
-        "operation_name": "Insert Edge",
-        "wrapper_name": "MongoDB",
+        "operation": "Insert Edge",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 11.87062406539917,
         "count_operations": 505,
         "msecs_per_operation": 2.350618626811717e-05,
         "operations_per_second": 42.541992503324934,
-        "operation_name": "Remove Edges Batch",
-        "wrapper_name": "MongoDB",
+        "operation": "Remove Edges Batch",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 0.06740403175354004,
         "count_operations": 505,
         "msecs_per_operation": 1.3347333020502978e-07,
         "operations_per_second": 7492.1334356750485,
-        "operation_name": "Insert Edges Batch",
-        "wrapper_name": "MongoDB",
+        "operation": "Insert Edges Batch",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 13.781459093093872,
         "count_operations": 472,
         "msecs_per_operation": 2.9198006553164984e-05,
         "operations_per_second": 34.248913472197394,
-        "operation_name": "Remove Vertex",
-        "wrapper_name": "MongoDB",
+        "operation": "Remove Vertex",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
     {
-        "device": "MacBook Pro (16 inch, 2019)",
+        "device": "av19mac.local",
         "time_elapsed": 0.06555986404418945,
         "count_operations": 43104,
         "msecs_per_operation": 1.5209693774171644e-09,
         "operations_per_second": 657475.4330019129,
-        "operation_name": "Remove All",
-        "wrapper_name": "MongoDB",
+        "operation": "Remove All",
+        "database": "MongoDB",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 518.6871018409729,
+        "count_operations": 52310,
+        "msecs_per_operation": 9.915639492276293e-06,
+        "operations_per_second": 100.85078232008554,
+        "operation": "Import Dump",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 6.399411916732788,
+        "count_operations": 514,
+        "msecs_per_operation": 1.2450217736834218e-05,
+        "operations_per_second": 80.31988043401682,
+        "operation": "Retrieve Directed Edge",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 6.072352886199951,
+        "count_operations": 514,
+        "msecs_per_operation": 1.1813916121011578e-05,
+        "operations_per_second": 84.64593702518806,
+        "operation": "Retrieve Undirected Edge",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 6.517529010772705,
+        "count_operations": 514,
+        "msecs_per_operation": 1.2680017530686196e-05,
+        "operations_per_second": 78.86424427883922,
+        "operation": "Retrieve Outgoing Edges",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 6.351928949356079,
+        "count_operations": 514,
+        "msecs_per_operation": 1.2357838422871749e-05,
+        "operations_per_second": 80.92030060444965,
+        "operation": "Retrieve Incoming Edges",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 6.346502065658569,
+        "count_operations": 514,
+        "msecs_per_operation": 1.2347280283382431e-05,
+        "operations_per_second": 80.98949542320251,
+        "operation": "Retrieve Connected Edges",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 4.313829183578491,
+        "count_operations": 514,
+        "msecs_per_operation": 8.39266378128111e-06,
+        "operations_per_second": 119.15168128507507,
+        "operation": "Retrieve Friends",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 9.708910942077637,
+        "count_operations": 514,
+        "msecs_per_operation": 1.8888931793925363e-05,
+        "operations_per_second": 52.94105621799099,
+        "operation": "Retrieve Friends of Friends",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 4.643739223480225,
+        "count_operations": 514,
+        "msecs_per_operation": 9.03451210793818e-06,
+        "operations_per_second": 110.68666332533323,
+        "operation": "Count Friends",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 4.534712791442871,
+        "count_operations": 514,
+        "msecs_per_operation": 8.822398426931655e-06,
+        "operations_per_second": 113.34786206745711,
+        "operation": "Count Followers",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 2.0983290672302246,
+        "count_operations": 540,
+        "msecs_per_operation": 3.885794568944861e-06,
+        "operations_per_second": 257.34762408490826,
+        "operation": "Remove Edge",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 2.2937850952148438,
+        "count_operations": 540,
+        "msecs_per_operation": 4.247750176323784e-06,
+        "operations_per_second": 235.41874133131105,
+        "operation": "Insert Edge",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 3.2696378231048584,
+        "count_operations": 540,
+        "msecs_per_operation": 6.05488485760159e-06,
+        "operations_per_second": 165.15590692770195,
+        "operation": "Remove Edges Batch",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 3.889072895050049,
+        "count_operations": 540,
+        "msecs_per_operation": 7.201986842685275e-06,
+        "operations_per_second": 138.8505730214786,
+        "operation": "Insert Edges Batch",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.00021505355834960938,
+        "count_operations": 514,
+        "msecs_per_operation": 4.183921368669443e-10,
+        "operations_per_second": 2390102.2793791573,
+        "operation": "Remove Vertex",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 11.26784610748291,
+        "count_operations": 52310,
+        "msecs_per_operation": 2.1540520182532805e-07,
+        "operations_per_second": 4642.4134214312035,
+        "operation": "Remove All",
+        "database": "Neo4j",
         "dataset": "fb-pages-company.edges"
     }
 ]
