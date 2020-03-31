@@ -4,6 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy import or_, and_
+from sqlalchemy_utils import create_database, database_exists
 
 from pygraphdb.graph_base import GraphBase
 from pygraphdb.edge import Edge
@@ -56,6 +57,9 @@ class PlainSQL(GraphBase):
 
     def __init__(self, url='sqlite:///:memory:'):
         super().__init__()
+        # https://stackoverflow.com/a/51184173
+        if not database_exists(url):
+            create_database(url)
         self.engine = sa.create_engine(url)
         self.table_name = EdgeSQL.__tablename__
         self.session_maker = sessionmaker(bind=self.engine)
