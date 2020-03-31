@@ -1,4 +1,5 @@
 from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
+from urllib.parse import urlparse
 
 # Properties of every entry are: 'from_id', 'to_id', 'weight'
 # There are indexes by all keys.
@@ -11,8 +12,23 @@ from pygraphdb.graph_base import GraphBase
 
 class MongoDB(GraphBase):
 
-    def __init__(self, url, db_name, collection_name):
+    def __init__(self, url, db_name=None, collection_name=None):
         super().__init__()
+        # Extract database name and collection name if nothing was provided.
+        if (db_name is None) or (collection_name is None):
+            url_parts = urlparse(url).path
+            url_parts = url_parts.split('/')
+            url_parts = [v for v in url_parts if (v != '/' and v != '')]
+            if len(url_parts) >= 1:
+                db_name = url_parts[0]
+            else:
+                db_name = 'graph'
+            if len(url_parts) >= 2:
+                collection_name = url_parts[1]
+            else:
+                collection_name = 'edges'
+            if len(url_parts) > 2:
+                print('Will avoid remaining url parts:', url_parts[2:])
         self.db = MongoClient(url)
         self.table = self.db[db_name][collection_name]
         self.create_index()
