@@ -31,26 +31,29 @@ mongo_url = os.getenv('URI_MONGO', 'mongodb://localhost:27017')
 file_path = os.getenv('URI_FILE',
                       '/Users/av/Datasets/graph-communities/fb-pages-company.edges')
 
+dataset_name = os.path.basename(file_path)
+report_path = 'artifacts/stats_mew.md'
+in_memory = True
+
+
 if __name__ == "__main__":
     # Preprocessing
     stats = StatsFile()
     tasks = TasksSampler()
     tasks.sample_from_file(file_path, sampling_ratio)
-    gs = [
-        # SQLiteMem(url='sqlite:///:memory:'),
-        SQLite(url='sqlite:////Users/av/sqlite/pygraphdb.db'),
-        MySQL(url='mysql://root:temptemp@0.0.0.0:3306/mysql'),
-        PostgreSQL(url='postgres://root:temptemp@0.0.0.0:5432'),
-        Neo4j(
-            url='bolt://0.0.0.0:7687/pygraphdb',
-            enterprise_edition=False,
-        ),
-        MongoDB(
-            url='mongodb://0.0.0.0:27017/',
-            db_name='pygraphdb',
-            collection_name='tests',
-        ),
-    ]
+    # Wrappers selection.
+    gs = list()
+    if in_memory:
+        gs.extend([
+            SQLiteMem(url='sqlite:///:memory:'),
+        ])
+    gs.extend([
+        SQLite(url='sqlite:////Users/av/sqlite/fb-pages-company/pygraphdb.db'),
+        MySQL(url='mysql://root:temptemp@0.0.0.0:3306/fb-pages-company/'),
+        PostgreSQL(url='postgres://root:temptemp@0.0.0.0:5432/fb-pages-company/'),
+        Neo4j(url='bolt://0.0.0.0:7687/fb-pages-company'),
+        MongoDB(url='mongodb://0.0.0.0:27017/fb-pages-company'),
+    ])
     # Analysis
     for g in gs:
         # try:
@@ -59,7 +62,5 @@ if __name__ == "__main__":
         # except Exception as e:
         #     print(f'Failed for {g}: {str(e)}')
         FullTest(graph=g).run()
-        FullBench(graph=g, stats=stats, tasks=tasks,
-                  dataset=file_path).run()
         # Postprocessing
-        stats.dump_to_file()
+        # stats.dump_to_file()
