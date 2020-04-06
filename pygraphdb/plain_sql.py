@@ -13,12 +13,22 @@ from pygraphdb.helpers import *
 BaseEntitySQL = declarative_base()
 
 
+class NodeSQL(BaseEntitySQL):
+    __tablename__ = 'nodes'
+    _id = Column(Integer, primary_key=True)
+    attributes = Column(String)
+
+    def __init__(self, *args, **kwargs):
+        BaseEntitySQL.__init__(self)
+
+
 class EdgeSQL(BaseEntitySQL, Edge):
     __tablename__ = 'edges'
     _id = Column(Integer, primary_key=True)
     v_from = Column(Integer, index=True)
     v_to = Column(Integer, index=True)
     weight = Column(Float)
+    attributes = Column(String)
 
     def __init__(self, *args, **kwargs):
         BaseEntitySQL.__init__(self)
@@ -61,20 +71,19 @@ class PlainSQL(GraphBase):
         if not database_exists(url):
             create_database(url)
         self.engine = sa.create_engine(url)
-        self.table_name = EdgeSQL.__tablename__
         self.session_maker = sessionmaker(bind=self.engine)
         self.session = self.session_maker()
         BaseEntitySQL.metadata.create_all(self.engine)
 
     # Relatives
 
-    def edge_directed(self, v_from: int, v_to: int) -> Optional[EdgeSQL]:
+    def find_edge(self, v_from: int, v_to: int) -> Optional[EdgeSQL]:
         return self.session.query(EdgeSQL).filter(and_(
             EdgeSQL.v_from == v_from,
             EdgeSQL.v_to == v_to,
         )).first()
 
-    def edge_undirected(self, v1: int, v2: int) -> Optional[EdgeSQL]:
+    def find_edge_or_inv(self, v1: int, v2: int) -> Optional[EdgeSQL]:
         return self.session.query(EdgeSQL).filter(or_(
             and_(
                 EdgeSQL.v_from == v1,
@@ -103,9 +112,9 @@ class PlainSQL(GraphBase):
         all_tos = self.session.query(EdgeSQL.v_to).distinct().all()
         return set(all_froms).union(all_tos)
 
-    # Wider range of neighbours
+    # Wider range of neighbors
 
-    def vertexes_related_to_group(self, vs: Sequence[int]) -> Set[int]:
+    def nodes_related_to_group(self, vs: Sequence[int]) -> Set[int]:
         edges = self.session.query(EdgeSQL).filter(or_(
             EdgeSQL.v_from.in_(vs),
             EdgeSQL.v_to.in_(vs),
@@ -120,7 +129,7 @@ class PlainSQL(GraphBase):
 
     # Metadata
 
-    def count_vertexes(self) -> int:
+    def count_nodes(self) -> int:
         return len(self.all_vertexes())
 
     def count_edges(self) -> int:
@@ -192,7 +201,7 @@ class PlainSQL(GraphBase):
         except:
             return 0
 
-    def remove_vertex(self, v: int) -> int:
+    def remove_node(self, v: int) -> int:
         try:
             count = self.session.query(EdgeSQL).filter(or_(
                 EdgeSQL.v_from == v,

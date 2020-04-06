@@ -16,6 +16,7 @@ class Edge(object):
         self.v_to = v_to
         self.weight = weight
         self._id = Edge.combine_ids(self.v_from, self.v_to)
+        self.attributes = {}
 
     def __repr__(self) -> str:
         return f'<EdgeSQL(_id={self._id}, v_from={self.v_from}, v_to={self.v_to}, weight={self.weight})>'

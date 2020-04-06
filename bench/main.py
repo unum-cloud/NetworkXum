@@ -22,7 +22,7 @@ print('Welcome to GraphDB benchmarks!')
 print('- Reading settings')
 sampling_ratio = float(os.getenv('SAMPLING_RATIO', '0.01'))
 sample_from_real_data = os.getenv('SAMPLE_FROM_REAL_DATA', '1') == '1'
-count_vertexes = int(os.getenv('COUNT_NODES', '0'))
+count_nodes = int(os.getenv('COUNT_NODES', '0'))
 count_edges = int(os.getenv('COUNT_EDGES', '0'))
 count_finds = int(os.getenv('COUNT_FINDS', '10000'))
 count_analytics = int(os.getenv('COUNT_ANALYTICS', '1000'))
@@ -48,19 +48,19 @@ if __name__ == "__main__":
             SQLiteMem(url='sqlite:///:memory:'),
         ])
     gs.extend([
-        SQLite(url='sqlite:////Users/av/sqlite/fb-pages-company/pygraphdb.db'),
+        SQLite(url='sqlite:////Users/av/sqlite/fb-pages-company/edges.db'),
         MySQL(url='mysql://root:temptemp@0.0.0.0:3306/fb-pages-company/'),
         PostgreSQL(url='postgres://root:temptemp@0.0.0.0:5432/fb-pages-company/'),
-        Neo4j(url='bolt://0.0.0.0:7687/fb-pages-company'),
-        MongoDB(url='mongodb://0.0.0.0:27017/fb-pages-company'),
+        Neo4j(url='bolt://0.0.0.0:7687/fb-pages-company/'),
+        MongoDB(url='mongodb://0.0.0.0:27017/fb-pages-company/edges'),
     ])
     # Analysis
     for g in gs:
-        # try:
-        #     FullTest(graph=g).run()
-        #     FullBench(graph=g, stats=stats, tasks=tasks).run()
-        # except Exception as e:
-        #     print(f'Failed for {g}: {str(e)}')
-        FullTest(graph=g).run()
-        # Postprocessing
-        # stats.dump_to_file()
+        try:
+            FullTest(graph=g).run()
+            FullBench(graph=g, stats=stats, tasks=tasks).run()
+        except Exception as e:
+            print(f'Failed for {g}: {str(e)}')
+        stats.dump_to_file()
+    # Postprocessing: Reporting
+    StatsExporter()
