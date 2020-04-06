@@ -8,7 +8,15 @@ from pygraphdb.helpers import StatsCounter
 
 class FullBench(object):
     """
+        Benchmarks groups in chronological order:
+        1. Bulk imports (if needed).
+        2. Edge lookups and simple queries.
+        3. A few complex analytical queries.
+        4. Modifications: removing and restoring same objects.
+        5. Clearing all the data (if needed).
 
+        Can run over existing graph database, if `tasks` is filled.
+        By default avoids cleaning data at the end, to allow further analysis.
     """
 
     def __init__(
@@ -26,20 +34,8 @@ class FullBench(object):
     def run(
         self,
         repeat_existing=False,
-        clear_afterwards=False,
+        remove_all_afterwards=False,
     ):
-        # Benchmark groups in self.tasks.chronological order:
-        # --
-        # - bulk load
-        # - index construction
-        # --
-        # - lookups
-        # - analytics
-        # --
-        # - edge removals
-        # - edge inserts
-        # - optional node removals
-        # --
         def micro(operation_name, f):
             counter = StatsCounter()
             dataset_name = os.path.basename(self.dataset)
@@ -63,7 +59,7 @@ class FullBench(object):
                 counter
             )
 
-        if self.graph.count_edges() == 0:
+        if self.graph.count_edges() == 0 or repeat_existing:
             micro('Import Dump', self.insert_bulk)
 
         # Queries returning single object.
@@ -88,7 +84,7 @@ class FullBench(object):
         micro('Remove Edges Batch', self.remove_es)  # Batched edge removals
         micro('Insert Edges Batch', self.insert_es)  # Batched edge inserts
 
-        if clear_afterwards:
+        if remove_all_afterwards:
             micro('Remove Vertex', self.remove_v)
             micro('Remove All', self.remove_bulk)
 
@@ -101,17 +97,17 @@ class FullBench(object):
         half = int(len(self.tasks.edges_to_query) / 2)
         cnt = 0
         for e in self.tasks.edges_to_query[:half]:
-            e = self.graph.edge_directed(e['v_from'], e['v_to'])
+            e = self.graph.find_edge(e['v_from'], e['v_to'])
             cnt += 1
         for e in self.tasks.edges_to_query[half:]:
-            e = self.graph.edge_directed(e['v_to'], e['v_from'])
+            e = self.graph.find_edge(e['v_to'], e['v_from'])
             cnt += 1
         return cnt
 
     def find_e_undirected(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_query:
-            self.graph.edge_directed(e['v_from'], e['v_to'])
+            self.graph.find_edge(e['v_from'], e['v_to'])
             cnt += 1
         return cnt
 
@@ -139,7 +135,7 @@ class FullBench(object):
     def find_vs_related(self) -> int:
         cnt = 0
         for v in self.tasks.nodes_to_query:
-            self.graph.vertexes_related(v)
+            self.graph.nodes_related(v)
             cnt += 1
         return cnt
 
@@ -167,7 +163,7 @@ class FullBench(object):
     def find_vs_related_related(self) -> int:
         cnt = 0
         for v in self.tasks.nodes_to_analyze:
-            self.graph.vertexes_related_to_related(v)
+            self.graph.nodes_related_to_related(v)
             cnt += 1
         return cnt
 
@@ -206,7 +202,7 @@ class FullBench(object):
     def remove_v(self) -> int:
         cnt = 0
         for v in self.tasks.nodes_to_change_by_one:
-            self.graph.remove_vertex(v)
+            self.graph.remove_node(v)
             cnt += 1
         return cnt
 
