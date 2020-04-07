@@ -289,13 +289,14 @@ persistent_dbs = [
     'Neo4j',
     'MongoDB',
     'HyperRocks',
+    'SQLiteMem',
 ]
 
 out.\
     add_title(f'PyGraphDB Benchmark').\
     add_text(f'Following tests compare the performance of various databases in classical graph operations.').\
     add_text(f'Many DBs werent opptimizied for such use case, but still perform better than actual Graph DBs.').\
-    add_text(f'Following results are **specific to `{dataset}` dataset and device** described below.')\
+    add_text(f'Following results are **specific to `{dataset}` dataset and device** described below.\n')\
 
 out.\
     add_title(f'Device').\

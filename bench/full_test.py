@@ -33,7 +33,7 @@ class FullTest(object):
         es_last = 0
         vs_last = 0
         for e in edges:
-            g.insert_edge(e)
+            g.insert_edge(e.__dict__)
             assert g.find_edge(e['v_from'], e['v_to']), \
                 f'No directed edge: {e}'
             assert g.find_edge_or_inv(e['v_from'], e['v_to']), \
@@ -57,9 +57,9 @@ class FullTest(object):
             f'count_following: {g.count_following(1)}'
         assert g.count_related(1) == (4, 14.0), \
             f'count_related: {g.count_related(1)}'
-        assert g.nodes_related(1) == {2, 4, 6, 7}, \
+        assert set(g.nodes_related(1)) == {2, 4, 6, 7}, \
             f'nodes_related: {g.nodes_related(1)}'
-        assert g.nodes_related_to_related(8) == {1}, \
+        assert set(g.nodes_related_to_related(8)) == {1}, \
             f'nodes_related_to_related: {g.nodes_related_to_related(8)}'
         assert g.count_followers(5) == (1, 3.0), \
             f'count_followers: {g.count_followers(5)}'
