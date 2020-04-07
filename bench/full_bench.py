@@ -25,12 +25,12 @@ class FullBench(object):
         graph: GraphBase,
         stats: StatsFile,
         tasks: TasksSampler,
-        dataset: str,
+        dataset_path: str,
     ):
         self.graph = graph
         self.stats = stats
         self.tasks = tasks
-        self.dataset = dataset
+        self.dataset_path = dataset_path
 
     def run(
         self,
@@ -39,7 +39,7 @@ class FullBench(object):
     ):
         def micro(operation_name, f):
             counter = StatsCounter()
-            dataset_name = os.path.basename(self.dataset)
+            dataset_name = os.path.basename(self.dataset_path)
             class_name = self.graph.__class__.__name__
             print(f'-- {class_name}: {operation_name} @ {dataset_name}')
             if not repeat_existing:
@@ -59,6 +59,9 @@ class FullBench(object):
                 dataset_name,
                 counter
             )
+
+        if repeat_existing:
+            self.remove_bulk()
 
         if self.graph.count_edges() == 0 or repeat_existing:
             micro('Import Dump', self.insert_bulk)
@@ -197,7 +200,7 @@ class FullBench(object):
         return cnt
 
     def insert_bulk(self) -> int:
-        self.graph.insert_dump(self.dataset)
+        self.graph.insert_dump(self.dataset_path)
         return self.graph.count_edges()
 
     def remove_v(self) -> int:

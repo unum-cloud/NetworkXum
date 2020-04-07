@@ -28,55 +28,62 @@ count_edges = int(os.getenv('COUNT_EDGES', '0'))
 count_finds = int(os.getenv('COUNT_FINDS', '10000'))
 count_analytics = int(os.getenv('COUNT_ANALYTICS', '1000'))
 count_changes = int(os.getenv('COUNT_CHANGES', '10000'))
-mongo_url = os.getenv('URI_MONGO', 'mongodb://localhost:27017')
 file_path = os.getenv('URI_FILE',
                       '/Users/av/Datasets/graph-communities/fb-pages-company.edges')
 
+sqlite_mem_url = os.getenv(
+    'URI_SQLITE', 'sqlite:///:memory:')
+sqlite_url = os.getenv(
+    'URI_SQLITE', 'sqlite:////Users/av/sqlite/fb-pages-company/temp.db')
+mysql_url = os.getenv(
+    'URI_MYSQL', 'mysql://root:temptemp@0.0.0.0:3306/fb-pages-company/')
+pgsql_url = os.getenv(
+    'URI_PGSQL', 'postgres://root:temptemp@0.0.0.0:5432/fb-pages-company/')
+neo4j_url = os.getenv('URI_MYSQL', 'bolt://0.0.0.0:7687/fb-pages-company/')
+mongo_url = os.getenv('URI_MONGO', 'mongodb://0.0.0.0:27017/fb-pages-company')
+hyperrocks_url = os.getenv('URI_MYSQL', '/Users/av/rocksdb/fb-pages-company/')
+
 dataset_name = os.path.basename(file_path)
 report_path = 'artifacts/stats_mew.md'
-compare_to_ram = True
-compare_to_cpp = True
 
-if compare_to_cpp:
-    from embedded_graph_py import HyperRocks
 
 if __name__ == "__main__":
     # Preprocessing
     stats = StatsFile()
     tasks = TasksSampler()
     tasks.sample_from_file(file_path, sampling_ratio)
+
     # Wrappers selection.
     gs = list()
-    if compare_to_cpp:
-        gs.extend([
-            HyperRocks('/Users/av/rocksdb/fb-pages-company/temp.db'),
-        ])
-    if compare_to_ram:
-        gs.extend([
-            SQLiteMem(url='sqlite:///:memory:'),
-        ])
-    gs.extend([
-        SQLite(url='sqlite:////Users/av/sqlite/fb-pages-company/temp.db'),
-        MySQL(url='mysql://root:temptemp@0.0.0.0:3306/fb-pages-company/'),
-        PostgreSQL(url='postgres://root:temptemp@0.0.0.0:5432/fb-pages-company/'),
-        Neo4j(url='bolt://0.0.0.0:7687/fb-pages-company/'),
-        MongoDB(url='mongodb://0.0.0.0:27017/fb-pages-company'),
-    ])
+    if len(hyperrocks_url):
+        from embedded_graph_py import HyperRocks
+        gs.append(lambda: HyperRocks(hyperrocks_url))
+    if len(sqlite_mem_url):
+        gs.append(lambda: SQLiteMem(url=sqlite_mem_url))
+    # if len(sqlite_url):
+    #     gs.append(lambda: SQLite(url=sqlite_url))
+    # if len(mysql_url):
+    #     gs.append(lambda: MySQL(url=mysql_url))
+    # if len(pgsql_url):
+    #     gs.append(lambda: PostgreSQL(url=pgsql_url))
+    # if len(neo4j_url):
+    #     gs.append(lambda: Neo4j(url=neo4j_url))
+    # if len(mongo_db):
+    #     gs.append(lambda: MongoDB(url=mongo_db))
+
     # Analysis
-    for g in gs:
+    for g_connector in gs:
+        g = g_connector()
         FullTest(graph=g).run()
         FullBench(
             graph=g,
             stats=stats,
             tasks=tasks,
-            dataset=dataset_name,
+            dataset_path=file_path,
         ).run(
             repeat_existing=True,
             remove_all_afterwards=False,
         )
-        # try:
-        # except Exception as e:
-        #     print(f'Failed for {g}: {str(e)}')
         stats.dump_to_file()
     # Postprocessing: Reporting
     # StatsExporter()

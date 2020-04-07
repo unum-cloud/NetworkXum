@@ -49,12 +49,18 @@ class StatsCounter:
         self.count_operations += ops
 
     def secs_per_op(self) -> float:
+        if (self.count_operations == 0):
+            return 0
         return self.time_elapsed / self.count_operations
 
     def msecs_per_op(self) -> float:
+        if (self.count_operations == 0):
+            return 0
         return self.secs_per_op() / 1000.0
 
     def ops_per_sec(self) -> float:
+        if (self.count_operations == 0):
+            return 0
         return self.count_operations / self.time_elapsed
 
     def __repr__(self) -> str:
