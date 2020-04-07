@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Float, Boolean
+from sqlalchemy import Column, Integer, Text, Float, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy import or_, and_
 from sqlalchemy_utils import create_database, database_exists
@@ -14,21 +14,21 @@ BaseEntitySQL = declarative_base()
 
 
 class NodeSQL(BaseEntitySQL):
-    __tablename__ = 'nodes'
+    __tablename__ = 'table_nodes'
     _id = Column(Integer, primary_key=True)
-    attributes = Column(String)
+    attributes_json = Column(Text)
 
     def __init__(self, *args, **kwargs):
         BaseEntitySQL.__init__(self)
 
 
 class EdgeSQL(BaseEntitySQL, Edge):
-    __tablename__ = 'edges'
+    __tablename__ = 'table_edges'
     _id = Column(Integer, primary_key=True)
     v_from = Column(Integer, index=True)
     v_to = Column(Integer, index=True)
     weight = Column(Float)
-    attributes = Column(String)
+    attributes_json = Column(Text)
 
     def __init__(self, *args, **kwargs):
         BaseEntitySQL.__init__(self)

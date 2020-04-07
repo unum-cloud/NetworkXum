@@ -1,9 +1,10 @@
 import os
 
 from pygraphdb.graph_base import GraphBase
-from pystats.file import StatsFile
-from bench.tasks_sampler import TasksSampler
 from pygraphdb.helpers import StatsCounter
+from pystats.file import StatsFile
+
+from tasks_sampler import TasksSampler
 
 
 class FullBench(object):
@@ -68,7 +69,7 @@ class FullBench(object):
 
         # Queries returning collections.
         micro('Retrieve Outgoing Edges', self.find_es_from)
-        micro('Retrieve Incoming Edges', self.find_es_to)
+        micro('Retrieve Ingoing Edges', self.find_es_to)
         micro('Retrieve Connected Edges', self.find_es_related)
         micro('Retrieve Friends', self.find_vs_related)
         micro('Retrieve Friends of Friends', self.find_vs_related_related)
