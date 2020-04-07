@@ -288,6 +288,7 @@ persistent_dbs = [
     'PostgreSQL',
     'Neo4j',
     'MongoDB',
+    'HyperRocks',
 ]
 
 out.\

@@ -1,13 +1,13 @@
 ## Simple Search Queries
 
-|            | Retrieve Incoming Edges | Retrieve Connected Edges | Retrieve Directed Edge | Retrieve Outgoing Edges | Retrieve Undirected Edge | Result       |
-| ---------- | ----------------------- | ------------------------ | ---------------------- | ----------------------- | ------------------------ | ------------ |
-| PostgreSQL | 295.73                  | 294.70                   | 326.20                 | 297.26                  | 305.19                   | :thumbsdown: |
-| SQLiteMem  | 2091.74                 | 1579.95                  | 1895.73                | 1931.75                 | 1789.21                  | :thumbsup:   |
-| SQLite     | 2028.63                 | 1170.30                  | 1278.22                | 1419.41                 | 1086.93                  |              |
-| MongoDB    | 46.67                   | 35.83                    | 56.42                  | 43.52                   | 80.91                    | :thumbsdown: |
-| MySQL      | 638.75                  | 529.53                   | 590.90                 | 590.84                  | 614.91                   | :thumbsdown: |
-| Neo4j      | 77.79                   | 75.39                    | 82.60                  | 76.95                   | 78.16                    | :thumbsdown: |
+|            | Retrieve Ingoing Edges | Retrieve Connected Edges | Retrieve Directed Edge | Retrieve Outgoing Edges | Retrieve Undirected Edge | Result       |
+| ---------- | ---------------------- | ------------------------ | ---------------------- | ----------------------- | ------------------------ | ------------ |
+| PostgreSQL | 295.73                 | 294.70                   | 326.20                 | 297.26                  | 305.19                   | :thumbsdown: |
+| SQLiteMem  | 2091.74                | 1579.95                  | 1895.73                | 1931.75                 | 1789.21                  | :thumbsup:   |
+| SQLite     | 2028.63                | 1170.30                  | 1278.22                | 1419.41                 | 1086.93                  |              |
+| MongoDB    | 46.67                  | 35.83                    | 56.42                  | 43.52                   | 80.91                    | :thumbsdown: |
+| MySQL      | 638.75                 | 529.53                   | 590.90                 | 590.84                  | 614.91                   | :thumbsdown: |
+| Neo4j      | 77.79                  | 75.39                    | 82.60                  | 76.95                   | 78.16                    | :thumbsdown: |
 
 ## Complex Search Queries
 

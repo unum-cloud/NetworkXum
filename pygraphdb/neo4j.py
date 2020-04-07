@@ -62,10 +62,6 @@ class Neo4j(GraphBase):
         # '''
         return self.session.run(task)
 
-    # def __del__(self):
-    #     self.driver.close()
-    #     super().__del__()
-
     # Relatives
 
     def find_edge(self, v_from: int, v_to: int) -> Optional[object]:
@@ -326,30 +322,3 @@ class Neo4j(GraphBase):
         if len(records) == 0:
             return None
         return records[0][key]
-
-
-# wrap = Neo4j()
-# print(wrap.insert(Edge(1, 3, 30)))
-# print(wrap.insert(Edge(1, 4, 40)))
-# print(wrap.insert(Edge(1, 5, 50)))
-# print(wrap.insert(Edge(1, 6, 60)))
-# print(wrap.insert(Edge(6, 7, 3)))
-# print(wrap.insert(Edge(7, 8, 3)))
-# wrap.insert_dump('file:///Users/av/Code/PyGraphDB/artifacts/test.csv')
-# print(wrap.insert_many([
-#     Edge(1, 3, 30),
-#     Edge(1, 4, 40),
-#     Edge(1, 5, 50),
-#     Edge(1, 6, 60),
-#     Edge(6, 7, 3),
-#     Edge(7, 8, 3),
-# ]))
-# print(wrap.find_edge(1, 3))
-# print(wrap.edges_related(1))
-# print(wrap.count_nodes())
-# print(wrap.count_edges())
-# print(wrap.count_related(1))
-# print(wrap.count_followers(1))
-# print(wrap.count_following(1))
-# print(wrap.nodes_related_to_group([7, 8]))
-# print(wrap.nodes_related_to_related(8))

@@ -46,7 +46,7 @@
         "count_operations": 488,
         "msecs_per_operation": 4.780717560502349e-07,
         "operations_per_second": 2091.7362034977064,
-        "operation": "Retrieve Incoming Edges",
+        "operation": "Retrieve Ingoing Edges",
         "database": "SQLiteMem"
     },
     {
@@ -216,7 +216,7 @@
         "count_operations": 488,
         "msecs_per_operation": 4.929431149216949e-07,
         "operations_per_second": 2028.6316407093996,
-        "operation": "Retrieve Incoming Edges",
+        "operation": "Retrieve Ingoing Edges",
         "database": "SQLite"
     },
     {
@@ -386,7 +386,7 @@
         "count_operations": 488,
         "msecs_per_operation": 1.565559477102561e-06,
         "operations_per_second": 638.7492871562677,
-        "operation": "Retrieve Incoming Edges",
+        "operation": "Retrieve Ingoing Edges",
         "database": "MySQL"
     },
     {
@@ -556,7 +556,7 @@
         "count_operations": 488,
         "msecs_per_operation": 3.3814262171260644e-06,
         "operations_per_second": 295.7332012555099,
-        "operation": "Retrieve Incoming Edges",
+        "operation": "Retrieve Ingoing Edges",
         "database": "PostgreSQL"
     },
     {
@@ -725,7 +725,7 @@
         "count_operations": 472,
         "msecs_per_operation": 2.1427825850955513e-05,
         "operations_per_second": 46.66829042552667,
-        "operation": "Retrieve Incoming Edges",
+        "operation": "Retrieve Ingoing Edges",
         "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
@@ -895,7 +895,7 @@
         "count_operations": 514,
         "msecs_per_operation": 1.2357838422871749e-05,
         "operations_per_second": 80.92030060444965,
-        "operation": "Retrieve Incoming Edges",
+        "operation": "Retrieve Ingoing Edges",
         "database": "Neo4j",
         "dataset": "fb-pages-company.edges"
     },
@@ -1007,6 +1007,66 @@
         "operations_per_second": 4642.4134214312035,
         "operation": "Remove All",
         "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.28518009185791016,
+        "count_operations": 484,
+        "msecs_per_operation": 5.892150658221284e-07,
+        "operations_per_second": 1697.1731681787628,
+        "operation": "Count Following",
+        "database": "SQLiteMem",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.29274606704711914,
+        "count_operations": 484,
+        "msecs_per_operation": 6.048472459651222e-07,
+        "operations_per_second": 1653.3099996253663,
+        "operation": "Count Following",
+        "database": "SQLite",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.7101850509643555,
+        "count_operations": 484,
+        "msecs_per_operation": 1.4673244854635442e-06,
+        "operations_per_second": 681.512514721029,
+        "operation": "Count Following",
+        "database": "MySQL",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 1.4896910190582275,
+        "count_operations": 484,
+        "msecs_per_operation": 3.077874006318652e-06,
+        "operations_per_second": 324.89958911478266,
+        "operation": "Count Following",
+        "database": "PostgreSQL",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 3.425391912460327,
+        "count_operations": 484,
+        "msecs_per_operation": 7.077256017480014e-06,
+        "operations_per_second": 141.297700341787,
+        "operation": "Count Following",
+        "database": "Neo4j",
+        "dataset": "fb-pages-company.edges"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.5676689147949219,
+        "count_operations": 484,
+        "msecs_per_operation": 1.172869658667194e-06,
+        "operations_per_second": 852.6096592321804,
+        "operation": "Count Following",
+        "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     }
 ]
