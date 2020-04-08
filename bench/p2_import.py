@@ -1,3 +1,6 @@
+from datetime import datetime
+import os
+
 from pygraphdb.helpers import StatsCounter
 
 import config
@@ -23,7 +26,10 @@ class BulkImporter(object):
                 if (g.count_edges() != 0):
                     print(f'-- Skipping: {dataset_name} -> {wrapper_name}')
                     continue
+                file_size = os.path.getsize(dataset_path) / (2 ** 20)
                 print(f'-- Bulk importing: {dataset_name} -> {wrapper_name}')
+                print(f'--- started at:', datetime.now().strftime('%H:%M:%S'))
+                print(f'--- file size (Mb):', file_size)
 
                 def import_one() -> int:
                     g.insert_dump(dataset_path)
@@ -37,6 +43,9 @@ class BulkImporter(object):
                     dataset=dataset_name,
                     stats=counter,
                 )
+                secs_elapsed = (counter.time_elapsed / 1000)
+                print(f'--- edges/second:', counter.ops_per_sec())
+                print(f'--- Mb/second:', file_size / secs_elapsed)
 
 
 if __name__ == "__main__":
