@@ -2,6 +2,10 @@ from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 from itertools import groupby, count
 import csv
 import time
+import concurrent
+import math
+
+from tqdm import tqdm
 
 from pygraphdb.edge import Edge
 
@@ -23,9 +27,12 @@ def yield_edges_from(filepath: str) -> Generator[Edge, None, None]:
         lines_to_skip = 2
     with open(filepath, 'r') as f:
         reader = csv.reader(f, delimiter=',')
-        for i, columns in enumerate(reader):
-            if i < lines_to_skip:
+        line_idx = 0
+        for columns in tqdm(reader):
+            if line_idx < lines_to_skip:
+                line_idx += 1
                 continue
+            line_idx += 1
             if len(columns) < 2:
                 continue
             # Skip header row.
@@ -37,6 +44,28 @@ def yield_edges_from(filepath: str) -> Generator[Edge, None, None]:
             has_weight = (len(columns) > 2 and len(columns[2]) > 0)
             w = float(columns[2]) if has_weight else 1.0
             yield Edge(v1, v2, w)
+
+
+def export_edges_into_graph(filepath: str, g) -> int:
+    chunk_len = type(g).__max_batch_size__
+    count_edges_added = 0
+    for es in chunks(yield_edges_from(filepath), chunk_len):
+        count_edges_added += g.insert_edges(es)
+    return count_edges_added
+
+
+def export_edges_into_graph_parallel(filepath: str, g, thread_count=8) -> int:
+    batch_per_thread = type(g).__max_batch_size__
+    chunk_len = thread_count * batch_per_thread
+    count_edges_before = g.count_edges()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=thread_count) as executor:
+        for es in chunks(yield_edges_from(filepath), chunk_len):
+            x_len = int(math.ceil(len(es) / thread_count))
+            es_per_thread = [es[x:x+x_len] for x in range(0, len(es), x_len)]
+            print(f'-- Importing part: {x_len} rows x {thread_count} threads')
+            executor.map(g.insert_edges, es_per_thread)
+            executor.shutdown(wait=True)
+    return g.count_edges() - count_edges_before
 
 
 class StatsCounter:
