@@ -18,7 +18,51 @@ services:
       COUNT_NODES: '14092'
       COUNT_EDGES: '52309'
       SAMPLE_FROM_REAL_DATA: '1'
-      
+    
+  # Patent Citation Network. 77 Mb.
+  # Average degree: 8.
+  # http://networkrepository.com/cit-patent.php
+  graphdb-task-patent-citations:
+    container_name: graphdb-task-patent-citations
+    image: 'unum/pycler/graphdb:latest'
+    volumes:
+      - '~/benchmarks/rocksdb/patent-citations:/var/lib/rocksdb'
+      - '~/benchmarks/sqlite/patent-citations:/var/lib/sqlite'
+    environment: 
+      URI_FILE: '/Users/av/Datasets/graph-patent-citations/all.edges'
+      SAMPLE_FROM_REAL_DATA: '1'
+
+  # Mouse gene regulatory network derived 
+  # from analyzing gene expression profiles. 162 Mb.
+  # Third column is the edge weights.
+  # Average degree: 670.
+  # http://networkrepository.com/bio-mouse-gene.php
+  graphdb-task-mouse-gene:
+    container_name: graphdb-task-mouse-gene
+    image: 'unum/pycler/graphdb:latest'
+    volumes:
+      - '~/benchmarks/rocksdb/mouse-gene:/var/lib/rocksdb'
+      - '~/benchmarks/sqlite/mouse-gene:/var/lib/sqlite'
+    environment: 
+      URI_FILE: '/Users/av/Datasets/graph-mouse-gene/all.edges'
+      COUNT_NODES: '45101'
+      COUNT_EDGES: '14506196'
+      SAMPLE_FROM_REAL_DATA: '1'
+
+  # Human Brain Network. 227 Mb.
+  # Average degree: 186.
+  # http://networkrepository.com/bn-human-Jung2015-M87102575.php
+  graphdb-task-human-brain:
+    container_name: graphdb-task-human-brain
+    image: 'unum/pycler/graphdb:latest'
+    volumes:
+      - '~/benchmarks/rocksdb/human-brain:/var/lib/rocksdb'
+      - '~/benchmarks/sqlite/human-brain:/var/lib/sqlite'
+    environment: 
+      URI_FILE: '/Users/av/Datasets/graph-human-brain/all.edges'
+      SAMPLE_FROM_REAL_DATA: '1'
+
+  # Orkut Communities.
   # http://networkrepository.com/orkut.php
   # Average degree: 320.
   # Which means: 2560 bytes for each memberships list.
@@ -74,23 +118,6 @@ services:
       URI_FILE: '/Users/av/Datasets/graph-friendster/all.mtx'
       COUNT_NODES: '65608366'
       COUNT_EDGES: '1806067135'
-
-  # Patent Citation Network. 77 Mb.
-  # Average degree: 8.
-  # http://networkrepository.com/cit-patent.php
-
-
-  # Human Brain Network. 227 Mb.
-  # Average degree: 186.
-  # http://networkrepository.com/bn-human-Jung2015-M87102575.php
-
-
-  # Mouse gene regulatory network derived 
-  # from analyzing gene expression profiles. 162 Mb.
-  # Third column is the edge weights.
-  # Average degree: 670.
-  # http://networkrepository.com/bio-mouse-gene.php
-
 
   # --------------------------
   # The infrastructure required for all of that to work:
