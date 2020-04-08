@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
+import concurrent.futures
 
 from pygraphdb.edge import Edge
 from pygraphdb.helpers import chunks, yield_edges_from
@@ -45,9 +46,14 @@ class GraphBase(object):
         return len(es)
 
     @abstractmethod
-    def insert_dump(self, filepath: str):
-        for es in chunks(yield_edges_from(filepath), 500):
-            self.insert_edges(es)
+    def insert_dump(self, filepath: str, thread_count=8, batch_per_thread=500):
+        chunk_len = thread_count * batch_per_thread
+        with concurrent.futures.ThreadPoolExecutor(max_workers=thread_count) as executor:
+            for es in chunks(yield_edges_from(filepath), chunk_len):
+                count_per_thread = len(es) / thread_count
+                es_per_thread = [data[x:x+count_per_thread]
+                                 for x in range(0, len(es), count_per_thread)]
+                executor.map(self.insert_edges, es_per_thread)
 
     @abstractmethod
     def remove_all(self):
