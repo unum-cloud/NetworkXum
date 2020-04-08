@@ -29,19 +29,20 @@ count_finds = int(os.getenv('COUNT_FINDS', '10000'))
 count_analytics = int(os.getenv('COUNT_ANALYTICS', '1000'))
 count_changes = int(os.getenv('COUNT_CHANGES', '10000'))
 file_path = os.getenv('URI_FILE',
-                      '/Users/av/Datasets/graph-communities/fb-pages-company.edges')
+                      '/Users/av/Datasets/graph-orkut/orkut.edges')
 
 sqlite_mem_url = os.getenv(
     'URI_SQLITE', 'sqlite:///:memory:')
 sqlite_url = os.getenv(
-    'URI_SQLITE', 'sqlite:////Users/av/sqlite/fb-pages-company/temp.db')
+    'URI_SQLITE', 'sqlite:////Users/av/sqlite/orkut/temp.db')
 mysql_url = os.getenv(
-    'URI_MYSQL', 'mysql://root:temptemp@0.0.0.0:3306/fb-pages-company/')
+    'URI_MYSQL', 'mysql://root:temptemp@0.0.0.0:3306/orkut/')
 pgsql_url = os.getenv(
-    'URI_PGSQL', 'postgres://root:temptemp@0.0.0.0:5432/fb-pages-company/')
-neo4j_url = os.getenv('URI_MYSQL', 'bolt://0.0.0.0:7687/fb-pages-company/')
-mongo_url = os.getenv('URI_MONGO', 'mongodb://0.0.0.0:27017/fb-pages-company')
-hyperrocks_url = os.getenv('URI_MYSQL', '/Users/av/rocksdb/fb-pages-company/')
+    'URI_PGSQL', 'postgres://root:temptemp@0.0.0.0:5432/orkut/')
+neo4j_url = os.getenv('URI_NEO4J', 'bolt://0.0.0.0:7687/orkut/')
+mongo_url = os.getenv('URI_MONGO', 'mongodb://0.0.0.0:27017/orkut')
+hyperrocks_url = os.getenv(
+    'URI_HYPER_ROCKS', '/Users/av/rocksdb/orkut/')
 
 dataset_name = os.path.basename(file_path)
 report_path = 'artifacts/stats_mew.md'
@@ -51,17 +52,18 @@ if __name__ == "__main__":
     # Preprocessing
     stats = StatsFile()
     tasks = TasksSampler()
-    tasks.sample_from_file(file_path, sampling_ratio)
+    print('- Sampling tasks!')
+    tasks.sample_from_distribution(2783196)
 
     # Wrappers selection.
     gs = list()
     if len(hyperrocks_url):
         from embedded_graph_py import HyperRocks
         gs.append(lambda: HyperRocks(hyperrocks_url))
-    if len(sqlite_mem_url):
-        gs.append(lambda: SQLiteMem(url=sqlite_mem_url))
-    # if len(sqlite_url):
-    #     gs.append(lambda: SQLite(url=sqlite_url))
+    if len(sqlite_url):
+        gs.append(lambda: SQLite(url=sqlite_url))
+    # if len(sqlite_mem_url):
+    #     gs.append(lambda: SQLiteMem(url=sqlite_mem_url))
     # if len(mysql_url):
     #     gs.append(lambda: MySQL(url=mysql_url))
     # if len(pgsql_url):
@@ -73,15 +75,18 @@ if __name__ == "__main__":
 
     # Analysis
     for g_connector in gs:
+        print('New adapter!')
         g = g_connector()
+        print('Starting tests!')
         FullTest(graph=g).run()
+        print('Starting bench!')
         FullBench(
             graph=g,
             stats=stats,
             tasks=tasks,
             dataset_path=file_path,
         ).run(
-            repeat_existing=True,
+            repeat_existing=False,
             remove_all_afterwards=False,
         )
         stats.dump_to_file()
