@@ -46,14 +46,21 @@ class GraphBase(object):
         return len(es)
 
     @abstractmethod
-    def insert_dump(self, filepath: str, thread_count=8, batch_per_thread=500):
+    def insert_dump(self, filepath: str, chunk_len=500):
+        for es in chunks(yield_edges_from(filepath), chunk_len):
+            self.insert_edges(es)
+
+    def insert_dump_parallel(self, filepath: str, thread_count=8, batch_per_thread=500):
         chunk_len = thread_count * batch_per_thread
         with concurrent.futures.ThreadPoolExecutor(max_workers=thread_count) as executor:
             for es in chunks(yield_edges_from(filepath), chunk_len):
                 count_per_thread = len(es) / thread_count
+                print(
+                    f'-- Importing part: {count_per_thread} rows x {thread_count} threads')
                 es_per_thread = [data[x:x+count_per_thread]
                                  for x in range(0, len(es), count_per_thread)]
                 executor.map(self.insert_edges, es_per_thread)
+                executor.shutdown(wait=True)
 
     @abstractmethod
     def remove_all(self):

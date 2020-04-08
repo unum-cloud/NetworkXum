@@ -4,68 +4,40 @@ from pygraphdb.graph_base import GraphBase
 from pygraphdb.helpers import StatsCounter
 from pystats.file import StatsFile
 
+import config
 from tasks_sampler import TasksSampler
 
 
 class SimpleBenchmark(object):
     """
-        Benchmarks groups in chronological order:
-        1. Bulk imports (if needed).
+        Benchmarks groups of operations in following order:
         2. Edge lookups and simple queries.
         3. A few complex analytical queries.
         4. Modifications: removing and restoring same objects.
         5. Clearing all the data (if needed).
-
-        Can run over existing graph database, if `tasks` is filled.
-        By default avoids cleaning data at the end, to allow further analysis.
     """
 
-    def __init__(
-        self,
-        graph: GraphBase,
-        stats: StatsFile,
-        tasks: TasksSampler,
-        dataset_path: str,
-    ):
-        self.graph = graph
-        self.stats = stats
-        self.tasks = tasks
-        self.dataset_path = dataset_path
+    def run(self):
+        for dataset_path in config.datasets:
+            self.tasks = TasksSampler()
+            max_wanted_edges = max(
+                config.count_finds, config.count_analytics, config.count_changes)
+            self.tasks.sample_from_file_cpp(dataset_path, max_wanted_edges)
 
-    def run(
-        self,
-        repeat_existing=False,
-        remove_all_afterwards=False,
-    ):
-        def micro(operation_name, f):
-            counter = StatsCounter()
-            dataset_name = os.path.basename(self.dataset_path)
-            class_name = self.graph.__class__.__name__
-            print(f'-- {class_name}: {operation_name} @ {dataset_name}')
-            if not repeat_existing:
-                old_results = self.stats.find(
-                    class_name,
-                    operation_name,
-                    dataset_name
-                )
-                if old_results is not None:
-                    print('--- Skipping!')
-                    return
-            counter.handle(f)
-            print(f'--- Importing new stats!')
-            self.stats.insert(
-                class_name,
-                operation_name,
-                dataset_name,
-                counter
-            )
+            for graph_type in config.wrapper_types:
+                url = config.database_url(graph_type, dataset_path)
+                if url is None:
+                    continue
+                g = graph_type(url)
+                if (g.count_nodes() != 0):
+                    continue
 
-        if repeat_existing:
-            self.remove_bulk()
+                dataset_name = config.dataset_name(dataset_path)
+                wrapper_name = config.wrapper_name(g)
+                print(f'-- Benchmarking: {dataset_name} @ {wrapper_name}')
+                self.run_one(g)
 
-        if self.graph.count_edges() == 0 or repeat_existing:
-            micro('Import Dump', self.insert_bulk)
-
+    def run_one(self, g, remove_all_afterwards=False):
         # Queries returning single object.
         micro('Retrieve Directed Edge', self.find_e_directed)
         micro('Retrieve Undirected Edge', self.find_e_undirected)
@@ -92,6 +64,29 @@ class SimpleBenchmark(object):
             micro('Remove Vertex', self.remove_v)
             micro('Remove All', self.remove_bulk)
 
+    def micro(operation_name, f):
+        counter = StatsCounter()
+        dataset_name = os.path.basename(self.dataset_path)
+        class_name = self.graph.__class__.__name__
+        print(f'--- {class_name}: {operation_name} @ {dataset_name}')
+        if not repeat_existing:
+            old_results = self.stats.find(
+                class_name,
+                operation_name,
+                dataset_name
+            )
+            if old_results is not None:
+                print('--- Skipping!')
+                return
+        counter.handle(f)
+        print(f'---- Importing new stats!')
+        self.stats.insert(
+            class_name,
+            operation_name,
+            dataset_name,
+            counter
+        )
+
     # ---
     # Operations
     # ---
@@ -109,7 +104,7 @@ class SimpleBenchmark(object):
             match = self.graph.find_edge(e['v_to'], e['v_from'])
             cnt += 1
             cnt_found += 0 if (match is None) else 1
-        print(f'--- {cnt} ops: {cnt_found} directed matches')
+        print(f'---- {cnt} ops: {cnt_found} directed matches')
         return cnt
 
     def find_e_undirected(self) -> int:
@@ -119,7 +114,7 @@ class SimpleBenchmark(object):
             match = self.graph.find_edge(e['v_from'], e['v_to'])
             cnt += 1
             cnt_found += 0 if (match is None) else 1
-        print(f'--- {cnt} ops: {cnt_found} undirected matches')
+        print(f'---- {cnt} ops: {cnt_found} undirected matches')
         return cnt
 
     def find_es_related(self) -> int:
@@ -129,7 +124,7 @@ class SimpleBenchmark(object):
             es = self.graph.edges_related(v)
             cnt += 1
             cnt_found += len(es)
-        print(f'--- {cnt} ops: {cnt_found} edges found')
+        print(f'---- {cnt} ops: {cnt_found} edges found')
         return cnt
 
     def find_es_from(self) -> int:
@@ -139,7 +134,7 @@ class SimpleBenchmark(object):
             es = self.graph.edges_from(v)
             cnt += 1
             cnt_found += len(es)
-        print(f'--- {cnt} ops: {cnt_found} edges found')
+        print(f'---- {cnt} ops: {cnt_found} edges found')
         return cnt
 
     def find_es_to(self) -> int:
@@ -149,7 +144,7 @@ class SimpleBenchmark(object):
             es = self.graph.edges_to(v)
             cnt += 1
             cnt_found += len(es)
-        print(f'--- {cnt} ops: {cnt_found} edges found')
+        print(f'---- {cnt} ops: {cnt_found} edges found')
         return cnt
 
     def find_vs_related(self) -> int:
@@ -159,7 +154,7 @@ class SimpleBenchmark(object):
             vs = self.graph.nodes_related(v)
             cnt += 1
             cnt_found += len(vs)
-        print(f'--- {cnt} ops: {cnt_found} related nodes')
+        print(f'---- {cnt} ops: {cnt_found} related nodes')
         return cnt
 
     def count_v_related(self) -> int:
@@ -218,7 +213,7 @@ class SimpleBenchmark(object):
             cnt += len(es)
         return cnt
 
-    def insert_bulk(self) -> int:
+    def insert_dump(self) -> int:
         self.graph.insert_dump(self.dataset_path)
         return self.graph.count_edges()
 
@@ -233,3 +228,8 @@ class SimpleBenchmark(object):
         c = self.graph.count_edges()
         self.graph.remove_all()
         return c - self.graph.count_edges()
+
+
+if __name__ == "__main__":
+    SimpleBenchmark().run()
+    config.stats.dump_to_file()

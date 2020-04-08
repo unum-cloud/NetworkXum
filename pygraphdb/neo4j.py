@@ -283,10 +283,13 @@ class Neo4j(GraphBase):
 
     def remove_all(self):
         try:
-            self.session.run('DROP CONSTRAINT unique_nodes;')
+            self.session.run('DROP CONSTRAINT unique_nodes')
         except:
             pass
-        self.session.run('MATCH (v) DETACH DELETE v;')
+        self.session.run('''
+        MATCH (v) 
+        DETACH DELETE v
+        ''')
 
     # def insert_dump(self, filepath: str):
     #     """

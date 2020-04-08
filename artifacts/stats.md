@@ -22,7 +22,7 @@
 
 ## Insertions
 
-|            | Insert Edge | Insert Edges Batch | Import Dump | Result       |
+|            | Insert Edge | Insert Edges Batch | Insert Dump | Result       |
 | ---------- | ----------- | ------------------ | ----------- | ------------ |
 | PostgreSQL | 171.15      | 1064.31            | 988.96      | :thumbsdown: |
 | SQLiteMem  | 1291.70     | 16273.28           | 16777.03    | :thumbsup:   |

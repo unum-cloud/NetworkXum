@@ -4,7 +4,7 @@ from pygraphdb.graph_base import GraphBase
 from pygraphdb.helpers import StatsCounter
 from pystats.file import StatsFile
 
-from tasks_sampler import TasksSampler
+import config
 
 
 class NetworkXBenchmark(object):
@@ -40,3 +40,8 @@ class NetworkXBenchmark(object):
         # https://networkx.github.io/documentation/stable/reference/algorithms/generated/networkx.algorithms.shortest_paths.weighted.bidirectional_dijkstra.html#networkx.algorithms.shortest_paths.weighted.bidirectional_dijkstra
         # https://networkx.github.io/documentation/stable/reference/algorithms/generated/networkx.algorithms.shortest_paths.weighted.bellman_ford_path.html#networkx.algorithms.shortest_paths.weighted.bellman_ford_path
         # https://networkx.github.io/documentation/stable/reference/algorithms/generated/networkx.algorithms.shortest_paths.astar.astar_path.html#networkx.algorithms.shortest_paths.astar.astar_path
+
+
+if __name__ == "__main__":
+    NetworkXBenchmark().run()
+    config.stats.dump_to_file()
