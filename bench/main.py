@@ -14,10 +14,12 @@ from pygraphdb.helpers import *
 
 from pystats.file import StatsFile
 
-
-from 1_test import FullTest
-from full_bench import FullBench
-from tasks_sampler import TasksSampler
+from p1_test import Tester
+from p2_import import BulkImporter
+from p3_sample_tasks import TasksSampler
+from p4_bench_simple import SimpleBenchmark
+from p5_bench_networkx import NetworkxBenchmark
+from p6_export_stats import StatsExporter
 
 
 print('Welcome to GraphDB benchmarks!')
@@ -77,14 +79,14 @@ if __name__ == "__main__":
 
             if g.count_edges() == 0:
                 print(f'- Importing data')
-                BulkImport(
+                BulkImporter(
                     graph=g,
                     dataset_path=dataset,
                     stats=stats
                 ).run()
 
             print(f'- Simple benchmarks')
-            FullBenchmark(
+            SimpleBenchmark(
                 graph=g,
                 stats=stats,
                 tasks=tasks,
