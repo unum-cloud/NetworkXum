@@ -6,6 +6,7 @@ services:
   # --------------------------
 
   # http://networkrepository.com/fb-pages-company.php
+  # Average degree: ~8 edges related to each node.
   graphdb-task-communities:
     container_name: graphdb-task-communities
     image: 'unum/pycler/graphdb:latest'
@@ -19,6 +20,8 @@ services:
       SAMPLE_FROM_REAL_DATA: '1'
       
   # http://networkrepository.com/orkut.php
+  # Average degree: 320 edges related to each node.
+  # Which means: 2560 bytes for each memberships list.
   graphdb-task-orkut:
     container_name: graphdb-task-orkut
     image: 'unum/pycler/graphdb:latest'
@@ -31,6 +34,7 @@ services:
       COUNT_EDGES: '444222386'
 
   # http://networkrepository.com/soc-sinaweibo.php
+  # Average degree: ~9 edges related to each node.
   graphdb-task-sinaweibo:
     container_name: graphdb-task-sinaweibo
     image: 'unum/pycler/graphdb:latest'
@@ -43,6 +47,7 @@ services:
       COUNT_EDGES: '261321071'
 
   # http://networkrepository.com/soc-twitter.php
+  # Average degree: 170 edges related to each node.
   graphdb-task-twitter:
     container_name: graphdb-task-twitter
     image: 'unum/pycler/graphdb:latest'
@@ -55,6 +60,7 @@ services:
       COUNT_EDGES: '1468365182'
 
   # http://networkrepository.com/soc-friendster.php
+  # Average degree: 55 edges related to each node.
   graphdb-task-friendster:
     container_name: graphdb-task-friendster
     image: 'unum/pycler/graphdb:latest'
