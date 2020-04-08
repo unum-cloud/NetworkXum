@@ -7,7 +7,7 @@ from pystats.file import StatsFile
 from tasks_sampler import TasksSampler
 
 
-class FullBench(object):
+class SimpleBenchmark(object):
     """
         Benchmarks groups in chronological order:
         1. Bulk imports (if needed).
