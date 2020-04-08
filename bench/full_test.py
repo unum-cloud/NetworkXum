@@ -76,6 +76,8 @@ class FullTest(object):
             f'count_nodes after dump imports: {g.count_nodes()}'
         assert g.count_edges() == 10, \
             f'count_edges after dump imports: {g.count_edges()}'
+        assert g.count_following(5) == (1, 2.0), \
+            f'count_following after dump import: {g.count_following(5)}'
         # Clear all the data at once.
         g.remove_all()
         assert g.count_nodes() == 0, \

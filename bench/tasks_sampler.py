@@ -47,6 +47,9 @@ class TasksSampler(object):
         )
         self._split_samples()
 
+    def sample_from_file_cpp(self, filename: str, sampling_ratio: float):
+        pass
+
     def sample_from_distribution(self, count_nodes):
         count_max = max(self.count_finds,
                         self.count_analytics,
@@ -63,6 +66,7 @@ class TasksSampler(object):
                 'v_from': v_from,
                 'v_to': v_to,
             })
+        self._select_nodes = list(self._select_nodes)
         self._split_samples()
 
     def _split_samples(self):
