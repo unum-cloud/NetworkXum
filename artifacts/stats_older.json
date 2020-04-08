@@ -6,7 +6,7 @@
         "count_operations": 52310,
         "msecs_per_operation": 5.960529654095766e-08,
         "operations_per_second": 16777.03254630823,
-        "operation": "Import Dump",
+        "operation": "Insert Dump",
         "database": "SQLiteMem"
     },
     {
@@ -176,7 +176,7 @@
         "count_operations": 52310,
         "msecs_per_operation": 7.83222124103013e-08,
         "operations_per_second": 12767.770077297706,
-        "operation": "Import Dump",
+        "operation": "Insert Dump",
         "database": "SQLite"
     },
     {
@@ -346,7 +346,7 @@
         "count_operations": 52310,
         "msecs_per_operation": 1.1322449097280588e-07,
         "operations_per_second": 8832.0114438861,
-        "operation": "Import Dump",
+        "operation": "Insert Dump",
         "database": "MySQL"
     },
     {
@@ -516,7 +516,7 @@
         "count_operations": 52310,
         "msecs_per_operation": 1.0111593557484313e-06,
         "operations_per_second": 988.9638011209703,
-        "operation": "Import Dump",
+        "operation": "Insert Dump",
         "database": "PostgreSQL"
     },
     {
@@ -685,7 +685,7 @@
         "count_operations": 52310,
         "msecs_per_operation": 1.1697161427831312e-07,
         "operations_per_second": 8549.082665651498,
-        "operation": "Import Dump",
+        "operation": "Insert Dump",
         "database": "MongoDB",
         "dataset": "fb-pages-company.edges"
     },
@@ -855,7 +855,7 @@
         "count_operations": 52310,
         "msecs_per_operation": 9.915639492276293e-06,
         "operations_per_second": 100.85078232008554,
-        "operation": "Import Dump",
+        "operation": "Insert Dump",
         "database": "Neo4j",
         "dataset": "fb-pages-company.edges"
     },
@@ -1075,7 +1075,7 @@
         "count_operations": 0,
         "msecs_per_operation": 0,
         "operations_per_second": 0,
-        "operation": "Import Dump",
+        "operation": "Insert Dump",
         "database": "HyperRocks",
         "dataset": "fb-pages-company.edges"
     },

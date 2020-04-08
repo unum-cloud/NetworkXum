@@ -1,0 +1,102 @@
+[
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.016259193420410156,
+        "count_operations": 0,
+        "msecs_per_operation": 0,
+        "operations_per_second": 0,
+        "operation": "Insert Dump",
+        "database": "SQLiteMem",
+        "dataset": "graph-communities"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 21.234360218048096,
+        "count_operations": 0,
+        "msecs_per_operation": 0,
+        "operations_per_second": 0,
+        "operation": "Insert Dump",
+        "database": "SQLiteMem",
+        "dataset": "graph-patent-citations"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.014469146728515625,
+        "count_operations": 0,
+        "msecs_per_operation": 0,
+        "operations_per_second": 0,
+        "operation": "Insert Dump",
+        "database": "SQLite",
+        "dataset": "graph-communities"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 21.356329917907715,
+        "count_operations": 0,
+        "msecs_per_operation": 0,
+        "operations_per_second": 0,
+        "operation": "Insert Dump",
+        "database": "SQLite",
+        "dataset": "graph-patent-citations"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.017132043838500977,
+        "count_operations": 0,
+        "msecs_per_operation": 0,
+        "operations_per_second": 0,
+        "operation": "Insert Dump",
+        "database": "MySQL",
+        "dataset": "graph-communities"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 21.356725931167603,
+        "count_operations": 0,
+        "msecs_per_operation": 0,
+        "operations_per_second": 0,
+        "operation": "Insert Dump",
+        "database": "MySQL",
+        "dataset": "graph-patent-citations"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.017396926879882812,
+        "count_operations": 0,
+        "msecs_per_operation": 0,
+        "operations_per_second": 0,
+        "operation": "Insert Dump",
+        "database": "PostgreSQL",
+        "dataset": "graph-communities"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 21.70897889137268,
+        "count_operations": 0,
+        "msecs_per_operation": 0,
+        "operations_per_second": 0,
+        "operation": "Insert Dump",
+        "database": "PostgreSQL",
+        "dataset": "graph-patent-citations"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.01603412628173828,
+        "count_operations": 0,
+        "msecs_per_operation": 0,
+        "operations_per_second": 0,
+        "operation": "Insert Dump",
+        "database": "MongoDB",
+        "dataset": "graph-communities"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 21.740419149398804,
+        "count_operations": 0,
+        "msecs_per_operation": 0,
+        "operations_per_second": 0,
+        "operation": "Insert Dump",
+        "database": "MongoDB",
+        "dataset": "graph-patent-citations"
+    }
+]

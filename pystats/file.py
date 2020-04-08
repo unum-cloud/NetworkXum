@@ -14,6 +14,8 @@ class StatsFile(object):
         self.results = []
         self.reset_from_file(self.filename)
 
+    # This is highly unreliable:
+    # https://stackoverflow.com/a/29737870/2766161
     # def __del__(self):
     #     self.dump_to_file(self.filename)
 
@@ -36,18 +38,17 @@ class StatsFile(object):
 
     def find(
         self,
-        wrapper_class: type,
+        wrapper_class: str,
         operation_name: str,
         dataset: str = '',
     ) -> Optional[StatsCounter]:
         def predicate(b):
-            wrapper_name = str(wrapper_class)
-            return self.bench_matches(b, wrapper_name, operation_name, dataset)
+            return self.bench_matches(b, wrapper_class, operation_name, dataset)
         return next(filter(predicate, self.results), None)
 
     def insert(
         self,
-        wrapper_class: type,
+        wrapper_class: str,
         operation_name: str,
         dataset: str,
         stats: StatsCounter,
@@ -60,7 +61,7 @@ class StatsFile(object):
             'msecs_per_operation': stats.msecs_per_op(),
             'operations_per_second': stats.ops_per_sec(),
             'operation': operation_name,
-            'database': str(wrapper_class),
+            'database': wrapper_class,
             'dataset': dataset,
         }
         if bench is None:

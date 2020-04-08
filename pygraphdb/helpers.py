@@ -28,9 +28,14 @@ def yield_edges_from(filepath: str) -> Generator[Edge, None, None]:
                 continue
             if len(columns) < 2:
                 continue
+            # Skip header row.
+            if (columns[0] == 'v_from'):
+                continue
+            # Check if the data isn't corrupt.
             v1 = int(columns[0])
             v2 = int(columns[1])
-            w = float(columns[2]) if len(columns) > 2 else 1.0
+            has_weight = (len(columns) > 2 and len(columns[2]) > 0)
+            w = float(columns[2]) if has_weight else 1.0
             yield Edge(v1, v2, w)
 
 
