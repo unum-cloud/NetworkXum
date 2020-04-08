@@ -1,5 +1,5 @@
 
-class Exporter(object):
+class StatsExporter(object):
 
     def __init__(
         self,

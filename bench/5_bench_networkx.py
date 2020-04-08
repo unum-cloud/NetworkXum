@@ -7,7 +7,10 @@ from pystats.file import StatsFile
 from tasks_sampler import TasksSampler
 
 
-class NetworkXBench(object):
+class NetworkXBenchmark(object):
+
+    def run(self):
+        pass
 
     def local_node_connectivity(self):
         """

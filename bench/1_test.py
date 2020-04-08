@@ -2,7 +2,11 @@ from pygraphdb.graph_base import GraphBase
 from pygraphdb.edge import Edge
 
 
-class FullTest(object):
+class Tester(object):
+    """
+    Test basic operations over a tiny graph.
+    Use this ONLY for empty databases!
+    """
 
     def __init__(self, graph: GraphBase):
         self.graph = graph

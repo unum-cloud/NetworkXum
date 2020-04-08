@@ -14,13 +14,15 @@ from pygraphdb.helpers import *
 
 from pystats.file import StatsFile
 
-from full_test import FullTest
+
+from 1_test import FullTest
 from full_bench import FullBench
 from tasks_sampler import TasksSampler
 
 
 print('Welcome to GraphDB benchmarks!')
 print('- Reading settings')
+
 sampling_ratio = float(os.getenv('SAMPLING_RATIO', '0.01'))
 sample_from_real_data = os.getenv('SAMPLE_FROM_REAL_DATA', '1') == '1'
 count_nodes = int(os.getenv('COUNT_NODES', '0'))
@@ -28,67 +30,74 @@ count_edges = int(os.getenv('COUNT_EDGES', '0'))
 count_finds = int(os.getenv('COUNT_FINDS', '10000'))
 count_analytics = int(os.getenv('COUNT_ANALYTICS', '1000'))
 count_changes = int(os.getenv('COUNT_CHANGES', '10000'))
-file_path = os.getenv('URI_FILE',
-                      '/Users/av/Datasets/graph-orkut/orkut.edges')
-
-sqlite_mem_url = os.getenv(
-    'URI_SQLITE', 'sqlite:///:memory:')
-sqlite_url = os.getenv(
-    'URI_SQLITE', 'sqlite:////Users/av/sqlite/orkut/temp.db')
-mysql_url = os.getenv(
-    'URI_MYSQL', 'mysql://root:temptemp@0.0.0.0:3306/orkut/')
-pgsql_url = os.getenv(
-    'URI_PGSQL', 'postgres://root:temptemp@0.0.0.0:5432/orkut/')
-neo4j_url = os.getenv('URI_NEO4J', 'bolt://0.0.0.0:7687/orkut/')
-mongo_url = os.getenv('URI_MONGO', 'mongodb://0.0.0.0:27017/orkut')
-hyperrocks_url = os.getenv(
-    'URI_HYPER_ROCKS', '/Users/av/rocksdb/orkut/')
-
-dataset_name = os.path.basename(file_path)
+device_name = os.getenv('DEVICE_NAME', 'Unknown Device')
 report_path = 'artifacts/stats_mew.md'
 
+datasets = [
+    '/Users/av/Code/PyGraphDB/artifacts/graph-test/all.edges'
+    '/Users/av/Datasets/graph-communities/all.edges',
+    '/Users/av/Datasets/graph-patent-citations/all.edges',
+    '/Users/av/Datasets/graph-mouse-gene/all.edges',
+    '/Users/av/Datasets/graph-human-brain/all.edges',
+]
+test_dataset = datasets[0]
+
+wrappers = [
+    (HyperRocks, 'URI_HYPER_ROCKS', '/Users/av/rocksdb/<dataset>/'),
+    (SQLiteMem, 'URI_SQLITE', 'sqlite:///:memory:'),
+    (SQLite, 'URI_SQLITE', 'sqlite:////Users/av/sqlite/<dataset>/graph.db'),
+    (MySQL, 'URI_MYSQL', 'mysql://root:temptemp@0.0.0.0:3306/<dataset>/'),
+    (PostgreSQL, 'URI_PGSQL', 'postgres://root:temptemp@0.0.0.0:5432/<dataset>/'),
+    (Neo4j, 'URI_NEO4J', 'bolt://0.0.0.0:7687/<dataset>'),
+    (MongoDB, 'URI_MONGO', 'mongodb://0.0.0.0:27017/<dataset>'),
+]
 
 if __name__ == "__main__":
     # Preprocessing
     stats = StatsFile()
-    tasks = TasksSampler()
-    print('- Sampling tasks!')
-    tasks.sample_from_distribution(2783196)
 
-    # Wrappers selection.
-    gs = list()
-    if len(hyperrocks_url):
-        from embedded_graph_py import HyperRocks
-        gs.append(lambda: HyperRocks(hyperrocks_url))
-    if len(sqlite_url):
-        gs.append(lambda: SQLite(url=sqlite_url))
-    # if len(sqlite_mem_url):
-    #     gs.append(lambda: SQLiteMem(url=sqlite_mem_url))
-    # if len(mysql_url):
-    #     gs.append(lambda: MySQL(url=mysql_url))
-    # if len(pgsql_url):
-    #     gs.append(lambda: PostgreSQL(url=pgsql_url))
-    # if len(neo4j_url):
-    #     gs.append(lambda: Neo4j(url=neo4j_url))
-    # if len(mongo_db):
-    #     gs.append(lambda: MongoDB(url=mongo_db))
+    for dataset in datasets:
+        dataset_name = split(dataset, '/')[-2]
+        print('- Sampling tasks!')
+        tasks = TasksSampler()
+        tasks.sample_from_real_data(dataset)
 
-    # Analysis
-    for g_connector in gs:
-        print('New adapter!')
-        g = g_connector()
-        print('Starting tests!')
-        FullTest(graph=g).run()
-        print('Starting bench!')
-        FullBench(
-            graph=g,
-            stats=stats,
-            tasks=tasks,
-            dataset_path=file_path,
-        ).run(
-            repeat_existing=False,
-            remove_all_afterwards=False,
-        )
-        stats.dump_to_file()
-    # Postprocessing: Reporting
-    # StatsExporter()
+        for wrapper in wrappers:
+            wrapper_class = wrapper[0]
+            wrapper_url: str = os.getenv(wrapper[1], wrapper[2])
+            if '<dataset>' in wrapper_url:
+                wrapper_url.replace('<dataset>', dataset_name)
+
+            print(f'- Establising connection: {wrapper_url}')
+            g = wrapper_class(url=wrapper_url)
+
+            if dataset == test_dataset:
+                print(f'- Running tests')
+                FullTest(graph=g).run()
+
+            if g.count_edges() == 0:
+                print(f'- Importing data')
+                BulkImport(
+                    graph=g,
+                    dataset_path=dataset,
+                    stats=stats
+                ).run()
+
+            print(f'- Simple benchmarks')
+            FullBenchmark(
+                graph=g,
+                stats=stats,
+                tasks=tasks,
+            ).run(repeat_existing=False)
+
+            print(f'- NetworkX benchmarks')
+            NetworkxBenchmark(
+                graph=g,
+                stats=stats,
+                tasks=tasks,
+            ).run(repeat_existing=False)
+
+            stats.dump_to_file()
+
+    # Postprocessing.
+    StatsExporter().run()
