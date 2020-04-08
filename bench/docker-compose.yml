@@ -119,6 +119,19 @@ services:
       COUNT_NODES: '65608366'
       COUNT_EDGES: '1806067135'
 
+  # Amazon ratings recommendations graph. 160 Mb.
+  # http://networkrepository.com/rec-amazon-ratings.php
+  # Average degree: 5.
+
+  # Movielens movies recommendations graph. 130 Mb.
+  # http://networkrepository.com/rec-movielens.php
+  # Average degree 285.
+
+  # Eachmovie recommendations graph. 130 Mb.
+  # http://networkrepository.com/rec-eachmovie.php
+  # Average degree 90.
+
+
   # --------------------------
   # The infrastructure required for all of that to work:
   # --------------------------

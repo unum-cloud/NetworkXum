@@ -22,13 +22,22 @@ stats = StatsFile(stats_path)
 dataset_test = '/Users/av/Code/PyGraphDB/artifacts/graph-test/all.csv'
 datasets = [
     '/Users/av/Datasets/graph-communities/all.csv',
-    '/Users/av/Datasets/graph-patent-citations/all.csv',
+    '/Users/av/Datasets/graph-eachmovie-ratings/all.csv',
+    # '/Users/av/Datasets/graph-patent-citations/all.csv',
     # '/Users/av/Datasets/graph-mouse-gene/all.csv',
     # '/Users/av/Datasets/graph-human-brain/all.csv',
 ]
 
-wrapper_types = [SQLiteMem, SQLite,
-                 MySQL, PostgreSQL, Neo4j, MongoDB, HyperRocks]
+wrapper_types = [
+    SQLite,
+    PostgreSQL,
+    MySQL,
+    Neo4j,
+    MongoDB,
+    SQLiteMem,
+    HyperRocks,
+]
+
 _wrappers = [
     (HyperRocks, 'URI_HYPER_ROCKS', '/Users/av/rocksdb/<dataset>/'),
     (SQLiteMem, 'URI_SQLITE', 'sqlite:///:memory:'),
