@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, Text, Float, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy import or_, and_
 from sqlalchemy_utils import create_database, database_exists
+from sqlalchemy import text
 
 from pygraphdb.graph_base import GraphBase
 from pygraphdb.edge import Edge
@@ -27,6 +28,19 @@ class EdgeSQL(BaseEntitySQL, Edge):
     _id = Column(Integer, primary_key=True)
     v_from = Column(Integer, index=True)
     v_to = Column(Integer, index=True)
+    weight = Column(Float)
+    attributes_json = Column(Text)
+
+    def __init__(self, *args, **kwargs):
+        BaseEntitySQL.__init__(self)
+        Edge.__init__(self, *args, **kwargs)
+
+
+class EdgeNew(BaseEntitySQL, Edge):
+    __tablename__ = 'new_edges'
+    _id = Column(Integer, primary_key=True)
+    v_from = Column(Integer, index=False)
+    v_to = Column(Integer, index=False)
     weight = Column(Float)
     attributes_json = Column(Text)
 
@@ -64,6 +78,7 @@ class PlainSQL(GraphBase):
         >>> str(query.statement.compile(dialect=postgresql.dialect()))
         Source: http://nicolascadou.com/blog/2014/01/printing-actual-sqlalchemy-queries/
     """
+    __max_batch_size__ = 50000
 
     def __init__(self, url='sqlite:///:memory:'):
         super().__init__()
@@ -159,8 +174,7 @@ class PlainSQL(GraphBase):
     # Modifications
 
     def insert_edge(self, e: EdgeSQL, check_uniqness=True) -> bool:
-        if not isinstance(e, EdgeSQL):
-            e = EdgeSQL(e['v_from'], e['v_to'], e['weight'])
+        e = self.to_sql(e)
         copies = []
         if check_uniqness:
             if '_id' in e:
@@ -191,10 +205,8 @@ class PlainSQL(GraphBase):
         self.session.commit()
 
     def insert_edges(self, es: List[Edge]) -> int:
-        for e in es:
-            if not isinstance(e, EdgeSQL):
-                e = EdgeSQL(e['v_from'], e['v_to'], e['weight'])
-            self.session.add(e)
+        es = [self.to_sql(e) for e in es]
+        self.session.bulk_save_objects(es)
         try:
             self.session.commit()
             return len(es)
@@ -215,19 +227,77 @@ class PlainSQL(GraphBase):
 
     def remove_all(self) -> int:
         try:
-            count = self.session.query(EdgeSQL).delete()
+            count = 0
+            count += self.session.query(EdgeSQL).delete()
+            count += self.session.query(EdgeNew).delete()
             self.session.commit()
             return count
         except:
             self.session.rollback()
 
+    def insert_dump(self, path: str) -> int:
+        """
+            Direct injections (even in batches) have huge performance impact.
+            We are not only conflicting with other operations in same DB, 
+            but also constantly rewriting indexes after every new batch insert.
+            Instead we create a an additional unindexed table, fill it and
+            then merge into the main one.
+        """
+        chunk_len = PlainSQL.__max_batch_size__
+        cnt = self.count_edges()
+        for es in chunks(yield_edges_from(path), chunk_len):
+            es = [self.to_sql(e, e_type=EdgeNew) for e in es]
+            self.session.bulk_save_objects(es)
+        self.session.commit()
+        self.commit_new_bulk()
+        return self.count_edges() - cnt
+
+    def commit_new_bulk(self):
+        migration = [
+            text(f'''
+                INSERT INTO {EdgeSQL.__tablename__} (_id, v_from, v_to, weight, attributes_json)
+                SELECT _id, v_from, v_to, weight, attributes_json
+                FROM {EdgeNew.__tablename__};
+            '''),
+            text(f'DELETE FROM {EdgeNew.__tablename__};'),
+        ]
+        # Performing an `INSERT` and then a `DELETE` might lead to integrity issues,
+        # so perhaps a way to get around it, and to perform everything neatly in
+        # a single statement, is to take advantage of the `[deleted]` temporary table.
+        # migration = text(f'''
+        # DELETE {EdgeNew.__tablename__};
+        # OUTPUT DELETED.*
+        # INTO {EdgeSQL.__tablename__} (_id, v_from, v_to, weight, attributes_json)
+        # ''')
+        # But this syntax isn't globally supported.
+        for step in migration:
+            self.session.execute(step)
+            self.session.commit()
+
+    def to_sql(self, e, e_type=EdgeSQL) -> BaseEntitySQL:
+        if isinstance(e, BaseEntitySQL):
+            return e
+        return e_type(e['v_from'], e['v_to'], e['weight'])
+
 
 class SQLiteMem(PlainSQL):
-    pass
+    """
+        In-memory version of SQLite database.
+    """
+    __is_concurrent__ = False
 
 
 class SQLite(PlainSQL):
-    pass
+    """
+        SQLite may be the fastest option for tiny databases 
+        under 20 Mb. It's write aplification is huge. 
+        Bulk inserting 250 Mb unweighted undirected graph 
+        will write ~200 Gb of data to disk.
+        The resulting file size will be ~1 Gb.
+
+        https://www.sqlite.org/faq.html#q19
+    """
+    __is_concurrent__ = False
 
 
 class MySQL(PlainSQL):
@@ -243,6 +313,15 @@ class PostgreSQL(PlainSQL):
             https://github.com/python-gino/gino
         *   Allows natively quering JSON subproperties via:
             https://sqlalchemy-utils.readthedocs.io/en/latest/data_types.html#module-sqlalchemy_utils.types.json        
-
     """
-    pass
+
+    def insert_dump(self, path: str) -> int:
+        cnt = self.count_edges()
+        with open(path, 'r') as f:
+            conn = self.engine.raw_connection()
+            cursor = conn.cursor()
+            cmd = f'COPY {EdgeNew.__tablename__} (v_from, v_to, weight) FROM STDIN WITH (FORMAT CSV, HEADER TRUE)'
+            cursor.copy_expert(cmd, f)
+            conn.commit()
+        self.commit_new_bulk()
+        return self.count_edges() - cnt
