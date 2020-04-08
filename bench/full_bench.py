@@ -100,47 +100,66 @@ class FullBench(object):
         # Try both existing and potentially missing edges
         half = int(len(self.tasks.edges_to_query) / 2)
         cnt = 0
+        cnt_found = 0
         for e in self.tasks.edges_to_query[:half]:
-            e = self.graph.find_edge(e['v_from'], e['v_to'])
+            match = self.graph.find_edge(e['v_from'], e['v_to'])
             cnt += 1
+            cnt_found += 0 if (match is None) else 1
         for e in self.tasks.edges_to_query[half:]:
-            e = self.graph.find_edge(e['v_to'], e['v_from'])
+            match = self.graph.find_edge(e['v_to'], e['v_from'])
             cnt += 1
+            cnt_found += 0 if (match is None) else 1
+        print(f'--- {cnt} ops: {cnt_found} directed matches')
         return cnt
 
     def find_e_undirected(self) -> int:
         cnt = 0
+        cnt_found = 0
         for e in self.tasks.edges_to_query:
-            self.graph.find_edge(e['v_from'], e['v_to'])
+            match = self.graph.find_edge(e['v_from'], e['v_to'])
             cnt += 1
+            cnt_found += 0 if (match is None) else 1
+        print(f'--- {cnt} ops: {cnt_found} undirected matches')
         return cnt
 
     def find_es_related(self) -> int:
         cnt = 0
+        cnt_found = 0
         for v in self.tasks.nodes_to_query:
-            self.graph.edges_related(v)
+            es = self.graph.edges_related(v)
             cnt += 1
+            cnt_found += len(es)
+        print(f'--- {cnt} ops: {cnt_found} edges found')
         return cnt
 
     def find_es_from(self) -> int:
         cnt = 0
+        cnt_found = 0
         for v in self.tasks.nodes_to_query:
-            self.graph.edges_from(v)
+            es = self.graph.edges_from(v)
             cnt += 1
+            cnt_found += len(es)
+        print(f'--- {cnt} ops: {cnt_found} edges found')
         return cnt
 
     def find_es_to(self) -> int:
         cnt = 0
+        cnt_found = 0
         for v in self.tasks.nodes_to_query:
-            self.graph.edges_to(v)
+            es = self.graph.edges_to(v)
             cnt += 1
+            cnt_found += len(es)
+        print(f'--- {cnt} ops: {cnt_found} edges found')
         return cnt
 
     def find_vs_related(self) -> int:
         cnt = 0
+        cnt_found = 0
         for v in self.tasks.nodes_to_query:
-            self.graph.nodes_related(v)
+            vs = self.graph.nodes_related(v)
             cnt += 1
+            cnt_found += len(vs)
+        print(f'--- {cnt} ops: {cnt_found} related nodes')
         return cnt
 
     def count_v_related(self) -> int:
