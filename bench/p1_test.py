@@ -59,6 +59,10 @@ class Tester(object):
         self.validate_contents(g)
         g.remove_all()
         self.validate_empty(g)
+
+        print(f'--- Parallel Bulk Operations')
+        g.insert_dump_parallel(config.dataset_test)
+        self.validate_contents(g)
         print(f'--- Passed All!')
 
     def validate_empty(self, g):
