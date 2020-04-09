@@ -1,4 +1,4 @@
-from table_sql import PlainSQL
+from pygraphdb.table_sql import PlainSQL
 
 
 class SQLiteMem(PlainSQL):
