@@ -1,5 +1,6 @@
 from pygraphdb.graph_base import GraphBase
 from pygraphdb.edge import Edge
+from pygraphdb.helpers import export_edges_into_graph_parallel
 
 import config
 
@@ -38,7 +39,8 @@ class Tester(object):
 
         print(f'--- Cleaning')
         g.remove_all()
-        self.validate_empty(g)
+        self.validate_empty_edges(g)
+        self.validate_empty_nodes(g)
 
         print(f'--- Single Operations')
         for e in self.edges:
@@ -46,28 +48,31 @@ class Tester(object):
         self.validate_contents(g)
         for e in self.edges:
             g.remove_edge(e)
-        self.validate_empty(g)
+        self.validate_empty_edges(g)
 
         print(f'--- Batch Operations')
         g.insert_edges(self.edges)
         self.validate_contents(g)
         g.remove_edges(self.edges)
-        self.validate_empty(g)
+        self.validate_empty_edges(g)
 
         print(f'--- Bulk Operations')
         g.insert_dump(config.dataset_test)
         self.validate_contents(g)
         g.remove_all()
-        self.validate_empty(g)
+        self.validate_empty_edges(g)
+        self.validate_empty_nodes(g)
 
-        print(f'--- Parallel Bulk Operations')
-        g.insert_dump_parallel(config.dataset_test)
-        self.validate_contents(g)
+        # print(f'--- Parallel Bulk Operations')
+        # export_edges_into_graph_parallel(config.dataset_test, g)
+        # self.validate_contents(g)
         print(f'--- Passed All!')
 
-    def validate_empty(self, g):
+    def validate_empty_edges(self, g):
         assert g.count_edges() == 0, \
             f'count_edges must be =0: {g.count_edges()}'
+
+    def validate_empty_nodes(self, g):
         assert g.count_nodes() == 0, \
             f'count_nodes must be =0: {g.count_nodes()}'
 
