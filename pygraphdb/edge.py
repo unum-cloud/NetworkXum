@@ -35,7 +35,10 @@ class Edge(object):
     @staticmethod
     def combine_ids(v_from: int, v_to: int) -> int:
         # Source: https://stackoverflow.com/a/919661
-        return (v_from + v_to) * (v_from + v_to + 1) // 2 + v_to
+        _id = (v_from + v_to) * (v_from + v_to + 1) // 2 + v_to
+        # Some databases may have smaller default integer sizes
+        _id = _id % (2 ** 31)
+        return _id
 
 
 assert (Edge.combine_ids(10, 20) != Edge.combine_ids(20, 10)), \
