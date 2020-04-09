@@ -101,8 +101,6 @@ class Tester(object):
             f'count_followers: {g.count_followers(5)}'
         assert g.count_following(5) == (1, 2.0), \
             f'count_following: {g.count_following(5)}'
-        # assert g.shortest_path(4, 3) == ([4, 5, 3], 5.0), \
-        #     f'shortest_path: {g.shortest_path(4, 3)}'
 
 
 if __name__ == "__main__":

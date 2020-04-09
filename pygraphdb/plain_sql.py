@@ -243,14 +243,19 @@ class PlainSQL(GraphBase):
             then merge into the main one.
         """
         try:
-            chunk_len = PlainSQL.__max_batch_size__
             cnt = self.count_edges()
+            # Import older data if exists.
+            self._commit_new_bulk()
+            # Build the new table.
+            chunk_len = PlainSQL.__max_batch_size__
             for es in chunks(yield_edges_from(path), chunk_len):
                 self._insert_bulk_list(es, e_type=EdgeNew)
             self.session.commit()
+            # Import the new data.
             self._commit_new_bulk()
             return self.count_edges() - cnt
-        except:
+        except Exception as e:
+            print(e)
             self.session.rollback()
             return 0
 
