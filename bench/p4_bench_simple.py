@@ -39,32 +39,32 @@ class SimpleBenchmark(object):
 
     def run_one(self, g, remove_all_afterwards=False):
         # Queries returning single object.
-        micro('Retrieve Directed Edge', self.find_e_directed)
-        micro('Retrieve Undirected Edge', self.find_e_undirected)
+        self.one('Retrieve Directed Edge', self.find_e_directed)
+        self.one('Retrieve Undirected Edge', self.find_e_undirected)
 
         # Queries returning collections.
-        micro('Retrieve Outgoing Edges', self.find_es_from)
-        micro('Retrieve Ingoing Edges', self.find_es_to)
-        micro('Retrieve Connected Edges', self.find_es_related)
-        micro('Retrieve Friends', self.find_vs_related)
-        micro('Retrieve Friends of Friends', self.find_vs_related_related)
+        self.one('Retrieve Outgoing Edges', self.find_es_from)
+        self.one('Retrieve Ingoing Edges', self.find_es_to)
+        self.one('Retrieve Connected Edges', self.find_es_related)
+        self.one('Retrieve Friends', self.find_vs_related)
+        self.one('Retrieve Friends of Friends', self.find_vs_related_related)
 
         # Queries returning stats.
-        micro('Count Friends', self.count_v_related)
-        micro('Count Followers', self.count_v_followers)
-        micro('Count Following', self.count_v_following)
+        self.one('Count Friends', self.count_v_related)
+        self.one('Count Followers', self.count_v_followers)
+        self.one('Count Following', self.count_v_following)
 
         # Reversable write operations.
-        micro('Remove Edge', self.remove_e)  # Single edge removals
-        micro('Insert Edge', self.insert_e)  # Single edge inserts
-        micro('Remove Edges Batch', self.remove_es)  # Batched edge removals
-        micro('Insert Edges Batch', self.insert_es)  # Batched edge inserts
+        self.one('Remove Edge', self.remove_e)  # Single edge removals
+        self.one('Insert Edge', self.insert_e)  # Single edge inserts
+        self.one('Remove Edges Batch', self.remove_es)  # Batched edge removals
+        self.one('Insert Edges Batch', self.insert_es)  # Batched edge inserts
 
         if remove_all_afterwards:
-            micro('Remove Vertex', self.remove_v)
-            micro('Remove All', self.remove_bulk)
+            self.one('Remove Vertex', self.remove_v)
+            self.one('Remove All', self.remove_bulk)
 
-    def micro(operation_name, f):
+    def one(operation_name, f):
         counter = StatsCounter()
         dataset_name = os.path.basename(self.dataset_path)
         class_name = self.graph.__class__.__name__
