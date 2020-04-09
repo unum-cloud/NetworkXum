@@ -1,3 +1,5 @@
+import os
+import shutil
 from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 
 from neo4j import GraphDatabase
@@ -19,11 +21,18 @@ class Neo4j(GraphBase):
         enterprise edition, so quering edges by their ID can be even 
         less then performant than searching them by connected node IDS.
     """
+    __max_batch_size__ = 10000
 
-    def __init__(self, url='bolt://0.0.0.0:7687', enterprise_edition=False):
+    def __init__(
+        self,
+        url='bolt://0.0.0.0:7687',
+        enterprise_edition=False,
+        import_directory='~/neo4j/import'
+    ):
         super().__init__()
         self.driver = GraphDatabase.driver(url, encrypted=False)
         self.session = self.driver.session()
+        self.import_directory = import_directory
         # Create constraints if needed.
         cs = self.get_constraints()
         if len(cs) == 0:
@@ -282,33 +291,42 @@ class Neo4j(GraphBase):
         return self.session.run(task)
 
     def remove_all(self):
-        try:
+        self.session.run('MATCH (v) DETACH DELETE v')
+        if len(self.get_constraints()) > 0:
             self.session.run('DROP CONSTRAINT unique_nodes')
-        except:
-            pass
-        self.session.run('''
-        MATCH (v) 
-        DETACH DELETE v
-        ''')
 
-    # def insert_dump(self, filepath: str):
-    #     """
-    #         The file path must be within the standard import directory:
-    #         https://neo4j.com/docs/operations-manual/4.0/configuration/file-locations/
-    #         This method works better with remote URLs.
-    #     """
-    #     pattern = '''
-    #     LOAD CSV FROM '%s' AS row
-    #     WITH
-    #         toInteger(row[0]) AS id_from,
-    #         toInteger(row[1]) AS id_to,
-    #         toFloat(row[2]) AS w
-    #     MERGE (v1:Vertex {_id: id_from})
-    #     MERGE (v2:Vertex {_id: id_to})
-    #     MERGE (v1)-[:Edge {_id: (floor((id_from + id_to) * (id_from + id_to + 1) / 2.0)+id_to), weight: w}]->(v2)
-    #     '''
-    #     task = pattern % filepath
-    #     self.session.run(task)
+    def insert_dump(self, filepath: str):
+        """
+            CAUTION: This operation makes a temporary copy of the entire dump 
+            and places it into pre-specified `import_directory`:
+            https://neo4j.com/docs/operations-manual/4.0/configuration/file-locations/
+        """
+
+        _, filename = os.path.split(filepath)
+
+        # We will need to link the file to import folder.
+        file_link = os.path.expanduser(self.import_directory)
+        file_link = os.path.join(file_link, filename)
+        file_link = os.path.abspath(file_link)
+
+        try:
+            shutil.copy(filepath, file_link)
+
+            pattern = '''
+            LOAD CSV WITH HEADERS FROM '%s' AS row
+            WITH
+                toInteger(row.v_from) AS id_from,
+                toInteger(row.v_to) AS id_to,
+                toFloat(row.weight) AS w
+            MERGE (v1:Vertex {_id: id_from})
+            MERGE (v2:Vertex {_id: id_to})
+            MERGE (v1)-[:Edge {_id: (floor((id_from + id_to) * (id_from + id_to + 1) / 2.0)+id_to), weight: w}]->(v2)
+            '''
+            task = pattern % ('file:///' + filename)
+            self.session.run(task)
+        finally:
+            # Don't forget to copy temporary file!
+            os.unlink(file_link)
 
     # ---
     # Helper methods.
