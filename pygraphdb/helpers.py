@@ -4,6 +4,7 @@ import csv
 import time
 import concurrent
 import math
+from urllib.parse import urlparse
 
 from pygraphdb.edge import Edge
 
@@ -64,6 +65,18 @@ def export_edges_into_graph_parallel(filepath: str, g, thread_count=8) -> int:
             executor.map(g.insert_edges, es_per_thread)
             executor.shutdown(wait=True)
     return g.count_edges() - count_edges_before
+
+
+def extract_database_name(url: str) -> str:
+    url_parts = urlparse(url).path
+    url_parts = url_parts.split('/')
+    url_parts = [v for v in url_parts if (v != '/' and v != '')]
+    if len(url_parts) >= 1:
+        if len(url_parts) > 1:
+            print('Will avoid remaining url parts:', url_parts[2:])
+        return url_parts[0]
+    else:
+        return 'graph'
 
 
 class StatsCounter:
