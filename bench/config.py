@@ -2,9 +2,12 @@ import os
 from typing import Optional
 
 from pystats.file import StatsFile
-from pygraphdb.plain_sql import SQLite, SQLiteMem, MySQL, PostgreSQL
-from pygraphdb.mongo_db import MongoDB
-from pygraphdb.neo4j import Neo4j
+
+from pygraphdb.table_sqlite import SQLite, SQLiteMem
+from pygraphdb.table_mysql import MySQL
+from pygraphdb.table_postgres import PostgreSQL
+from pygraphdb.docs_mongo import MongoDB
+from pygraphdb.graph_neo4j import Neo4j
 from embedded_graph_py import HyperRocks
 
 

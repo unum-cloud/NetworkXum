@@ -1,3 +1,5 @@
+from table_sql import PlainSQL
+
 
 class PostgreSQL(PlainSQL):
     """
