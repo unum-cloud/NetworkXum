@@ -27,6 +27,7 @@ class BulkImporter(object):
                     print(f'-- Skipping: {dataset_name} -> {wrapper_name}')
                     continue
                 file_size = os.path.getsize(dataset_path) / (2 ** 20)
+                expected_edges = config.dataset_number_of_edges(dataset_path)
                 print(f'-- Bulk importing: {dataset_name} -> {wrapper_name}')
                 print(f'--- started at:', datetime.now().strftime('%H:%M:%S'))
                 print(f'--- file size (Mb):', file_size)
@@ -44,6 +45,7 @@ class BulkImporter(object):
                     stats=counter,
                 )
                 secs_elapsed = (counter.time_elapsed / 1000)
+                print(f'--- edges:', counter.count_operations)
                 print(f'--- edges/second:', counter.ops_per_sec())
                 print(f'--- Mb/second:', file_size / secs_elapsed)
 

@@ -20,6 +20,12 @@ class Neo4j(GraphBase):
         Furthermore, indexing edge properties is only available in 
         enterprise edition, so quering edges by their ID can be even 
         less then performant than searching them by connected node IDS.
+
+        CAUTION:
+        Neo4J doesn't have easy switching mechanism between different 
+        databases on the same server. That's why we have to use "labels"
+        to distringuish nodes and edges belonging to disjoint datasets,
+        but mixed into the same pot.
     """
     __max_batch_size__ = 10000
 
@@ -27,9 +33,11 @@ class Neo4j(GraphBase):
         self,
         url='bolt://0.0.0.0:7687',
         enterprise_edition=False,
-        import_directory='~/neo4j/import'
+        import_directory='~/neo4j/import',
+        use_full_name_for_label=False,
     ):
         super().__init__()
+
         self.driver = GraphDatabase.driver(url, encrypted=False)
         self.session = self.driver.session()
         self.import_directory = import_directory
