@@ -1,3 +1,5 @@
+from table_sql import PlainSQL
+
 
 class MySQL(PlainSQL):
 
@@ -15,13 +17,6 @@ class MySQL(PlainSQL):
         for p in pragmas:
             self.session.execute(p)
             self.session.commit()
-
-    # def insert_dump(self, path: str) -> int:
-    #     """
-    #         MySQL keeps producing strange errors using SQL injection method.
-    #         So this implementation reverts back to the basic batch inserts.
-    #     """
-    #     return export_edges_into_graph(path, self)
 
     def insert_dump_native(self, path: str) -> int:
         """
