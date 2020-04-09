@@ -11,6 +11,7 @@ from pygraphdb.graph_base import GraphBase
 
 
 class MongoDB(GraphBase):
+    __max_batch_size__ = 1000
 
     def __init__(self, url, db_name=None):
         super().__init__()
@@ -202,9 +203,12 @@ class MongoDB(GraphBase):
     def insert_edges(self, es: List[object]) -> int:
         """Supports up to 1000 operations"""
         ops = list()
+        ids = set()
         for e in es:
             if not isinstance(e, dict):
                 e = e.__dict__
+            if e['_id'] in ids:
+                continue
             op = UpdateOne(
                 filter={
                     '_id': e['_id'],
@@ -217,5 +221,6 @@ class MongoDB(GraphBase):
                 upsert=True,
             )
             ops.append(op)
+            ids.add(e['_id'])
         result = self.edges.bulk_write(requests=ops, ordered=False)
         return len(result.bulk_api_result['upserted'])

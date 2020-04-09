@@ -36,8 +36,10 @@ class Edge(object):
     def combine_ids(v_from: int, v_to: int) -> int:
         # Source: https://stackoverflow.com/a/919661
         _id = (v_from + v_to) * (v_from + v_to + 1) // 2 + v_to
-        # Some databases may have smaller default integer sizes
-        _id = _id % (2 ** 31)
+        # Some databases may have smaller default integer sizes,
+        # but it's bette to switch to `BigInteger`.
+        # https://docs.sqlalchemy.org/en/13/core/type_basics.html#sqlalchemy.types.BigInteger
+        # _id = _id % (2 ** 31)
         return _id
 
 

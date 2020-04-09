@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, Text, Float, Boolean
+from sqlalchemy import Column, Integer, BigInteger, Text, Float, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy import or_, and_
 from sqlalchemy_utils import create_database, database_exists
@@ -16,7 +16,7 @@ BaseEntitySQL = declarative_base()
 
 class NodeSQL(BaseEntitySQL):
     __tablename__ = 'table_nodes'
-    _id = Column(Integer, primary_key=True)
+    _id = Column(BigInteger, primary_key=True)
     attributes_json = Column(Text)
 
     def __init__(self, *args, **kwargs):
@@ -25,9 +25,9 @@ class NodeSQL(BaseEntitySQL):
 
 class EdgeSQL(BaseEntitySQL, Edge):
     __tablename__ = 'table_edges'
-    _id = Column(Integer, primary_key=True)
-    v_from = Column(Integer, index=True)
-    v_to = Column(Integer, index=True)
+    _id = Column(BigInteger, primary_key=True)
+    v_from = Column(BigInteger, index=True)
+    v_to = Column(BigInteger, index=True)
     weight = Column(Float)
     attributes_json = Column(Text)
 
@@ -38,9 +38,9 @@ class EdgeSQL(BaseEntitySQL, Edge):
 
 class EdgeNew(BaseEntitySQL, Edge):
     __tablename__ = 'new_edges'
-    _id = Column(Integer, primary_key=True)
-    v_from = Column(Integer, index=False)
-    v_to = Column(Integer, index=False)
+    _id = Column(BigInteger, primary_key=True)
+    v_from = Column(BigInteger, index=False)
+    v_to = Column(BigInteger, index=False)
     weight = Column(Float)
     attributes_json = Column(Text)
 
@@ -174,7 +174,7 @@ class PlainSQL(GraphBase):
     # Modifications
 
     def insert_edge(self, e: EdgeSQL, check_uniqness=True) -> bool:
-        e = self.to_sql(e)
+        e = self._to_sql(e)
         copies = []
         if check_uniqness:
             if '_id' in e:
@@ -205,8 +205,7 @@ class PlainSQL(GraphBase):
         self.session.commit()
 
     def insert_edges(self, es: List[Edge]) -> int:
-        es = [self.to_sql(e) for e in es]
-        self.session.bulk_save_objects(es)
+        self._insert_bulk_list(es, e_type=EdgeSQL)
         try:
             self.session.commit()
             return len(es)
@@ -243,16 +242,19 @@ class PlainSQL(GraphBase):
             Instead we create a an additional unindexed table, fill it and
             then merge into the main one.
         """
-        chunk_len = PlainSQL.__max_batch_size__
-        cnt = self.count_edges()
-        for es in chunks(yield_edges_from(path), chunk_len):
-            es = [self.to_sql(e, e_type=EdgeNew) for e in es]
-            self.session.bulk_save_objects(es)
-        self.session.commit()
-        self.commit_new_bulk()
-        return self.count_edges() - cnt
+        try:
+            chunk_len = PlainSQL.__max_batch_size__
+            cnt = self.count_edges()
+            for es in chunks(yield_edges_from(path), chunk_len):
+                self._insert_bulk_list(es, e_type=EdgeNew)
+            self.session.commit()
+            self._commit_new_bulk()
+            return self.count_edges() - cnt
+        except:
+            self.session.rollback()
+            return 0
 
-    def commit_new_bulk(self):
+    def _commit_new_bulk(self):
         migration = [
             text(f'''
                 INSERT INTO {EdgeSQL.__tablename__} (_id, v_from, v_to, weight, attributes_json)
@@ -274,7 +276,26 @@ class PlainSQL(GraphBase):
             self.session.execute(step)
             self.session.commit()
 
-    def to_sql(self, e, e_type=EdgeSQL) -> BaseEntitySQL:
+    def _insert_bulk_list(self, es, e_type=EdgeSQL):
+        # Some low quality datasets contain duplicates and
+        # if we have ID collisions, the operation will fail.
+        es_filtered = list()
+        es_ids = set()
+        for e in es:
+            e_new = self._to_sql(e, e_type=e_type)
+            if e_new['_id'] in es_ids:
+                continue
+            es_filtered.append(e_new)
+            es_ids.add(e_new['_id'])
+        # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.bulk_save_objects
+        self.session.bulk_save_objects(
+            es_filtered,
+            return_defaults=False,
+            update_changed_only=True,
+            preserve_order=False,
+        )
+
+    def _to_sql(self, e, e_type=EdgeSQL) -> BaseEntitySQL:
         if isinstance(e, BaseEntitySQL):
             return e
         return e_type(e['v_from'], e['v_to'], e['weight'])
@@ -343,5 +364,5 @@ class PostgreSQL(PlainSQL):
             cmd = f'COPY {EdgeNew.__tablename__} (v_from, v_to, weight) FROM STDIN WITH (FORMAT CSV, HEADER TRUE)'
             cursor.copy_expert(cmd, f)
             conn.commit()
-        self.commit_new_bulk()
+        self._commit_new_bulk()
         return self.count_edges() - cnt
