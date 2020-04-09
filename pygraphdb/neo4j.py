@@ -28,7 +28,9 @@ class Neo4j(GraphBase):
         to distringuish nodes and edges belonging to disjoint datasets,
         but mixed into the same pot.
     """
-    __max_batch_size__ = 10000
+    # Depending on the machine this can be higher.
+    # But on a laptop we would get "Java heap space" error.
+    __max_batch_size__ = 500
 
     def __init__(
         self,
@@ -356,11 +358,16 @@ class Neo4j(GraphBase):
         if self._e in cs:
             self.session.run(f'DROP CONSTRAINT {self._e}')
 
-    def insert_dump(self, filepath: str):
+    def insert_dump_native(self, filepath: str):
         """
-            CAUTION: This operation makes a temporary copy of the entire dump 
+            This function isn't recommended for use!
+
+            CAUTION 1: This operation makes a temporary copy of the entire dump 
             and places it into pre-specified `import_directory`:
             https://neo4j.com/docs/operations-manual/4.0/configuration/file-locations/
+
+            CAUTION 2: This frequently fails with following error:
+            `neobolt.exceptions.DatabaseError`: "Java heap space".
         """
 
         _, filename = os.path.split(filepath)
@@ -372,8 +379,9 @@ class Neo4j(GraphBase):
 
         try:
             shutil.copy(filepath, file_link)
-
+            # https://neo4j.com/docs/cypher-manual/current/clauses/load-csv/#load-csv-importing-large-amounts-of-data
             pattern = '''
+            USING PERIODIC COMMIT %d
             LOAD CSV WITH HEADERS FROM '%s' AS row
             WITH
                 toInteger(row.v_from) AS id_from,
@@ -383,7 +391,7 @@ class Neo4j(GraphBase):
             MERGE (v2:VERTEX {_id: id_to})
             MERGE (v1)-[:EDGE {_id: (floor((id_from + id_to) * (id_from + id_to + 1) / 2.0)+id_to), weight: w}]->(v2)
             '''
-            task = pattern % ('file:///' + filename)
+            task = pattern % (Neo4j.__max_batch_size__, 'file:///' + filename)
             task = task.replace('VERTEX', self._v)
             task = task.replace('EDGE', self._e)
             self.session.run(task)

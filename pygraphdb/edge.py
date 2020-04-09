@@ -39,7 +39,7 @@ class Edge(object):
         # Some databases may have smaller default integer sizes,
         # but it's bette to switch to `BigInteger`.
         # https://docs.sqlalchemy.org/en/13/core/type_basics.html#sqlalchemy.types.BigInteger
-        # _id = _id % (2 ** 31)
+        _id = _id % (2 ** 31)
         return _id
 
 
