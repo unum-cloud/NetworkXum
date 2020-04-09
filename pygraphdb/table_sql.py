@@ -237,8 +237,16 @@ class PlainSQL(GraphBase):
             # Build the new table.
             chunk_len = PlainSQL.__max_batch_size__
             for es in chunks(yield_edges_from(path), chunk_len):
-                es = [self._to_sql(e) for e in es]
-                self.insert_edges(es)
+                # for e in es:
+                #     e = self._to_sql(e, e_type=EdgeNew)
+                #     self.session.add(e)
+                es = [self._to_sql(e, e_type=EdgeNew) for e in es]
+                self.session.bulk_save_objects(
+                    es,
+                    return_defaults=False,
+                    update_changed_only=True,
+                    preserve_order=False,
+                )
             self.session.commit()
             # Import the new data.
             self.insert_table(EdgeNew.__tablename__)
@@ -264,7 +272,7 @@ class PlainSQL(GraphBase):
         # INTO {EdgeSQL.__tablename__} (_id, v_from, v_to, weight, attributes_json)
         # ''')
         # But this syntax isn't globally supported.
-        self.session.execute(step)
+        self.session.execute(migration)
         self.session.commit()
 
     def insert_bulk_deduplicated(self, es: List[EdgeNew]):
@@ -272,7 +280,7 @@ class PlainSQL(GraphBase):
         # if we have ID collisions, the operation will fail.
         # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.bulk_save_objects
         self.session.bulk_save_objects(
-            es_filtered,
+            es,
             return_defaults=False,
             update_changed_only=True,
             preserve_order=False,
@@ -287,4 +295,3 @@ class PlainSQL(GraphBase):
         if isinstance(e, BaseEntitySQL):
             return e
         return e_type(e['v_from'], e['v_to'], e['weight'])
-
