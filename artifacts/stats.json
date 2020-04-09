@@ -68,5 +68,15 @@
         "operation": "Insert Dump",
         "database": "MongoDB",
         "dataset": "graph-eachmovie-ratings"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 1.877573013305664,
+        "count_operations": 10000,
+        "msecs_per_operation": 1.8775730133056642e-07,
+        "operations_per_second": 5326.0245695553285,
+        "operation": "Insert Dump",
+        "database": "MySQL",
+        "dataset": "graph-communities"
     }
 ]
