@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -78,7 +80,7 @@ class PlainSQL(GraphBase):
         >>> str(query.statement.compile(dialect=postgresql.dialect()))
         Source: http://nicolascadou.com/blog/2014/01/printing-actual-sqlalchemy-queries/
     """
-    __max_batch_size__ = 50000
+    __max_batch_size__ = 5000
 
     def __init__(self, url='sqlite:///:memory:'):
         super().__init__()
@@ -173,23 +175,9 @@ class PlainSQL(GraphBase):
 
     # Modifications
 
-    def insert_edge(self, e: EdgeSQL, check_uniqness=True) -> bool:
-        e = self._to_sql(e)
-        copies = []
-        if check_uniqness:
-            if '_id' in e:
-                copies = self.session.query(EdgeSQL).filter_by(
-                    _id=e['_id']
-                ).all()
-            else:
-                copies = self.session.query(EdgeSQL).filter_by(
-                    v_from=e['v_from'],
-                    v_to=e['v_to'],
-                ).all()
-        if len(copies) == 0:
-            self.session.add(e)
-        else:
-            copies[0]['weight'] = e['weight']
+    def insert_edge(self, e: EdgeSQL) -> bool:
+        e = self._to_sql(e, e_type=EdgeSQL)
+        self.session.merge(e)
         self.session.commit()
 
     def remove_edge(self, e: EdgeSQL) -> bool:
@@ -205,7 +193,9 @@ class PlainSQL(GraphBase):
         self.session.commit()
 
     def insert_edges(self, es: List[Edge]) -> int:
-        self._insert_bulk_list(es, e_type=EdgeSQL)
+        for e in es:
+            e = self._to_sql(e, e_type=EdgeSQL)
+            self.session.merge(e)
         try:
             self.session.commit()
             return len(es)
@@ -244,30 +234,27 @@ class PlainSQL(GraphBase):
         """
         try:
             cnt = self.count_edges()
-            # Import older data if exists.
-            self._commit_new_bulk()
             # Build the new table.
             chunk_len = PlainSQL.__max_batch_size__
             for es in chunks(yield_edges_from(path), chunk_len):
-                self._insert_bulk_list(es, e_type=EdgeNew)
+                es = [self._to_sql(e) for e in es]
+                self.insert_edges(es)
             self.session.commit()
             # Import the new data.
-            self._commit_new_bulk()
+            self.insert_table(EdgeNew.__tablename__)
+            self.flush_temporary_table()
             return self.count_edges() - cnt
         except Exception as e:
             print(e)
             self.session.rollback()
             return 0
 
-    def _commit_new_bulk(self):
-        migration = [
-            text(f'''
-                INSERT INTO {EdgeSQL.__tablename__} (_id, v_from, v_to, weight, attributes_json)
-                SELECT _id, v_from, v_to, weight, attributes_json
-                FROM {EdgeNew.__tablename__};
-            '''),
-            text(f'DELETE FROM {EdgeNew.__tablename__};'),
-        ]
+    @abstractmethod
+    def insert_table(self, source_name: str):
+        migration = text(f'''
+            REPLACE INTO {EdgeSQL.__tablename__}
+            SELECT * FROM {source_name};
+        ''')
         # Performing an `INSERT` and then a `DELETE` might lead to integrity issues,
         # so perhaps a way to get around it, and to perform everything neatly in
         # a single statement, is to take advantage of the `[deleted]` temporary table.
@@ -277,21 +264,12 @@ class PlainSQL(GraphBase):
         # INTO {EdgeSQL.__tablename__} (_id, v_from, v_to, weight, attributes_json)
         # ''')
         # But this syntax isn't globally supported.
-        for step in migration:
-            self.session.execute(step)
-            self.session.commit()
+        self.session.execute(step)
+        self.session.commit()
 
-    def _insert_bulk_list(self, es, e_type=EdgeSQL):
+    def insert_bulk_deduplicated(self, es: List[EdgeNew]):
         # Some low quality datasets contain duplicates and
         # if we have ID collisions, the operation will fail.
-        es_filtered = list()
-        es_ids = set()
-        for e in es:
-            e_new = self._to_sql(e, e_type=e_type)
-            if e_new['_id'] in es_ids:
-                continue
-            es_filtered.append(e_new)
-            es_ids.add(e_new['_id'])
         # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.bulk_save_objects
         self.session.bulk_save_objects(
             es_filtered,
@@ -299,6 +277,11 @@ class PlainSQL(GraphBase):
             update_changed_only=True,
             preserve_order=False,
         )
+        self.session.commit()
+
+    def flush_temporary_table(self):
+        self.session.execute(text(f'DELETE FROM {EdgeNew.__tablename__};'))
+        self.session.commit()
 
     def _to_sql(self, e, e_type=EdgeSQL) -> BaseEntitySQL:
         if isinstance(e, BaseEntitySQL):
@@ -347,7 +330,48 @@ class SQLite(PlainSQL):
 
 
 class MySQL(PlainSQL):
-    pass
+
+    def __init__(self, url):
+        PlainSQL.__init__(self, url)
+        self.set_pragmas_on_first_launch()
+
+    def set_pragmas_on_first_launch(self):
+        if self.count_edges() > 0:
+            return
+        # https://stackoverflow.com/a/60717467/2766161
+        pragmas = [
+            'SET GLOBAL local_infile=1;',
+        ]
+        for p in pragmas:
+            self.session.execute(p)
+            self.session.commit()
+
+    # def insert_dump(self, path: str) -> int:
+    #     """
+    #         MySQL keeps producing strange errors using SQL injection method.
+    #         So this implementation reverts back to the basic batch inserts.
+    #     """
+    #     return export_edges_into_graph(path, self)
+
+    def insert_dump_native(self, path: str) -> int:
+        """
+            This method requires the file to be mounted on the same filesystem.
+            Unlike Postgres the connection wrapper doesn't allow channeling data to remote DB.            
+        """
+        cnt = self.count_edges()
+        pattern = '''
+        LOAD DATA LOCAL INFILE  '%s'
+        INTO TABLE %s
+        FIELDS TERMINATED BY ',' 
+        LINES TERMINATED BY '\n'
+        IGNORE 1 ROWS
+        (v_from, v_to, weight);
+        '''
+        task = pattern % (path, EdgeNew.__tablename__)
+        self.session.execute(task)
+        self.session.commit()
+        self.insert_table(EdgeNew.__tablename__)
+        return self.count_edges() - cnt
 
 
 class PostgreSQL(PlainSQL):
@@ -369,5 +393,16 @@ class PostgreSQL(PlainSQL):
             cmd = f'COPY {EdgeNew.__tablename__} (v_from, v_to, weight) FROM STDIN WITH (FORMAT CSV, HEADER TRUE)'
             cursor.copy_expert(cmd, f)
             conn.commit()
-        self._commit_new_bulk()
+        self.insert_table(EdgeNew.__tablename__)
         return self.count_edges() - cnt
+
+    def insert_table(self, source_name: str):
+        # https://stackoverflow.com/a/17267423/2766161
+        migration = text(f'''
+            INSERT INTO {EdgeSQL.__tablename__}
+            SELECT * FROM {source_name}
+            ON CONFLICT (_id) DO UPDATE SET
+            (v_from, v_to, weight, attributes_json) = (EXCLUDED.v_from, EXCLUDED.v_to, EXCLUDED.weight, EXCLUDED.attributes_json);
+        ''')
+        self.session.execute(migration)
+        self.session.commit()
