@@ -44,6 +44,16 @@ def yield_edges_from(filepath: str) -> Generator[Edge, None, None]:
             w = float(columns[2]) if has_weight else 1.0
             yield Edge(v1, v2, w)
 
+# def deduplicate_chunks()
+#         es_filtered = list()
+#         es_ids = set()
+#         for e in es:
+#             e_new = self._to_sql(e, e_type=e_type)
+#             if e_new['_id'] in es_ids:
+#                 continue
+#             es_ids.add(e_new['_id'])
+#             es_filtered.append(e_new)
+
 
 def export_edges_into_graph(filepath: str, g) -> int:
     chunk_len = type(g).__max_batch_size__
