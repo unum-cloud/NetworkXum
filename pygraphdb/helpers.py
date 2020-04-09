@@ -5,8 +5,6 @@ import time
 import concurrent
 import math
 
-from tqdm import tqdm
-
 from pygraphdb.edge import Edge
 
 
@@ -28,7 +26,7 @@ def yield_edges_from(filepath: str) -> Generator[Edge, None, None]:
     with open(filepath, 'r') as f:
         reader = csv.reader(f, delimiter=',')
         line_idx = 0
-        for columns in tqdm(reader):
+        for columns in reader:
             if line_idx < lines_to_skip:
                 line_idx += 1
                 continue
