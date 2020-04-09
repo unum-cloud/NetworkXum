@@ -1,5 +1,4 @@
 from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
-from urllib.parse import urlparse
 
 # Properties of every entry are: 'from_id', 'to_id', 'weight'
 # There are indexes by all keys.
@@ -8,24 +7,15 @@ from pymongo import UpdateOne
 
 from pygraphdb.edge import Edge
 from pygraphdb.graph_base import GraphBase
+from pygraphdb.helpers import extract_database_name
 
 
 class MongoDB(GraphBase):
     __max_batch_size__ = 1000
 
-    def __init__(self, url, db_name=None):
+    def __init__(self, url='mongodb://localhost:27017/graph'):
         super().__init__()
-        # Extract database name and collection name if nothing was provided.
-        if (db_name is None):
-            url_parts = urlparse(url).path
-            url_parts = url_parts.split('/')
-            url_parts = [v for v in url_parts if (v != '/' and v != '')]
-            if len(url_parts) >= 1:
-                db_name = url_parts[0]
-            else:
-                db_name = 'graph'
-            if len(url_parts) > 1:
-                print('Will avoid remaining url parts:', url_parts[2:])
+        db_name = extract_database_name(url)
         self.db = MongoClient(url)
         self.edges = self.db[db_name]['edges']
         self.nodes = self.db[db_name]['nodes']
