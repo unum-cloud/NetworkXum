@@ -39,6 +39,13 @@ Here are some relatively big graphs you can use for benchmarks:
 * Friendster social network. 9Gb. `|V|`=65M, `|E|`=1.8B. [Source](http://networkrepository.com/soc-friendster.php).
 * ClueWeb 2009 network. 40Gb. `|V|`=1.7B, `|E|`=7.8B. [Source](http://networkrepository.com/web-ClueWeb09.php).
 
+## TODO
+
+[x] Benchmark on small graphs.
+[ ] Benchmark on mid size graphs.
+[ ] Session management in SQL and Neo4J.
+[ ] ArangoDB wrapper.
+
 ## Related notes
 
 * Alternative Graph Storage Approaches
