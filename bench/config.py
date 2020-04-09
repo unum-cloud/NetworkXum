@@ -33,21 +33,21 @@ datasets = [x[0] for x in _datasets[1:]]
 
 wrapper_types = [
     MySQL,
-    # SQLite,
-    # PostgreSQL,
+    SQLite,
+    PostgreSQL,
     # MongoDB,
-    Neo4j,
+    # Neo4j,
     # SQLiteMem,
     # HyperRocks,
 ]
 
 _wrappers = [
     # Type, Environment Variable, Default Value
-    (HyperRocks, 'URI_HYPER_ROCKS', '/Users/av/rocksdb/<dataset>/'),
+    (HyperRocks, 'URI_HYPER_ROCKS', '/Users/av/rocksdb/<dataset>'),
     (SQLiteMem, 'URI_SQLITE', 'sqlite:///:memory:'),
     (SQLite, 'URI_SQLITE', 'sqlite:////Users/av/sqlite/<dataset>/graph.db'),
-    (MySQL, 'URI_MYSQL', 'mysql://root:temptemp@0.0.0.0:3306/<dataset>/'),
-    (PostgreSQL, 'URI_PGSQL', 'postgres://root:temptemp@0.0.0.0:5432/<dataset>/'),
+    (MySQL, 'URI_MYSQL', 'mysql://root:temptemp@0.0.0.0:3306/<dataset>'),
+    (PostgreSQL, 'URI_PGSQL', 'postgres://root:temptemp@0.0.0.0:5432/<dataset>'),
     (Neo4j, 'URI_NEO4J', 'bolt://0.0.0.0:7687/<dataset>'),
     (MongoDB, 'URI_MONGO', 'mongodb://0.0.0.0:27017/<dataset>'),
 ]
