@@ -30,7 +30,6 @@ class GraphBase(object):
         edge_id_generator=None,
         **kwargs,
     ):
-        print('Called constructor:', self)
         object.__init__(self)
         self.count_undirected_in_source_queries = True
         self.is_directed = is_directed
@@ -38,7 +37,6 @@ class GraphBase(object):
         self.edge_id_generator = edge_id_generator
         if self.edge_id_generator is None:
             self.edge_id_generator = lambda e: self.biggest_edge_id() + 1
-        print('Constructed graph:', self)
 
     @abstractmethod
     def validate_edge(self, e: object) -> Optional[object]:
