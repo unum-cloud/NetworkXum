@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from contextlib import contextmanager
 
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
@@ -40,6 +41,8 @@ class EdgeSQL(BaseEntitySQL, Edge):
 
 class EdgeNew(BaseEntitySQL, Edge):
     __tablename__ = 'new_edges'
+    # TODO: Consider using different Integer types in different SQL DBs.
+    # https://stackoverflow.com/a/60840921/2766161
     _id = Column(BigInteger, primary_key=True)
     v_from = Column(BigInteger, index=False)
     v_to = Column(BigInteger, index=False)
@@ -90,61 +93,87 @@ class PlainSQL(GraphBase):
         if not database_exists(url):
             create_database(url)
         self.engine = sa.create_engine(url)
-        self.session_maker = sessionmaker(bind=self.engine)
-        self.session = self.session_maker()
         BaseEntitySQL.metadata.create_all(self.engine)
+        self.session_maker = sessionmaker(bind=self.engine)
+
+    @contextmanager
+    def get_session(self):
+        session = self.session_maker()
+        try:
+            yield session
+            session.commit()
+        except Exception as e:
+            print(e)
+            session.rollback()
+            raise e
+        finally:
+            session.close()
 
     # Relatives
 
     def find_edge(self, v_from: int, v_to: int) -> Optional[EdgeSQL]:
-        return self.session.query(EdgeSQL).filter(and_(
-            EdgeSQL.v_from == v_from,
-            EdgeSQL.v_to == v_to,
-        )).first()
+        with self.get_session() as s:
+            return s.query(EdgeSQL).filter(and_(
+                EdgeSQL.v_from == v_from,
+                EdgeSQL.v_to == v_to,
+            )).first()
+        return None
 
     def find_edge_or_inv(self, v1: int, v2: int) -> Optional[EdgeSQL]:
-        return self.session.query(EdgeSQL).filter(or_(
-            and_(
-                EdgeSQL.v_from == v1,
-                EdgeSQL.v_to == v2,
-            ),
-            and_(
-                EdgeSQL.v_from == v2,
-                EdgeSQL.v_to == v1,
-            )
-        )).all()
+        with self.get_session() as s:
+            return s.query(EdgeSQL).filter(or_(
+                and_(
+                    EdgeSQL.v_from == v1,
+                    EdgeSQL.v_to == v2,
+                ),
+                and_(
+                    EdgeSQL.v_from == v2,
+                    EdgeSQL.v_to == v1,
+                )
+            )).all()
+        return None
 
     def edges_from(self, v: int) -> List[EdgeSQL]:
-        return self.session.query(EdgeSQL).filter_by(v_from=v).all()
+        with self.get_session() as s:
+            return s.query(EdgeSQL).filter_by(v_from=v).all()
+        return []
 
     def edges_to(self, v: int) -> List[EdgeSQL]:
-        return self.session.query(EdgeSQL).filter_by(v_to=v).all()
+        with self.get_session() as s:
+            return s.query(EdgeSQL).filter_by(v_to=v).all()
+        return []
 
     def edges_related(self, v: int) -> List[EdgeSQL]:
-        return self.session.query(EdgeSQL).filter(or_(
-            EdgeSQL.v_from == v,
-            EdgeSQL.v_to == v,
-        )).all()
+        with self.get_session() as s:
+            return s.query(EdgeSQL).filter(or_(
+                EdgeSQL.v_from == v,
+                EdgeSQL.v_to == v,
+            )).all()
+        return []
 
     def all_vertexes(self) -> Set[int]:
-        all_froms = self.session.query(EdgeSQL.v_from).distinct().all()
-        all_tos = self.session.query(EdgeSQL.v_to).distinct().all()
-        return set(all_froms).union(all_tos)
+        with self.get_session() as s:
+            all_froms = s.query(EdgeSQL.v_from).distinct().all()
+            all_tos = s.query(EdgeSQL.v_to).distinct().all()
+            return set(all_froms).union(all_tos)
+        return set()
 
     # Wider range of neighbors
 
     def nodes_related_to_group(self, vs: Sequence[int]) -> Set[int]:
-        edges = self.session.query(EdgeSQL).filter(or_(
-            EdgeSQL.v_from.in_(vs),
-            EdgeSQL.v_to.in_(vs),
-        )).all()
-        result = set()
-        for e in edges:
-            if (e.v_from not in vs):
-                result.add(e.v_from)
-            elif (e.v_to not in vs):
-                result.add(e.v_to)
-        return result
+        with self.get_session() as s:
+            edges = s.query(EdgeSQL).filter(or_(
+                EdgeSQL.v_from.in_(vs),
+                EdgeSQL.v_to.in_(vs),
+            )).all()
+            result = set()
+            for e in edges:
+                if (e.v_from not in vs):
+                    result.add(e.v_from)
+                elif (e.v_to not in vs):
+                    result.add(e.v_to)
+            return result
+        return set()
 
     # Metadata
 
@@ -152,94 +181,98 @@ class PlainSQL(GraphBase):
         return len(self.all_vertexes())
 
     def count_edges(self) -> int:
-        return self.session.query(EdgeSQL).count()
+        with self.get_session() as s:
+            return s.query(EdgeSQL).count()
+        return 0
 
     def count_related(self, v: int) -> (int, float):
-        return self.session.query(
-            func.count(EdgeSQL.weight).label("count"),
-            func.sum(EdgeSQL.weight).label("sum"),
-        ).filter(or_(
-            EdgeSQL.v_from == v,
-            EdgeSQL.v_to == v,
-        )).first()
+        with self.get_session() as s:
+            return s.query(
+                func.count(EdgeSQL.weight).label("count"),
+                func.sum(EdgeSQL.weight).label("sum"),
+            ).filter(or_(
+                EdgeSQL.v_from == v,
+                EdgeSQL.v_to == v,
+            )).first()
+        return (0, 0)
 
     def count_followers(self, v: int) -> (int, float):
-        return self.session.query(
-            func.count(EdgeSQL.weight).label("count"),
-            func.sum(EdgeSQL.weight).label("sum"),
-        ).filter_by(v_to=v).first()
+        with self.get_session() as s:
+            return s.query(
+                func.count(EdgeSQL.weight).label("count"),
+                func.sum(EdgeSQL.weight).label("sum"),
+            ).filter_by(v_to=v).first()
+        return (0, 0)
 
     def count_following(self, v: int) -> (int, float):
-        return self.session.query(
-            func.count(EdgeSQL.weight).label("count"),
-            func.sum(EdgeSQL.weight).label("sum"),
-        ).filter_by(v_from=v).first()
+        with self.get_session() as s:
+            return s.query(
+                func.count(EdgeSQL.weight).label("count"),
+                func.sum(EdgeSQL.weight).label("sum"),
+            ).filter_by(v_from=v).first()
+        return (0, 0)
 
     def biggest_edge_id(self) -> int:
-        biggest = self.session.query(
-            func.max(EdgeSQL._id).label("max"),
-        ).first()
-        if biggest[0] is None:
-            return 0
-        return biggest[0]
+        with self.get_session() as s:
+            biggest = s.query(
+                func.max(EdgeSQL._id).label("max"),
+            ).first()
+            if biggest[0] is None:
+                return 0
+            return biggest[0]
+        return 0
 
     # Modifications
 
     def upsert_edge(self, e: EdgeSQL) -> bool:
-        e = self.validate_edge(e)
-        if e is None:
-            return False
-        self.session.merge(e)
-        self.session.commit()
-        return True
+        with self.get_session() as s:
+            e = self.validate_edge(e)
+            if e is None:
+                return False
+            s.merge(e)
+            return True
+        return False
 
     def remove_edge(self, e: EdgeSQL) -> bool:
-        if '_id' in e:
-            self.session.query(EdgeSQL).filter_by(
-                _id=e['_id']
-            ).delete()
-        else:
-            self.session.query(EdgeSQL).filter_by(
-                v_from=e['v_from'],
-                v_to=e['v_to'],
-            ).delete()
-        self.session.commit()
-        return True
+        with self.get_session() as s:
+            if '_id' in e:
+                s.query(EdgeSQL).filter_by(
+                    _id=e['_id']
+                ).delete()
+            else:
+                s.query(EdgeSQL).filter_by(
+                    v_from=e['v_from'],
+                    v_to=e['v_to'],
+                ).delete()
+            return True
+        return False
 
     def upsert_edges(self, es: List[Edge]) -> int:
-        try:
-            es[:] = map_compact(self.validate_edge, es)
-            map(self.session.merge, es)
-            self.session.commit()
+        with self.get_session() as s:
+            es = map_compact(self.validate_edge, es)
+            map(s.merge, es)
             return len(es)
-        except:
-            return 0
+        return 0
 
     def remove_node(self, v: int) -> int:
-        try:
-            count = self.session.query(EdgeSQL).filter(or_(
+        with self.get_session() as s:
+            count = s.query(EdgeSQL).filter(or_(
                 EdgeSQL.v_from == v,
                 EdgeSQL.v_to == v,
             )).delete()
-            self.session.commit()
             return count
-        except:
-            self.session.rollback()
-            return 0
+        return 0
 
     def remove_all(self) -> int:
-        try:
+        with self.get_session() as s:
             count = 0
-            count += self.session.query(EdgeSQL).delete()
-            count += self.session.query(EdgeNew).delete()
-            self.session.commit()
+            count += s.query(EdgeSQL).delete()
+            count += s.query(EdgeNew).delete()
             return count
-        except:
-            self.session.rollback()
-            return 0
+        return 0
 
     def insert_adjacency_list(self, path: str) -> int:
-        try:
+        with self.get_session() as s:
             current_id = self.biggest_edge_id() + 1
             # Build the new table.
             chunk_len = type(self).__max_batch_size__
@@ -250,30 +283,27 @@ class PlainSQL(GraphBase):
                     current_id += 1
                 es = map(EdgeNew, es_raw)
                 es = map_compact(self.validate_edge, es_raw)
-                self.session.bulk_save_objects(
+                s.bulk_save_objects(
                     es,
                     return_defaults=False,
                     update_changed_only=True,
                     preserve_order=False,
                 )
-            self.session.commit()
             # Import the new data.
             cnt = self.count_edges()
             self.insert_table(EdgeNew.__tablename__)
             self.flush_temporary_table()
             return self.count_edges() - cnt
-        except Exception as e:
-            print(e)
-            self.session.rollback()
-            return 0
+        return 0
 
     def insert_table(self, source_name: str):
-        migration = text(f'''
-            INSERT INTO {EdgeSQL.__tablename__}
-            SELECT * FROM {source_name};
-        ''')
-        self.session.execute(migration)
-        self.session.commit()
+        with self.get_session() as s:
+            migration = text(f'''
+                INSERT INTO {EdgeSQL.__tablename__}
+                SELECT * FROM {source_name};
+            ''')
+            s.execute(migration)
+        return 0
 
     def upsert_adjacency_list(self, path: str) -> int:
         """
@@ -283,56 +313,52 @@ class PlainSQL(GraphBase):
             Instead we create a an additional unindexed table, fill it and
             then merge into the main one.
         """
-        try:
+        with self.get_session() as s:
             # Build the new table.
             chunk_len = type(self).__max_batch_size__
             for es in chunks(yield_edges_from(path), chunk_len):
-                es[:] = map_compact(self.validate_edge, es)
-                self.map(self.session.merge, es)
-            self.session.commit()
+                es = map_compact(self.validate_edge, es)
+                self.map(s.merge, es)
             # Import the new data.
             cnt = self.count_edges()
             self.upsert_table(EdgeNew.__tablename__)
             self.flush_temporary_table()
             return self.count_edges() - cnt
-        except Exception as e:
-            print(e)
-            self.session.rollback()
-            return 0
+        return 0
 
     @abstractmethod
     def upsert_table(self, source_name: str):
-        migration = text(f'''
-            REPLACE INTO {EdgeSQL.__tablename__}
-            SELECT * FROM {source_name};
-        ''')
-        # Performing an `INSERT` and then a `DELETE` might lead to integrity issues,
-        # so perhaps a way to get around it, and to perform everything neatly in
-        # a single statement, is to take advantage of the `[deleted]` temporary table.
-        # migration = text(f'''
-        # DELETE {EdgeNew.__tablename__};
-        # OUTPUT DELETED.*
-        # INTO {EdgeSQL.__tablename__} (_id, v_from, v_to, weight, attributes_json)
-        # ''')
-        # But this syntax isn't globally supported.
-        self.session.execute(migration)
-        self.session.commit()
+        with self.get_session() as s:
+            migration = text(f'''
+                REPLACE INTO {EdgeSQL.__tablename__}
+                SELECT * FROM {source_name};
+            ''')
+            # Performing an `INSERT` and then a `DELETE` might lead to integrity issues,
+            # so perhaps a way to get around it, and to perform everything neatly in
+            # a single statement, is to take advantage of the `[deleted]` temporary table.
+            # migration = text(f'''
+            # DELETE {EdgeNew.__tablename__};
+            # OUTPUT DELETED.*
+            # INTO {EdgeSQL.__tablename__} (_id, v_from, v_to, weight, attributes_json)
+            # ''')
+            # But this syntax isn't globally supported.
+            s.execute(migration)
 
     def insert_bulk_deduplicated(self, es: List[EdgeNew]):
         # Some low quality datasets contain duplicates and
         # if we have ID collisions, the operation will fail.
         # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.bulk_save_objects
-        self.session.bulk_save_objects(
-            es,
-            return_defaults=False,
-            update_changed_only=True,
-            preserve_order=False,
-        )
-        self.session.commit()
+        with self.get_session() as s:
+            s.bulk_save_objects(
+                es,
+                return_defaults=False,
+                update_changed_only=True,
+                preserve_order=False,
+            )
 
     def flush_temporary_table(self):
-        self.session.execute(text(f'DELETE FROM {EdgeNew.__tablename__};'))
-        self.session.commit()
+        with self.get_session() as s:
+            s.execute(text(f'DELETE FROM {EdgeNew.__tablename__};'))
 
     def validate_edge(self, e) -> BaseEntitySQL:
         if not isinstance(e, BaseEntitySQL):
