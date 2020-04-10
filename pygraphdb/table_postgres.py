@@ -30,9 +30,10 @@ class PostgreSQL(PlainSQL):
             # "SET shared_buffers='512MB';",
             # "SET wal_buffers='32MB';",
         ]
-        for p in pragmas:
-            self.session.execute(p)
-            self.session.commit()
+        with self.get_session() as s:
+            for p in pragmas:
+                s.execute(p)
+                s.commit()
 
     # TODO: Change the IDs of imported entries.
     # def upsert_adjacency_list(self, path: str) -> int:
@@ -54,5 +55,6 @@ class PostgreSQL(PlainSQL):
             ON CONFLICT (_id) DO UPDATE SET
             (v_from, v_to, weight, attributes_json) = (EXCLUDED.v_from, EXCLUDED.v_to, EXCLUDED.weight, EXCLUDED.attributes_json);
         '''
-        self.session.execute(migration)
-        self.session.commit()
+        with self.get_session() as s:
+            s.execute(migration)
+            s.commit()

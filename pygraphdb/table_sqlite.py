@@ -40,6 +40,7 @@ class SQLite(PlainSQL):
             'PRAGMA main.journal_mode=WAL;',
             'PRAGMA main.temp_store=MEMORY;',
         ]
-        for p in pragmas:
-            self.session.execute(p)
-            self.session.commit()
+        with self.get_session() as s:
+            for p in pragmas:
+                s.execute(p)
+                s.commit()
