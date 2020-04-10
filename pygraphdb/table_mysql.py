@@ -37,9 +37,10 @@ class MySQL(PlainSQL):
             # https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_flush_method
             # 'SET GLOBAL innodb_flush_method=O_DIRECT;',
         ]
-        for p in pragmas:
-            self.session.execute(p)
-            self.session.commit()
+        with self.get_session() as s:
+            for p in pragmas:
+                s.execute(p)
+                s.commit()
 
     def upsert_adjacency_list_native(self, path: str) -> int:
         """
@@ -56,7 +57,8 @@ class MySQL(PlainSQL):
         (v_from, v_to, weight);
         '''
         task = pattern % (path, EdgeNew.__tablename__)
-        self.session.execute(task)
-        self.session.commit()
+        with self.get_session() as s:
+            s.execute(task)
+            s.commit()
         self.upsert_table(EdgeNew.__tablename__)
         return self.count_edges() - cnt
