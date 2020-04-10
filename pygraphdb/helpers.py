@@ -59,7 +59,7 @@ def export_edges_into_graph(filepath: str, g) -> int:
     chunk_len = type(g).__max_batch_size__
     count_edges_added = 0
     for es in chunks(yield_edges_from(filepath), chunk_len):
-        count_edges_added += g.insert_edges(es)
+        count_edges_added += g.upsert_edges(es)
     return count_edges_added
 
 
@@ -72,7 +72,7 @@ def export_edges_into_graph_parallel(filepath: str, g, thread_count=8) -> int:
             x_len = int(math.ceil(len(es) / thread_count))
             es_per_thread = [es[x:x+x_len] for x in range(0, len(es), x_len)]
             print(f'-- Importing part: {x_len} rows x {thread_count} threads')
-            executor.map(g.insert_edges, es_per_thread)
+            executor.map(g.upsert_edges, es_per_thread)
             executor.shutdown(wait=True)
     return g.count_edges() - count_edges_before
 

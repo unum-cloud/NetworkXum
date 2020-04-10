@@ -33,7 +33,7 @@ class BulkImporter(object):
                 print(f'--- file size (Mb):', file_size)
 
                 def import_one() -> int:
-                    g.insert_dump(dataset_path)
+                    g.insert_adjacency_list(dataset_path)
                     return g.count_edges()
 
                 counter = StatsCounter()

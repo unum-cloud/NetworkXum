@@ -34,18 +34,19 @@ class PostgreSQL(PlainSQL):
             self.session.execute(p)
             self.session.commit()
 
-    def insert_dump(self, path: str) -> int:
-        cnt = self.count_edges()
-        with open(path, 'r') as f:
-            conn = self.engine.raw_connection()
-            cursor = conn.cursor()
-            cmd = f'COPY {EdgeNew.__tablename__} (v_from, v_to, weight) FROM STDIN WITH (FORMAT CSV, HEADER TRUE)'
-            cursor.copy_expert(cmd, f)
-            conn.commit()
-        self.insert_table(EdgeNew.__tablename__)
-        return self.count_edges() - cnt
+    # TODO: Change the IDs of imported entries.
+    # def upsert_adjacency_list(self, path: str) -> int:
+    #     cnt = self.count_edges()
+    #     with open(path, 'r') as f:
+    #         conn = self.engine.raw_connection()
+    #         cursor = conn.cursor()
+    #         cmd = f'COPY {EdgeNew.__tablename__} (v_from, v_to, weight) FROM STDIN WITH (FORMAT CSV, HEADER TRUE)'
+    #         cursor.copy_expert(cmd, f)
+    #         conn.commit()
+    #     self.upsert_table(EdgeNew.__tablename__)
+    #     return self.count_edges() - cnt
 
-    def insert_table(self, source_name: str):
+    def upsert_table(self, source_name: str):
         # https://stackoverflow.com/a/17267423/2766161
         migration = f'''
             INSERT INTO {EdgeSQL.__tablename__}
