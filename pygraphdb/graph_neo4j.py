@@ -285,7 +285,7 @@ class Neo4j(GraphBase):
         return c, s
 
     def biggest_edge_id(self) -> int:
-        pattern = '''
+        task = '''
         MATCH (:VERTEX)-[e:EDGE]->(:VERTEX)
         RETURN e._id AS _id
         ORDER BY _id DESC
@@ -307,7 +307,8 @@ class Neo4j(GraphBase):
         task = pattern % (e['v_from'], e['v_to'], e['_id'], e['weight'])
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
-        return self.session.run(task)
+        self.session.run(task)
+        return True
 
     def insert_many(self, es: List[Edge]) -> int:
         vs = set()
@@ -363,7 +364,8 @@ class Neo4j(GraphBase):
             task = pattern % (e['v_from'], e['v_to'])
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
-        return self.session.run(task)
+        self.session.run(task)
+        return True
 
     def remove_all(self):
         self.session.run(f'MATCH (v:{self._v}) DETACH DELETE v')
@@ -402,10 +404,11 @@ class Neo4j(GraphBase):
             WITH
                 toInteger(row.v_from) AS id_from,
                 toInteger(row.v_to) AS id_to,
-                toFloat(row.weight) AS w
+                toFloat(row.weight) AS w,
+                toInteger(linenumber()) AS idx
             MERGE (v1:VERTEX {_id: id_from})
             MERGE (v2:VERTEX {_id: id_to})
-            CREATE (v1)-[:EDGE {_id: linenumber() + %d, weight: w}]->(v2)
+            CREATE (v1)-[:EDGE {_id: idx + %d, weight: w}]->(v2)
             '''
             task = pattern % (Neo4j.__max_batch_size__,
                               'file:///' + filename, current_id)
