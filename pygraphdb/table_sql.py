@@ -9,8 +9,8 @@ from sqlalchemy import or_, and_
 from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy import text
 
-from pygraphdb.graph_base import GraphBase
-from pygraphdb.edge import Edge
+from pygraphdb.base_graph import GraphBase
+from pygraphdb.base_edge import Edge
 from pygraphdb.helpers import *
 
 BaseEntitySQL = declarative_base()
@@ -82,9 +82,10 @@ class PlainSQL(GraphBase):
     """
     __is_concurrent__ = True
     __max_batch_size__ = 5000
+    __edge_type__ = EdgeSQL
 
-    def __init__(self, url='sqlite:///:memory:'):
-        super().__init__()
+    def __init__(self, url='sqlite:///:memory:', **kwargs):
+        GraphBase.__init__(self, **kwargs)
         # https://stackoverflow.com/a/51184173
         if not database_exists(url):
             create_database(url)
@@ -185,9 +186,12 @@ class PlainSQL(GraphBase):
     # Modifications
 
     def upsert_edge(self, e: EdgeSQL) -> bool:
-        e = self._to_sql(e, e_type=EdgeSQL)
+        e = self.validate_edge(e)
+        if e is None:
+            return False
         self.session.merge(e)
         self.session.commit()
+        return True
 
     def remove_edge(self, e: EdgeSQL) -> bool:
         if '_id' in e:
@@ -200,12 +204,12 @@ class PlainSQL(GraphBase):
                 v_to=e['v_to'],
             ).delete()
         self.session.commit()
+        return True
 
     def upsert_edges(self, es: List[Edge]) -> int:
-        for e in es:
-            e = self._to_sql(e, e_type=EdgeSQL)
-            self.session.merge(e)
         try:
+            es[:] = map_compact(self.validate_edge, es)
+            map(self.session.merge, es)
             self.session.commit()
             return len(es)
         except:
@@ -232,6 +236,7 @@ class PlainSQL(GraphBase):
             return count
         except:
             self.session.rollback()
+            return 0
 
     def insert_adjacency_list(self, path: str) -> int:
         try:
@@ -239,12 +244,12 @@ class PlainSQL(GraphBase):
             # Build the new table.
             chunk_len = type(self).__max_batch_size__
             for es_raw in chunks(yield_edges_from(path), chunk_len):
-                es = list()
-                for e in es_raw:
-                    e = self._to_sql(e, e_type=EdgeNew)
-                    e._id = current_id
+                for i, e in enumerate(es_raw):
+                    e['_id'] = current_id
+                    es_raw[i] = e
                     current_id += 1
-                    es.append(e)
+                es = map(EdgeNew, es_raw)
+                es = map_compact(self.validate_edge, es_raw)
                 self.session.bulk_save_objects(
                     es,
                     return_defaults=False,
@@ -282,9 +287,8 @@ class PlainSQL(GraphBase):
             # Build the new table.
             chunk_len = type(self).__max_batch_size__
             for es in chunks(yield_edges_from(path), chunk_len):
-                for e in es:
-                    e = self._to_sql(e, e_type=EdgeNew)
-                    e = self.session.merge(e)
+                es[:] = map_compact(self.validate_edge, es)
+                self.map(self.session.merge, es)
             self.session.commit()
             # Import the new data.
             cnt = self.count_edges()
@@ -330,7 +334,8 @@ class PlainSQL(GraphBase):
         self.session.execute(text(f'DELETE FROM {EdgeNew.__tablename__};'))
         self.session.commit()
 
-    def _to_sql(self, e, e_type) -> BaseEntitySQL:
-        if isinstance(e, BaseEntitySQL):
-            return e
-        return e_type(e['v_from'], e['v_to'], e['weight'])
+    def validate_edge(self, e) -> BaseEntitySQL:
+        if not isinstance(e, BaseEntitySQL):
+            e = EdgeNew(v_from=e['v_from'], v_to=e['v_to'],
+                        _id=e['_id'], weight=e['weight'])
+        return super().validate_edge(e)

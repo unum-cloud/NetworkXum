@@ -5,8 +5,8 @@ from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 from neo4j import GraphDatabase
 from neo4j import BoltStatementResult
 
-from pygraphdb.edge import Edge
-from pygraphdb.graph_base import GraphBase
+from pygraphdb.base_edge import Edge
+from pygraphdb.base_graph import GraphBase
 from pygraphdb.helpers import extract_database_name
 
 
@@ -31,6 +31,8 @@ class Neo4j(GraphBase):
     # Depending on the machine this can be higher.
     # But on a laptop we would get "Java heap space" error.
     __max_batch_size__ = 500
+    __is_concurrent__ = True
+    __edge_type__ = Edge
 
     def __init__(
         self,
@@ -38,8 +40,9 @@ class Neo4j(GraphBase):
         enterprise_edition=False,
         import_directory='~/neo4j/import',
         use_full_name_for_label=False,
+        **kwargs,
     ):
-        super().__init__()
+        GraphBase.__init__(self, **kwargs)
         self.driver = GraphDatabase.driver(url, encrypted=False)
         self.session = self.driver.session()
         self.import_directory = import_directory
@@ -371,6 +374,16 @@ class Neo4j(GraphBase):
             self.session.run(f'DROP CONSTRAINT {self._e}')
 
     def insert_adjacency_list(self, filepath: str) -> int:
+        """
+            This function may be tricky to use!
+
+            CAUTION 1: This operation makes a temporary copy of the entire dump 
+            and places it into pre-specified `import_directory`:
+            https://neo4j.com/docs/operations-manual/4.0/configuration/file-locations/
+
+            CAUTION 2: This frequently fails with following error:
+            `neobolt.exceptions.DatabaseError`: "Java heap space".
+        """
         cnt = self.count_edges()
         current_id = self.biggest_edge_id() + 1
         _, filename = os.path.split(filepath)
@@ -403,47 +416,6 @@ class Neo4j(GraphBase):
             # Don't forget to copy temporary file!
             os.unlink(file_link)
         return self.count_edges() - cnt
-
-    def upsert_adjacency_list_native(self, filepath: str):
-        """
-            This function isn't recommended for use!
-
-            CAUTION 1: This operation makes a temporary copy of the entire dump 
-            and places it into pre-specified `import_directory`:
-            https://neo4j.com/docs/operations-manual/4.0/configuration/file-locations/
-
-            CAUTION 2: This frequently fails with following error:
-            `neobolt.exceptions.DatabaseError`: "Java heap space".
-        """
-
-        _, filename = os.path.split(filepath)
-
-        # We will need to link the file to import folder.
-        file_link = os.path.expanduser(self.import_directory)
-        file_link = os.path.join(file_link, filename)
-        file_link = os.path.abspath(file_link)
-
-        try:
-            shutil.copy(filepath, file_link)
-            # https://neo4j.com/docs/cypher-manual/current/clauses/load-csv/#load-csv-importing-large-amounts-of-data
-            pattern = '''
-            USING PERIODIC COMMIT %d
-            LOAD CSV WITH HEADERS FROM '%s' AS row
-            WITH
-                toInteger(row.v_from) AS id_from,
-                toInteger(row.v_to) AS id_to,
-                toFloat(row.weight) AS w
-            MERGE (v1:VERTEX {_id: id_from})
-            MERGE (v2:VERTEX {_id: id_to})
-            MERGE (v1)-[:EDGE {_id: (floor((id_from + id_to) * (id_from + id_to + 1) / 2.0)+id_to), weight: w}]->(v2)
-            '''
-            task = pattern % (Neo4j.__max_batch_size__, 'file:///' + filename)
-            task = task.replace('VERTEX', self._v)
-            task = task.replace('EDGE', self._e)
-            self.session.run(task)
-        finally:
-            # Don't forget to copy temporary file!
-            os.unlink(file_link)
 
     # ---
     # Helper methods.

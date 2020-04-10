@@ -1,5 +1,5 @@
-from pygraphdb.graph_base import GraphBase
-from pygraphdb.edge import Edge
+from pygraphdb.base_graph import GraphBase
+from pygraphdb.base_edge import Edge
 from pygraphdb.helpers import export_edges_into_graph_parallel
 
 import config

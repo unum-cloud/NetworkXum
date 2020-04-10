@@ -1,10 +1,10 @@
-from pygraphdb.table_sql import PlainSQL
+from pygraphdb.table_sql import PlainSQL, EdgeNew
 
 
 class MySQL(PlainSQL):
 
-    def __init__(self, url):
-        PlainSQL.__init__(self, url)
+    def __init__(self, url, **kwargs):
+        PlainSQL.__init__(self, url, **kwargs)
         self.set_pragmas_on_first_launch()
 
     def set_pragmas_on_first_launch(self):

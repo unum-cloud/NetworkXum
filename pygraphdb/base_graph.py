@@ -2,26 +2,54 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 import concurrent.futures
 
-from pygraphdb.edge import Edge
-from pygraphdb.helpers import export_edges_into_graph
+from pygraphdb.base_edge import Edge
+from pygraphdb.helpers import *
 
 
-class GraphBase(ABC):
+class GraphBase(object):
+    """
+        Abstract base class for Graph Datastructures.
+        It's designed for directed weighted graphs, but can be easily tweaked.
+        By default, it allows multi-edges (multiple edges connecting same nodes).
+        Easiest way to preserve edge uniqness is to generate edge IDs
+        by hashing IDs of nodes that it's connecting.
+    """
     __max_batch_size__ = 100
     __is_concurrent__ = True
+    __edge_type__ = Edge
 
     # --------------------------------
     # region: Adding and removing nodes and edges.
     # https://networkx.github.io/documentation/stable/reference/classes/graph.html#adding-and-removing-nodes-and-edges
     # --------------------------------
 
-    def __init__(self, **kwargs):
-        super().__init__()
+    def __init__(
+        self,
+        is_directed=True,
+        is_weighted=True,
+        edge_id_generator=None,
+        **kwargs,
+    ):
+        print('Called constructor:', self)
+        object.__init__(self)
         self.count_undirected_in_source_queries = True
-        pass
+        self.is_directed = is_directed
+        self.is_weighted = is_weighted
+        self.edge_id_generator = edge_id_generator
+        if self.edge_id_generator is None:
+            self.edge_id_generator = lambda e: self.biggest_edge_id() + 1
+        print('Constructed graph:', self)
 
     @abstractmethod
-    def upsert_edge(self, e: Edge) -> bool:
+    def validate_edge(self, e: object) -> Optional[object]:
+        if ('v_from' not in e) or ('v_to' not in e):
+            return None
+        if '_id' not in e:
+            e['_id'] = self.edge_id_generator(e)
+        return e
+
+    @abstractmethod
+    def upsert_edge(self, e: object) -> bool:
         """
             Updates an `Edge` with given ID. If it's missing - creates a new one.
             If ID property isn't set - it will be computed as hash of member nodes, 
@@ -40,16 +68,15 @@ class GraphBase(ABC):
         return False
 
     @abstractmethod
-    def upsert_edges(self, es: List[Edge]) -> int:
-        for e in es:
-            self.upsert_edge(e)
-        return len(es)
+    def upsert_edges(self, es: Sequence[object]) -> int:
+        es = map_compact(self.validate_edge, es)
+        successes = map(self.upsert_edge, es)
+        return int(sum(successes))
 
     @abstractmethod
-    def remove_edges(self, es: List[object]) -> int:
-        for e in es:
-            self.remove_edge(e)
-        return len(es)
+    def remove_edges(self, es: Sequence[object]) -> int:
+        successes = map(self.remove_edge, es)
+        return int(sum(successes))
 
     @abstractmethod
     def upsert_adjacency_list(self, filepath: str) -> int:
@@ -124,12 +151,12 @@ class GraphBase(ABC):
     # --------------------------------
 
     @abstractmethod
-    def iterate_nodes(self):
+    def iterate_nodes(self) -> Generator[object, None, None]:
         # TODO
         pass
 
     @abstractmethod
-    def iterate_edges(self):
+    def iterate_edges(self) -> Generator[object, None, None]:
         # TODO
         pass
 
@@ -165,6 +192,8 @@ class GraphBase(ABC):
 
     # --------------------------------
     # region: Wider range of neighbors & analytics.
+    # Most of them aren't implemented in DBs and will
+    # be called through NetworkX wrapper.
     # --------------------------------
 
     @abstractmethod

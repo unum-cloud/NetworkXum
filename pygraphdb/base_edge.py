@@ -7,16 +7,15 @@ class Edge(object):
         checking in this class to simplify queries in pygraphdb.
     """
 
-    def __init__(self, v_from: int, v_to: int, weight=1):
+    def __init__(self, v_from: int, v_to: int, weight=1, _id=None, **kwargs):
         super().__init__()
         assert isinstance(v_from, int) and isinstance(v_from, int), \
             'Non integer IDs arent supported, use hashes'
-        self._id = None
+        self._id = _id
         self.v_from = v_from
         self.v_to = v_to
         self.weight = weight
-        self._id = Edge.combine_ids(self.v_from, self.v_to)
-        self.attributes = {}
+        self.attributes = kwargs
 
     def __repr__(self) -> str:
         return f'<EdgeSQL(_id={self._id}, v_from={self.v_from}, v_to={self.v_to}, weight={self.weight})>'
