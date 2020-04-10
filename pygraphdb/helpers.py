@@ -10,26 +10,26 @@ from pygraphdb.base_edge import Edge
 
 
 def map_compact(func, os: Sequence[object]) -> Sequence[object]:
-    if isinstance(os, Generator):
-        for o in os:
-            o_new = func(o)
-            if o_new is None:
-                continue
-            yield o_new
-    else:
-        os_new = list()
-        for o in os:
-            o_new = func(o)
-            if o_new is None:
-                continue
-            os_new.append(o_new)
-        return os_new
+    # if isinstance(os, Generator):
+    #     for o in os:
+    #         o_new = func(o)
+    #         if o_new is None:
+    #             continue
+    #         yield o_new
+    # else:
+    os_new = list()
+    for o in os:
+        o_new = func(o)
+        if o_new is None:
+            continue
+        os_new.append(o_new)
+    return os_new
 
 
 def remove_duplicate_edges(es: Sequence[object]) -> Sequence[object]:
     ids = set()
 
-    def false_if_exists(e: object):
+    def false_if_exists(e: object) -> bool:
         if '_id' in e:
             return False
         ids.add(e['_id'])

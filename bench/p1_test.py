@@ -13,16 +13,16 @@ class Tester(object):
 
     def __init__(self):
         self.edges = [
-            Edge(1, 2, weight=4).__dict__,
-            Edge(2, 3, weight=20).__dict__,
-            Edge(3, 4, weight=10).__dict__,
-            Edge(4, 5, weight=3).__dict__,
-            Edge(5, 3, weight=2).__dict__,
-            Edge(4, 1, weight=5).__dict__,
-            Edge(8, 6, weight=4).__dict__,
-            Edge(8, 7, weight=2).__dict__,
-            Edge(6, 1, weight=3).__dict__,
-            Edge(7, 1, weight=2).__dict__,
+            Edge(1, 2, weight=4, _id=100).__dict__,
+            Edge(2, 3, weight=20, _id=1100).__dict__,
+            Edge(3, 4, weight=10, _id=1200).__dict__,
+            Edge(4, 5, weight=3, _id=1300).__dict__,
+            Edge(5, 3, weight=2, _id=1400).__dict__,
+            Edge(4, 1, weight=5, _id=1500).__dict__,
+            Edge(8, 6, weight=4, _id=1600).__dict__,
+            Edge(8, 7, weight=2, _id=1700).__dict__,
+            Edge(6, 1, weight=3, _id=1800).__dict__,
+            Edge(7, 1, weight=2, _id=1900).__dict__,
         ]
 
     def run(self):
@@ -59,8 +59,6 @@ class Tester(object):
         print(f'--- Bulk Upsert')
         g.upsert_adjacency_list(config.dataset_test)
         self.validate_contents(g)
-        assert g.biggest_edge_id() == 127, \
-            f'biggest_edge_id must be =127: {g.biggest_edge_id()}'
         g.remove_all()
         self.validate_empty_edges(g)
         self.validate_empty_nodes(g)
@@ -68,8 +66,6 @@ class Tester(object):
         print(f'--- Bulk Insert')
         g.insert_adjacency_list(config.dataset_test)
         self.validate_contents(g)
-        assert g.biggest_edge_id() == 10, \
-            f'biggest_edge_id must be =10: {g.biggest_edge_id()}'
         g.remove_all()
         self.validate_empty_edges(g)
         self.validate_empty_nodes(g)
@@ -109,6 +105,8 @@ class Tester(object):
             f'count_followers: {g.count_followers(5)}'
         assert g.count_following(5) == (1, 2.0), \
             f'count_following: {g.count_following(5)}'
+        assert g.biggest_edge_id() == 1900, \
+            f'biggest_edge_id must be =1900: {g.biggest_edge_id()}'
 
 
 if __name__ == "__main__":
