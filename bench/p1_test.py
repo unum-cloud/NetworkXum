@@ -56,15 +56,15 @@ class Tester(object):
         g.remove_edges(self.edges)
         self.validate_empty_edges(g)
 
-        print(f'--- Bulk Upsert')
-        g.upsert_adjacency_list(config.dataset_test)
+        print(f'--- Bulk Insert')
+        g.insert_adjacency_list(config.dataset_test)
         self.validate_contents(g)
         g.remove_all()
         self.validate_empty_edges(g)
         self.validate_empty_nodes(g)
 
-        print(f'--- Bulk Insert')
-        g.insert_adjacency_list(config.dataset_test)
+        print(f'--- Bulk Upsert')
+        g.upsert_adjacency_list(config.dataset_test)
         self.validate_contents(g)
         g.remove_all()
         self.validate_empty_edges(g)
@@ -105,8 +105,6 @@ class Tester(object):
             f'count_followers: {g.count_followers(5)}'
         assert g.count_following(5) == (1, 2.0), \
             f'count_following: {g.count_following(5)}'
-        assert g.biggest_edge_id() == 1900, \
-            f'biggest_edge_id must be =1900: {g.biggest_edge_id()}'
 
 
 if __name__ == "__main__":

@@ -347,8 +347,8 @@ class PlainSQL(GraphBase):
     def upsert_table(self, source_name: str):
         with self.get_session() as s:
             migration = text(f'''
-                INSERT OR REPLACE INTO {EdgeSQL.__tablename__}(_id, v_from, v_to, weight)
-                SELECT (_id, v_from, v_to, weight) FROM {source_name};
+                REPLACE INTO {EdgeSQL.__tablename__}
+                SELECT * FROM {source_name};
             ''')
             # Performing an `INSERT` and then a `DELETE` might lead to integrity issues,
             # so perhaps a way to get around it, and to perform everything neatly in

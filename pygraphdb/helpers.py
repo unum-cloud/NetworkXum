@@ -53,7 +53,7 @@ def yield_edges_from(filepath: str, edge_type: type = Edge) -> Generator[object,
         reader = csv.reader(f, delimiter=',')
         # Skip the header line.
         next(reader)
-        for columns in reader:
+        for idx, columns in enumerate(reader):
             if len(columns) < 2:
                 continue
             # Check if the data isn't corrupt.
@@ -61,14 +61,17 @@ def yield_edges_from(filepath: str, edge_type: type = Edge) -> Generator[object,
             v2 = int(columns[1])
             has_weight = (len(columns) > 2 and len(columns[2]) > 0)
             w = float(columns[2]) if has_weight else 1.0
-            yield edge_type(v_from=v1, v_to=v2, weight=w)
+            yield edge_type(v_from=v1, v_to=v2, weight=w, _id=idx)
 
 
 def export_edges_into_graph(filepath: str, g) -> int:
     e_type = type(g).__edge_type__
     chunk_len = type(g).__max_batch_size__
     count_edges_added = 0
+    starting_id = g.biggest_edge_id()
     for es in chunks(yield_edges_from(filepath, e_type), chunk_len):
+        for i, e in enumerate(es):
+            es[i]['_id'] += starting_id
         count_edges_added += g.upsert_edges(es)
     return count_edges_added
 
