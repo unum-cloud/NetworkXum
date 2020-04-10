@@ -1,12 +1,40 @@
-from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
-from itertools import groupby, count
+from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence, Generator
+from itertools import groupby, count, filterfalse
 import csv
 import time
 import concurrent
 import math
 from urllib.parse import urlparse
 
-from pygraphdb.edge import Edge
+from pygraphdb.base_edge import Edge
+
+
+def map_compact(func, os: Sequence[object]) -> Sequence[object]:
+    if isinstance(os, Generator):
+        for o in os:
+            o_new = func(o)
+            if o_new is None:
+                continue
+            yield o_new
+    else:
+        os_new = list()
+        for o in os:
+            o_new = func(o)
+            if o_new is None:
+                continue
+            os_new.append(o_new)
+        return os_new
+
+
+def remove_duplicate_edges(es: Sequence[object]) -> Sequence[object]:
+    ids = set()
+
+    def false_if_exists(e: object):
+        if '_id' in e:
+            return False
+        ids.add(e['_id'])
+        return True
+    return filterfalse(false_if_exists, es)
 
 
 def chunks(iterable, size) -> Generator[list, None, None]:
@@ -20,55 +48,38 @@ def chunks(iterable, size) -> Generator[list, None, None]:
         yield current
 
 
-def yield_edges_from(filepath: str) -> Generator[Edge, None, None]:
-    lines_to_skip = 0
-    if filepath.endswith('.mtx'):
-        lines_to_skip = 2
+def yield_edges_from(filepath: str, edge_type: type = Edge) -> Generator[object, None, None]:
     with open(filepath, 'r') as f:
         reader = csv.reader(f, delimiter=',')
-        line_idx = 0
+        # Skip the header line.
+        next(reader)
         for columns in reader:
-            if line_idx < lines_to_skip:
-                line_idx += 1
-                continue
-            line_idx += 1
             if len(columns) < 2:
-                continue
-            # Skip header row.
-            if (columns[0] == 'v_from'):
                 continue
             # Check if the data isn't corrupt.
             v1 = int(columns[0])
             v2 = int(columns[1])
             has_weight = (len(columns) > 2 and len(columns[2]) > 0)
             w = float(columns[2]) if has_weight else 1.0
-            yield Edge(v1, v2, w)
-
-# def deduplicate_chunks()
-#         es_filtered = list()
-#         es_ids = set()
-#         for e in es:
-#             e_new = self._to_sql(e, e_type=e_type)
-#             if e_new['_id'] in es_ids:
-#                 continue
-#             es_ids.add(e_new['_id'])
-#             es_filtered.append(e_new)
+            yield edge_type(v_from=v1, v_to=v2, weight=w)
 
 
 def export_edges_into_graph(filepath: str, g) -> int:
+    e_type = type(g).__edge_type__
     chunk_len = type(g).__max_batch_size__
     count_edges_added = 0
-    for es in chunks(yield_edges_from(filepath), chunk_len):
+    for es in chunks(yield_edges_from(filepath, e_type), chunk_len):
         count_edges_added += g.upsert_edges(es)
     return count_edges_added
 
 
 def export_edges_into_graph_parallel(filepath: str, g, thread_count=8) -> int:
+    e_type = type(g).__edge_type__
     batch_per_thread = type(g).__max_batch_size__
     chunk_len = thread_count * batch_per_thread
     count_edges_before = g.count_edges()
     with concurrent.futures.ThreadPoolExecutor(max_workers=thread_count) as executor:
-        for es in chunks(yield_edges_from(filepath), chunk_len):
+        for es in chunks(yield_edges_from(filepath, e_type), chunk_len):
             x_len = int(math.ceil(len(es) / thread_count))
             es_per_thread = [es[x:x+x_len] for x in range(0, len(es), x_len)]
             print(f'-- Importing part: {x_len} rows x {thread_count} threads')

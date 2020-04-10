@@ -6,17 +6,17 @@ import pymongo
 from pymongo import MongoClient
 from pymongo import UpdateOne
 
-from pygraphdb.edge import Edge
-from pygraphdb.graph_base import GraphBase
-from pygraphdb.helpers import extract_database_name, chunks, yield_edges_from
+from pygraphdb.base_graph import GraphBase
+from pygraphdb.helpers import *
 
 
 class MongoDB(GraphBase):
     __max_batch_size__ = 1000
     __is_concurrent__ = True
+    __edge_type__ = dict
 
-    def __init__(self, url='mongodb://localhost:27017/graph'):
-        super().__init__()
+    def __init__(self, url='mongodb://localhost:27017/graph', **kwargs):
+        GraphBase.__init__(self, **kwargs)
         db_name = extract_database_name(url)
         self.db = MongoClient(url)
         self.edges = self.db[db_name]['edges']
@@ -157,20 +157,26 @@ class MongoDB(GraphBase):
         return result[0]['count'], result[0]['weight']
 
     def biggest_edge_id(self) -> int:
-        result = self.edges.find_one(
+        result = self.edges.find(
+            {},
             sort=[('_id', pymongo.DESCENDING)],
-            projection={'_id': 1}
-        )
+        ).limit(1)
         result = list(result)
         if len(result) == 0:
             return 0
-        return result[0]['_id']
+        return int(result[0]['_id'])
 
     # Modifications
 
-    def upsert_edge(self, e: Edge) -> bool:
+    def validate_edge(self, e: object) -> object:
         if not isinstance(e, dict):
             e = e.__dict__
+        return super().validate_edge(e)
+
+    def upsert_edge(self, e: object) -> bool:
+        e = self.validate_edge(e)
+        if e is None:
+            return False
         result = self.edges.update_one(
             filter={
                 'v_from': e['v_from'],
@@ -204,13 +210,7 @@ class MongoDB(GraphBase):
 
     def upsert_edges(self, es: List[object]) -> int:
         """Supports up to 1000 operations"""
-        ops = list()
-        ids = set()
-        for e in es:
-            if not isinstance(e, dict):
-                e = e.__dict__
-            if e['_id'] in ids:
-                continue
+        def make_upsert(e):
             op = UpdateOne(
                 filter={
                     '_id': e['_id'],
@@ -222,19 +222,14 @@ class MongoDB(GraphBase):
                 },
                 upsert=True,
             )
-            ops.append(op)
-            ids.add(e['_id'])
+        es[:] = map_compact(self.validate_edge, es)
+        es[:] = remove_duplicate_edges(es)
+        ops = map(make_upsert, es)
         result = self.edges.bulk_write(requests=ops, ordered=False)
         return len(result.bulk_api_result['upserted'])
 
     def insert_edges(self, es: List[object]) -> int:
-        current_id = self.biggest_edge_id()
-        for e in es:
-            if not isinstance(e, dict):
-                e = e.__dict__
-            if '_id' not in e:
-                e['_id'] = current_id
-                current_id += 1
+        es[:] = map_compact(self.validate_edge, es)
         result = self.edges.insert_many(es, ordered=False)
         return len(result.inserted_ids)
 
@@ -244,3 +239,6 @@ class MongoDB(GraphBase):
         for es in chunks(yield_edges_from(filepath), chunk_len):
             count_edges_added += self.insert_edges(es)
         return count_edges_added
+
+    def upsert_adjacency_list(self, filepath: str) -> int:
+        return export_edges_into_graph(filepath, self)

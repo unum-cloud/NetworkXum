@@ -12,8 +12,8 @@ class PostgreSQL(PlainSQL):
             https://sqlalchemy-utils.readthedocs.io/en/latest/data_types.html#module-sqlalchemy_utils.types.json        
     """
 
-    def __init__(self, url):
-        PlainSQL.__init__(self, url)
+    def __init__(self, url, **kwargs):
+        PlainSQL.__init__(self, url, **kwargs)
         self.set_pragmas_on_first_launch()
 
     def set_pragmas_on_first_launch(self):

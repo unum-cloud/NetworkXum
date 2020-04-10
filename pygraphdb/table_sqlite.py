@@ -1,4 +1,4 @@
-from pygraphdb.table_sql import PlainSQL
+from pygraphdb.table_sql import PlainSQL, EdgeSQL
 
 
 class SQLiteMem(PlainSQL):
@@ -7,6 +7,7 @@ class SQLiteMem(PlainSQL):
     """
     __is_concurrent__ = False
     __max_batch_size__ = 50000
+    __edge_type__ = EdgeSQL
 
 
 class SQLite(PlainSQL):
@@ -22,9 +23,10 @@ class SQLite(PlainSQL):
     """
     __is_concurrent__ = False
     __max_batch_size__ = 10000
+    __edge_type__ = EdgeSQL
 
-    def __init__(self, url):
-        PlainSQL.__init__(self, url)
+    def __init__(self, url, **kwargs):
+        PlainSQL.__init__(self, url, **kwargs)
         self.set_pragmas_on_first_launch()
 
     def set_pragmas_on_first_launch(self):
