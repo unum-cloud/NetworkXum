@@ -10,8 +10,8 @@ class NetworkX(object):
         self.db = self.graph_db
 
     def add_edge(self, u: int, v: int, **attrs) -> bool:
-        """https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.insert_edge.html#networkx.Graph.add_edge"""
-        return self.insert_edge(Edge(v_from=u, v_to=v, **attrs))
+        """https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.upsert_edge.html#networkx.Graph.add_edge"""
+        return self.upsert_edge(Edge(v_from=u, v_to=v, **attrs))
 
     def add_edges_from(self, es, **attrs) -> int:
         """https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.add_edges_from.html#networkx.Graph.add_edges_from"""

@@ -6,7 +6,7 @@ from pygraphdb.edge import Edge
 from pygraphdb.helpers import export_edges_into_graph
 
 
-class GraphBase(object):
+class GraphBase(ABC):
     __max_batch_size__ = 100
     __is_concurrent__ = True
 
@@ -21,8 +21,12 @@ class GraphBase(object):
         pass
 
     @abstractmethod
-    def insert_edge(self, e: Edge) -> bool:
-        """Inserts an `Edge` with automatically precomputed ID."""
+    def upsert_edge(self, e: Edge) -> bool:
+        """
+            Updates an `Edge` with given ID. If it's missing - creates a new one.
+            If ID property isn't set - it will be computed as hash of member nodes, 
+            so only one such edge can exist in DB.
+        """
         pass
 
     @abstractmethod
@@ -36,9 +40,9 @@ class GraphBase(object):
         return False
 
     @abstractmethod
-    def insert_edges(self, es: List[Edge]) -> int:
+    def upsert_edges(self, es: List[Edge]) -> int:
         for e in es:
-            self.insert_edge(e)
+            self.upsert_edge(e)
         return len(es)
 
     @abstractmethod
@@ -48,7 +52,21 @@ class GraphBase(object):
         return len(es)
 
     @abstractmethod
-    def insert_dump(self, filepath: str) -> int:
+    def upsert_adjacency_list(self, filepath: str) -> int:
+        """
+            Imports data from adjacency list CSV file. Row shape: `(v_from, v_to, weight)`.
+            Generates the edge IDs by hashing the members.
+            So it guarantess edge uniqness, but is much slower than `insert_adjacency_list`.
+        """
+        return export_edges_into_graph(filepath, self)
+
+    @abstractmethod
+    def insert_adjacency_list(self, filepath: str) -> int:
+        """
+            Imports data from adjacency list CSV file. Row shape: `(v_from, v_to, weight)`.
+            Uses the `biggest_edge_id` to generate incremental IDs for new edges.
+            Doesn't guarantee edge uniqness (for 2 given nodes) as `upsert_adjacency_list` does.
+        """
         return export_edges_into_graph(filepath, self)
 
     @abstractmethod
@@ -85,6 +103,10 @@ class GraphBase(object):
     def find_edge_or_inv(self, v1: int, v2: int) -> Optional[object]:
         """Checks for edges in both directions."""
         pass
+
+    @abstractmethod
+    def biggest_edge_id(self) -> int:
+        return 0
 
     @abstractmethod
     def contains_node(self, v: int) -> bool:

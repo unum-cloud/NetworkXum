@@ -80,6 +80,7 @@ class PlainSQL(GraphBase):
         >>> str(query.statement.compile(dialect=postgresql.dialect()))
         Source: http://nicolascadou.com/blog/2014/01/printing-actual-sqlalchemy-queries/
     """
+    __is_concurrent__ = True
     __max_batch_size__ = 5000
 
     def __init__(self, url='sqlite:///:memory:'):
@@ -173,9 +174,17 @@ class PlainSQL(GraphBase):
             func.sum(EdgeSQL.weight).label("sum"),
         ).filter_by(v_from=v).first()
 
+    def biggest_edge_id(self) -> int:
+        biggest = self.session.query(
+            func.max(EdgeSQL._id).label("max"),
+        ).first()
+        if biggest[0] is None:
+            return 0
+        return biggest[0]
+
     # Modifications
 
-    def insert_edge(self, e: EdgeSQL) -> bool:
+    def upsert_edge(self, e: EdgeSQL) -> bool:
         e = self._to_sql(e, e_type=EdgeSQL)
         self.session.merge(e)
         self.session.commit()
@@ -192,7 +201,7 @@ class PlainSQL(GraphBase):
             ).delete()
         self.session.commit()
 
-    def insert_edges(self, es: List[Edge]) -> int:
+    def upsert_edges(self, es: List[Edge]) -> int:
         for e in es:
             e = self._to_sql(e, e_type=EdgeSQL)
             self.session.merge(e)
@@ -224,23 +233,18 @@ class PlainSQL(GraphBase):
         except:
             self.session.rollback()
 
-    def insert_dump(self, path: str) -> int:
-        """
-            Direct injections (even in batches) have huge performance impact.
-            We are not only conflicting with other operations in same DB, 
-            but also constantly rewriting indexes after every new batch insert.
-            Instead we create a an additional unindexed table, fill it and
-            then merge into the main one.
-        """
+    def insert_adjacency_list(self, path: str) -> int:
         try:
-            cnt = self.count_edges()
+            current_id = self.biggest_edge_id() + 1
             # Build the new table.
-            chunk_len = PlainSQL.__max_batch_size__
-            for es in chunks(yield_edges_from(path), chunk_len):
-                # for e in es:
-                #     e = self._to_sql(e, e_type=EdgeNew)
-                #     self.session.add(e)
-                es = [self._to_sql(e, e_type=EdgeNew) for e in es]
+            chunk_len = type(self).__max_batch_size__
+            for es_raw in chunks(yield_edges_from(path), chunk_len):
+                es = list()
+                for e in es_raw:
+                    e = self._to_sql(e, e_type=EdgeNew)
+                    e._id = current_id
+                    current_id += 1
+                    es.append(e)
                 self.session.bulk_save_objects(
                     es,
                     return_defaults=False,
@@ -249,6 +253,7 @@ class PlainSQL(GraphBase):
                 )
             self.session.commit()
             # Import the new data.
+            cnt = self.count_edges()
             self.insert_table(EdgeNew.__tablename__)
             self.flush_temporary_table()
             return self.count_edges() - cnt
@@ -257,8 +262,42 @@ class PlainSQL(GraphBase):
             self.session.rollback()
             return 0
 
-    @abstractmethod
     def insert_table(self, source_name: str):
+        migration = text(f'''
+            INSERT INTO {EdgeSQL.__tablename__}
+            SELECT * FROM {source_name};
+        ''')
+        self.session.execute(migration)
+        self.session.commit()
+
+    def upsert_adjacency_list(self, path: str) -> int:
+        """
+            Direct injections (even in batches) have huge performance impact.
+            We are not only conflicting with other operations in same DB, 
+            but also constantly rewriting indexes after every new batch insert.
+            Instead we create a an additional unindexed table, fill it and
+            then merge into the main one.
+        """
+        try:
+            # Build the new table.
+            chunk_len = type(self).__max_batch_size__
+            for es in chunks(yield_edges_from(path), chunk_len):
+                for e in es:
+                    e = self._to_sql(e, e_type=EdgeNew)
+                    e = self.session.merge(e)
+            self.session.commit()
+            # Import the new data.
+            cnt = self.count_edges()
+            self.upsert_table(EdgeNew.__tablename__)
+            self.flush_temporary_table()
+            return self.count_edges() - cnt
+        except Exception as e:
+            print(e)
+            self.session.rollback()
+            return 0
+
+    @abstractmethod
+    def upsert_table(self, source_name: str):
         migration = text(f'''
             REPLACE INTO {EdgeSQL.__tablename__}
             SELECT * FROM {source_name};
@@ -291,7 +330,7 @@ class PlainSQL(GraphBase):
         self.session.execute(text(f'DELETE FROM {EdgeNew.__tablename__};'))
         self.session.commit()
 
-    def _to_sql(self, e, e_type=EdgeSQL) -> BaseEntitySQL:
+    def _to_sql(self, e, e_type) -> BaseEntitySQL:
         if isinstance(e, BaseEntitySQL):
             return e
         return e_type(e['v_from'], e['v_to'], e['weight'])

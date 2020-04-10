@@ -38,9 +38,9 @@ wrapper_types = [
     MySQL,
     SQLite,
     PostgreSQL,
-    # MongoDB,
-    # Neo4j,
-    # SQLiteMem,
+    MongoDB,
+    Neo4j,
+    SQLiteMem,
     # HyperRocks,
 ]
 

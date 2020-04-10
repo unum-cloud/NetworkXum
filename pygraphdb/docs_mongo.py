@@ -2,16 +2,18 @@ from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 
 # Properties of every entry are: 'from_id', 'to_id', 'weight'
 # There are indexes by all keys.
+import pymongo
 from pymongo import MongoClient
 from pymongo import UpdateOne
 
 from pygraphdb.edge import Edge
 from pygraphdb.graph_base import GraphBase
-from pygraphdb.helpers import extract_database_name
+from pygraphdb.helpers import extract_database_name, chunks, yield_edges_from
 
 
 class MongoDB(GraphBase):
     __max_batch_size__ = 1000
+    __is_concurrent__ = True
 
     def __init__(self, url='mongodb://localhost:27017/graph'):
         super().__init__()
@@ -154,9 +156,19 @@ class MongoDB(GraphBase):
             return 0, 0
         return result[0]['count'], result[0]['weight']
 
+    def biggest_edge_id(self) -> int:
+        result = self.edges.find_one(
+            sort=[('_id', pymongo.DESCENDING)],
+            projection={'_id': 1}
+        )
+        result = list(result)
+        if len(result) == 0:
+            return 0
+        return result[0]['_id']
+
     # Modifications
 
-    def insert_edge(self, e: Edge) -> bool:
+    def upsert_edge(self, e: Edge) -> bool:
         if not isinstance(e, dict):
             e = e.__dict__
         result = self.edges.update_one(
@@ -190,7 +202,7 @@ class MongoDB(GraphBase):
     def remove_all(self):
         self.edges.drop()
 
-    def insert_edges(self, es: List[object]) -> int:
+    def upsert_edges(self, es: List[object]) -> int:
         """Supports up to 1000 operations"""
         ops = list()
         ids = set()
@@ -214,3 +226,21 @@ class MongoDB(GraphBase):
             ids.add(e['_id'])
         result = self.edges.bulk_write(requests=ops, ordered=False)
         return len(result.bulk_api_result['upserted'])
+
+    def insert_edges(self, es: List[object]) -> int:
+        current_id = self.biggest_edge_id()
+        for e in es:
+            if not isinstance(e, dict):
+                e = e.__dict__
+            if '_id' not in e:
+                e['_id'] = current_id
+                current_id += 1
+        result = self.edges.insert_many(es, ordered=False)
+        return len(result.inserted_ids)
+
+    def insert_adjacency_list(self, filepath: str) -> int:
+        chunk_len = MongoDB.__max_batch_size__
+        count_edges_added = 0
+        for es in chunks(yield_edges_from(filepath), chunk_len):
+            count_edges_added += self.insert_edges(es)
+        return count_edges_added

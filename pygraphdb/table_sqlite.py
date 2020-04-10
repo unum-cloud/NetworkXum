@@ -6,6 +6,7 @@ class SQLiteMem(PlainSQL):
         In-memory version of SQLite database.
     """
     __is_concurrent__ = False
+    __max_batch_size__ = 50000
 
 
 class SQLite(PlainSQL):
@@ -20,6 +21,7 @@ class SQLite(PlainSQL):
         https://stackoverflow.com/a/6533930/2766161
     """
     __is_concurrent__ = False
+    __max_batch_size__ = 10000
 
     def __init__(self, url):
         PlainSQL.__init__(self, url)

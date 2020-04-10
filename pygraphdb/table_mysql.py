@@ -19,28 +19,29 @@ class MySQL(PlainSQL):
             # We often flush the temporary table after bulk imports.
             # https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_file_per_table
             'SET GLOBAL innodb_file_per_table=1;'
-            # NVME SSDs work well with multi-threaded accesses.
-            # https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_read_io_threads
-            'SET GLOBAL innodb_read_io_threads=16;'
             # Don't use 0 as node or edge ID, unless prespecified.
             # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_insert_id
-            'SET GLOBAL insert_id=1;'
-            # https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_flush_method
-            'SET GLOBAL innodb_flush_method=O_DIRECT;',
+            'SET SESSION insert_id=1;'
             # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_tmp_table_size
             'SET GLOBAL tmp_table_size=16777216;',
             # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_max_heap_table_size
             'SET GLOBAL max_heap_table_size=16777216;',
 
+            # Readonly.
             # Choosing performance over data integrity.
             # https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_doublewrite
             #'SET GLOBAL innodb_doublewrite=1;',
+            # NVME SSDs work well with multi-threaded accesses.
+            # https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_read_io_threads
+            # 'SET GLOBAL innodb_read_io_threads=16;'
+            # https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_flush_method
+            # 'SET GLOBAL innodb_flush_method=O_DIRECT;',
         ]
         for p in pragmas:
             self.session.execute(p)
             self.session.commit()
 
-    def insert_dump_native(self, path: str) -> int:
+    def upsert_adjacency_list_native(self, path: str) -> int:
         """
             This method requires the file to be mounted on the same filesystem.
             Unlike Postgres the connection wrapper doesn't allow channeling data to remote DB.            
@@ -57,5 +58,5 @@ class MySQL(PlainSQL):
         task = pattern % (path, EdgeNew.__tablename__)
         self.session.execute(task)
         self.session.commit()
-        self.insert_table(EdgeNew.__tablename__)
+        self.upsert_table(EdgeNew.__tablename__)
         return self.count_edges() - cnt

@@ -44,28 +44,36 @@ class Tester(object):
 
         print(f'--- Single Operations')
         for e in self.edges:
-            g.insert_edge(e)
+            g.upsert_edge(e)
         self.validate_contents(g)
         for e in self.edges:
             g.remove_edge(e)
         self.validate_empty_edges(g)
 
         print(f'--- Batch Operations')
-        g.insert_edges(self.edges)
+        g.upsert_edges(self.edges)
         self.validate_contents(g)
         g.remove_edges(self.edges)
         self.validate_empty_edges(g)
 
-        print(f'--- Bulk Operations')
-        g.insert_dump(config.dataset_test)
+        print(f'--- Bulk Upsert')
+        g.upsert_adjacency_list(config.dataset_test)
         self.validate_contents(g)
+        assert g.biggest_edge_id() == 127, \
+            f'biggest_edge_id must be =127: {g.biggest_edge_id()}'
         g.remove_all()
         self.validate_empty_edges(g)
         self.validate_empty_nodes(g)
 
-        # print(f'--- Parallel Bulk Operations')
-        # export_edges_into_graph_parallel(config.dataset_test, g)
-        # self.validate_contents(g)
+        print(f'--- Bulk Insert')
+        g.insert_adjacency_list(config.dataset_test)
+        self.validate_contents(g)
+        assert g.biggest_edge_id() == 10, \
+            f'biggest_edge_id must be =10: {g.biggest_edge_id()}'
+        g.remove_all()
+        self.validate_empty_edges(g)
+        self.validate_empty_nodes(g)
+
         print(f'--- Passed All!')
 
     def validate_empty_edges(self, g):

@@ -195,7 +195,7 @@ class SimpleBenchmark(object):
     def insert_e(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_change_by_one:
-            self.graph.insert_edge(e)
+            self.graph.upsert_edge(e)
             cnt += 1
         return cnt
 
@@ -209,12 +209,12 @@ class SimpleBenchmark(object):
     def insert_es(self) -> int:
         cnt = 0
         for es in self.tasks.edges_to_change_batched:
-            self.graph.insert_edges(es)
+            self.graph.upsert_edges(es)
             cnt += len(es)
         return cnt
 
-    def insert_dump(self) -> int:
-        self.graph.insert_dump(self.dataset_path)
+    def upsert_adjacency_list(self) -> int:
+        self.graph.upsert_adjacency_list(self.dataset_path)
         return self.graph.count_edges()
 
     def remove_v(self) -> int:

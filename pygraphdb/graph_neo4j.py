@@ -281,9 +281,21 @@ class Neo4j(GraphBase):
         s = float(self._first_record(rs, 's'))
         return c, s
 
-    # Modifications
+    def biggest_edge_id(self) -> int:
+        pattern = '''
+        MATCH (:VERTEX)-[e:EDGE]->(:VERTEX)
+        RETURN e._id AS _id
+        ORDER BY _id DESC
+        LIMIT 1
+        '''
+        task = task.replace('VERTEX', self._v)
+        task = task.replace('EDGE', self._e)
+        rs = list(self.session.run(task).records())
+        if len(rs) == 0:
+            return 0
+        return int(self._first_record(rs, '_id'))
 
-    def insert_edge(self, e: Edge) -> bool:
+    def upsert_edge(self, e: Edge) -> bool:
         pattern = '''
         MERGE (v1:VERTEX {_id: %d})
         MERGE (v2:VERTEX {_id: %d})
@@ -358,7 +370,41 @@ class Neo4j(GraphBase):
         if self._e in cs:
             self.session.run(f'DROP CONSTRAINT {self._e}')
 
-    def insert_dump_native(self, filepath: str):
+    def insert_adjacency_list(self, filepath: str) -> int:
+        cnt = self.count_edges()
+        current_id = self.biggest_edge_id() + 1
+        _, filename = os.path.split(filepath)
+
+        # We will need to link the file to import folder.
+        file_link = os.path.expanduser(self.import_directory)
+        file_link = os.path.join(file_link, filename)
+        file_link = os.path.abspath(file_link)
+
+        try:
+            shutil.copy(filepath, file_link)
+            # https://neo4j.com/docs/cypher-manual/current/clauses/load-csv/#load-csv-importing-large-amounts-of-data
+            pattern = '''
+            USING PERIODIC COMMIT %d
+            LOAD CSV WITH HEADERS FROM '%s' AS row
+            WITH
+                toInteger(row.v_from) AS id_from,
+                toInteger(row.v_to) AS id_to,
+                toFloat(row.weight) AS w
+            MERGE (v1:VERTEX {_id: id_from})
+            MERGE (v2:VERTEX {_id: id_to})
+            CREATE (v1)-[:EDGE {_id: linenumber() + %d, weight: w}]->(v2)
+            '''
+            task = pattern % (Neo4j.__max_batch_size__,
+                              'file:///' + filename, current_id)
+            task = task.replace('VERTEX', self._v)
+            task = task.replace('EDGE', self._e)
+            self.session.run(task)
+        finally:
+            # Don't forget to copy temporary file!
+            os.unlink(file_link)
+        return self.count_edges() - cnt
+
+    def upsert_adjacency_list_native(self, filepath: str):
         """
             This function isn't recommended for use!
 
