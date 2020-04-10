@@ -210,6 +210,12 @@ class MongoDB(GraphBase):
 
     def upsert_edges(self, es: List[object]) -> int:
         """Supports up to 1000 operations"""
+        es = map_compact(self.validate_edge, es)
+        es = remove_duplicate_edges(es)
+        es = list(es)
+        if len(es) == 0:
+            return 0
+
         def make_upsert(e):
             return UpdateOne(
                 filter={
@@ -222,26 +228,32 @@ class MongoDB(GraphBase):
                 },
                 upsert=True,
             )
-        es = map_compact(self.validate_edge, es)
-        es = remove_duplicate_edges(es)
-        es = list(es)
-        if len(es) == 0:
-            return 0
         ops = list(map(make_upsert, es))
-        result = self.edges.bulk_write(requests=ops, ordered=False)
-        return len(result.bulk_api_result['upserted'])
+        try:
+            result = self.edges.bulk_write(requests=ops, ordered=False)
+            return len(result.bulk_api_result['upserted'])
+        except pymongo.errors.BulkWriteError as bwe:
+            print(bwe)
+            print(bwe.details['writeErrors'])
+            return 0
 
     def insert_edges(self, es: List[object]) -> int:
-        es = map_compact(self.validate_edge, es)
-        result = self.edges.insert_many(es, ordered=False)
-        return len(result.inserted_ids)
+        try:
+            es = map_compact(self.validate_edge, es)
+            es = remove_duplicate_edges(es)
+            result = self.edges.insert_many(es, ordered=False)
+            return len(result.inserted_ids)
+        except pymongo.errors.BulkWriteError as bwe:
+            print(bwe)
+            print(bwe.details['writeErrors'])
+            return 0
 
-    def insert_adjacency_list(self, filepath: str) -> int:
-        chunk_len = MongoDB.__max_batch_size__
-        count_edges_added = 0
-        for es in chunks(yield_edges_from(filepath), chunk_len):
-            count_edges_added += self.insert_edges(es)
-        return count_edges_added
+    # def insert_adjacency_list(self, filepath: str) -> int:
+    #     chunk_len = MongoDB.__max_batch_size__
+    #     count_edges_added = 0
+    #     for es in chunks(yield_edges_from(filepath), chunk_len):
+    #         count_edges_added += self.insert_edges(es)
+    #     return count_edges_added
 
-    def upsert_adjacency_list(self, filepath: str) -> int:
-        return export_edges_into_graph(filepath, self)
+    # def upsert_adjacency_list(self, filepath: str) -> int:
+    #     return export_edges_into_graph(filepath, self)
