@@ -211,7 +211,7 @@ class MongoDB(GraphBase):
     def upsert_edges(self, es: List[object]) -> int:
         """Supports up to 1000 operations"""
         def make_upsert(e):
-            op = UpdateOne(
+            return UpdateOne(
                 filter={
                     '_id': e['_id'],
                     'v_from': e['v_from'],
@@ -222,14 +222,17 @@ class MongoDB(GraphBase):
                 },
                 upsert=True,
             )
-        es[:] = map_compact(self.validate_edge, es)
-        es[:] = remove_duplicate_edges(es)
-        ops = map(make_upsert, es)
+        es = map_compact(self.validate_edge, es)
+        es = remove_duplicate_edges(es)
+        es = list(es)
+        if len(es) == 0:
+            return 0
+        ops = list(map(make_upsert, es))
         result = self.edges.bulk_write(requests=ops, ordered=False)
         return len(result.bulk_api_result['upserted'])
 
     def insert_edges(self, es: List[object]) -> int:
-        es[:] = map_compact(self.validate_edge, es)
+        es = map_compact(self.validate_edge, es)
         result = self.edges.insert_many(es, ordered=False)
         return len(result.inserted_ids)
 
