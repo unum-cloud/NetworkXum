@@ -1,82 +1,112 @@
 [
     {
         "device": "av19mac.local",
-        "time_elapsed": 1.3318347930908203,
-        "count_operations": 10000,
-        "msecs_per_operation": 1.3318347930908203e-07,
-        "operations_per_second": 7508.438773245115,
-        "operation": "Insert Dump",
-        "database": "Neo4j",
-        "dataset": "graph-communities"
-    },
-    {
-        "device": "av19mac.local",
-        "time_elapsed": 0.38520002365112305,
-        "count_operations": 10000,
-        "msecs_per_operation": 3.8520002365112305e-08,
-        "operations_per_second": 25960.53838526509,
-        "operation": "Insert Dump",
-        "database": "SQLite",
-        "dataset": "graph-communities"
-    },
-    {
-        "device": "av19mac.local",
-        "time_elapsed": 145.79544067382812,
-        "count_operations": 2811717,
-        "msecs_per_operation": 5.1852814729870796e-08,
-        "operations_per_second": 19285.35616069326,
-        "operation": "Insert Dump",
-        "database": "SQLite",
-        "dataset": "graph-eachmovie-ratings"
-    },
-    {
-        "device": "av19mac.local",
-        "time_elapsed": 0.35949110984802246,
-        "count_operations": 10000,
-        "msecs_per_operation": 3.594911098480224e-08,
-        "operations_per_second": 27817.099577865985,
-        "operation": "Insert Dump",
-        "database": "PostgreSQL",
-        "dataset": "graph-communities"
-    },
-    {
-        "device": "av19mac.local",
-        "time_elapsed": 97.92025709152222,
-        "count_operations": 2811717,
-        "msecs_per_operation": 3.4825786909394585e-08,
-        "operations_per_second": 28714.35475676906,
-        "operation": "Insert Dump",
-        "database": "PostgreSQL",
-        "dataset": "graph-eachmovie-ratings"
-    },
-    {
-        "device": "av19mac.local",
-        "time_elapsed": 1.8637361526489258,
-        "count_operations": 0,
-        "msecs_per_operation": 0,
-        "operations_per_second": 0,
-        "operation": "Insert Dump",
-        "database": "MySQL",
-        "dataset": "graph-eachmovie-ratings"
-    },
-    {
-        "device": "av19mac.local",
-        "time_elapsed": 399.9236569404602,
-        "count_operations": 2811717,
-        "msecs_per_operation": 1.4223467615711687e-07,
-        "operations_per_second": 7030.634350342027,
         "operation": "Insert Dump",
         "database": "MongoDB",
-        "dataset": "graph-eachmovie-ratings"
+        "dataset": "graph-communities",
+        "time_elapsed": 0.0011,
+        "count_operations": 10000,
+        "msecs_per_operation": 0.113,
+        "operations_per_second": 8834.540253853509
     },
     {
         "device": "av19mac.local",
-        "time_elapsed": 1.877573013305664,
+        "operation": "Insert Dump",
+        "database": "MongoDB",
+        "dataset": "graph-eachmovie-ratings",
+        "time_elapsed": 0.342,
+        "count_operations": 2811717,
+        "msecs_per_operation": 0.122,
+        "operations_per_second": 8196.225995199997
+    },
+    {
+        "device": "av19mac.local",
+        "operation": "Insert Dump",
+        "database": "PostgreSQL",
+        "dataset": "graph-communities",
+        "time_elapsed": 0.0078,
         "count_operations": 10000,
-        "msecs_per_operation": 1.8775730133056642e-07,
-        "operations_per_second": 5326.0245695553285,
+        "msecs_per_operation": 0.78,
+        "operations_per_second": 1272.8768926526034
+    },
+    {
+        "device": "av19mac.local",
+        "operation": "Insert Dump",
+        "database": "PostgreSQL",
+        "dataset": "graph-eachmovie-ratings",
+        "time_elapsed": 2.54313832116127,
+        "count_operations": 2811717,
+        "msecs_per_operation": 0.90447876552344,
+        "operations_per_second": 1105.609150947043
+    },
+    {
+        "device": "av19mac.local",
+        "operation": "Insert Dump",
+        "database": "SQLite",
+        "dataset": "graph-communities",
+        "time_elapsed": 0.000381458044052124,
+        "count_operations": 10000,
+        "msecs_per_operation": 0.038145804405212404,
+        "operations_per_second": 26215.202840586993
+    },
+    {
+        "device": "av19mac.local",
+        "operation": "Insert Dump",
+        "database": "SQLite",
+        "dataset": "graph-eachmovie-ratings",
+        "time_elapsed": 0.10946069717407228,
+        "count_operations": 2811717,
+        "msecs_per_operation": 0.038930197162115626,
+        "operations_per_second": 25687.000654934673
+    },
+    {
+        "device": "av19mac.local",
         "operation": "Insert Dump",
         "database": "MySQL",
+        "dataset": "graph-communities",
+        "time_elapsed": 0.0016126410961151123,
+        "count_operations": 10000,
+        "msecs_per_operation": 0.16126410961151125,
+        "operations_per_second": 6201.007790320003
+    },
+    {
+        "device": "av19mac.local",
+        "operation": "Insert Dump",
+        "database": "MySQL",
+        "dataset": "graph-eachmovie-ratings",
+        "time_elapsed": 0.3568877286911011,
+        "count_operations": 2811717,
+        "msecs_per_operation": 0.12692875161017309,
+        "operations_per_second": 7878.435636641461
+    },
+    {
+        "device": "av19mac.local",
+        "operation": "Insert Dump",
+        "database": "SQLiteMem",
+        "dataset": "graph-communities",
+        "time_elapsed": 0.00037617588043212897,
+        "count_operations": 10000,
+        "msecs_per_operation": 0.03761758804321289,
+        "operations_per_second": 26583.309882899943
+    },
+    {
+        "device": "av19mac.local",
+        "operation": "Insert Dump",
+        "database": "SQLiteMem",
+        "dataset": "graph-eachmovie-ratings",
+        "time_elapsed": 0.11254142618179322,
+        "count_operations": 2811717,
+        "msecs_per_operation": 0.04002587251198937,
+        "operations_per_second": 24983.84013241584
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.5787310600280762,
+        "count_operations": 10000,
+        "msecs_per_operation": 5.787310600280762e-08,
+        "operations_per_second": 17279.183183143596,
+        "operation": "Insert Dump",
+        "database": "Neo4j",
         "dataset": "graph-communities"
     }
 ]

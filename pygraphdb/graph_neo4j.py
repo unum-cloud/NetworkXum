@@ -7,7 +7,7 @@ from neo4j import BoltStatementResult
 
 from pygraphdb.base_edge import Edge
 from pygraphdb.base_graph import GraphBase
-from pygraphdb.helpers import extract_database_name
+from pygraphdb.helpers import *
 
 
 class Neo4j(GraphBase):
@@ -40,6 +40,7 @@ class Neo4j(GraphBase):
         enterprise_edition=False,
         import_directory='~/neo4j/import',
         use_full_name_for_label=False,
+        use_indexes_over_constraints=True,
         **kwargs,
     ):
         GraphBase.__init__(self, **kwargs)
@@ -56,19 +57,43 @@ class Neo4j(GraphBase):
         self._v = 'v' + name
         self._e = 'e' + name
         # Create constraints if needed.
-        cs = self.get_constraints()
-        if self._v not in cs:
-            self.create_index_nodes()
-        if self._e not in cs:
-            if enterprise_edition:
-                self.create_index_edges()
+        self.use_indexes_over_constraints = use_indexes_over_constraints
+        if use_indexes_over_constraints:
+            idxs = self.get_indexes()
+            if self._v not in idxs:
+                self.create_index_nodes()
+        else:
+            cs = self.get_constraints()
+            if self._v not in cs:
+                self.create_constraint_nodes()
+            if self._e not in cs:
+                if enterprise_edition:
+                    self.create_constraint_edges()
 
     def get_constraints(self) -> List[str]:
         cs = list(self.session.run('CALL db.constraints').records())
         names = [c['name'] for c in cs]
         return names
 
+    def get_indexes(self) -> List[str]:
+        cs = list(self.session.run('CALL db.indexes').records())
+        names = [c['name'] for c in cs]
+        return names
+
     def create_index_nodes(self):
+        # Existing uniqness constraint means,
+        # that we don't have to create a separate index.
+        # Docs: https://neo4j.com/docs/cypher-manual/current/administration/constraints/
+        task = f'''
+        CREATE INDEX VERTEX
+        FOR (v:VERTEX)
+        ON (v._id)
+        '''
+        task = task.replace('VERTEX', self._v)
+        task = task.replace('EDGE', self._e)
+        return self.session.run(task)
+
+    def create_constraint_nodes(self):
         # Existing uniqness constraint means,
         # that we don't have to create a separate index.
         # Docs: https://neo4j.com/docs/cypher-manual/current/administration/constraints/
@@ -81,7 +106,7 @@ class Neo4j(GraphBase):
         task = task.replace('EDGE', self._e)
         return self.session.run(task)
 
-    def create_index_edges(self):
+    def create_constraint_edges(self):
         # Edge uniqness constrains are only availiable to Enterprise Edition customers.
         # https://neo4j.com/docs/cypher-manual/current/administration/constraints/#administration-constraints-syntax
         task = f'''
@@ -299,6 +324,12 @@ class Neo4j(GraphBase):
         return int(self._first_record(rs, '_id'))
 
     def upsert_edge(self, e: Edge) -> bool:
+        """
+            CAUTION: True Upserting is too slow, if indexing isn't enabled,
+            as we need to perform full scans to match each edge ID!
+            So for the non-enterprise version - we strongly recommend 
+            using `insert_edge()`
+        """
         pattern = '''
         MERGE (v1:VERTEX {_id: %d})
         MERGE (v2:VERTEX {_id: %d})
@@ -310,7 +341,19 @@ class Neo4j(GraphBase):
         self.session.run(task)
         return True
 
-    def insert_many(self, es: List[Edge]) -> int:
+    def insert_edge(self, e: Edge) -> bool:
+        pattern = '''
+        MERGE (v1:VERTEX {_id: %d})
+        MERGE (v2:VERTEX {_id: %d})
+        CREATE (v1)-[:EDGE {_id: %d, weight: %d}]->(v2)
+        '''
+        task = pattern % (e['v_from'], e['v_to'], e['_id'], e['weight'])
+        task = task.replace('VERTEX', self._v)
+        task = task.replace('EDGE', self._e)
+        self.session.run(task)
+        return True
+
+    def insert_edges(self, es: List[Edge]) -> int:
         vs = set()
         for e in es:
             vs.add(e['v_from'])
@@ -324,13 +367,14 @@ class Neo4j(GraphBase):
             task += '\n'
         # Then add the edges connecting matched nodes.
         for e in es:
-            pattern = 'MERGE (v%d)-[:EDGE {_id: %d, weight: %d}]->(v%d)'
+            pattern = 'CREATE (v%d)-[:EDGE {_id: %d, weight: %d}]->(v%d)'
             part = (pattern % (e['v_from'], e['_id'], e['weight'], e['v_to']))
             task += part
             task += '\n'
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
-        return self.session.run(task)
+        self.session.run(task)
+        return len(es)
 
     def remove_node(self, v: int):
         pattern = '''
@@ -358,7 +402,7 @@ class Neo4j(GraphBase):
             pattern = '''
             MATCH (v1:VERTEX {_id: %d})
             MATCH (v2:VERTEX {_id: %d})
-            MERGE (v1)-[e:EDGE]->(v2)
+            MATCH (v1)-[e:EDGE]->(v2)
             DELETE e
             '''
             task = pattern % (e['v_from'], e['v_to'])
@@ -369,6 +413,9 @@ class Neo4j(GraphBase):
 
     def remove_all(self):
         self.session.run(f'MATCH (v:{self._v}) DETACH DELETE v')
+        idxs = self.get_indexes()
+        if self._v in idxs:
+            self.session.run(f'DROP INDEX {self._v}')
         cs = self.get_constraints()
         if self._v in cs:
             self.session.run(f'DROP CONSTRAINT {self._v}')
@@ -376,6 +423,13 @@ class Neo4j(GraphBase):
             self.session.run(f'DROP CONSTRAINT {self._e}')
 
     def insert_adjacency_list(self, filepath: str) -> int:
+        chunk_len = Neo4j.__max_batch_size__
+        count_edges_added = 0
+        for es in chunks(yield_edges_from(filepath), chunk_len):
+            count_edges_added += self.insert_edges(es)
+        return count_edges_added
+
+    def insert_adjacency_list_native(self, filepath: str) -> int:
         """
             This function may be tricky to use!
 

@@ -35,12 +35,12 @@ dataset_test = _datasets[0][0]
 datasets = [x[0] for x in _datasets[1:]]
 
 wrapper_types = [
-    MySQL,
-    SQLite,
-    PostgreSQL,
-    MongoDB,
     Neo4j,
-    SQLiteMem,
+    MongoDB,
+    PostgreSQL,
+    SQLite,
+    MySQL,
+    # SQLiteMem,
     # HyperRocks,
 ]
 

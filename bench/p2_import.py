@@ -48,8 +48,11 @@ class BulkImporter(object):
                 print(f'--- edges:', counter.count_operations)
                 print(f'--- edges/second:', counter.ops_per_sec())
                 print(f'--- Mb/second:', file_size / secs_elapsed)
+                config.stats.dump_to_file()
 
 
 if __name__ == "__main__":
-    BulkImporter().run()
-    config.stats.dump_to_file()
+    try:
+        BulkImporter().run()
+    finally:
+        config.stats.dump_to_file()

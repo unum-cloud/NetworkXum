@@ -248,12 +248,5 @@ class MongoDB(GraphBase):
             print(bwe.details['writeErrors'])
             return 0
 
-    # def insert_adjacency_list(self, filepath: str) -> int:
-    #     chunk_len = MongoDB.__max_batch_size__
-    #     count_edges_added = 0
-    #     for es in chunks(yield_edges_from(filepath), chunk_len):
-    #         count_edges_added += self.insert_edges(es)
-    #     return count_edges_added
-
     # def upsert_adjacency_list(self, filepath: str) -> int:
     #     return export_edges_into_graph(filepath, self)

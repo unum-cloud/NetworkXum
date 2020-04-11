@@ -20,5 +20,5 @@ if __name__ == "__main__":
         # NetworkXBenchmark().run()
         # print('- Exporting stats!')
         # StatsExporter().run()
-    except:
+    finally:
         config.stats.dump_to_file()
