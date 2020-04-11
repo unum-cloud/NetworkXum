@@ -21,13 +21,13 @@
     },
     {
         "device": "av19mac.local",
+        "time_elapsed": 9.734031915664673,
+        "count_operations": 10000,
+        "msecs_per_operation": 9.734031915664674e-07,
+        "operations_per_second": 1027.3235270481612,
         "operation": "Insert Dump",
         "database": "PostgreSQL",
-        "dataset": "graph-communities",
-        "time_elapsed": 0.0078,
-        "count_operations": 10000,
-        "msecs_per_operation": 0.78,
-        "operations_per_second": 1272.8768926526034
+        "dataset": "graph-communities"
     },
     {
         "device": "av19mac.local",
@@ -61,13 +61,13 @@
     },
     {
         "device": "av19mac.local",
+        "time_elapsed": 0.8278021812438965,
+        "count_operations": 10000,
+        "msecs_per_operation": 8.278021812438965e-08,
+        "operations_per_second": 12080.180780598459,
         "operation": "Insert Dump",
         "database": "MySQL",
-        "dataset": "graph-communities",
-        "time_elapsed": 0.0016126410961151123,
-        "count_operations": 10000,
-        "msecs_per_operation": 0.16126410961151125,
-        "operations_per_second": 6201.007790320003
+        "dataset": "graph-communities"
     },
     {
         "device": "av19mac.local",

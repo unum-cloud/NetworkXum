@@ -36,24 +36,25 @@ class StatsFile(object):
             return False
         return True
 
-    def find(
+    def find_index(
         self,
         wrapper_class: str,
         operation_name: str,
         dataset: str = '',
-    ) -> Optional[StatsCounter]:
-        def predicate(b):
-            return self.bench_matches(b, wrapper_class, operation_name, dataset)
-        return next(filter(predicate, self.results), None)
+    ) -> Optional[int]:
+        for i, r in enumerate(self.results):
+            if self.bench_matches(r, wrapper_class, operation_name, dataset):
+                return i
+        return None
 
-    def insert(
+    def upsert(
         self,
         wrapper_class: str,
         operation_name: str,
         dataset: str,
         stats: StatsCounter,
     ):
-        bench = self.find(wrapper_class, operation_name, dataset)
+        bench_idx = self.find_index(wrapper_class, operation_name, dataset)
         stats_serialized = {
             'device': self.device_name,
             'time_elapsed': stats.time_elapsed,
@@ -64,10 +65,10 @@ class StatsFile(object):
             'database': wrapper_class,
             'dataset': dataset,
         }
-        if bench is None:
-            self.results.append(stats_serialized)
+        if bench_idx is None:
+            bench_idx.results.append(stats_serialized)
         else:
-            bench = stats_serialized
+            self.results[bench_idx] = stats_serialized
 
     def reset_from_file(self, filename=None):
         if filename is None:
