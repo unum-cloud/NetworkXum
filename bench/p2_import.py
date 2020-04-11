@@ -38,7 +38,7 @@ class BulkImporter(object):
 
                 counter = StatsCounter()
                 counter.handle(import_one)
-                config.stats.insert(
+                config.stats.upsert(
                     wrapper_class=wrapper_name,
                     operation_name='Insert Dump',
                     dataset=dataset_name,

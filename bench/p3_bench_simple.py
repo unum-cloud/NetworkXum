@@ -17,7 +17,8 @@ class SimpleBenchmark(object):
         5. Clearing all the data (if needed).
     """
 
-    def run(self):
+    def run(self, repeat_existing=True):
+        self.repeat_existing = repeat_existing
         for dataset_path in config.datasets:
             self.tasks = TasksSampler()
             max_wanted_edges = max(
@@ -64,23 +65,22 @@ class SimpleBenchmark(object):
             self.one('Remove Vertex', self.remove_v)
             self.one('Remove All', self.remove_bulk)
 
-    def one(operation_name, f):
+    def one(self, operation_name, f):
         counter = StatsCounter()
         dataset_name = os.path.basename(self.dataset_path)
         class_name = self.graph.__class__.__name__
         print(f'--- {class_name}: {operation_name} @ {dataset_name}')
-        if not repeat_existing:
-            old_results = self.stats.find(
+        if not self.repeat_existing:
+            if self.stats.find_index(
                 class_name,
                 operation_name,
                 dataset_name
-            )
-            if old_results is not None:
+            ) is not None:
                 print('--- Skipping!')
                 return
         counter.handle(f)
         print(f'---- Importing new stats!')
-        self.stats.insert(
+        self.stats.upsert(
             class_name,
             operation_name,
             dataset_name,
