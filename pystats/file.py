@@ -75,9 +75,11 @@ class StatsFile(object):
         if not path.exists(filename):
             self.results = []
             return
-        self.results = json.load(open(filename, 'r'))
+        with open(filename, 'r') as f:
+            self.results = json.load(f)
 
     def dump_to_file(self, filename=None):
         if filename is None:
             filename = self.filename
-        json.dump(self.results, open(filename, 'w'), indent=4)
+        with open(filename, 'w') as f:
+            json.dump(self.results, f, indent=4)

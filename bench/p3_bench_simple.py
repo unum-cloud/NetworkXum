@@ -231,5 +231,7 @@ class SimpleBenchmark(object):
 
 
 if __name__ == "__main__":
-    SimpleBenchmark().run()
-    config.stats.dump_to_file()
+    try:
+        SimpleBenchmark().run()
+    finally:
+        config.stats.dump_to_file()

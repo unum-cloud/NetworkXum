@@ -43,5 +43,7 @@ class NetworkXBenchmark(object):
 
 
 if __name__ == "__main__":
-    NetworkXBenchmark().run()
-    config.stats.dump_to_file()
+    try:
+        NetworkXBenchmark().run()
+    finally:
+        config.stats.dump_to_file()
