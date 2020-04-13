@@ -48,7 +48,7 @@ def chunks(iterable, size) -> Generator[list, None, None]:
         yield current
 
 
-def yield_edges_from(filepath: str, edge_type: type = Edge) -> Generator[object, None, None]:
+def yield_edges_from(filepath: str, edge_type: type = Edge, directed=True) -> Generator[object, None, None]:
     with open(filepath, 'r') as f:
         reader = csv.reader(f, delimiter=',')
         # Skip the header line.
@@ -61,7 +61,7 @@ def yield_edges_from(filepath: str, edge_type: type = Edge) -> Generator[object,
             v2 = int(columns[1])
             has_weight = (len(columns) > 2 and len(columns[2]) > 0)
             w = float(columns[2]) if has_weight else 1.0
-            yield edge_type(v_from=v1, v_to=v2, weight=w, _id=idx)
+            yield edge_type(v1=v1, v2=v2, weight=w, _id=idx, directed=directed)
 
 
 def export_edges_into_graph(filepath: str, g) -> int:

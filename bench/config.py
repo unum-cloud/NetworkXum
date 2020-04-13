@@ -25,8 +25,8 @@ stats = StatsFile(stats_path)
 _datasets = [
     # Path, Number of Nodes, Number of Edges
     ('/Users/av/Code/PyGraphDB/artifacts/graph-test/all.csv', 8, 10),
-    ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
-    # ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
+    # ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
+    ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
     # ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
     # ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
     # ('/Users/av/Datasets/graph-human-brain/all.csv', 0, 87273967),
@@ -35,12 +35,12 @@ dataset_test = _datasets[0][0]
 datasets = [x[0] for x in _datasets[1:]]
 
 wrapper_types = [
+    Neo4j,
+    SQLiteMem,
+    MongoDB,
     PostgreSQL,
     SQLite,
     MySQL,
-    Neo4j,
-    # MongoDB,
-    # SQLiteMem,
     # HyperRocks,
 ]
 

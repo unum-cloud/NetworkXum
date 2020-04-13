@@ -29,7 +29,7 @@ class TasksSampler(object):
         for e in yield_edges_from(filename):
             if rnd.random() < sampling_ratio:
                 self._select_edges.append(e)
-                self._select_nodes.add(e['v_from'])
+                self._select_nodes.add(e['v1'])
         self._select_nodes = list(self._select_nodes)
         random.shuffle(self._select_edges)
         random.shuffle(self._select_nodes)
@@ -55,16 +55,16 @@ class TasksSampler(object):
                         self.count_analytics,
                         self.count_changes)
         while len(self._select_edges) < count_max:
-            v_from = random.randrange(1, count_nodes)
-            v_to = random.randrange(1, count_nodes)
-            if v_from == v_to:
+            v1 = random.randrange(1, count_nodes)
+            v2 = random.randrange(1, count_nodes)
+            if v1 == v2:
                 continue
-            if v_from in self._select_nodes:
+            if v1 in self._select_nodes:
                 continue
-            self._select_nodes.add(v_from)
+            self._select_nodes.add(v1)
             self._select_edges.append({
-                'v_from': v_from,
-                'v_to': v_to,
+                'v1': v1,
+                'v2': v2,
             })
         self._select_nodes = list(self._select_nodes)
         self._split_samples()

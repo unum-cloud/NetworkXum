@@ -41,7 +41,7 @@ class PostgreSQL(PlainSQL):
     #     with open(path, 'r') as f:
     #         conn = self.engine.raw_connection()
     #         cursor = conn.cursor()
-    #         cmd = f'COPY {EdgeNew.__tablename__} (v_from, v_to, weight) FROM STDIN WITH (FORMAT CSV, HEADER TRUE)'
+    #         cmd = f'COPY {EdgeNew.__tablename__} (v1, v2, weight) FROM STDIN WITH (FORMAT CSV, HEADER TRUE)'
     #         cursor.copy_expert(cmd, f)
     #         conn.commit()
     #     self.upsert_table(EdgeNew.__tablename__)
@@ -53,7 +53,7 @@ class PostgreSQL(PlainSQL):
             INSERT INTO {EdgeSQL.__tablename__}
             SELECT * FROM {source_name}
             ON CONFLICT (_id) DO UPDATE SET
-            (v_from, v_to, weight, attributes_json) = (EXCLUDED.v_from, EXCLUDED.v_to, EXCLUDED.weight, EXCLUDED.attributes_json);
+            (v1, v2, weight, attributes_json) = (EXCLUDED.v1, EXCLUDED.v2, EXCLUDED.weight, EXCLUDED.attributes_json);
         '''
         with self.get_session() as s:
             s.execute(migration)

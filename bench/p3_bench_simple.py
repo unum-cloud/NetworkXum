@@ -97,11 +97,11 @@ class SimpleBenchmark(object):
         cnt = 0
         cnt_found = 0
         for e in self.tasks.edges_to_query[:half]:
-            match = self.graph.find_edge(e['v_from'], e['v_to'])
+            match = self.graph.find_directed(e['v1'], e['v2'])
             cnt += 1
             cnt_found += 0 if (match is None) else 1
         for e in self.tasks.edges_to_query[half:]:
-            match = self.graph.find_edge(e['v_to'], e['v_from'])
+            match = self.graph.find_directed(e['v2'], e['v1'])
             cnt += 1
             cnt_found += 0 if (match is None) else 1
         print(f'---- {cnt} ops: {cnt_found} directed matches')
@@ -111,7 +111,7 @@ class SimpleBenchmark(object):
         cnt = 0
         cnt_found = 0
         for e in self.tasks.edges_to_query:
-            match = self.graph.find_edge(e['v_from'], e['v_to'])
+            match = self.graph.find_directed(e['v1'], e['v2'])
             cnt += 1
             cnt_found += 0 if (match is None) else 1
         print(f'---- {cnt} ops: {cnt_found} undirected matches')

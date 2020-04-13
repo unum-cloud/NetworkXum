@@ -1,23 +1,23 @@
 [
     {
         "device": "av19mac.local",
+        "time_elapsed": 1.1282291412353516,
+        "count_operations": 10000,
+        "msecs_per_operation": 1.1282291412353516e-07,
+        "operations_per_second": 8863.447711561967,
         "operation": "Insert Dump",
         "database": "MongoDB",
-        "dataset": "graph-communities",
-        "time_elapsed": 0.0011,
-        "count_operations": 10000,
-        "msecs_per_operation": 0.113,
-        "operations_per_second": 8834.540253853509
+        "dataset": "graph-communities"
     },
     {
         "device": "av19mac.local",
+        "time_elapsed": 365.89860916137695,
+        "count_operations": 2811717,
+        "msecs_per_operation": 1.3013351242723823e-07,
+        "operations_per_second": 7684.41565395487,
         "operation": "Insert Dump",
         "database": "MongoDB",
-        "dataset": "graph-eachmovie-ratings",
-        "time_elapsed": 0.342,
-        "count_operations": 2811717,
-        "msecs_per_operation": 0.122,
-        "operations_per_second": 8196.225995199997
+        "dataset": "graph-eachmovie-ratings"
     },
     {
         "device": "av19mac.local",
@@ -81,23 +81,23 @@
     },
     {
         "device": "av19mac.local",
+        "time_elapsed": 0.3941199779510498,
+        "count_operations": 10000,
+        "msecs_per_operation": 3.941199779510498e-08,
+        "operations_per_second": 25372.9842673492,
         "operation": "Insert Dump",
         "database": "SQLiteMem",
-        "dataset": "graph-communities",
-        "time_elapsed": 0.00037617588043212897,
-        "count_operations": 10000,
-        "msecs_per_operation": 0.03761758804321289,
-        "operations_per_second": 26583.309882899943
+        "dataset": "graph-communities"
     },
     {
         "device": "av19mac.local",
+        "time_elapsed": 40.93934106826782,
+        "count_operations": 2811717,
+        "msecs_per_operation": 1.456026373503017e-08,
+        "operations_per_second": 68680.07463313494,
         "operation": "Insert Dump",
         "database": "SQLiteMem",
-        "dataset": "graph-eachmovie-ratings",
-        "time_elapsed": 0.11254142618179322,
-        "count_operations": 2811717,
-        "msecs_per_operation": 0.04002587251198937,
-        "operations_per_second": 24983.84013241584
+        "dataset": "graph-eachmovie-ratings"
     },
     {
         "device": "av19mac.local",

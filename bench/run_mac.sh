@@ -14,8 +14,8 @@ brew services start neo4j
 
 # brew tap mongodb/brew
 # brew install mongodb-community@4.2
-# brew services start mongodb/brew/mongodb-community
-mongod --dbpath /usr/local/var/mongodb --directoryperdb --wiredTigerDirectoryForIndexes
+# mongod --dbpath /usr/local/var/mongodb --directoryperdb --wiredTigerDirectoryForIndexes
+brew services start mongodb/brew/mongodb-community
 
 # brew install redis
 brew services start redis

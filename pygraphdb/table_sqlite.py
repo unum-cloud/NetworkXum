@@ -6,7 +6,7 @@ class SQLiteMem(PlainSQL):
         In-memory version of SQLite database.
     """
     __is_concurrent__ = False
-    __max_batch_size__ = 50000
+    __max_batch_size__ = 5000000
     __edge_type__ = EdgeSQL
 
 
@@ -22,7 +22,7 @@ class SQLite(PlainSQL):
         https://stackoverflow.com/a/6533930/2766161
     """
     __is_concurrent__ = False
-    __max_batch_size__ = 10000
+    __max_batch_size__ = 1000000
     __edge_type__ = EdgeSQL
 
     def __init__(self, url, **kwargs):

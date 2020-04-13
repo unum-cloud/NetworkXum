@@ -24,44 +24,46 @@ class MongoDB(GraphBase):
         self.create_index()
 
     def create_index(self, background=False):
-        self.edges.create_index('v_from', background=background, sparse=True)
-        self.edges.create_index('v_to', background=background, sparse=True)
+        self.edges.create_index('v1', background=background, sparse=True)
+        self.edges.create_index('v2', background=background, sparse=True)
+        self.edges.create_index('directed', background=background, sparse=True)
 
     # Relatives
 
-    def find_edge(self, v_from: int, v_to: int) -> Optional[object]:
+    def find_directed(self, v1: int, v2: int) -> Optional[object]:
         result = self.edges.find_one(filter={
-            'v_from': v_from,
-            'v_to': v_to,
+            'v1': v1,
+            'v2': v2,
+            'directed': True,
         })
         return result
 
-    def find_edge_or_inv(self, v1: int, v2: int) -> Optional[object]:
+    def find_undirected(self, v1: int, v2: int) -> Optional[object]:
         result = self.edges.find_one(filter={
             '$or': [{
-                'v_from': v1,
-                'v_to': v2,
+                'v1': v1,
+                'v2': v2,
             }, {
-                'v_from': v2,
-                'v_to': v1,
+                'v1': v2,
+                'v2': v1,
             }],
         })
         return result
 
     def edges_from(self, v: int) -> List[object]:
-        result = self.edges.find(filter={'v_from': v})
+        result = self.edges.find(filter={'v1': v, 'directed': True})
         return list(result)
 
     def edges_to(self, v: int) -> List[object]:
-        result = self.edges.find(filter={'v_to': v})
+        result = self.edges.find(filter={'v2': v, 'directed': True})
         return list(result)
 
     def edges_related(self, v: int) -> List[object]:
         result = self.edges.find(filter={
             '$or': [{
-                'v_from': v,
+                'v1': v,
             }, {
-                'v_to': v,
+                'v2': v,
             }],
         })
         return list(result)
@@ -72,25 +74,25 @@ class MongoDB(GraphBase):
         vs = list(vs)
         result = self.edges.find(filter={
             '$or': [{
-                'v_from': {'$in': vs},
+                'v1': {'$in': vs},
             }, {
-                'v_to': {'$in': vs},
+                'v2': {'$in': vs},
             }],
         }, projection={
-            'v_from': 1,
-            'v_to': 1,
+            'v1': 1,
+            'v2': 1,
         })
         vs_unique = set()
         for e in result:
-            vs_unique.add(e['v_from'])
-            vs_unique.add(e['v_to'])
+            vs_unique.add(e['v1'])
+            vs_unique.add(e['v2'])
         return vs_unique.difference(set(vs))
 
     # Metadata
 
     def count_nodes(self) -> int:
-        froms = set(self.edges.distinct('v_from'))
-        tos = set(self.edges.distinct('v_to'))
+        froms = set(self.edges.distinct('v1'))
+        tos = set(self.edges.distinct('v2'))
         attributed = set(self.nodes.distinct('_id'))
         return len(froms.union(tos).union(attributed))
 
@@ -102,8 +104,8 @@ class MongoDB(GraphBase):
             {
                 '$match': {
                     '$or': [
-                        {'v_from': v},
-                        {'v_to': v}
+                        {'v1': v},
+                        {'v2': v}
                     ],
                 }
             },
@@ -123,7 +125,10 @@ class MongoDB(GraphBase):
     def count_followers(self, v: int) -> (int, float):
         result = self.edges.aggregate(pipeline=[
             {
-                '$match': {'v_to': v}
+                '$match': {
+                    'v2': v,
+                    'directed': True
+                }
             },
             {
                 '$group': {
@@ -141,7 +146,10 @@ class MongoDB(GraphBase):
     def count_following(self, v: int) -> (int, float):
         result = self.edges.aggregate(pipeline=[
             {
-                '$match': {'v_from': v}
+                '$match': {
+                    'v1': v,
+                    'directed': True
+                }
             },
             {
                 '$group': {
@@ -179,8 +187,8 @@ class MongoDB(GraphBase):
             return False
         result = self.edges.update_one(
             filter={
-                'v_from': e['v_from'],
-                'v_to': e['v_to'],
+                'v1': e['v1'],
+                'v2': e['v2'],
             },
             update={
                 '$set': e,
@@ -191,16 +199,17 @@ class MongoDB(GraphBase):
 
     def remove_edge(self, e: object) -> bool:
         result = self.edges.delete_one(filter={
-            'v_from': e['v_from'],
-            'v_to': e['v_to'],
+            'v1': e['v1'],
+            'v2': e['v2'],
+            'directed': e['directed'],
         })
         return result.deleted_count >= 1
 
     def remove_node(self, v: int) -> int:
         result = self.edges.delete_many(filter={
             '$or': [
-                {'v_from': v},
-                {'v_to': v},
+                {'v1': v},
+                {'v2': v},
             ]
         })
         return result.deleted_count >= 1
@@ -217,12 +226,16 @@ class MongoDB(GraphBase):
             return 0
 
         def make_upsert(e):
+            filters = {}
+            if '_id' in e:
+                filters['_id'] = e['_id']
+            else:
+                filters['v1'] = e['v1']
+                filters['v2'] = e['v2']
+                filters['directed'] = e['directed']
+
             return UpdateOne(
-                filter={
-                    '_id': e['_id'],
-                    'v_from': e['v_from'],
-                    'v_to': e['v_to'],
-                },
+                filter=filters,
                 update={
                     '$set': e
                 },

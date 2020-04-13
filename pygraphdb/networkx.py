@@ -11,7 +11,7 @@ class NetworkX(object):
 
     def add_edge(self, u: int, v: int, **attrs) -> bool:
         """https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.upsert_edge.html#networkx.Graph.add_edge"""
-        return self.upsert_edge(Edge(v_from=u, v_to=v, **attrs))
+        return self.upsert_edge(Edge(v1=u, v2=v, **attrs))
 
     def add_edges_from(self, es, **attrs) -> int:
         """https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.add_edges_from.html#networkx.Graph.add_edges_from"""
@@ -60,15 +60,15 @@ class NetworkX(object):
     # --------------------------------
 
     @abstractmethod
-    def edge_directed(self, v_from: int, v_to: int) -> Optional[object]:
+    def edge_directed(self, v1: int, v2: int) -> Optional[object]:
         """
             Given 2 vertexes that are stored in DB as 
-            outgoing from `v_from` into `v_to`.
+            outgoing from `v1` into `v2`.
         """
         pass
 
     @abstractmethod
-    def find_edge_or_inv(self, v1: int, v2: int) -> Optional[object]:
+    def find_undirected(self, v1: int, v2: int) -> Optional[object]:
         """
             Given 2 vertexes search for an edge 
             that goes in any direction.
@@ -202,8 +202,8 @@ class NetworkX(object):
         """
         vs_unique = set()
         for e in self.edges_related(v):
-            vs_unique.add(e['v_from'])
-            vs_unique.add(e['v_to'])
+            vs_unique.add(e['v1'])
+            vs_unique.add(e['v2'])
         vs_unique.discard(v)
         return vs_unique
 
@@ -228,5 +228,5 @@ class NetworkX(object):
             return related_to_related.difference(related).difference({v})
 
     @abstractmethod
-    def shortest_path(self, v_from, v_to) -> List[int]:
+    def shortest_path(self, v1, v2) -> List[int]:
         pass
