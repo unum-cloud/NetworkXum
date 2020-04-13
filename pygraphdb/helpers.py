@@ -125,7 +125,7 @@ class StatsCounter:
     def msecs_per_op(self) -> float:
         if (self.count_operations == 0):
             return 0
-        return self.secs_per_op() / 1000.0
+        return self.secs_per_op() * 1000.0
 
     def ops_per_sec(self) -> float:
         if (self.count_operations == 0):
