@@ -54,7 +54,7 @@ class MySQL(PlainSQL):
         FIELDS TERMINATED BY ',' 
         LINES TERMINATED BY '\n'
         IGNORE 1 ROWS
-        (v_from, v_to, weight);
+        (v1, v2, weight);
         '''
         task = pattern % (path, EdgeNew.__tablename__)
         with self.get_session() as s:

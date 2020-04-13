@@ -40,7 +40,7 @@ class GraphBase(object):
 
     @abstractmethod
     def validate_edge(self, e: object) -> Optional[object]:
-        if ('v_from' not in e) or ('v_to' not in e):
+        if ('v1' not in e) or ('v2' not in e):
             return None
         if '_id' not in e:
             e['_id'] = self.edge_id_generator(e)
@@ -60,7 +60,7 @@ class GraphBase(object):
         """
             Can delete edges with known ID and without.
             In the second case we only delete 1 edge, that has 
-            matching `v_from` and `v_to` nodes without 
+            matching `v1` and `v2` nodes without 
             searching for reverse edge.
         """
         return False
@@ -79,7 +79,7 @@ class GraphBase(object):
     @abstractmethod
     def upsert_adjacency_list(self, filepath: str) -> int:
         """
-            Imports data from adjacency list CSV file. Row shape: `(v_from, v_to, weight)`.
+            Imports data from adjacency list CSV file. Row shape: `(v1, v2, weight)`.
             Generates the edge IDs by hashing the members.
             So it guarantess edge uniqness, but is much slower than `insert_adjacency_list`.
         """
@@ -88,7 +88,7 @@ class GraphBase(object):
     @abstractmethod
     def insert_adjacency_list(self, filepath: str) -> int:
         """
-            Imports data from adjacency list CSV file. Row shape: `(v_from, v_to, weight)`.
+            Imports data from adjacency list CSV file. Row shape: `(v1, v2, weight)`.
             Uses the `biggest_edge_id` to generate incremental IDs for new edges.
             Doesn't guarantee edge uniqness (for 2 given nodes) as `upsert_adjacency_list` does.
         """
@@ -120,12 +120,12 @@ class GraphBase(object):
         pass
 
     @abstractmethod
-    def find_edge(self, v_from: int, v_to: int) -> Optional[object]:
-        """Only finds edges directed from `v_from` to `v_to`."""
+    def find_directed(self, v1: int, v2: int) -> Optional[object]:
+        """Only finds edges directed from `v1` to `v2`."""
         pass
 
     @abstractmethod
-    def find_edge_or_inv(self, v1: int, v2: int) -> Optional[object]:
+    def find_undirected(self, v1: int, v2: int) -> Optional[object]:
         """Checks for edges in both directions."""
         pass
 
@@ -199,8 +199,8 @@ class GraphBase(object):
         """Returns IDs of nodes that have a shared edge with `v`."""
         vs_unique = set()
         for e in self.edges_related(v):
-            vs_unique.add(e['v_from'])
-            vs_unique.add(e['v_to'])
+            vs_unique.add(e['v1'])
+            vs_unique.add(e['v2'])
         vs_unique.discard(v)
         return vs_unique
 
@@ -222,7 +222,7 @@ class GraphBase(object):
             return related_to_related.difference(related).difference({v})
 
     @abstractmethod
-    def shortest_path(self, v_from, v_to) -> List[int]:
+    def shortest_path(self, v1, v2) -> List[int]:
         pass
 
     # endregion

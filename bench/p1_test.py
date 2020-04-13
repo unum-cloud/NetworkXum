@@ -82,9 +82,9 @@ class Tester(object):
 
     def validate_contents(self, g):
         for e in self.edges:
-            assert g.find_edge(e['v_from'], e['v_to']), \
+            assert g.find_directed(e['v1'], e['v2']), \
                 f'No directed edge: {e}'
-            assert g.find_edge_or_inv(e['v_from'], e['v_to']), \
+            assert g.find_undirected(e['v1'], e['v2']), \
                 f'No undirected edge: {e}'
 
         assert g.count_edges() == 10, \

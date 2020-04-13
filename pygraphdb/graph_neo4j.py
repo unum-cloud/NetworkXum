@@ -30,7 +30,7 @@ class Neo4j(GraphBase):
     """
     # Depending on the machine this can be higher.
     # But on a laptop we would get "Java heap space" error.
-    __max_batch_size__ = 500
+    __max_batch_size__ = 50000
     __is_concurrent__ = True
     __edge_type__ = Edge
 
@@ -38,9 +38,9 @@ class Neo4j(GraphBase):
         self,
         url='bolt://0.0.0.0:7687/graph',
         enterprise_edition=False,
-        import_directory='~/neo4j/import',
+        import_directory='/usr/local/Cellar/neo4j/3.5.14/libexec/import',
         use_full_name_for_label=False,
-        use_indexes_over_constraints=True,
+        use_indexes_over_constraints=False,
         **kwargs,
     ):
         GraphBase.__init__(self, **kwargs)
@@ -58,37 +58,36 @@ class Neo4j(GraphBase):
         self._e = 'e' + name
         # Create constraints if needed.
         self.use_indexes_over_constraints = use_indexes_over_constraints
-        if use_indexes_over_constraints:
-            idxs = self.get_indexes()
-            if self._v not in idxs:
-                self.create_index_nodes()
-        else:
-            cs = self.get_constraints()
-            if self._v not in cs:
-                self.create_constraint_nodes()
-            if self._e not in cs:
-                if enterprise_edition:
-                    self.create_constraint_edges()
+        # if use_indexes_over_constraints:
+        #     idxs = self.get_indexes()
+        #     if f'index{self._v}' not in idxs:
+        #         self.create_index_nodes()
+        # else:
+        #     cs = self.get_constraints()
+        #     if f'constraint{self._v}' not in cs:
+        #         self.create_constraint_nodes()
+        #     if f'constraint{self._e}' not in cs:
+        #         if enterprise_edition:
+        #             self.create_constraint_edges()
 
     def get_constraints(self) -> List[str]:
         cs = list(self.session.run('CALL db.constraints').records())
-        names = [c['name'] for c in cs]
+        names = [c.get('name', '') for c in cs]
         return names
 
     def get_indexes(self) -> List[str]:
         cs = list(self.session.run('CALL db.indexes').records())
-        names = [c['name'] for c in cs]
+        names = [c.get('name', '') for c in cs]
         return names
 
     def create_index_nodes(self):
-        # Existing uniqness constraint means,
-        # that we don't have to create a separate index.
-        # Docs: https://neo4j.com/docs/cypher-manual/current/administration/constraints/
-        task = f'''
-        CREATE INDEX VERTEX
-        FOR (v:VERTEX)
-        ON (v._id)
-        '''
+        # Docs for CYPHER direct syntax:
+        # https://neo4j.com/docs/cypher-manual/current/administration/indexes-for-search-performance/index.html#administration-indexes-syntax
+        task = 'CREATE INDEX constraintVERTEX FOR (v:VERTEX) ON (v._id)'
+        # Older version didn't have index names.
+        # Docs for `db.` operations.
+        # https://neo4j.com/docs/operations-manual/current/reference/procedures/#ref-procedure-reference-enterprise-edition
+        # task = 'CALL db.createIndex(":VERTEX(_id)", "native-btree-1.0", )'
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
         return self.session.run(task)
@@ -98,7 +97,7 @@ class Neo4j(GraphBase):
         # that we don't have to create a separate index.
         # Docs: https://neo4j.com/docs/cypher-manual/current/administration/constraints/
         task = f'''
-        CREATE CONSTRAINT VERTEX
+        CREATE CONSTRAINT constraintVERTEX
         ON (v:VERTEX)
         ASSERT (v._id) IS UNIQUE
         '''
@@ -110,7 +109,7 @@ class Neo4j(GraphBase):
         # Edge uniqness constrains are only availiable to Enterprise Edition customers.
         # https://neo4j.com/docs/cypher-manual/current/administration/constraints/#administration-constraints-syntax
         task = f'''
-        CREATE CONSTRAINT unique_edges
+        CREATE CONSTRAINT uniqueEDGE
         ON ()-[e:EDGE]-()
         ASSERT (e._id) IS UNIQUE
         '''
@@ -127,20 +126,20 @@ class Neo4j(GraphBase):
 
     # Relatives
 
-    def find_edge(self, v_from: int, v_to: int) -> Optional[object]:
+    def find_directed(self, v1: int, v2: int) -> Optional[object]:
         pattern = '''
-        MATCH (v_from:VERTEX {_id: %d})-[e:EDGE]->(v_to:VERTEX {_id: %d})
-        RETURN v_from._id, v_to._id, e.weight
+        MATCH (v1:VERTEX {_id: %d})-[e:EDGE]->(v2:VERTEX {_id: %d})
+        RETURN v1._id, v2._id, e.weight
         '''
-        task = pattern % (v_from, v_to)
+        task = pattern % (v1, v2)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
         return self._records_to_edges(self.session.run(task))
 
-    def find_edge_or_inv(self, v1: int, v2: int) -> Optional[object]:
+    def find_undirected(self, v1: int, v2: int) -> Optional[object]:
         pattern = '''
-        MATCH (v_from:VERTEX {_id: %d})-[e:EDGE]-(v_to:VERTEX {_id: %d})
-        RETURN v_from._id, v_to._id, e.weight
+        MATCH (v1:VERTEX {_id: %d})-[e:EDGE]-(v2:VERTEX {_id: %d})
+        RETURN v1._id, v2._id, e.weight
         '''
         task = pattern % (v1, v2)
         task = task.replace('VERTEX', self._v)
@@ -149,8 +148,8 @@ class Neo4j(GraphBase):
 
     def edges_from(self, v: int) -> List[object]:
         pattern = '''
-        MATCH (v_from:VERTEX {_id: %d})-[e:EDGE]->(v_to:VERTEX)
-        RETURN v_from._id, v_to._id, e.weight
+        MATCH (v1:VERTEX {_id: %d})-[e:EDGE]->(v2:VERTEX)
+        RETURN v1._id, v2._id, e.weight
         '''
         task = pattern % (v)
         task = task.replace('VERTEX', self._v)
@@ -159,8 +158,8 @@ class Neo4j(GraphBase):
 
     def edges_to(self, v: int) -> List[object]:
         pattern = '''
-        MATCH (v_from:VERTEX)-[e:EDGE]->(v_to:VERTEX {_id: %d})
-        RETURN v_from._id, v_to._id, e.weight
+        MATCH (v1:VERTEX)-[e:EDGE]->(v2:VERTEX {_id: %d})
+        RETURN v1._id, v2._id, e.weight
         '''
         task = pattern % (v)
         task = task.replace('VERTEX', self._v)
@@ -169,8 +168,8 @@ class Neo4j(GraphBase):
 
     def edges_related(self, v: int) -> List[object]:
         pattern = '''
-        MATCH (v_from:VERTEX {_id: %d})-[e:EDGE]-(v_to:VERTEX)
-        RETURN v_from._id, v_to._id, e.weight
+        MATCH (v1:VERTEX {_id: %d})-[e:EDGE]-(v2:VERTEX)
+        RETURN v1._id, v2._id, e.weight
         '''
         task = pattern % (v)
         task = task.replace('VERTEX', self._v)
@@ -181,9 +180,9 @@ class Neo4j(GraphBase):
 
     def edges_related_to_group(self, vs: Sequence[int]) -> List[Edge]:
         pattern = '''
-        MATCH (v_from:VERTEX)-[e:EDGE]-(v_to:VERTEX)
-        WHERE (v_from._id IN [%s]) AND NOT (v_to._id IN [%s])
-        RETURN v_from._id, v_to._id, e.weight
+        MATCH (v1:VERTEX)-[e:EDGE]-(v2:VERTEX)
+        WHERE (v1._id IN [%s]) AND NOT (v2._id IN [%s])
+        RETURN v1._id, v2._id, e.weight
         '''
         group_members = ','.join([str(v) for v in vs])
         task = pattern % (group_members, group_members)
@@ -193,9 +192,9 @@ class Neo4j(GraphBase):
 
     def nodes_related_to_group(self, vs: Sequence[int]) -> Set[int]:
         pattern = '''
-        MATCH (v_from:VERTEX)-[:EDGE]-(v_to:VERTEX)
-        WHERE (v_from._id IN [%s]) AND NOT (v_to._id IN [%s])
-        RETURN v_to._id as _id
+        MATCH (v1:VERTEX)-[:EDGE]-(v2:VERTEX)
+        WHERE (v1._id IN [%s]) AND NOT (v2._id IN [%s])
+        RETURN v2._id as _id
         '''
         group_members = ','.join([str(v) for v in vs])
         task = pattern % (group_members, group_members)
@@ -234,10 +233,10 @@ class Neo4j(GraphBase):
         task = task.replace('EDGE', self._e)
         return {int(r['_id']) for r in self.session.run(task).records()}
 
-    def shortest_path(self, v_from, v_to) -> (List[int], float):
+    def shortest_path(self, v1, v2) -> (List[int], float):
         pattern = '''
-        MATCH (v_from:VERTEX {_id: %d}), (v_to:VERTEX {_id: %d})
-        CALL algo.shortestPath.stream(v_from, v_to, "weight")
+        MATCH (v1:VERTEX {_id: %d}), (v2:VERTEX {_id: %d})
+        CALL algo.shortestPath.stream(v1, v2, "weight")
         YIELD nodeId, weight
         MATCH (v_on_path:Loc) WHERE id(v_on_path) = nodeId
         RETURN v_on_path._id AS _id, weight
@@ -333,9 +332,10 @@ class Neo4j(GraphBase):
         pattern = '''
         MERGE (v1:VERTEX {_id: %d})
         MERGE (v2:VERTEX {_id: %d})
-        MERGE (v1)-[:EDGE {_id: %d, weight: %d}]->(v2)
+        MERGE (v1)-[:EDGE {_id: %d, weight: %d}]%s(v2)
         '''
-        task = pattern % (e['v_from'], e['v_to'], e['_id'], e['weight'])
+        d = '->' if e['directed'] else '-'
+        task = pattern % (e['v1'], e['v2'], e['_id'], e['weight'], d)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
         self.session.run(task)
@@ -345,9 +345,10 @@ class Neo4j(GraphBase):
         pattern = '''
         MERGE (v1:VERTEX {_id: %d})
         MERGE (v2:VERTEX {_id: %d})
-        CREATE (v1)-[:EDGE {_id: %d, weight: %d}]->(v2)
+        CREATE (v1)-[:EDGE {_id: %d, weight: %d}]%s(v2)
         '''
-        task = pattern % (e['v_from'], e['v_to'], e['_id'], e['weight'])
+        d = '->' if e['directed'] else '-'
+        task = pattern % (e['v1'], e['v2'], e['_id'], e['weight'], d)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
         self.session.run(task)
@@ -356,8 +357,8 @@ class Neo4j(GraphBase):
     def insert_edges(self, es: List[Edge]) -> int:
         vs = set()
         for e in es:
-            vs.add(e['v_from'])
-            vs.add(e['v_to'])
+            vs.add(e['v1'])
+            vs.add(e['v2'])
         task = str()
         # First upsert all the nodes.
         for v in vs:
@@ -367,8 +368,9 @@ class Neo4j(GraphBase):
             task += '\n'
         # Then add the edges connecting matched nodes.
         for e in es:
-            pattern = 'CREATE (v%d)-[:EDGE {_id: %d, weight: %d}]->(v%d)'
-            part = (pattern % (e['v_from'], e['_id'], e['weight'], e['v_to']))
+            pattern = 'CREATE (v%d)-[:EDGE {_id: %d, weight: %d}]%s(v%d)'
+            d = '->' if e['directed'] else '-'
+            part = (pattern % (e['v1'], e['_id'], e['weight'], d, e['v2']))
             task += part
             task += '\n'
         task = task.replace('VERTEX', self._v)
@@ -394,18 +396,20 @@ class Neo4j(GraphBase):
             pattern = '''
             MATCH (v1:VERTEX {_id: %d})
             MATCH (v2:VERTEX {_id: %d})
-            MATCH (v1)-[e:EDGE {_id: %d}]->(v2)
+            MATCH (v1)-[e:EDGE {_id: %d}]%s(v2)
             DELETE e
             '''
-            task = pattern % (e['v_from'], e['v_to'], e['_id'])
+            d = '->' if e['directed'] else '-'
+            task = pattern % (e['v1'], e['v2'], e['_id'], d)
         else:
             pattern = '''
             MATCH (v1:VERTEX {_id: %d})
             MATCH (v2:VERTEX {_id: %d})
-            MATCH (v1)-[e:EDGE]->(v2)
+            MATCH (v1)-[e:EDGE]%s(v2)
             DELETE e
             '''
-            task = pattern % (e['v_from'], e['v_to'])
+            d = '->' if e['directed'] else '-'
+            task = pattern % (e['v1'], e['v2'], d)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
         self.session.run(task)
@@ -414,13 +418,13 @@ class Neo4j(GraphBase):
     def remove_all(self):
         self.session.run(f'MATCH (v:{self._v}) DETACH DELETE v')
         idxs = self.get_indexes()
-        if self._v in idxs:
-            self.session.run(f'DROP INDEX {self._v}')
+        if f'index{self._v}' in idxs:
+            self.session.run(f'DROP INDEX index{self._v}')
         cs = self.get_constraints()
-        if self._v in cs:
-            self.session.run(f'DROP CONSTRAINT {self._v}')
-        if self._e in cs:
-            self.session.run(f'DROP CONSTRAINT {self._e}')
+        if f'constraint{self._v}' in cs:
+            self.session.run(f'DROP CONSTRAINT constraint{self._v}')
+        if f'constraint{self._e}' in cs:
+            self.session.run(f'DROP CONSTRAINT constraint{self._e}')
 
     def insert_adjacency_list(self, filepath: str) -> int:
         chunk_len = Neo4j.__max_batch_size__
@@ -429,7 +433,7 @@ class Neo4j(GraphBase):
             count_edges_added += self.insert_edges(es)
         return count_edges_added
 
-    def insert_adjacency_list_native(self, filepath: str) -> int:
+    def insert_adjacency_list_native(self, filepath: str, directed=True) -> int:
         """
             This function may be tricky to use!
 
@@ -456,16 +460,17 @@ class Neo4j(GraphBase):
             USING PERIODIC COMMIT %d
             LOAD CSV WITH HEADERS FROM '%s' AS row
             WITH
-                toInteger(row.v_from) AS id_from,
-                toInteger(row.v_to) AS id_to,
+                toInteger(row.v1) AS id_from,
+                toInteger(row.v2) AS id_to,
                 toFloat(row.weight) AS w,
                 toInteger(linenumber()) AS idx
             MERGE (v1:VERTEX {_id: id_from})
             MERGE (v2:VERTEX {_id: id_to})
-            CREATE (v1)-[:EDGE {_id: idx + %d, weight: w}]->(v2)
+            CREATE (v1)-[:EDGE {_id: idx + %d, weight: w}]%s(v2)
             '''
+            d = '->' if directed else '-'
             task = pattern % (Neo4j.__max_batch_size__,
-                              'file:///' + filename, current_id)
+                              'file:///' + filename, current_id, d)
             task = task.replace('VERTEX', self._v)
             task = task.replace('EDGE', self._e)
             self.session.run(task)
@@ -481,7 +486,7 @@ class Neo4j(GraphBase):
     def _records_to_edges(self, records) -> List[Edge]:
         if isinstance(records, BoltStatementResult):
             records = list(records.records())
-        return [Edge(r['v_from._id'], r['v_to._id'], r['e.weight']) for r in records]
+        return [Edge(r['v1._id'], r['v2._id'], r['e.weight']) for r in records]
 
     def _first_record(self, records, key):
         if isinstance(records, BoltStatementResult):

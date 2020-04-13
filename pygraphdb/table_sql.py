@@ -29,8 +29,9 @@ class NodeSQL(BaseEntitySQL):
 class EdgeSQL(BaseEntitySQL, Edge):
     __tablename__ = 'table_edges'
     _id = Column(BigInteger, primary_key=True)
-    v_from = Column(BigInteger, index=True)
-    v_to = Column(BigInteger, index=True)
+    v1 = Column(BigInteger, index=True)
+    v2 = Column(BigInteger, index=True)
+    directed = Column(Boolean, index=True)
     weight = Column(Float)
     attributes_json = Column(Text)
 
@@ -44,8 +45,9 @@ class EdgeNew(BaseEntitySQL, Edge):
     # TODO: Consider using different Integer types in different SQL DBs.
     # https://stackoverflow.com/a/60840921/2766161
     _id = Column(BigInteger, primary_key=True)
-    v_from = Column(BigInteger, index=False)
-    v_to = Column(BigInteger, index=False)
+    v1 = Column(BigInteger, index=False)
+    v2 = Column(BigInteger, index=False)
+    directed = Column(Boolean, index=False)
     weight = Column(Float)
     attributes_json = Column(Text)
 
@@ -82,9 +84,16 @@ class PlainSQL(GraphBase):
         but if you want to compile them for a specific dialect use following snippet:
         >>> str(query.statement.compile(dialect=postgresql.dialect()))
         Source: http://nicolascadou.com/blog/2014/01/printing-actual-sqlalchemy-queries/
+
+        CAUTION:
+        Using ORM can be very costly in some cases. Benchmarking with `pyinstrument` 
+        revealed that ORM mapping takes 2x more time than `bulk_save_objects()`
+        in case of in-memory SQLite instance.
+        Replacing it with `bulk_insert_mappings()` reduced import time by 70%!
+        https://docs.sqlalchemy.org/en/13/faq/performance.html#result-fetching-slowness-core
     """
     __is_concurrent__ = True
-    __max_batch_size__ = 5000
+    __max_batch_size__ = 1000000
     __edge_type__ = EdgeSQL
 
     def __init__(self, url='sqlite:///:memory:', **kwargs):
@@ -112,26 +121,27 @@ class PlainSQL(GraphBase):
 
     # Relatives
 
-    def find_edge(self, v_from: int, v_to: int) -> Optional[EdgeSQL]:
+    def find_directed(self, v1: int, v2: int) -> Optional[EdgeSQL]:
         result = None
         with self.get_session() as s:
             result = s.query(EdgeSQL).filter(and_(
-                EdgeSQL.v_from == v_from,
-                EdgeSQL.v_to == v_to,
+                EdgeSQL.v1 == v1,
+                EdgeSQL.v2 == v2,
+                EdgeSQL.directed == True,
             )).first()
         return result
 
-    def find_edge_or_inv(self, v1: int, v2: int) -> Optional[EdgeSQL]:
+    def find_undirected(self, v1: int, v2: int) -> Optional[EdgeSQL]:
         result = None
         with self.get_session() as s:
             result = s.query(EdgeSQL).filter(or_(
                 and_(
-                    EdgeSQL.v_from == v1,
-                    EdgeSQL.v_to == v2,
+                    EdgeSQL.v1 == v1,
+                    EdgeSQL.v2 == v2,
                 ),
                 and_(
-                    EdgeSQL.v_from == v2,
-                    EdgeSQL.v_to == v1,
+                    EdgeSQL.v1 == v2,
+                    EdgeSQL.v2 == v1,
                 )
             )).all()
         return result
@@ -139,29 +149,29 @@ class PlainSQL(GraphBase):
     def edges_from(self, v: int) -> List[EdgeSQL]:
         result = list()
         with self.get_session() as s:
-            result = s.query(EdgeSQL).filter_by(v_from=v).all()
+            result = s.query(EdgeSQL).filter_by(v1=v, directed=True).all()
         return result
 
     def edges_to(self, v: int) -> List[EdgeSQL]:
         result = list()
         with self.get_session() as s:
-            result = s.query(EdgeSQL).filter_by(v_to=v).all()
+            result = s.query(EdgeSQL).filter_by(v2=v, directed=True).all()
         return result
 
     def edges_related(self, v: int) -> List[EdgeSQL]:
         result = list()
         with self.get_session() as s:
             result = s.query(EdgeSQL).filter(or_(
-                EdgeSQL.v_from == v,
-                EdgeSQL.v_to == v,
+                EdgeSQL.v1 == v,
+                EdgeSQL.v2 == v,
             )).all()
         return result
 
     def all_vertexes(self) -> Set[int]:
         result = set()
         with self.get_session() as s:
-            all_froms = s.query(EdgeSQL.v_from).distinct().all()
-            all_tos = s.query(EdgeSQL.v_to).distinct().all()
+            all_froms = s.query(EdgeSQL.v1).distinct().all()
+            all_tos = s.query(EdgeSQL.v2).distinct().all()
             result = set(all_froms).union(all_tos)
         return result
 
@@ -171,14 +181,14 @@ class PlainSQL(GraphBase):
         result = set()
         with self.get_session() as s:
             edges = s.query(EdgeSQL).filter(or_(
-                EdgeSQL.v_from.in_(vs),
-                EdgeSQL.v_to.in_(vs),
+                EdgeSQL.v1.in_(vs),
+                EdgeSQL.v2.in_(vs),
             )).all()
             for e in edges:
-                if (e.v_from not in vs):
-                    result.add(e.v_from)
-                elif (e.v_to not in vs):
-                    result.add(e.v_to)
+                if (e.v1 not in vs):
+                    result.add(e.v1)
+                elif (e.v2 not in vs):
+                    result.add(e.v2)
         return result
 
     # Metadata
@@ -199,8 +209,8 @@ class PlainSQL(GraphBase):
                 func.count(EdgeSQL.weight).label("count"),
                 func.sum(EdgeSQL.weight).label("sum"),
             ).filter(or_(
-                EdgeSQL.v_from == v,
-                EdgeSQL.v_to == v,
+                EdgeSQL.v1 == v,
+                EdgeSQL.v2 == v,
             )).first()
         return result
 
@@ -210,7 +220,7 @@ class PlainSQL(GraphBase):
             result = s.query(
                 func.count(EdgeSQL.weight).label("count"),
                 func.sum(EdgeSQL.weight).label("sum"),
-            ).filter_by(v_to=v).first()
+            ).filter_by(v2=v, directed=True).first()
         return result
 
     def count_following(self, v: int) -> (int, float):
@@ -219,7 +229,7 @@ class PlainSQL(GraphBase):
             result = s.query(
                 func.count(EdgeSQL.weight).label("count"),
                 func.sum(EdgeSQL.weight).label("sum"),
-            ).filter_by(v_from=v).first()
+            ).filter_by(v1=v, directed=True).first()
         return result
 
     def biggest_edge_id(self) -> int:
@@ -254,8 +264,9 @@ class PlainSQL(GraphBase):
                 ).delete()
             else:
                 s.query(EdgeSQL).filter_by(
-                    v_from=e['v_from'],
-                    v_to=e['v_to'],
+                    v1=e['v1'],
+                    v2=e['v2'],
+                    directed=e['directed'],
                 ).delete()
             result = True
         return result
@@ -272,8 +283,8 @@ class PlainSQL(GraphBase):
         result = 0
         with self.get_session() as s:
             result = s.query(EdgeSQL).filter(or_(
-                EdgeSQL.v_from == v,
-                EdgeSQL.v_to == v,
+                EdgeSQL.v1 == v,
+                EdgeSQL.v2 == v,
             )).delete()
         return result
 
@@ -290,18 +301,16 @@ class PlainSQL(GraphBase):
             current_id = self.biggest_edge_id() + 1
             # Build the new table.
             chunk_len = type(self).__max_batch_size__
-            for es in chunks(yield_edges_from(path), chunk_len):
+            for es in chunks(yield_edges_from(path, edge_type=dict), chunk_len):
                 for i, e in enumerate(es):
                     e['_id'] = current_id
                     es[i] = e
                     current_id += 1
-                es = map_compact(
-                    lambda e: self.validate_edge_and_convert(e, EdgeNew), es)
-                s.bulk_save_objects(
+                s.bulk_insert_mappings(
+                    EdgeNew,
                     es,
                     return_defaults=False,
-                    update_changed_only=True,
-                    preserve_order=False,
+                    render_nulls=True,
                 )
         # Import the new data.
         cnt = self.count_edges()
@@ -356,7 +365,7 @@ class PlainSQL(GraphBase):
             # migration = text(f'''
             # DELETE {EdgeNew.__tablename__};
             # OUTPUT DELETED.*
-            # INTO {EdgeSQL.__tablename__} (_id, v_from, v_to, weight, attributes_json)
+            # INTO {EdgeSQL.__tablename__} (_id, v1, v2, weight, attributes_json)
             # ''')
             # But this syntax isn't globally supported.
             s.execute(migration)
@@ -366,11 +375,11 @@ class PlainSQL(GraphBase):
         # if we have ID collisions, the operation will fail.
         # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.bulk_save_objects
         with self.get_session() as s:
-            s.bulk_save_objects(
+            s.bulk_insert_mappings(
+                EdgeNew,
                 es,
                 return_defaults=False,
-                update_changed_only=True,
-                preserve_order=False,
+                render_nulls=True,
             )
 
     def flush_temporary_table(self):
@@ -381,7 +390,9 @@ class PlainSQL(GraphBase):
         return self.validate_edge_and_convert(e, EdgeSQL)
 
     def validate_edge_and_convert(self, e, e_type) -> BaseEntitySQL:
-        if not isinstance(e, BaseEntitySQL):
-            e = e_type(v_from=e['v_from'], v_to=e['v_to'],
-                       _id=e['_id'], weight=e['weight'])
+        if (not isinstance(e, BaseEntitySQL)) and (e_type is not None):
+            if isinstance(e, dict):
+                e = e_type(**e)
+            else:
+                e = e_type(**e.__dict__)
         return super().validate_edge(e)
