@@ -2,6 +2,7 @@ import json
 from typing import Optional
 from os import path
 import platform
+import datetime
 
 from pygraphdb.helpers import StatsCounter
 
@@ -64,9 +65,12 @@ class StatsFile(object):
             'operation': operation_name,
             'database': wrapper_class,
             'dataset': dataset,
+            'date_utc': datetime.timestamp(datetime.datetime.utcnow()),
+            'date_readable': datetime.datetime.utcnow().strftime("%b %d, %Y"),
+            'date_sortable': datetime.datetime.utcnow().strftime("%Y/%M/%d"),
         }
         if bench_idx is None:
-            bench_idx.results.append(stats_serialized)
+            self.results.append(stats_serialized)
         else:
             self.results[bench_idx] = stats_serialized
 

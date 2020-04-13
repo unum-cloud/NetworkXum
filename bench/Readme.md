@@ -16,3 +16,11 @@ The results are presented in [artifacts folder](https://github.com/ashvardanian/
 ## Setup
 
 Testing and benchmarking was done on 16" 2019 MacBook Pro. The simplest approach is to test using Docker Compose to start sandboxed DB instances, but [it comes with sacrifices on other platforms.](https://github.com/docker/for-mac/issues/1592). In case you are running this on the mac - call `run_mac.sh`, otherwise - `run_docker.sh`.
+
+## Benchmarking the Benchmark
+
+If you want to improve the benchmarks and make sure no time is wasted on needless operations use `pyinstrument`. The app is too complex to validate it with `cProfile` and the stats tables are impossible to navigate.
+
+```sh
+python -m pyinstrument p2_import.py
+```
