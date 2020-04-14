@@ -31,13 +31,16 @@
     },
     {
         "device": "av19mac.local",
-        "time_elapsed": 9.734031915664673,
+        "time_elapsed": 7.723057270050049,
         "count_operations": 10000,
-        "msecs_per_operation": 0.9734031915664674,
-        "operations_per_second": 1027.3235270481612,
+        "msecs_per_operation": 0.7723057270050049,
+        "operations_per_second": 1294.8240120890875,
         "operation": "Insert Dump",
         "database": "PostgreSQL",
-        "dataset": "graph-communities"
+        "dataset": "graph-communities",
+        "date_utc": 1586776095.180136,
+        "date_readable": "Apr 13, 2020",
+        "date_sortable": "2020/08/13"
     },
     {
         "device": "av19mac.local",
@@ -51,23 +54,29 @@
     },
     {
         "device": "av19mac.local",
+        "time_elapsed": 0.14592599868774414,
+        "count_operations": 10000,
+        "msecs_per_operation": 0.014592599868774415,
+        "operations_per_second": 68527.88461224263,
         "operation": "Insert Dump",
         "database": "SQLite",
         "dataset": "graph-communities",
-        "time_elapsed": 0.000381458044052124,
-        "count_operations": 10000,
-        "msecs_per_operation": 0.038145804405212404,
-        "operations_per_second": 26215.202840586993
+        "date_utc": 1586778393.077881,
+        "date_readable": "Apr 13, 2020",
+        "date_sortable": "2020/46/13"
     },
     {
         "device": "av19mac.local",
+        "time_elapsed": 49.507529973983765,
+        "count_operations": 2811717,
+        "msecs_per_operation": 0.017607579274153042,
+        "operations_per_second": 56793.72413605686,
         "operation": "Insert Dump",
         "database": "SQLite",
         "dataset": "graph-eachmovie-ratings",
-        "time_elapsed": 0.10946069717407228,
-        "count_operations": 2811717,
-        "msecs_per_operation": 0.038930197162115626,
-        "operations_per_second": 25687.000654934673
+        "date_utc": 1586778442.606119,
+        "date_readable": "Apr 13, 2020",
+        "date_sortable": "2020/47/13"
     },
     {
         "device": "av19mac.local",
@@ -118,5 +127,18 @@
         "operation": "Insert Dump",
         "database": "Neo4j",
         "dataset": "graph-communities"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 374.2605309486389,
+        "count_operations": 16518947,
+        "msecs_per_operation": 0.022656439962464855,
+        "operations_per_second": 44137.560960888375,
+        "operation": "Insert Dump",
+        "database": "SQLite",
+        "dataset": "graph-patent-citations",
+        "date_utc": 1586778816.884285,
+        "date_readable": "Apr 13, 2020",
+        "date_sortable": "2020/53/13"
     }
 ]

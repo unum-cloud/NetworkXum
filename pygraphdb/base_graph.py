@@ -120,16 +120,6 @@ class GraphBase(object):
         pass
 
     @abstractmethod
-    def find_directed(self, v1: int, v2: int) -> Optional[object]:
-        """Only finds edges directed from `v1` to `v2`."""
-        pass
-
-    @abstractmethod
-    def find_undirected(self, v1: int, v2: int) -> Optional[object]:
-        """Checks for edges in both directions."""
-        pass
-
-    @abstractmethod
     def biggest_edge_id(self) -> int:
         return 0
 
@@ -156,6 +146,16 @@ class GraphBase(object):
     @abstractmethod
     def iterate_edges(self) -> Generator[object, None, None]:
         # TODO
+        pass
+
+    @abstractmethod
+    def edge_directed(self, v1: int, v2: int) -> Optional[object]:
+        """Only finds edges directed from `v1` to `v2`."""
+        pass
+
+    @abstractmethod
+    def edge_undirected(self, v1: int, v2: int) -> Optional[object]:
+        """Checks for edges in both directions."""
         pass
 
     @abstractmethod
