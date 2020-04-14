@@ -68,7 +68,7 @@ class NetworkX(object):
         pass
 
     @abstractmethod
-    def find_undirected(self, v1: int, v2: int) -> Optional[object]:
+    def edge_undirected(self, v1: int, v2: int) -> Optional[object]:
         """
             Given 2 vertexes search for an edge 
             that goes in any direction.

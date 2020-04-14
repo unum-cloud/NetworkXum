@@ -9,6 +9,7 @@ from sqlalchemy.sql import func
 from sqlalchemy import or_, and_
 from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy import text
+from sqlalchemy import Index
 
 from pygraphdb.base_graph import GraphBase
 from pygraphdb.base_edge import Edge
@@ -29,11 +30,16 @@ class NodeSQL(BaseEntitySQL):
 class EdgeSQL(BaseEntitySQL, Edge):
     __tablename__ = 'table_edges'
     _id = Column(BigInteger, primary_key=True)
-    v1 = Column(BigInteger, index=True)
-    v2 = Column(BigInteger, index=True)
-    directed = Column(Boolean, index=True)
+    v1 = Column(BigInteger)
+    v2 = Column(BigInteger)
+    directed = Column(Boolean)
     weight = Column(Float)
     attributes_json = Column(Text)
+    __table_args__ = (
+        Index('index_v1', v1, unique=False),
+        Index('index_v2', v2, unique=False),
+        Index('index_directed', directed, unique=False),
+    )
 
     def __init__(self, *args, **kwargs):
         BaseEntitySQL.__init__(self)
@@ -45,9 +51,9 @@ class EdgeNew(BaseEntitySQL, Edge):
     # TODO: Consider using different Integer types in different SQL DBs.
     # https://stackoverflow.com/a/60840921/2766161
     _id = Column(BigInteger, primary_key=True)
-    v1 = Column(BigInteger, index=False)
-    v2 = Column(BigInteger, index=False)
-    directed = Column(Boolean, index=False)
+    v1 = Column(BigInteger)
+    v2 = Column(BigInteger)
+    directed = Column(Boolean)
     weight = Column(Float)
     attributes_json = Column(Text)
 
@@ -121,7 +127,7 @@ class PlainSQL(GraphBase):
 
     # Relatives
 
-    def find_directed(self, v1: int, v2: int) -> Optional[EdgeSQL]:
+    def edge_directed(self, v1: int, v2: int) -> Optional[EdgeSQL]:
         result = None
         with self.get_session() as s:
             result = s.query(EdgeSQL).filter(and_(
@@ -131,7 +137,7 @@ class PlainSQL(GraphBase):
             )).first()
         return result
 
-    def find_undirected(self, v1: int, v2: int) -> Optional[EdgeSQL]:
+    def edge_undirected(self, v1: int, v2: int) -> Optional[EdgeSQL]:
         result = None
         with self.get_session() as s:
             result = s.query(EdgeSQL).filter(or_(

@@ -126,7 +126,7 @@ class Neo4j(GraphBase):
 
     # Relatives
 
-    def find_directed(self, v1: int, v2: int) -> Optional[object]:
+    def edge_directed(self, v1: int, v2: int) -> Optional[object]:
         pattern = '''
         MATCH (v1:VERTEX {_id: %d})-[e:EDGE]->(v2:VERTEX {_id: %d})
         RETURN v1._id, v2._id, e.weight
@@ -136,7 +136,7 @@ class Neo4j(GraphBase):
         task = task.replace('EDGE', self._e)
         return self._records_to_edges(self.session.run(task))
 
-    def find_undirected(self, v1: int, v2: int) -> Optional[object]:
+    def edge_undirected(self, v1: int, v2: int) -> Optional[object]:
         pattern = '''
         MATCH (v1:VERTEX {_id: %d})-[e:EDGE]-(v2:VERTEX {_id: %d})
         RETURN v1._id, v2._id, e.weight

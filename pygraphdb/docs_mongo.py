@@ -30,7 +30,7 @@ class MongoDB(GraphBase):
 
     # Relatives
 
-    def find_directed(self, v1: int, v2: int) -> Optional[object]:
+    def edge_directed(self, v1: int, v2: int) -> Optional[object]:
         result = self.edges.find_one(filter={
             'v1': v1,
             'v2': v2,
@@ -38,7 +38,7 @@ class MongoDB(GraphBase):
         })
         return result
 
-    def find_undirected(self, v1: int, v2: int) -> Optional[object]:
+    def edge_undirected(self, v1: int, v2: int) -> Optional[object]:
         result = self.edges.find_one(filter={
             '$or': [{
                 'v1': v1,
