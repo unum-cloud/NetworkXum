@@ -41,15 +41,13 @@ class StatsExporter(object):
         self.full_content = ''
         return self
 
-    def add_title(self, text: str) -> StatsExporter:
-        if len(self.full_content) == 0:
-            self.full_content += f'# {text}\n\n'
-        else:
-            self.full_content += f'## {text}\n\n'
-        return self
-
     def add_text(self, text: str) -> StatsExporter:
+        # Remove whitespaces in front of every row.
+        text = '\n'.join([line.strip() for line in text.splitlines()])
         self.full_content += f'{text}\n'
+        # Headers must have 2 line spacings.
+        if text.startswith('#'):
+            self.full_content += '\n'
         return self
 
     def add_last_table(self) -> StatsExporter:
@@ -119,7 +117,9 @@ class StatsExporter(object):
         # Define filtering predicate.
         def matches(s) -> bool:
             for k, v in kwargs.items():
-                if isinstance(v, re.Pattern):
+                if v is None:
+                    pass
+                elif isinstance(v, re.Pattern):
                     if not v.search(s.get(k, '')):
                         return False
                 elif s.get(k, None) != v:
@@ -236,9 +236,6 @@ class StatsExporter(object):
         col_idx: int,
         log_scale=False,
     ) -> List[List[str]]:
-        print('Comparing column:', col_idx, ':::',
-              [r[col_idx] for r in table[1:]])
-        print('full table:', table)
         values = [StatsExporter.str2num(r[col_idx]) for r in table[1:]]
         values = [v for v in values if v is not None]
         value_smallest = min(values) if len(values) else 0
