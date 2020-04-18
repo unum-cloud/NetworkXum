@@ -67,26 +67,29 @@
     },
     {
         "device": "av19mac.local",
-        "time_elapsed": 49.507529973983765,
+        "time_elapsed": 49.0080988407135,
         "count_operations": 2811717,
-        "msecs_per_operation": 0.017607579274153042,
-        "operations_per_second": 56793.72413605686,
+        "msecs_per_operation": 0.01742995430931118,
+        "operations_per_second": 57372.49692420561,
         "operation": "Insert Dump",
         "database": "SQLite",
         "dataset": "graph-eachmovie-ratings",
-        "date_utc": 1586778442.606119,
-        "date_readable": "Apr 13, 2020",
-        "date_sortable": "2020/47/13"
+        "date_utc": 1587219377.904475,
+        "date_readable": "Apr 18, 2020",
+        "date_sortable": "2020/16/18"
     },
     {
         "device": "av19mac.local",
-        "time_elapsed": 0.8278021812438965,
+        "time_elapsed": 0.4536161422729492,
         "count_operations": 10000,
-        "msecs_per_operation": 0.08278021812438965,
-        "operations_per_second": 12080.180780598459,
+        "msecs_per_operation": 0.04536161422729492,
+        "operations_per_second": 22045.070860778174,
         "operation": "Insert Dump",
         "database": "MySQL",
-        "dataset": "graph-communities"
+        "dataset": "graph-communities",
+        "date_utc": 1587225462.917589,
+        "date_readable": "Apr 18, 2020",
+        "date_sortable": "2020/57/18"
     },
     {
         "device": "av19mac.local",
@@ -169,16 +172,16 @@
     },
     {
         "device": "av19mac.local",
-        "time_elapsed": 13.489126920700073,
+        "time_elapsed": 5.729929208755493,
         "count_operations": 2811717,
-        "msecs_per_operation": 0.004797469631794406,
-        "operations_per_second": 208443.2162681493,
+        "msecs_per_operation": 0.0020378755076543953,
+        "operations_per_second": 490707.10955793614,
         "operation": "Insert Dump",
         "database": "GraphLSM",
         "dataset": "graph-eachmovie-ratings",
-        "date_utc": 1587201224.085717,
+        "date_utc": 1587218721.069331,
         "date_readable": "Apr 18, 2020",
-        "date_sortable": "2020/13/18"
+        "date_sortable": "2020/05/18"
     },
     {
         "device": "av19mac.local",

@@ -31,7 +31,7 @@ class Tester(object):
             url = config.database_url(graph_type, file_path)
             if url is None:
                 continue
-            g = graph_type(url)
+            g = graph_type(url=url)
             self.run_one(g)
 
     def run_one(self, g):
