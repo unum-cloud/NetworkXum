@@ -140,5 +140,83 @@
         "date_utc": 1586778816.884285,
         "date_readable": "Apr 13, 2020",
         "date_sortable": "2020/53/13"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.08381199836730957,
+        "count_operations": 10000,
+        "msecs_per_operation": 0.008381199836730958,
+        "operations_per_second": 119314.65893671433,
+        "operation": "Insert Dump",
+        "database": "GraphLSM",
+        "dataset": "graph-communities",
+        "date_utc": 1587200321.836754,
+        "date_readable": "Apr 18, 2020",
+        "date_sortable": "2020/58/18"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.04893183708190918,
+        "count_operations": 10000,
+        "msecs_per_operation": 0.004893183708190918,
+        "operations_per_second": 204365.921991863,
+        "operation": "Insert Dump",
+        "database": "GraphBPlus",
+        "dataset": "graph-communities",
+        "date_utc": 1587201925.057665,
+        "date_readable": "Apr 18, 2020",
+        "date_sortable": "2020/25/18"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 13.489126920700073,
+        "count_operations": 2811717,
+        "msecs_per_operation": 0.004797469631794406,
+        "operations_per_second": 208443.2162681493,
+        "operation": "Insert Dump",
+        "database": "GraphLSM",
+        "dataset": "graph-eachmovie-ratings",
+        "date_utc": 1587201224.085717,
+        "date_readable": "Apr 18, 2020",
+        "date_sortable": "2020/13/18"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 13.57378602027893,
+        "count_operations": 2811717,
+        "msecs_per_operation": 0.0048275790274337465,
+        "operations_per_second": 207143.1652008775,
+        "operation": "Insert Dump",
+        "database": "GraphBPlus",
+        "dataset": "graph-eachmovie-ratings",
+        "date_utc": 1587201938.637831,
+        "date_readable": "Apr 18, 2020",
+        "date_sortable": "2020/25/18"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 121.71826696395874,
+        "count_operations": 16518947,
+        "msecs_per_operation": 0.007368403504409739,
+        "operations_per_second": 135714.6089246516,
+        "operation": "Insert Dump",
+        "database": "GraphLSM",
+        "dataset": "graph-patent-citations",
+        "date_utc": 1587202153.159217,
+        "date_readable": "Apr 18, 2020",
+        "date_sortable": "2020/29/18"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 145.70490193367004,
+        "count_operations": 16518947,
+        "msecs_per_operation": 0.008820471542990607,
+        "operations_per_second": 113372.62357528644,
+        "operation": "Insert Dump",
+        "database": "GraphBPlus",
+        "dataset": "graph-patent-citations",
+        "date_utc": 1587202299.722339,
+        "date_readable": "Apr 18, 2020",
+        "date_sortable": "2020/31/18"
     }
 ]
