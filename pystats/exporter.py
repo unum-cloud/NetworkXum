@@ -85,8 +85,8 @@ class StatsExporter(object):
         field_col: str,
         field_row: str,
         field_cell: str,
-        allowed_rows: List[str],
         allowed_cols: List[str],
+        allowed_rows: List[str],
     ) -> StatsExporter:
         self.current_table = StatsExporter.to_table(
             stats=self.filtered_stats,
@@ -142,8 +142,8 @@ class StatsExporter(object):
 
     @staticmethod
     def str2num(str_: str) -> float:
-        if str_ is None:
-            return 0.0
+        if str_ is None or len(str_) == 0:
+            return None
         if isinstance(str_, float):
             return str_
         str_ = str_.replace(',', '')
@@ -236,9 +236,13 @@ class StatsExporter(object):
         col_idx: int,
         log_scale=False,
     ) -> List[List[str]]:
+        print('Comparing column:', col_idx, ':::',
+              [r[col_idx] for r in table[1:]])
+        print('full table:', table)
         values = [StatsExporter.str2num(r[col_idx]) for r in table[1:]]
-        value_smallest = min(values)
-        value_biggest = max(values)
+        values = [v for v in values if v is not None]
+        value_smallest = min(values) if len(values) else 0
+        value_biggest = max(values) if len(values) else 1
         diff = (value_biggest-value_smallest)
         best_bracket_smalest_val = value_biggest - diff/3
         worst_bracket_biggest_val = value_smallest + diff/3
@@ -246,7 +250,9 @@ class StatsExporter(object):
         table[0].append('Result')
         for r in table[1:]:
             val = StatsExporter.str2num(r[col_idx])
-            if val >= best_bracket_smalest_val:
+            if val is None:
+                r.append('?')
+            elif val >= best_bracket_smalest_val:
                 r.append(':thumbsup:')
             elif val < worst_bracket_biggest_val:
                 r.append(':thumbsdown:')

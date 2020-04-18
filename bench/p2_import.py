@@ -3,6 +3,7 @@ import os
 import importlib
 
 from pygraphdb.helpers import StatsCounter
+from pygraphdb.helpers import export_edges_into_graph
 
 import config
 
@@ -27,9 +28,48 @@ class BulkImporter(object):
             size /= 1000.0
         return f"{size:.{decimal_places}f}{unit}"
 
+    def parse_without_importing_if_unknown(self, dataset_path):
+        # Avoid repeating ourselves.
+        dataset_name = config.dataset_name(dataset_path)
+        if config.stats.find_index(
+            wrapper_class='Parsing in Python',
+            operation_name='Insert Dump',
+            dataset=dataset_name,
+        ) != None:
+            return
+
+        class PseudoGraph(object):
+            __edge_type__ = dict
+            __max_batch_size__ = 1000000
+
+            def __init__(self):
+                self.count = 0
+
+            def biggest_edge_id(self) -> int:
+                return self.count
+
+            def upsert_edges(self, es) -> int:
+                self.count += len(es)
+                return len(es)
+
+        g = PseudoGraph()
+        counter = StatsCounter()
+        counter.handle(lambda: export_edges_into_graph(dataset_path, g))
+        config.stats.upsert(
+            wrapper_class='Parsing in Python',
+            operation_name='Insert Dump',
+            dataset=dataset_name,
+            stats=counter,
+        )
+
     def run(self):
-        for graph_type in config.wrapper_types:
-            for dataset_path in config.datasets:
+        for dataset_path in config.datasets:
+            # Define a baseline, so we know how much time it took
+            # to read the data vs actually importing it into DB
+            # and building indexes.
+            self.parse_without_importing_if_unknown(dataset_path)
+
+            for graph_type in config.wrapper_types:
                 url = config.database_url(graph_type, dataset_path)
                 if url is None:
                     continue
@@ -64,6 +104,7 @@ class BulkImporter(object):
                       self.printable_count(counter.ops_per_sec()))
                 print(f'--- bytes/second:',
                       self.printable_bytes(file_size / counter.time_elapsed))
+                print(f'--- finished at:', datetime.now().strftime('%H:%M:%S'))
                 config.stats.dump_to_file()
 
 

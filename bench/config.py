@@ -35,7 +35,7 @@ _datasets = [
     ('/Users/av/Code/PyGraphDB/artifacts/graph-test/all.csv', 8, 10),
     ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
     ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
-    # ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
+    ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
     # ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
     # ('/Users/av/Datasets/graph-human-brain/all.csv', 0, 87273967),
 ]
@@ -45,9 +45,9 @@ datasets = [x[0] for x in _datasets[1:]]
 wrapper_types = [
     # SQLiteMem,
     SQLite,
+    MongoDB,
     MySQL,
-    # MongoDB,
-    # PostgreSQL,
+    PostgreSQL,
     # Neo4j,
     # GraphLSM,
     # GraphBPlus,
@@ -60,8 +60,10 @@ _wrappers = [
     (SQLiteMem, 'URI_SQLITE_MEM', 'sqlite:///:memory:'),
     (SQLite, 'URI_SQLITE', 'sqlite:////Users/av/DBs/sqlite/<dataset>.db3'),
     (MySQL, 'URI_MYSQL', 'mysql://av:temptemp@0.0.0.0:3306/<dataset>'),
-    (PostgreSQL, 'URI_PGSQL', 'postgres://0.0.0.0:5432/<dataset>'),
+    (PostgreSQL, 'URI_PGSQL', 'postgres://av:temptemp@0.0.0.0:5432/<dataset>'),
     (Neo4j, 'URI_NEO4J', 'bolt://0.0.0.0:7687/<dataset>'),
+    # To startup:
+    # mongod --dbpath=/Users/av/DBs/mongo/ --directoryperdb --wiredTigerCacheSizeGB=2 --wiredTigerDirectoryForIndexes
     (MongoDB, 'URI_MONGO', 'mongodb://0.0.0.0:27017/<dataset>'),
 ]
 
