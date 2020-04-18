@@ -9,25 +9,25 @@ from sqlalchemy.sql import func
 from sqlalchemy import or_, and_
 from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy import text
-from sqlalchemy import Index
+from sqlalchemy import Index, Table
 
 from pygraphdb.base_graph import GraphBase
 from pygraphdb.base_edge import Edge
 from pygraphdb.helpers import *
 
-BaseEntitySQL = declarative_base()
+BaseSQL = declarative_base()
 
 
-class NodeSQL(BaseEntitySQL):
+class NodeSQL(BaseSQL):
     __tablename__ = 'table_nodes'
     _id = Column(BigInteger, primary_key=True)
     attributes_json = Column(Text)
 
     def __init__(self, *args, **kwargs):
-        BaseEntitySQL.__init__(self)
+        BaseSQL.__init__(self)
 
 
-class EdgeSQL(BaseEntitySQL, Edge):
+class EdgeSQL(BaseSQL, Edge):
     __tablename__ = 'table_edges'
     _id = Column(BigInteger, primary_key=True)
     v1 = Column(BigInteger)
@@ -35,64 +35,62 @@ class EdgeSQL(BaseEntitySQL, Edge):
     directed = Column(Boolean)
     weight = Column(Float)
     attributes_json = Column(Text)
-    __table_args__ = (
-        Index('index_v1', v1, unique=False),
-        Index('index_v2', v2, unique=False),
-        Index('index_directed', directed, unique=False),
-    )
 
     def __init__(self, *args, **kwargs):
-        BaseEntitySQL.__init__(self)
+        BaseSQL.__init__(self)
         Edge.__init__(self, *args, **kwargs)
 
 
-class EdgeNew(BaseEntitySQL, Edge):
+class EdgeNew(BaseSQL, Edge):
     __tablename__ = 'new_edges'
-    # TODO: Consider using different Integer types in different SQL DBs.
-    # https://stackoverflow.com/a/60840921/2766161
     _id = Column(BigInteger, primary_key=True)
     v1 = Column(BigInteger)
     v2 = Column(BigInteger)
     directed = Column(Boolean)
     weight = Column(Float)
     attributes_json = Column(Text)
+    index_v1 = Index('index_v1', EdgeSQL.v1, unique=False)
+    index_v2 = Index('index_v2', EdgeSQL.v2, unique=False)
+    index_directed = Index('index_directed', EdgeSQL.directed, unique=False)
 
+    # TODO: Consider using different Integer types in different SQL DBs.
+    # https://stackoverflow.com/a/60840921/2766161
     def __init__(self, *args, **kwargs):
-        BaseEntitySQL.__init__(self)
+        BaseSQL.__init__(self)
         Edge.__init__(self, *args, **kwargs)
 
 
 class PlainSQL(GraphBase):
     """
         A generic SQL-compatiable wrapper for Graph-shaped data.
-        It's built on top of SQLAlchemy which supports following engines: 
-        *   SQLite, 
-        *   PostgreSQL, 
-        *   MySQL, 
-        *   Oracle, 
-        *   MS-SQL, 
-        *   Firebird, 
-        *   Sybase. 
+        It's built on top of SQLAlchemy which supports following engines:
+        *   SQLite,
+        *   PostgreSQL,
+        *   MySQL,
+        *   Oracle,
+        *   MS-SQL,
+        *   Firebird,
+        *   Sybase.
         Other dialects are published as external projects.
-        This wrapper does not only emit the query results, 
-        but can export the serialized quaery itself to be used 
+        This wrapper does not only emit the query results,
+        but can export the serialized quaery itself to be used
         with other SQL-compatible systems.
         Docs: https://docs.python.org/3/library/sqlite3.html
 
         CAUTION:
-        Implementations of analytical queries are suboptimal, 
-        as implementing them in SQL dialects is troublesome and 
-        often results in excessive memory consumption, 
+        Implementations of analytical queries are suboptimal,
+        as implementing them in SQL dialects is troublesome and
+        often results in excessive memory consumption,
         when temporary tables are created.
 
         CAUTION:
-        Queries can be exported without execution with `str(query)`, 
+        Queries can be exported without execution with `str(query)`,
         but if you want to compile them for a specific dialect use following snippet:
         >>> str(query.statement.compile(dialect=postgresql.dialect()))
         Source: http://nicolascadou.com/blog/2014/01/printing-actual-sqlalchemy-queries/
 
         CAUTION:
-        Using ORM can be very costly in some cases. Benchmarking with `pyinstrument` 
+        Using ORM can be very costly in some cases. Benchmarking with `pyinstrument`
         revealed that ORM mapping takes 2x more time than `bulk_save_objects()`
         in case of in-memory SQLite instance.
         Replacing it with `bulk_insert_mappings()` reduced import time by 70%!
@@ -108,7 +106,7 @@ class PlainSQL(GraphBase):
         if not database_exists(url):
             create_database(url)
         self.engine = sa.create_engine(url)
-        BaseEntitySQL.metadata.create_all(self.engine)
+        BaseSQL.metadata.create_all(self.engine)
         self.session_maker = sessionmaker(bind=self.engine)
 
     @contextmanager
@@ -392,11 +390,11 @@ class PlainSQL(GraphBase):
         with self.get_session() as s:
             s.execute(text(f'DELETE FROM {EdgeNew.__tablename__};'))
 
-    def validate_edge(self, e) -> BaseEntitySQL:
+    def validate_edge(self, e) -> BaseSQL:
         return self.validate_edge_and_convert(e, EdgeSQL)
 
-    def validate_edge_and_convert(self, e, e_type) -> BaseEntitySQL:
-        if (not isinstance(e, BaseEntitySQL)) and (e_type is not None):
+    def validate_edge_and_convert(self, e, e_type) -> BaseSQL:
+        if (not isinstance(e, BaseSQL)) and (e_type is not None):
             if isinstance(e, dict):
                 e = e_type(**e)
             else:

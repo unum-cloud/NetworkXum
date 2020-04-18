@@ -42,7 +42,7 @@ class MySQL(PlainSQL):
                 s.execute(p)
                 s.commit()
 
-    def upsert_adjacency_list_native(self, path: str) -> int:
+    def insert_adjacency_list_native(self, path: str) -> int:
         """
             This method requires the file to be mounted on the same filesystem.
             Unlike Postgres the connection wrapper doesn't allow channeling data to remote DB.            
