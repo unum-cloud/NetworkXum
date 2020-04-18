@@ -1,5 +1,6 @@
 import os
 from typing import Optional
+import importlib
 
 from pystats.file import StatsFile
 
@@ -8,7 +9,14 @@ from pygraphdb.table_mysql import MySQL
 from pygraphdb.table_postgres import PostgreSQL
 from pygraphdb.docs_mongo import MongoDB
 from pygraphdb.graph_neo4j import Neo4j
-from embedded_graph_py import HyperRocks
+
+try:
+    # pylint: disable=undefined-variable
+    importlib.reload(unumdb_python)
+except NameError:
+    import unumdb_python
+from unumdb_python import GraphLSM, GraphBPlus
+# print('Using UnumDB version: ', unumdb_python.__dict__)
 
 
 count_nodes = int(os.getenv('COUNT_NODES', '0'))
@@ -25,9 +33,9 @@ stats = StatsFile(stats_path)
 _datasets = [
     # Path, Number of Nodes, Number of Edges
     ('/Users/av/Code/PyGraphDB/artifacts/graph-test/all.csv', 8, 10),
-    # ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
+    ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
     ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
-    # ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
+    ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
     # ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
     # ('/Users/av/Datasets/graph-human-brain/all.csv', 0, 87273967),
 ]
@@ -35,22 +43,24 @@ dataset_test = _datasets[0][0]
 datasets = [x[0] for x in _datasets[1:]]
 
 wrapper_types = [
-    Neo4j,
-    SQLiteMem,
-    MongoDB,
-    PostgreSQL,
+    # MongoDB,
+    # PostgreSQL,
     SQLite,
-    MySQL,
-    # HyperRocks,
+    # MySQL,
+    # Neo4j,
+    # SQLiteMem,
+    GraphLSM,
+    GraphBPlus,
 ]
 
 _wrappers = [
     # Type, Environment Variable, Default Value
-    (HyperRocks, 'URI_HYPER_ROCKS', '/Users/av/DBs/rocksdb/<dataset>'),
+    (GraphLSM, 'URI_UNUMDB_LSM', '/Users/av/DBs/unumdb.GraphLSM/<dataset>'),
+    (GraphBPlus, 'URI_UNUMDB_BPLUS', '/Users/av/DBs/unumdb.GraphBPLus/<dataset>.db3'),
     (SQLiteMem, 'URI_SQLITE_MEM', 'sqlite:///:memory:'),
-    (SQLite, 'URI_SQLITE', 'sqlite:////Users/av/DBs/sqlite/<dataset>/graph.db'),
+    (SQLite, 'URI_SQLITE', 'sqlite:////Users/av/DBs/sqlite/<dataset>.db3'),
     (MySQL, 'URI_MYSQL', 'mysql://root:temptemp@0.0.0.0:3306/<dataset>'),
-    (PostgreSQL, 'URI_PGSQL', 'postgres://av:temptemp@0.0.0.0:5432/<dataset>'),
+    (PostgreSQL, 'URI_PGSQL', 'postgres://0.0.0.0:5432/<dataset>'),
     (Neo4j, 'URI_NEO4J', 'bolt://0.0.0.0:7687/<dataset>'),
     (MongoDB, 'URI_MONGO', 'mongodb://0.0.0.0:27017/<dataset>'),
 ]

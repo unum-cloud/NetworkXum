@@ -44,10 +44,9 @@ class BulkImporter(object):
                     dataset=dataset_name,
                     stats=counter,
                 )
-                secs_elapsed = (counter.time_elapsed / 1000)
                 print(f'--- edges:', counter.count_operations)
                 print(f'--- edges/second:', counter.ops_per_sec())
-                print(f'--- Mb/second:', file_size / secs_elapsed)
+                print(f'--- Mb/second:', file_size / counter.time_elapsed)
                 config.stats.dump_to_file()
 
 
