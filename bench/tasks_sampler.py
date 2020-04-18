@@ -1,5 +1,6 @@
 import random
 from random import SystemRandom
+from typing import List
 
 from pygraphdb.helpers import yield_edges_from, chunks
 
@@ -16,81 +17,66 @@ class TasksSampler(object):
         self.nodes_to_query = []
         self.nodes_to_analyze = []
         self.edges_to_change_by_one = []
-        self.nodes_to_change_by_one = []
         self.edges_to_change_batched = [[]]
         self.count_finds = 10000
         self.count_analytics = 1000
         self.count_changes = 10000
-        self._select_edges = list()
-        self._select_nodes = set()
+        self._buffer_edges = list()
 
-    def sample_from_file(self, filename: str, sampling_ratio: float):
-        rnd = SystemRandom()
+    def number_of_needed_samples(self) -> int:
+        return max(self.count_finds,
+                   self.count_analytics,
+                   self.count_changes)
+
+    def sample_reservoir(self, filename: str) -> int:
+        self._buffer_edges = []
+        count_seen = 0
+        count_needed = self.number_of_needed_samples()
         for e in yield_edges_from(filename):
-            if rnd.random() < sampling_ratio:
-                self._select_edges.append(e)
-                self._select_nodes.add(e['v1'])
-        self._select_nodes = list(self._select_nodes)
-        random.shuffle(self._select_edges)
-        random.shuffle(self._select_nodes)
-        self.count_finds = min(
-            self.count_finds,
-            len(self._select_nodes)
-        )
-        self.count_analytics = min(
-            self.count_analytics,
-            len(self._select_nodes)
-        )
-        self.count_changes = min(
-            self.count_changes,
-            len(self._select_edges)
-        )
-        self._split_samples()
-
-    def sample_from_file_cpp(self, filename: str, sampling_ratio: float):
-        pass
+            count_seen += 1
+            if len(self._buffer_edges) < count_needed:
+                self._buffer_edges.append(e)
+            else:
+                s = int(random.random() * count_seen)
+                if s < count_needed:
+                    self._buffer_edges[s] = e
+        self._split_samples_into_tasks()
 
     def sample_from_distribution(self, count_nodes):
-        count_max = max(self.count_finds,
-                        self.count_analytics,
-                        self.count_changes)
-        while len(self._select_edges) < count_max:
+        count_needed = self.number_of_needed_samples()
+        while len(self._buffer_edges) < count_needed:
             v1 = random.randrange(1, count_nodes)
             v2 = random.randrange(1, count_nodes)
             if v1 == v2:
                 continue
-            if v1 in self._select_nodes:
-                continue
-            self._select_nodes.add(v1)
-            self._select_edges.append({
+            self._buffer_edges.append({
                 'v1': v1,
                 'v2': v2,
             })
-        self._select_nodes = list(self._select_nodes)
-        self._split_samples()
+        self._split_samples_into_tasks()
 
-    def _split_samples(self):
+    def sample_nodes_from_edges(self, cnt) -> List[int]:
+        cnt = min(len(self._buffer_edges), cnt)
+        es = random.sample(self._buffer_edges, cnt)
+        # Save only unique values, but don't forget to shuffle.
+        vs = {e['v1'] for e in es}
+        vs = list(vs)
+        random.shuffle(vs)
+        return vs
+
+    def _split_samples_into_tasks(self):
         self.edges_to_query = random.sample(
-            self._select_edges,
-            self.count_finds,
-        )
-        self.nodes_to_query = random.sample(
-            self._select_nodes,
-            self.count_finds,
-        )
-        self.nodes_to_analyze = random.sample(
-            self._select_nodes,
-            self.count_analytics,
-        )
-
-        # Split write operations into groups.
-        self.nodes_to_change_by_one = self._select_nodes[:self.count_changes]
-        self.edges_to_change_by_one = self._select_edges[:self.count_changes]
+            self._buffer_edges, self.count_finds)
+        self.nodes_to_query = self.sample_nodes_from_edges(
+            self.count_finds)
+        self.nodes_to_analyze = self.sample_nodes_from_edges(
+            self.count_analytics)
+        self.edges_to_change_by_one = self._buffer_edges[:self.count_changes]
         self.edges_to_change_batched = list(chunks(
-            self._select_edges[:self.count_changes],
+            self._buffer_edges[:self.count_changes],
             100,
         ))
 
         # Clear the memory
-        # self._select_edges = None
+        # self._buffer_edges = None
         # self._select_nodes = None
