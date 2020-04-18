@@ -1,44 +1,303 @@
-## Simple Search Queries
+# PyGraphDB Benchmarks Overview
+## Insert Dump (edges/sec)
 
-|            | Retrieve Ingoing Edges | Retrieve Connected Edges | Retrieve Directed Edge | Retrieve Outgoing Edges | Retrieve Undirected Edge | Result       |
-| ---------- | ---------------------- | ------------------------ | ---------------------- | ----------------------- | ------------------------ | ------------ |
-| PostgreSQL | 295.73                 | 294.70                   | 326.20                 | 297.26                  | 305.19                   | :thumbsdown: |
-| SQLiteMem  | 2091.74                | 1579.95                  | 1895.73                | 1931.75                 | 1789.21                  | :thumbsup:   |
-| SQLite     | 2028.63                | 1170.30                  | 1278.22                | 1419.41                 | 1086.93                  |              |
-| MongoDB    | 46.67                  | 35.83                    | 56.42                  | 43.52                   | 80.91                    | :thumbsdown: |
-| MySQL      | 638.75                 | 529.53                   | 590.90                 | 590.84                  | 614.91                   | :thumbsdown: |
-| Neo4j      | 77.79                  | 75.39                    | 82.60                  | 76.95                   | 78.16                    | :thumbsdown: |
 
-## Complex Search Queries
+            First lets see, how much time it takes to simply parse the adjacency list file.
+            This will be our baseline for estimating the time required to build the indexes.
+            
+|                   | graph-communities | graph-eachmovie-ratings | graph-patent-citations |   Result   |
+| :---------------- | :---------------: | :---------------------: | :--------------------: | :--------: |
+| Parsing in Python |    490,068.94     |       564,322.69        |       617,139.11       | :thumbsup: |
 
-|            | Count Followers | Retrieve Friends of Friends | Retrieve Friends | Count Friends | Count Followers | Result       |
-| ---------- | --------------- | --------------------------- | ---------------- | ------------- | --------------- | ------------ |
-| PostgreSQL | 362.58          | 79.87                       | 293.02           | 318.92        | 364.03          |              |
-| SQLiteMem  | 1696.61         | 154.77                      | 1484.09          | 1476.50       | 1729.20         | :thumbsup:   |
-| SQLite     | 1642.76         | 150.47                      | 1226.09          | 1453.94       | 1627.44         | :thumbsup:   |
-| MongoDB    | 45.62           | 15.32                       | 35.00            | 35.10         | 43.75           | :thumbsdown: |
-| MySQL      | 491.51          | 88.44                       | 526.66           | 395.65        | 491.11          |              |
-| Neo4j      | 103.57          | 49.45                       | 111.86           | 97.41         | 110.55          | :thumbsdown: |
+|            | graph-communities | graph-eachmovie-ratings | graph-patent-citations |    Result    |
+| :--------- | :---------------: | :---------------------: | :--------------------: | :----------: |
+| SQLiteMem  |     73,992.93     |        74,524.73        |       71,887.72        |  :thumbsup:  |
+| SQLite     |     68,527.88     |        57,372.50        |       44,137.56        |              |
+| MySQL      |     22,045.07     |        23,981.46        |       14,636.07        | :thumbsdown: |
+| PostgreSQL |     7,951.17      |        7,174.14         |        7,230.86        | :thumbsdown: |
+| MongoDB    |     8,863.45      |        14,832.76        |       14,199.87        | :thumbsdown: |
+| Neo4j      |     17,279.18     |                         |                        |      ?       |
 
-## Insertions
 
-|            | Insert Edge | Insert Edges Batch | Insert Dump | Result       |
-| ---------- | ----------- | ------------------ | ----------- | ------------ |
-| PostgreSQL | 171.15      | 1064.31            | 988.96      | :thumbsdown: |
-| SQLiteMem  | 1291.70     | 16273.28           | 16777.03    | :thumbsup:   |
-| SQLite     | 509.00      | 7177.28            | 12767.77    |              |
-| MongoDB    | 41.36       | 7492.13            | 8549.08     | :thumbsdown: |
-| MySQL      | 145.84      | 6202.72            | 8832.01     | :thumbsdown: |
-| Neo4j      | 217.57      | 166.53             | 97.99       | :thumbsdown: |
+            Most DBs provide some form functionality for faster bulk imports,
+            but not all of them where used in benchmarks for various reasons.
 
-## Removals
+            * Neo4J supports CSV imports, but it requires duplicating the
+            imported file and constantly crashes (due to Java heap management issues).
 
-|            | Remove All | Remove Vertex | Remove Edge | Remove Edges Batch | Result       |
-| ---------- | ---------- | ------------- | ----------- | ------------------ | ------------ |
-| PostgreSQL | 647486.53  | 199.21        | 192.96      | 220.20             | :thumbsdown: |
-| SQLiteMem  | 9565520.52 | 1858.00       | 2842.31     | 2804.89            | :thumbsup:   |
-| SQLite     | 1827424.38 | 380.43        | 839.24      | 712.66             | :thumbsdown: |
-| MongoDB    | 657475.43  | 34.25         | 82.31       | 42.54              | :thumbsdown: |
-| MySQL      | 77234.82   | 164.41        | 210.02      | 203.29             | :thumbsdown: |
-| Neo4j      | 4626.08    | 2358087.96    | 230.51      | 167.82             | :thumbsdown: |
+            * PostgreSQL and MySQL dialects of SQL have special functions for importing
+            CSVs, but their functionality is very limited and performance gains aren't
+            substantial. A better approach is to use unindexed table of incoming edges
+            and later submit it into the main store once the data is absorbed.
+
+            * MongoDB provides a command line tool, but it wasn't used to limit
+            the number of binary dependencies and simlify configuration.
+        
+|            | graph-communities | graph-eachmovie-ratings | graph-patent-citations |    Result    |
+| :--------- | :---------------: | :---------------------: | :--------------------: | :----------: |
+| GraphLSM   |    119,314.66     |       490,707.11        |       135,714.61       |  :thumbsup:  |
+| GraphBPlus |    204,365.92     |       207,143.17        |       113,372.62       | :thumbsdown: |
+
+## Read Queries
+
+
+            Following are simple lookup operations.
+            Their speed translates into the execution time of analytical queries like:
+
+            * Shortest Path Calculation,
+            * Clustering Analysis,
+            * Pattern Matching.
+
+            As we are running on a local machine and within the same filesystem,
+            the networking bandwidth and latency between server and client applications
+            can't be a bottleneck.
+        
+### Retrieve Directed Edge
+|            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
+| SQLiteMem  |                   |                         |                        |   ?    |
+| SQLite     |                   |                         |                        |   ?    |
+| MySQL      |                   |                         |                        |   ?    |
+| PostgreSQL |                   |                         |                        |   ?    |
+| MongoDB    |                   |                         |                        |   ?    |
+| Neo4j      |                   |                         |                        |   ?    |
+| GraphLSM   |                   |                         |                        |   ?    |
+| GraphBPlus |                   |                         |                        |   ?    |
+
+### Given nodes A and B - find any directed edge that goes from A to B.
+|            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
+| SQLiteMem  |                   |                         |                        |   ?    |
+| SQLite     |                   |                         |                        |   ?    |
+| MySQL      |                   |                         |                        |   ?    |
+| PostgreSQL |                   |                         |                        |   ?    |
+| MongoDB    |                   |                         |                        |   ?    |
+| Neo4j      |                   |                         |                        |   ?    |
+| GraphLSM   |                   |                         |                        |   ?    |
+| GraphBPlus |                   |                         |                        |   ?    |
+
+### Retrieve Undirected Edge
+|            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
+| SQLiteMem  |                   |                         |                        |   ?    |
+| SQLite     |                   |                         |                        |   ?    |
+| MySQL      |                   |                         |                        |   ?    |
+| PostgreSQL |                   |                         |                        |   ?    |
+| MongoDB    |                   |                         |                        |   ?    |
+| Neo4j      |                   |                         |                        |   ?    |
+| GraphLSM   |                   |                         |                        |   ?    |
+| GraphBPlus |                   |                         |                        |   ?    |
+
+### Given a pair of nodes - find any edge that connects them.
+|                                                                                                                                                                            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------: |
+| SQLiteMem                  |                                                                                                                                                                                                                                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                        |                                   ?                                                    |
+| SQLite                                                                     |                                                                                                                                                                                                                                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                        |                                   ?                                                    |
+| MySQL                                                                                      |                                                                                                                                                                                                                                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                        |                                   ?                                                    |
+| PostgreSQL |                                                                                                                                                                                                                                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                        |                                   ?                                                    |
+| MongoDB                                                    |                                                                                                                                                                                                                                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                        |                                   ?                                                    |
+| Neo4j                                                                                      |                                                                                                                                                                                                                                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                        |                                   ?                                                    |
+| GraphLSM                                   |                                                                                                                                                                                                                                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                        |                                   ?                                                    |
+| GraphBPlus |                                                                                                                                                                                                                                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                        |                                   ?                                                    |
+
+### Retrieve Connected Edges
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Find all directed edges that contain a specific node in any role.
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Retrieve Outgoing Edges
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Find all directed edges that start in a specific node.
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Retrieve Friends
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Get IDs of all nodes that share an edge with a given node.
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Retrieve Friends of Friends
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Get IDs of all nodes that share an edge with neighbors of a given node.
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Count Friends
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Count the number of edges containing a specific node and their total weight.
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Count Followers
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Count the number of edges ending in a specific node and their total weight.
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+## Write Operations
+
+
+        We don't benchmark edge insertions as those operations are uncommon in graph workloads.
+        Instead of that we benchmark **upserts** = inserts or updates.
+        Batch operations have different sizes for different DBs depending on memory consumption 
+        and other limitations of each DB.
+        Concurrency is tested only in systems that explicitly support it..
+        
+### Count the number of edges ending in a specific node and their total weight.
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Count the number of edges ending in a specific node and their total weight.
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Count the number of edges ending in a specific node and their total weight.
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
+
+### Count the number of edges ending in a specific node and their total weight.
+|  | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
+| :--- | :---: | :---: | :---: | :---: |
+| SQLiteMem |  |  |  | ? |
+| SQLite |  |  |  | ? |
+| MySQL |  |  |  | ? |
+| PostgreSQL |  |  |  | ? |
+| MongoDB |  |  |  | ? |
+| Neo4j |  |  |  | ? |
+| GraphLSM |  |  |  | ? |
+| GraphBPlus |  |  |  | ? |
 

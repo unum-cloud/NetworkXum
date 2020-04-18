@@ -57,9 +57,9 @@ class SimpleBenchmark(object):
 
         # Reversable write operations.
         self.one('Remove Edge', self.remove_e)  # Single edge removals
-        self.one('Insert Edge', self.insert_e)  # Single edge inserts
+        self.one('Upsert Edge', self.insert_e)  # Single edge inserts
         self.one('Remove Edges Batch', self.remove_es)  # Batched edge removals
-        self.one('Insert Edges Batch', self.insert_es)  # Batched edge inserts
+        self.one('Upsert Edges Batch', self.insert_es)  # Batched edge inserts
 
         if remove_all_afterwards:
             self.one('Remove Vertex', self.remove_v)
