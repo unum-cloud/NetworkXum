@@ -56,7 +56,10 @@ Implements the same [interface](adapters/base.py) for every one of those backend
 
 ## TODO
 
-[x] Benchmark on small graphs.
-[x] Benchmark on mid size graphs.
-[x] Session management in SQL and Neo4J.
-[ ] ArangoDB wrapper.
+- [x] Benchmark on small graphs.
+- [x] Benchmark on mid size graphs.
+- [x] Session management in SQL and Neo4J.
+- [ ] ArangoDB wrapper.
+- [ ] Mixed Read/Write benchmarks.
+- [ ] NetworkX analytical wrapper and benchmarks.
+- [ ] Compare to CompressedGraphLSM.

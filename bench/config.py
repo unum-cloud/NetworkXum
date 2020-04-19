@@ -15,7 +15,7 @@ try:
     importlib.reload(unumdb_python)
 except NameError:
     import unumdb_python
-from unumdb_python import GraphLSM, GraphBPlus
+from unumdb_python import GraphLSM, SQLiteCpp
 # print('Using UnumDB version: ', unumdb_python.__dict__)
 
 
@@ -55,7 +55,7 @@ _datasets = [
     # Third column is the edge weights.
     # Average degree: 670.
     # http://networkrepository.com/bio-mouse-gene.php
-    # ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
+    ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
 
     # Human Brain Network. 227 Mb.
     # Average degree: 186.
@@ -68,18 +68,18 @@ datasets = [x[0] for x in _datasets[1:]]
 wrapper_types = [
     # SQLiteMem,
     GraphLSM,
-    GraphBPlus,
-    MongoDB,
-    SQLite,
-    MySQL,
-    PostgreSQL,
+    # SQLiteCpp,
+    # MongoDB,
+    # SQLite,
+    # MySQL,
+    # PostgreSQL,
     # Neo4J,
 ]
 
 _wrappers = [
     # Type, Environment Variable, Default Value
     (GraphLSM, 'URI_UNUMDB_LSM', '/Users/av/DBs/unumdb.GraphLSM/<dataset>'),
-    (GraphBPlus, 'URI_UNUMDB_BPLUS', '/Users/av/DBs/unumdb.GraphBPLus/<dataset>.db3'),
+    (SQLiteCpp, 'URI_UNUMDB_BPLUS', '/Users/av/DBs/unumdb.GraphBPLus/<dataset>.db3'),
     (SQLiteMem, 'URI_SQLITE_MEM', 'sqlite:///:memory:'),
     (SQLite, 'URI_SQLITE', 'sqlite:////Users/av/DBs/sqlite/<dataset>.db3'),
     (MySQL, 'URI_MYSQL', 'mysql://av:temptemp@0.0.0.0:3306/<dataset>'),

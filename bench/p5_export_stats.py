@@ -23,7 +23,7 @@ class StatsExporterPerOperation():
             # 'ArangoDB',
         ]
         dbs_unum = [
-            # 'GraphBPlus',
+            'SQLiteCpp',
             'GraphLSM',
             # 'GraphGigaHash',
             # 'GraphTeraHash',
@@ -32,8 +32,9 @@ class StatsExporterPerOperation():
             'graph-communities',
             'graph-eachmovie-ratings',
             'graph-patent-citations',
-            # 'graph-mouse-gene',
+            'graph-mouse-gene',
         ]
+        dataset_for_comparison = dataset_names[2]
 
         # Intro.
         out.add_text('# PyGraphDB Benchmarks Overview')
@@ -58,7 +59,7 @@ class StatsExporterPerOperation():
                 allowed_rows=['Parsing in Python', 'SQLiteMem'],
                 allowed_cols=dataset_names,
             ).\
-            compare_by(dataset_names[-1]).\
+            compare_by(dataset_for_comparison).\
             add_last_table()
 
         out.add_text('''
@@ -80,7 +81,7 @@ class StatsExporterPerOperation():
                 allowed_rows=[*dbs_pygraph, 'Neo4J', *dbs_unum],
                 allowed_cols=dataset_names,
             ).\
-            compare_by(dataset_names[-1]).\
+            compare_by(dataset_for_comparison).\
             add_last_table()
 
         # Read Queries.
@@ -131,7 +132,7 @@ class StatsExporterPerOperation():
                     allowed_rows=[*dbs_pygraph, *dbs_unum],
                     allowed_cols=dataset_names
                 ).\
-                compare_by(dataset_names[-1]).\
+                compare_by(dataset_for_comparison).\
                 add_last_table()
 
         # Write Operations.
@@ -165,7 +166,7 @@ class StatsExporterPerOperation():
                     allowed_rows=[*dbs_pygraph, *dbs_unum],
                     allowed_cols=dataset_names
                 ).\
-                compare_by(dataset_names[-1]).\
+                compare_by(dataset_for_comparison).\
                 add_last_table()
 
         # Configuration Details
