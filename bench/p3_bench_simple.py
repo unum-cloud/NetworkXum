@@ -18,10 +18,10 @@ class SimpleBenchmark(object):
         5. Clearing all the data (if needed).
     """
 
-    def __init__(self, max_seconds_per_query=15):
+    def __init__(self, max_seconds_per_query=45):
         self.max_seconds_per_query = max_seconds_per_query
 
-    def run(self, repeat_existing=False):
+    def run(self, repeat_existing=True):
         self.repeat_existing = repeat_existing
         for dataset_path in config.datasets:
             self.dataset_path = dataset_path
