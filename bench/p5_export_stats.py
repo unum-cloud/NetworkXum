@@ -28,12 +28,11 @@ class StatsExporterPerOperation():
             # 'GraphGigaHash',
             # 'GraphTeraHash',
         ]
-        # dataset_names = [config.dataset_name(p) for p in config.datasets]
         dataset_names = [
             'graph-communities',
             'graph-eachmovie-ratings',
             'graph-patent-citations',
-            'graph-mouse-gene',
+            # 'graph-mouse-gene',
         ]
 
         # Intro.

@@ -55,7 +55,7 @@ _datasets = [
     # Third column is the edge weights.
     # Average degree: 670.
     # http://networkrepository.com/bio-mouse-gene.php
-    ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
+    # ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
 
     # Human Brain Network. 227 Mb.
     # Average degree: 186.
@@ -67,8 +67,8 @@ datasets = [x[0] for x in _datasets[1:]]
 
 wrapper_types = [
     # SQLiteMem,
-    # GraphLSM,
-    # GraphBPlus,
+    GraphLSM,
+    GraphBPlus,
     MongoDB,
     SQLite,
     MySQL,
