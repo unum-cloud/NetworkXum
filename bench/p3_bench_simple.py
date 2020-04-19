@@ -1,4 +1,5 @@
 import os
+from time import time
 
 from pygraphdb.base_graph import GraphBase
 from pygraphdb.helpers import StatsCounter
@@ -16,6 +17,9 @@ class SimpleBenchmark(object):
         4. Modifications: removing and restoring same objects.
         5. Clearing all the data (if needed).
     """
+
+    def __init__(self, max_seconds_per_step=60):
+        self.max_seconds_per_step = max_seconds_per_step
 
     def run(self, repeat_existing=False):
         self.repeat_existing = repeat_existing
@@ -191,9 +195,16 @@ class SimpleBenchmark(object):
 
     def find_vs_related_related(self) -> int:
         cnt = 0
+        cnt_found = 0
+        t0 = time()
         for v in self.tasks.nodes_to_analyze:
-            self.graph.nodes_related_to_related(v)
+            vs = self.graph.nodes_related_to_related(v)
             cnt += 1
+            cnt_found += len(vs)
+            dt = time() - t0
+            if dt > self.max_seconds_per_step:
+                break
+        print(f'---- {cnt} ops: {cnt_found} related to related nodes')
         return cnt
 
     def remove_e(self) -> int:
