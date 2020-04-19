@@ -141,13 +141,16 @@
     },
     {
         "device": "av19mac.local",
-        "time_elapsed": 0.5787310600280762,
+        "time_elapsed": 21.967702865600586,
         "count_operations": 10000,
-        "msecs_per_operation": 0.05787310600280762,
-        "operations_per_second": 17279.183183143596,
+        "msecs_per_operation": 2.1967702865600587,
+        "operations_per_second": 455.21373177616516,
         "operation": "Insert Dump",
         "database": "Neo4j",
-        "dataset": "graph-communities"
+        "dataset": "graph-communities",
+        "date_utc": 1587281622.870989,
+        "date_readable": "Apr 19, 2020",
+        "date_sortable": "2020/33/19"
     },
     {
         "device": "av19mac.local",
