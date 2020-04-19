@@ -66,6 +66,7 @@ class TasksSampler(object):
         return vs
 
     def _split_samples_into_tasks(self):
+        self.count_finds = min(len(self._buffer_edges), self.count_finds)
         self.edges_to_query = random.sample(
             self._buffer_edges, self.count_finds)
         self.nodes_to_query = self.sample_nodes_from_edges(

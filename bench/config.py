@@ -21,8 +21,8 @@ from unumdb_python import GraphLSM, SQLiteCpp
 
 count_nodes = int(os.getenv('COUNT_NODES', '0'))
 count_edges = int(os.getenv('COUNT_EDGES', '0'))
-count_finds = int(os.getenv('COUNT_FINDS', '500'))
-count_analytics = int(os.getenv('COUNT_ANALYTICS', '50'))
+count_finds = int(os.getenv('COUNT_FINDS', '5000'))
+count_analytics = int(os.getenv('COUNT_ANALYTICS', '300'))
 count_changes = int(os.getenv('COUNT_CHANGES', '5000'))
 device_name = os.getenv('DEVICE_NAME', 'Unknown Device')
 
@@ -36,19 +36,18 @@ _datasets = [
     # Test graph.
     ('/Users/av/Code/PyGraphDB/datasets/graph-test/all.csv', 8, 10),
 
-
     # Average degree: ~8.
     # http://networkrepository.com/fb-pages-company.php
-    ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
+    # ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
 
     # Average degree 90.
     # http://networkrepository.com/rec-eachmovie.php
-    ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
+    # ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
 
     # Patent Citation Network. 77 Mb.
     # Average degree: 8.
     # http://networkrepository.com/cit-patent.php
-    ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
+    # ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
 
     # Mouse gene regulatory network derived
     # from analyzing gene expression profiles. 162 Mb.
@@ -67,12 +66,12 @@ datasets = [x[0] for x in _datasets[1:]]
 
 wrapper_types = [
     # SQLiteMem,
+    SQLite,
+    MongoDB,
+    MySQL,
+    PostgreSQL,
     GraphLSM,
-    # SQLiteCpp,
-    # MongoDB,
-    # SQLite,
-    # MySQL,
-    # PostgreSQL,
+    SQLiteCpp,
     # Neo4J,
 ]
 

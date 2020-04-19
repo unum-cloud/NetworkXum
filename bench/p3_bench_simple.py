@@ -18,10 +18,10 @@ class SimpleBenchmark(object):
         5. Clearing all the data (if needed).
     """
 
-    def __init__(self, max_seconds_per_query=45):
+    def __init__(self, max_seconds_per_query=60):
         self.max_seconds_per_query = max_seconds_per_query
 
-    def run(self, repeat_existing=True):
+    def run(self, repeat_existing=False):
         self.repeat_existing = repeat_existing
         for dataset_path in config.datasets:
             self.dataset_path = dataset_path
@@ -55,7 +55,7 @@ class SimpleBenchmark(object):
         self.one('Retrieve Directed Edge', self.find_e_directed)
         self.one('Retrieve Undirected Edge', self.find_e_undirected)
 
-        # Queries returning collections.
+        # # Queries returning collections.
         self.one('Retrieve Outgoing Edges', self.find_es_from)
         self.one('Retrieve Ingoing Edges', self.find_es_to)
         self.one('Retrieve Connected Edges', self.find_es_related)
