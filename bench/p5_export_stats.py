@@ -1,3 +1,6 @@
+import platform
+
+import psutil
 from pystats.exporter import StatsExporter
 
 import config
@@ -174,6 +177,20 @@ class StatsExporterPerOperation():
                 ).\
                 compare_by(dataset_names[-1]).\
                 add_last_table()
+
+        # Configuration Details
+        out.add_text('## Device')
+        cores = psutil.cpu_count(logical=False)
+        threads = psutil.cpu_count(logical=True)
+        frequency = psutil.cpu_freq().min
+        ram_gbs = psutil.virtual_memory().total / (2 ** 30)
+        disk_gbs = psutil.disk_usage('/').total / (2 ** 30)
+        out.add_text(f'''
+            * CPU: {cores} cores, {threads} threads @ {frequency:.2f}Mhz.
+            * RAM: {ram_gbs:.2f} Gb
+            * Disk: {disk_gbs:.2f} Gb
+            * OS: {platform.system()}
+            ''')
 
         out.export_to(config.report_path, overwrite=True)
 

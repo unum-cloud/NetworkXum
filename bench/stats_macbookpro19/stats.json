@@ -1451,5 +1451,44 @@
         "date_utc": 1587276514.556364,
         "date_readable": "Apr 19, 2020",
         "date_sortable": "2020/08/19"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 1.5729501247406006,
+        "count_operations": 5000,
+        "msecs_per_operation": 0.3145900249481201,
+        "operations_per_second": 3178.7403308954654,
+        "operation": "Upsert Edge",
+        "database": "MongoDB",
+        "dataset": "graph-communities",
+        "date_utc": 1587285660.713153,
+        "date_readable": "Apr 19, 2020",
+        "date_sortable": "2020/41/19"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 1.7642230987548828,
+        "count_operations": 5000,
+        "msecs_per_operation": 0.35284461975097653,
+        "operations_per_second": 2834.108681338997,
+        "operation": "Remove Edges Batch",
+        "database": "MongoDB",
+        "dataset": "graph-communities",
+        "date_utc": 1587285662.477561,
+        "date_readable": "Apr 19, 2020",
+        "date_sortable": "2020/41/19"
+    },
+    {
+        "device": "av19mac.local",
+        "time_elapsed": 0.3641700744628906,
+        "count_operations": 5000,
+        "msecs_per_operation": 0.07283401489257812,
+        "operations_per_second": 13729.848635625622,
+        "operation": "Upsert Edges Batch",
+        "database": "MongoDB",
+        "dataset": "graph-communities",
+        "date_utc": 1587285662.84186,
+        "date_readable": "Apr 19, 2020",
+        "date_sortable": "2020/41/19"
     }
 ]

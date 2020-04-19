@@ -26,16 +26,16 @@ count_analytics = int(os.getenv('COUNT_ANALYTICS', '100'))
 count_changes = int(os.getenv('COUNT_CHANGES', '5000'))
 device_name = os.getenv('DEVICE_NAME', 'Unknown Device')
 
-report_path = 'artifacts/stats.md'
-stats_path = 'artifacts/stats.json'
+report_path = 'bench/stats_macbookpro19/stats.md'
+stats_path = 'bench/stats_macbookpro19/stats.json'
 stats = StatsFile(stats_path)
 
 _datasets = [
     # Path, Number of Nodes, Number of Edges
-    ('/Users/av/Code/PyGraphDB/artifacts/graph-test/all.csv', 8, 10),
+    ('/Users/av/Code/PyGraphDB/datasets/graph-test/all.csv', 8, 10),
     ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
     ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
-    ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
+    # ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
     # ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
     # ('/Users/av/Datasets/graph-human-brain/all.csv', 0, 87273967),
 ]
@@ -43,13 +43,13 @@ dataset_test = _datasets[0][0]
 datasets = [x[0] for x in _datasets[1:]]
 
 wrapper_types = [
-    # SQLiteMem,
+    SQLiteMem,
     SQLite,
     GraphLSM,
     GraphBPlus,
     MySQL,
     PostgreSQL,
-    # MongoDB,
+    MongoDB,
     # Neo4j,
 ]
 
@@ -61,7 +61,8 @@ _wrappers = [
     (SQLite, 'URI_SQLITE', 'sqlite:////Users/av/DBs/sqlite/<dataset>.db3'),
     (MySQL, 'URI_MYSQL', 'mysql://av:temptemp@0.0.0.0:3306/<dataset>'),
     (PostgreSQL, 'URI_PGSQL', 'postgres://av:temptemp@0.0.0.0:5432/<dataset>'),
-    (Neo4j, 'URI_NEO4J', 'bolt://0.0.0.0:7687/<dataset>'),
+    (Neo4j, 'URI_NEO4J', 'bolt://neo4j:temptemp@localhost:7687/<dataset>'),
+    # (Neo4j, 'URI_NEO4J', 'bolt://localhost:7687/<dataset>'),
     # To startup:
     # mongod --dbpath=/Users/av/DBs/mongo/ --directoryperdb --wiredTigerCacheSizeGB=2 --wiredTigerDirectoryForIndexes &!
     (MongoDB, 'URI_MONGO', 'mongodb://0.0.0.0:27017/<dataset>'),

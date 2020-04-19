@@ -9,7 +9,7 @@ from pygraphdb.helpers import StatsCounter
 
 class StatsFile(object):
 
-    def __init__(self, filename='artifacts/stats.json'):
+    def __init__(self, filename='bench/tmp/stats.json'):
         self.filename = filename
         self.device_name = platform.node()
         self.results = []

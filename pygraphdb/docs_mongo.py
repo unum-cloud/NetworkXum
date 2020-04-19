@@ -185,16 +185,21 @@ class MongoDB(GraphBase):
         e = self.validate_edge(e)
         if e is None:
             return False
-        result = self.edges.update_one(
-            filter={
-                'v1': e['v1'],
-                'v2': e['v2'],
-            },
-            update={
-                '$set': e,
-            },
-            upsert=True,
-        )
+        if '_id' in e:
+            result = self.edges.update_one(
+                filter={'_id': e['_id'], },
+                update={'$set': e, },
+                upsert=True,
+            )
+        else:
+            result = self.edges.update_one(
+                filter={
+                    'v1': e['v1'],
+                    'v2': e['v2'],
+                },
+                update={'$set': e, },
+                upsert=True,
+            )
         return result.modified_count >= 1
 
     def remove_edge(self, e: object) -> bool:
