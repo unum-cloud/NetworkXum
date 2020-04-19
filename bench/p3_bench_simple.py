@@ -111,24 +111,36 @@ class SimpleBenchmark(object):
         half = int(len(self.tasks.edges_to_query) / 2)
         cnt = 0
         cnt_found = 0
+        t0 = time()
         for e in self.tasks.edges_to_query[:half]:
             match = self.graph.edge_directed(e['v1'], e['v2'])
             cnt += 1
             cnt_found += 0 if (match is None) else 1
+            dt = time() - t0
+            if dt > self.max_seconds_per_query:
+                break
+        t0 = time()
         for e in self.tasks.edges_to_query[half:]:
             match = self.graph.edge_directed(e['v2'], e['v1'])
             cnt += 1
             cnt_found += 0 if (match is None) else 1
+            dt = time() - t0
+            if dt > self.max_seconds_per_query:
+                break
         print(f'---- {cnt} ops: {cnt_found} directed matches')
         return cnt
 
     def find_e_undirected(self) -> int:
         cnt = 0
         cnt_found = 0
+        t0 = time()
         for e in self.tasks.edges_to_query:
             match = self.graph.edge_directed(e['v1'], e['v2'])
             cnt += 1
             cnt_found += 0 if (match is None) else 1
+            dt = time() - t0
+            if dt > self.max_seconds_per_query:
+                break
         print(f'---- {cnt} ops: {cnt_found} undirected matches')
         return cnt
 
