@@ -17,28 +17,36 @@ class SimpleBenchmark(object):
         5. Clearing all the data (if needed).
     """
 
-    def run(self, repeat_existing=True):
+    def run(self, repeat_existing=False):
         self.repeat_existing = repeat_existing
         for dataset_path in config.datasets:
+            self.dataset_path = dataset_path
             self.tasks = TasksSampler()
-            max_wanted_edges = max(
-                config.count_finds, config.count_analytics, config.count_changes)
-            self.tasks.sample_from_file_cpp(dataset_path, max_wanted_edges)
+            self.tasks.count_finds = config.count_finds
+            self.tasks.count_analytics = config.count_analytics
+            self.tasks.count_changes = config.count_changes
+            self.tasks.sample_reservoir(dataset_path)
 
             for graph_type in config.wrapper_types:
                 url = config.database_url(graph_type, dataset_path)
                 if url is None:
                     continue
                 g = graph_type(url)
-                if (g.count_nodes() != 0):
+                if (g.count_edges() == 0):
                     continue
 
                 dataset_name = config.dataset_name(dataset_path)
                 wrapper_name = config.wrapper_name(g)
                 print(f'-- Benchmarking: {dataset_name} @ {wrapper_name}')
-                self.run_one(g)
+                self.graph = g
+                self.run_one()
+                self.graph = None
+                config.stats.dump_to_file()
 
-    def run_one(self, g, remove_all_afterwards=False):
+            self.tasks = None
+            self.dataset_path = None
+
+    def run_one(self, remove_all_afterwards=False):
         # Queries returning single object.
         self.one('Retrieve Directed Edge', self.find_e_directed)
         self.one('Retrieve Undirected Edge', self.find_e_undirected)
@@ -57,9 +65,9 @@ class SimpleBenchmark(object):
 
         # Reversable write operations.
         self.one('Remove Edge', self.remove_e)  # Single edge removals
-        self.one('Upsert Edge', self.insert_e)  # Single edge inserts
+        self.one('Upsert Edge', self.upsert_e)  # Single edge inserts
         self.one('Remove Edges Batch', self.remove_es)  # Batched edge removals
-        self.one('Upsert Edges Batch', self.insert_es)  # Batched edge inserts
+        self.one('Upsert Edges Batch', self.upsert_es)  # Batched edge inserts
 
         if remove_all_afterwards:
             self.one('Remove Vertex', self.remove_v)
@@ -67,24 +75,27 @@ class SimpleBenchmark(object):
 
     def one(self, operation_name, f):
         counter = StatsCounter()
-        dataset_name = os.path.basename(self.dataset_path)
-        class_name = self.graph.__class__.__name__
-        print(f'--- {class_name}: {operation_name} @ {dataset_name}')
+        dataset_name = config.dataset_name(self.dataset_path)
+        wrapper_name = config.wrapper_name(self.graph)
+        print(f'--- {wrapper_name}: {operation_name} @ {dataset_name}')
         if not self.repeat_existing:
-            if self.stats.find_index(
-                class_name,
-                operation_name,
-                dataset_name
+            if config.stats.find_index(
+                wrapper_class=wrapper_name,
+                operation_name=operation_name,
+                dataset=dataset_name,
             ) is not None:
                 print('--- Skipping!')
                 return
         counter.handle(f)
+        if counter.count_operations == 0:
+            print(f'---- Didnt measure!')
+            return
         print(f'---- Importing new stats!')
-        self.stats.upsert(
-            class_name,
-            operation_name,
-            dataset_name,
-            counter
+        config.stats.upsert(
+            wrapper_class=wrapper_name,
+            operation_name=operation_name,
+            dataset=dataset_name,
+            stats=counter,
         )
 
     # ---
@@ -192,7 +203,7 @@ class SimpleBenchmark(object):
             cnt += 1
         return cnt
 
-    def insert_e(self) -> int:
+    def upsert_e(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_change_by_one:
             self.graph.upsert_edge(e)
@@ -206,16 +217,12 @@ class SimpleBenchmark(object):
             cnt += len(es)
         return cnt
 
-    def insert_es(self) -> int:
+    def upsert_es(self) -> int:
         cnt = 0
         for es in self.tasks.edges_to_change_batched:
             self.graph.upsert_edges(es)
             cnt += len(es)
         return cnt
-
-    def upsert_adjacency_list(self) -> int:
-        self.graph.upsert_adjacency_list(self.dataset_path)
-        return self.graph.count_edges()
 
     def remove_v(self) -> int:
         cnt = 0

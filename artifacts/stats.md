@@ -1,5 +1,4 @@
 # PyGraphDB Benchmarks Overview
-
 ## Insert Dump (edges/sec)
 
 Every datascience project starts by importing the data.
@@ -20,15 +19,17 @@ This will be our baseline for estimating the time required to build the indexes 
 | MongoDB    |     8,863.45      |        14,832.76        |       14,199.87        | :thumbsdown: |
 | Neo4j      |     17,279.18     |                         |                        |      ?       |
 
+
 Most DBs provide some form functionality for faster bulk imports, but not all of them where used in benchmarks for various reasons.
 
 * Neo4J supports CSV imports, but it requires duplicating the imported file and constantly crashes (due to Java heap management issues).
 * PostgreSQL and MySQL dialects of SQL have special functions for importing CSVs, but their functionality is very limited and performance gains aren't substantial. A better approach is to use unindexed table of incoming edges and later submit it into the main store once the data is absorbed.
 * MongoDB provides a command line tool, but it wasn't used to limit the number of binary dependencies and simlify configuration.
 
+
 |            | graph-communities | graph-eachmovie-ratings | graph-patent-citations |    Result    |
 | :--------- | :---------------: | :---------------------: | :--------------------: | :----------: |
-| GraphLSM   |    119,314.66     |       490,707.11        |       135,714.61       |  :thumbsup:  |
+| GraphLSM   |    119,314.66     |       534,250.90        |       135,714.61       |  :thumbsup:  |
 | GraphBPlus |    204,365.92     |       207,143.17        |       113,372.62       | :thumbsdown: |
 
 ## Read Queries
@@ -45,116 +46,108 @@ the networking bandwidth and latency between server and client applications
 can't be a bottleneck.
 
 ### Retrieve Directed Edge
-
 Given nodes A and B - find any directed edge that goes from A to B.
 |            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
 | :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
 | SQLiteMem  |                   |                         |                        |   ?    |
-| SQLite     |                   |                         |                        |   ?    |
-| MySQL      |                   |                         |                        |   ?    |
-| PostgreSQL |                   |                         |                        |   ?    |
-| MongoDB    |                   |                         |                        |   ?    |
+| SQLite     |      656.64       |         420.76          |                        |   ?    |
+| MySQL      |     1,072.92      |                         |                        |   ?    |
+| PostgreSQL |      840.35       |                         |                        |   ?    |
+| MongoDB    |     2,655.66      |                         |                        |   ?    |
 | Neo4j      |                   |                         |                        |   ?    |
-| GraphLSM   |                   |                         |                        |   ?    |
-| GraphBPlus |                   |                         |                        |   ?    |
+| GraphLSM   |     46,640.69     |                         |                        |   ?    |
+| GraphBPlus |     1,339.74      |                         |                        |   ?    |
 
 ### Retrieve Undirected Edge
-
 Given a pair of nodes - find any edge that connects them.
 |            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
 | :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
 | SQLiteMem  |                   |                         |                        |   ?    |
-| SQLite     |                   |                         |                        |   ?    |
-| MySQL      |                   |                         |                        |   ?    |
-| PostgreSQL |                   |                         |                        |   ?    |
-| MongoDB    |                   |                         |                        |   ?    |
+| SQLite     |      682.46       |         382.87          |                        |   ?    |
+| MySQL      |      973.20       |                         |                        |   ?    |
+| PostgreSQL |      890.59       |                         |                        |   ?    |
+| MongoDB    |     3,080.53      |                         |                        |   ?    |
 | Neo4j      |                   |                         |                        |   ?    |
-| GraphLSM   |                   |                         |                        |   ?    |
-| GraphBPlus |                   |                         |                        |   ?    |
+| GraphLSM   |     56,837.62     |                         |                        |   ?    |
+| GraphBPlus |     1,354.79      |                         |                        |   ?    |
 
 ### Retrieve Connected Edges
-
 Find all directed edges that contain a specific node in any role.
 |            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
 | :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
 | SQLiteMem  |                   |                         |                        |   ?    |
-| SQLite     |                   |                         |                        |   ?    |
-| MySQL      |                   |                         |                        |   ?    |
-| PostgreSQL |                   |                         |                        |   ?    |
-| MongoDB    |                   |                         |                        |   ?    |
+| SQLite     |      716.92       |          18.50          |                        |   ?    |
+| MySQL      |      643.70       |                         |                        |   ?    |
+| PostgreSQL |      910.70       |                         |                        |   ?    |
+| MongoDB    |     2,682.58      |                         |                        |   ?    |
 | Neo4j      |                   |                         |                        |   ?    |
-| GraphLSM   |                   |                         |                        |   ?    |
-| GraphBPlus |                   |                         |                        |   ?    |
+| GraphLSM   |     12,193.76     |                         |                        |   ?    |
+| GraphBPlus |     13,168.71     |                         |                        |   ?    |
 
 ### Retrieve Outgoing Edges
-
 Find all directed edges that start in a specific node.
 |            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
 | :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
 | SQLiteMem  |                   |                         |                        |   ?    |
-| SQLite     |                   |                         |                        |   ?    |
-| MySQL      |                   |                         |                        |   ?    |
-| PostgreSQL |                   |                         |                        |   ?    |
-| MongoDB    |                   |                         |                        |   ?    |
+| SQLite     |      711.15       |          17.62          |                        |   ?    |
+| MySQL      |      740.72       |                         |                        |   ?    |
+| PostgreSQL |      910.29       |                         |                        |   ?    |
+| MongoDB    |     2,876.23      |                         |                        |   ?    |
 | Neo4j      |                   |                         |                        |   ?    |
-| GraphLSM   |                   |                         |                        |   ?    |
-| GraphBPlus |                   |                         |                        |   ?    |
+| GraphLSM   |     12,330.82     |                         |                        |   ?    |
+| GraphBPlus |     1,356.34      |                         |                        |   ?    |
 
 ### Retrieve Friends
-
 Get IDs of all nodes that share an edge with a given node.
 |            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
 | :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
 | SQLiteMem  |                   |                         |                        |   ?    |
-| SQLite     |                   |                         |                        |   ?    |
-| MySQL      |                   |                         |                        |   ?    |
-| PostgreSQL |                   |                         |                        |   ?    |
-| MongoDB    |                   |                         |                        |   ?    |
+| SQLite     |      673.63       |          17.83          |                        |   ?    |
+| MySQL      |      531.39       |                         |                        |   ?    |
+| PostgreSQL |      908.78       |                         |                        |   ?    |
+| MongoDB    |     3,109.96      |                         |                        |   ?    |
 | Neo4j      |                   |                         |                        |   ?    |
-| GraphLSM   |                   |                         |                        |   ?    |
-| GraphBPlus |                   |                         |                        |   ?    |
+| GraphLSM   |     13,046.63     |                         |                        |   ?    |
+| GraphBPlus |     18,836.18     |                         |                        |   ?    |
 
 ### Retrieve Friends of Friends
-
 Get IDs of all nodes that share an edge with neighbors of a given node.
 |            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
 | :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
 | SQLiteMem  |                   |                         |                        |   ?    |
-| SQLite     |                   |                         |                        |   ?    |
-| MySQL      |                   |                         |                        |   ?    |
-| PostgreSQL |                   |                         |                        |   ?    |
-| MongoDB    |                   |                         |                        |   ?    |
+| SQLite     |      226.19       |                         |                        |   ?    |
+| MySQL      |      165.94       |                         |                        |   ?    |
+| PostgreSQL |      175.87       |                         |                        |   ?    |
+| MongoDB    |     1,430.51      |                         |                        |   ?    |
 | Neo4j      |                   |                         |                        |   ?    |
-| GraphLSM   |                   |                         |                        |   ?    |
-| GraphBPlus |                   |                         |                        |   ?    |
+| GraphLSM   |      917.64       |                         |                        |   ?    |
+| GraphBPlus |      704.90       |                         |                        |   ?    |
 
 ### Count Friends
-
 Count the number of edges containing a specific node and their total weight.
 |            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
 | :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
 | SQLiteMem  |                   |                         |                        |   ?    |
-| SQLite     |                   |                         |                        |   ?    |
-| MySQL      |                   |                         |                        |   ?    |
-| PostgreSQL |                   |                         |                        |   ?    |
-| MongoDB    |                   |                         |                        |   ?    |
+| SQLite     |      623.74       |                         |                        |   ?    |
+| MySQL      |      842.55       |                         |                        |   ?    |
+| PostgreSQL |      748.09       |                         |                        |   ?    |
+| MongoDB    |     2,087.07      |                         |                        |   ?    |
 | Neo4j      |                   |                         |                        |   ?    |
-| GraphLSM   |                   |                         |                        |   ?    |
-| GraphBPlus |                   |                         |                        |   ?    |
+| GraphLSM   |     15,158.66     |                         |                        |   ?    |
+| GraphBPlus |     17,210.93     |                         |                        |   ?    |
 
 ### Count Followers
-
 Count the number of edges ending in a specific node and their total weight.
 |            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
 | :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
 | SQLiteMem  |                   |                         |                        |   ?    |
-| SQLite     |                   |                         |                        |   ?    |
-| MySQL      |                   |                         |                        |   ?    |
-| PostgreSQL |                   |                         |                        |   ?    |
-| MongoDB    |                   |                         |                        |   ?    |
+| SQLite     |      468.51       |                         |                        |   ?    |
+| MySQL      |     1,062.65      |                         |                        |   ?    |
+| PostgreSQL |      778.25       |                         |                        |   ?    |
+| MongoDB    |     2,172.86      |                         |                        |   ?    |
 | Neo4j      |                   |                         |                        |   ?    |
-| GraphLSM   |                   |                         |                        |   ?    |
-| GraphBPlus |                   |                         |                        |   ?    |
+| GraphLSM   |     14,473.62     |                         |                        |   ?    |
+| GraphBPlus |     1,270.27      |                         |                        |   ?    |
 
 ## Write Operations
 
@@ -165,54 +158,50 @@ and other limitations of each DB.
 Concurrency is tested only in systems that explicitly support it.
 
 ### Upsert Edge
-
 |            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
 | :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
 | SQLiteMem  |                   |                         |                        |   ?    |
-| SQLite     |                   |                         |                        |   ?    |
-| MySQL      |                   |                         |                        |   ?    |
-| PostgreSQL |                   |                         |                        |   ?    |
+| SQLite     |      386.17       |                         |                        |   ?    |
+| MySQL      |      615.32       |                         |                        |   ?    |
+| PostgreSQL |      666.96       |                         |                        |   ?    |
 | MongoDB    |                   |                         |                        |   ?    |
 | Neo4j      |                   |                         |                        |   ?    |
-| GraphLSM   |                   |                         |                        |   ?    |
-| GraphBPlus |                   |                         |                        |   ?    |
+| GraphLSM   |     13,345.08     |                         |                        |   ?    |
+| GraphBPlus |     1,750.36      |                         |                        |   ?    |
 
 ### Upsert Edges Batch
-
 |            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
 | :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
 | SQLiteMem  |                   |                         |                        |   ?    |
-| SQLite     |                   |                         |                        |   ?    |
-| MySQL      |                   |                         |                        |   ?    |
-| PostgreSQL |                   |                         |                        |   ?    |
+| SQLite     |     1,395.34      |                         |                        |   ?    |
+| MySQL      |      890.93       |                         |                        |   ?    |
+| PostgreSQL |      950.84       |                         |                        |   ?    |
 | MongoDB    |                   |                         |                        |   ?    |
 | Neo4j      |                   |                         |                        |   ?    |
-| GraphLSM   |                   |                         |                        |   ?    |
-| GraphBPlus |                   |                         |                        |   ?    |
+| GraphLSM   |     78,205.83     |                         |                        |   ?    |
+| GraphBPlus |     18,428.76     |                         |                        |   ?    |
 
 ### Remove Edge
-
 |            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
 | :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
 | SQLiteMem  |                   |                         |                        |   ?    |
-| SQLite     |                   |                         |                        |   ?    |
-| MySQL      |                   |                         |                        |   ?    |
-| PostgreSQL |                   |                         |                        |   ?    |
-| MongoDB    |                   |                         |                        |   ?    |
+| SQLite     |      613.05       |                         |                        |   ?    |
+| MySQL      |     1,045.80      |                         |                        |   ?    |
+| PostgreSQL |     1,320.79      |                         |                        |   ?    |
+| MongoDB    |     3,366.41      |                         |                        |   ?    |
 | Neo4j      |                   |                         |                        |   ?    |
-| GraphLSM   |                   |                         |                        |   ?    |
-| GraphBPlus |                   |                         |                        |   ?    |
+| GraphLSM   |     9,766.94      |                         |                        |   ?    |
+| GraphBPlus |     1,762.28      |                         |                        |   ?    |
 
 ### Remove Edges Batch
-
 |            | graph-communities | graph-eachmovie-ratings | graph-patent-citations | Result |
 | :--------- | :---------------: | :---------------------: | :--------------------: | :----: |
 | SQLiteMem  |                   |                         |                        |   ?    |
-| SQLite     |                   |                         |                        |   ?    |
-| MySQL      |                   |                         |                        |   ?    |
-| PostgreSQL |                   |                         |                        |   ?    |
+| SQLite     |      631.44       |                         |                        |   ?    |
+| MySQL      |      919.22       |                         |                        |   ?    |
+| PostgreSQL |     1,307.67      |                         |                        |   ?    |
 | MongoDB    |                   |                         |                        |   ?    |
 | Neo4j      |                   |                         |                        |   ?    |
-| GraphLSM   |                   |                         |                        |   ?    |
-| GraphBPlus |                   |                         |                        |   ?    |
+| GraphLSM   |     77,003.51     |                         |                        |   ?    |
+| GraphBPlus |     1,758.83      |                         |                        |   ?    |
 

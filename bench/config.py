@@ -21,9 +21,9 @@ from unumdb_python import GraphLSM, GraphBPlus
 
 count_nodes = int(os.getenv('COUNT_NODES', '0'))
 count_edges = int(os.getenv('COUNT_EDGES', '0'))
-count_finds = int(os.getenv('COUNT_FINDS', '10000'))
-count_analytics = int(os.getenv('COUNT_ANALYTICS', '1000'))
-count_changes = int(os.getenv('COUNT_CHANGES', '10000'))
+count_finds = int(os.getenv('COUNT_FINDS', '2000'))
+count_analytics = int(os.getenv('COUNT_ANALYTICS', '100'))
+count_changes = int(os.getenv('COUNT_CHANGES', '5000'))
 device_name = os.getenv('DEVICE_NAME', 'Unknown Device')
 
 report_path = 'artifacts/stats.md'
@@ -45,12 +45,12 @@ datasets = [x[0] for x in _datasets[1:]]
 wrapper_types = [
     # SQLiteMem,
     SQLite,
-    MongoDB,
+    GraphLSM,
+    GraphBPlus,
     MySQL,
     PostgreSQL,
+    # MongoDB,
     # Neo4j,
-    # GraphLSM,
-    # GraphBPlus,
 ]
 
 _wrappers = [
@@ -63,7 +63,7 @@ _wrappers = [
     (PostgreSQL, 'URI_PGSQL', 'postgres://av:temptemp@0.0.0.0:5432/<dataset>'),
     (Neo4j, 'URI_NEO4J', 'bolt://0.0.0.0:7687/<dataset>'),
     # To startup:
-    # mongod --dbpath=/Users/av/DBs/mongo/ --directoryperdb --wiredTigerCacheSizeGB=2 --wiredTigerDirectoryForIndexes
+    # mongod --dbpath=/Users/av/DBs/mongo/ --directoryperdb --wiredTigerCacheSizeGB=2 --wiredTigerDirectoryForIndexes &!
     (MongoDB, 'URI_MONGO', 'mongodb://0.0.0.0:27017/<dataset>'),
 ]
 
