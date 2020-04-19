@@ -32,11 +32,34 @@ stats = StatsFile(stats_path)
 
 _datasets = [
     # Path, Number of Nodes, Number of Edges
+
+    # Test graph.
     ('/Users/av/Code/PyGraphDB/datasets/graph-test/all.csv', 8, 10),
+
+
+    # Average degree: ~8.
+    # http://networkrepository.com/fb-pages-company.php
     ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
+
+    # Average degree 90.
+    # http://networkrepository.com/rec-eachmovie.php
     ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
+
+    # Patent Citation Network. 77 Mb.
+    # Average degree: 8.
+    # http://networkrepository.com/cit-patent.php
     # ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
+
+    # Mouse gene regulatory network derived
+    # from analyzing gene expression profiles. 162 Mb.
+    # Third column is the edge weights.
+    # Average degree: 670.
+    # http://networkrepository.com/bio-mouse-gene.php
     # ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
+
+    # Human Brain Network. 227 Mb.
+    # Average degree: 186.
+    # http://networkrepository.com/bn-human-Jung2015-M87102575.php
     # ('/Users/av/Datasets/graph-human-brain/all.csv', 0, 87273967),
 ]
 dataset_test = _datasets[0][0]
@@ -46,10 +69,10 @@ wrapper_types = [
     # SQLiteMem,
     # GraphLSM,
     # GraphBPlus,
+    MongoDB,
     SQLite,
     MySQL,
     PostgreSQL,
-    MongoDB,
     # Neo4j,
 ]
 
