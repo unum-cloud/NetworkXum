@@ -29,7 +29,12 @@ class StatsExporterPerOperation():
             # 'GraphGigaHash',
             # 'GraphTeraHash',
         ]
-        dataset_names = [config.dataset_name(p) for p in config.datasets]
+        # dataset_names = [config.dataset_name(p) for p in config.datasets]
+        dataset_names = [
+            'graph-communities',
+            'graph-eachmovie-ratings',
+            'patent-citations',
+        ]
 
         # Intro.
         out.add_text('# PyGraphDB Benchmarks Overview')

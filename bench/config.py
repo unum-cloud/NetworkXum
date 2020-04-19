@@ -22,7 +22,7 @@ from unumdb_python import GraphLSM, GraphBPlus
 count_nodes = int(os.getenv('COUNT_NODES', '0'))
 count_edges = int(os.getenv('COUNT_EDGES', '0'))
 count_finds = int(os.getenv('COUNT_FINDS', '2000'))
-count_analytics = int(os.getenv('COUNT_ANALYTICS', '100'))
+count_analytics = int(os.getenv('COUNT_ANALYTICS', '50'))
 count_changes = int(os.getenv('COUNT_CHANGES', '5000'))
 device_name = os.getenv('DEVICE_NAME', 'Unknown Device')
 
@@ -43,10 +43,10 @@ dataset_test = _datasets[0][0]
 datasets = [x[0] for x in _datasets[1:]]
 
 wrapper_types = [
-    SQLiteMem,
+    # SQLiteMem,
+    # GraphLSM,
+    # GraphBPlus,
     SQLite,
-    GraphLSM,
-    GraphBPlus,
     MySQL,
     PostgreSQL,
     MongoDB,
