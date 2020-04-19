@@ -33,7 +33,7 @@ class StatsExporterPerOperation():
         dataset_names = [
             'graph-communities',
             'graph-eachmovie-ratings',
-            'patent-citations',
+            'graph-patent-citations',
         ]
 
         # Intro.
