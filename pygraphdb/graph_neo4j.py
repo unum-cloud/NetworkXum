@@ -11,9 +11,9 @@ from pygraphdb.base_graph import GraphBase
 from pygraphdb.helpers import *
 
 
-class Neo4j(GraphBase):
+class Neo4J(GraphBase):
     """
-        Uses Cypher DSL and Bolt API to access Neo4j graph database.
+        Uses Cypher DSL and Bolt API to access Neo4J graph database.
 
         CAUTION 1:
         This is a suboptimal implementation in terms of space,
@@ -41,7 +41,7 @@ class Neo4j(GraphBase):
         *   `neobolt.exceptions.TransientError:`
             There is not enough stack size to perform the current task. 
             This is generally considered to be a database error, 
-            so please contact Neo4j support.
+            so please contact Neo4J support.
         *   `neobolt.exceptions.DatabaseError`
             Java heap space...
     """
@@ -55,7 +55,7 @@ class Neo4j(GraphBase):
         self,
         url='bolt://localhost:7687/graph',
         enterprise_edition=False,
-        import_directory='/Users/av/Library/Application Support/Neo4j Desktop/Application/neo4jDatabases/database-b5d1180d-a778-47d2-84e6-4169343543ea/installation-4.0.3/import',
+        import_directory='/Users/av/Library/Application Support/Neo4J Desktop/Application/neo4jDatabases/database-b5d1180d-a778-47d2-84e6-4169343543ea/installation-4.0.3/import',
         use_full_name_for_label=False,
         use_indexes_over_constraints=True,
         **kwargs,
@@ -454,7 +454,7 @@ class Neo4j(GraphBase):
             self.session.run(f'DROP CONSTRAINT constraint{self._e}')
 
     def insert_adjacency_list(self, filepath: str) -> int:
-        chunk_len = Neo4j.__max_batch_size__
+        chunk_len = Neo4J.__max_batch_size__
         count_edges_added = 0
         for es in chunks(yield_edges_from(filepath), chunk_len):
             count_edges_added += self.insert_edges(es)
@@ -555,10 +555,10 @@ class Neo4j(GraphBase):
             d = '->' if directed else '-'
             tasks = [
                 pattern_nodes % (
-                    Neo4j.__max_batch_size__, 'file:///' + filename
+                    Neo4J.__max_batch_size__, 'file:///' + filename
                 ),
                 pattern_edges % (
-                    Neo4j.__max_batch_size__, 'file:///' + filename, current_id, d
+                    Neo4J.__max_batch_size__, 'file:///' + filename, current_id, d
                 ),
             ]
             for task in tasks:

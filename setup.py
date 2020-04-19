@@ -15,7 +15,7 @@ setup(
     url='https://github.com/ashvardanian/PyGraphDB',
     description='''
     A generic persistent Graph structure compatiable with NetworkX. 
-    It can store big graphs in SQLite, MySQL, Postgres, MongoDB or Neo4j database.
+    It can store big graphs in SQLite, MySQL, Postgres, MongoDB or Neo4J database.
     ''',
     long_description=long_description,
     packages=['pygraphdb', 'pystats'],

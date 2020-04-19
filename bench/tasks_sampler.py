@@ -59,7 +59,8 @@ class TasksSampler(object):
         cnt = min(len(self._buffer_edges), cnt)
         es = random.sample(self._buffer_edges, cnt)
         # Save only unique values, but don't forget to shuffle.
-        vs = {e['v1'] for e in es}
+        vs = {(e['v1'] if bool(random.getrandbits(1)) else e['v2'])
+              for e in es}
         vs = list(vs)
         random.shuffle(vs)
         return vs

@@ -15,17 +15,16 @@ class StatsExporterPerOperation():
 
         out = StatsExporter()
         dbs_pygraph = [
-            'SQLiteMem',
             'SQLite',
             'MySQL',
             'PostgreSQL',
             'MongoDB',
-            'Neo4j',
+            # 'Neo4J',
             # 'ArangoDB',
         ]
         dbs_unum = [
-            'GraphLSM',
             'GraphBPlus',
+            'GraphLSM',
             # 'GraphGigaHash',
             # 'GraphTeraHash',
         ]
@@ -34,6 +33,7 @@ class StatsExporterPerOperation():
             'graph-communities',
             'graph-eachmovie-ratings',
             'graph-patent-citations',
+            'graph-mouse-gene',
         ]
 
         # Intro.
@@ -56,7 +56,7 @@ class StatsExporterPerOperation():
                 field_row='database',
                 field_col='dataset',
                 field_cell='operations_per_second',
-                allowed_rows=['Parsing in Python'],
+                allowed_rows=['Parsing in Python', 'SQLiteMem'],
                 allowed_cols=dataset_names,
             ).\
             compare_by(dataset_names[-1]).\
@@ -70,7 +70,7 @@ class StatsExporterPerOperation():
                 field_row='database',
                 field_col='dataset',
                 field_cell='operations_per_second',
-                allowed_rows=dbs_pygraph,
+                allowed_rows=[*dbs_pygraph, 'Neo4J'],
                 allowed_cols=dataset_names,
             ).\
             compare_by(dataset_names[-1]).\
@@ -123,14 +123,15 @@ class StatsExporterPerOperation():
              'Find all edges that contain a specific node in any role.'),
             ('Retrieve Outgoing Edges',
              'Find all directed edges that start in a specific node.'),
-            # ('Retrieve Ingoing Edges', 'Find all directed edges that end in a specific node.'),
+            ('Retrieve Ingoing Edges',
+             'Find all directed edges that end in a specific node.'),
             ('Retrieve Friends',
              'Get IDs of all nodes that share an edge with a given node.'),
             ('Retrieve Friends of Friends',
              'Get IDs of all nodes that share an edge with neighbors of a given node.'),
             ('Count Friends', 'Count the number of edges containing a specific node and their total weight.'),
             ('Count Followers', 'Count the number of edges ending in a specific node and their total weight.'),
-            # ('Count Following', 'Count the number of edges starting in a specific node and their total weight.'),
+            ('Count Following', 'Count the number of edges starting in a specific node and their total weight.'),
         ]
         for read_op, description in read_ops:
             out.\

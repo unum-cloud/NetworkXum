@@ -18,8 +18,8 @@ class SimpleBenchmark(object):
         5. Clearing all the data (if needed).
     """
 
-    def __init__(self, max_seconds_per_step=60):
-        self.max_seconds_per_step = max_seconds_per_step
+    def __init__(self, max_seconds_per_query=15):
+        self.max_seconds_per_query = max_seconds_per_query
 
     def run(self, repeat_existing=False):
         self.repeat_existing = repeat_existing
@@ -135,62 +135,90 @@ class SimpleBenchmark(object):
     def find_es_related(self) -> int:
         cnt = 0
         cnt_found = 0
+        t0 = time()
         for v in self.tasks.nodes_to_query:
             es = self.graph.edges_related(v)
             cnt += 1
             cnt_found += len(es)
+            dt = time() - t0
+            if dt > self.max_seconds_per_query:
+                break
         print(f'---- {cnt} ops: {cnt_found} edges found')
         return cnt
 
     def find_es_from(self) -> int:
         cnt = 0
         cnt_found = 0
+        t0 = time()
         for v in self.tasks.nodes_to_query:
             es = self.graph.edges_from(v)
             cnt += 1
             cnt_found += len(es)
+            dt = time() - t0
+            if dt > self.max_seconds_per_query:
+                break
         print(f'---- {cnt} ops: {cnt_found} edges found')
         return cnt
 
     def find_es_to(self) -> int:
         cnt = 0
         cnt_found = 0
+        t0 = time()
         for v in self.tasks.nodes_to_query:
             es = self.graph.edges_to(v)
             cnt += 1
             cnt_found += len(es)
+            dt = time() - t0
+            if dt > self.max_seconds_per_query:
+                break
         print(f'---- {cnt} ops: {cnt_found} edges found')
         return cnt
 
     def find_vs_related(self) -> int:
         cnt = 0
         cnt_found = 0
+        t0 = time()
         for v in self.tasks.nodes_to_query:
             vs = self.graph.nodes_related(v)
             cnt += 1
             cnt_found += len(vs)
+            dt = time() - t0
+            if dt > self.max_seconds_per_query:
+                break
         print(f'---- {cnt} ops: {cnt_found} related nodes')
         return cnt
 
     def count_v_related(self) -> int:
         cnt = 0
+        t0 = time()
         for v in self.tasks.nodes_to_query:
             self.graph.count_related(v)
             cnt += 1
+            dt = time() - t0
+            if dt > self.max_seconds_per_query:
+                break
         return cnt
 
     def count_v_followers(self) -> int:
         cnt = 0
+        t0 = time()
         for v in self.tasks.nodes_to_query:
             self.graph.count_followers(v)
             cnt += 1
+            dt = time() - t0
+            if dt > self.max_seconds_per_query:
+                break
         return cnt
 
     def count_v_following(self) -> int:
         cnt = 0
+        t0 = time()
         for v in self.tasks.nodes_to_query:
             self.graph.count_following(v)
             cnt += 1
+            dt = time() - t0
+            if dt > self.max_seconds_per_query:
+                break
         return cnt
 
     def find_vs_related_related(self) -> int:
@@ -202,7 +230,7 @@ class SimpleBenchmark(object):
             cnt += 1
             cnt_found += len(vs)
             dt = time() - t0
-            if dt > self.max_seconds_per_step:
+            if dt > self.max_seconds_per_query:
                 break
         print(f'---- {cnt} ops: {cnt_found} related to related nodes')
         return cnt
