@@ -23,7 +23,7 @@ class StatsExporterPerOperation():
             # 'ArangoDB',
         ]
         dbs_unum = [
-            'GraphBPlus',
+            # 'GraphBPlus',
             'GraphLSM',
             # 'GraphGigaHash',
             # 'GraphTeraHash',
@@ -61,27 +61,12 @@ class StatsExporterPerOperation():
             compare_by(dataset_names[-1]).\
             add_last_table()
 
-        out.\
-            reload_stats(config.stats_path).\
-            filter_stats(device=device_name).\
-            filter_stats(operation='Insert Dump').\
-            correlate(
-                field_row='database',
-                field_col='dataset',
-                field_cell='operations_per_second',
-                allowed_rows=[*dbs_pygraph, 'Neo4J'],
-                allowed_cols=dataset_names,
-            ).\
-            compare_by(dataset_names[-1]).\
-            add_last_table()
-
         out.add_text('''
             Most DBs provide some form functionality for faster bulk imports, but not all of them where used in benchmarks for various reasons.
 
             * Neo4J supports CSV imports, but it requires duplicating the imported file and constantly crashes (due to Java heap management issues).
             * PostgreSQL and MySQL dialects of SQL have special functions for importing CSVs, but their functionality is very limited and performance gains aren't substantial. A better approach is to use unindexed table of incoming edges and later submit it into the main store once the data is absorbed.
             * MongoDB provides a command line tool, but it wasn't used to limit the number of binary dependencies and simlify configuration.
-
         ''')
 
         out.\
@@ -92,7 +77,7 @@ class StatsExporterPerOperation():
                 field_row='database',
                 field_col='dataset',
                 field_cell='operations_per_second',
-                allowed_rows=dbs_unum,
+                allowed_rows=[*dbs_pygraph, 'Neo4J', *dbs_unum],
                 allowed_cols=dataset_names,
             ).\
             compare_by(dataset_names[-1]).\
