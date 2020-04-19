@@ -120,7 +120,7 @@ class StatsExporterPerOperation():
             ('Retrieve Undirected Edge',
              'Given a pair of nodes - find any edge that connects them.'),
             ('Retrieve Connected Edges',
-             'Find all directed edges that contain a specific node in any role.'),
+             'Find all edges that contain a specific node in any role.'),
             ('Retrieve Outgoing Edges',
              'Find all directed edges that start in a specific node.'),
             # ('Retrieve Ingoing Edges', 'Find all directed edges that end in a specific node.'),

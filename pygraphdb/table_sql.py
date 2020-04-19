@@ -132,7 +132,7 @@ class PlainSQL(GraphBase):
                 EdgeSQL.v1 == v1,
                 EdgeSQL.v2 == v2,
                 EdgeSQL.directed == True,
-            )).first()
+            )).limit(1).first()
         return result
 
     def edge_undirected(self, v1: int, v2: int) -> Optional[EdgeSQL]:
@@ -147,7 +147,7 @@ class PlainSQL(GraphBase):
                     EdgeSQL.v1 == v2,
                     EdgeSQL.v2 == v1,
                 )
-            )).all()
+            )).limit(1).first()
         return result
 
     def edges_from(self, v: int) -> List[EdgeSQL]:
