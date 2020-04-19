@@ -34,10 +34,20 @@ class Neo4j(GraphBase):
         rude to other processes running on the same machine :)
         The CPU utilization is often 10-20x higher than in other DBs.
         To import 30 MB CSV file it allocated 1.4 GB of RAM!!!
+
+        CAUTION 4:
+        It constantly crashes with different codes and included query 
+        profiler outputs incosistent results. Examples:
+        *   `neobolt.exceptions.TransientError:`
+            There is not enough stack size to perform the current task. 
+            This is generally considered to be a database error, 
+            so please contact Neo4j support.
+        *   `neobolt.exceptions.DatabaseError`
+            Java heap space...
     """
     # Depending on the machine this can be higher.
     # But on a laptop we would get "Java heap space" error.
-    __max_batch_size__ = 500
+    __max_batch_size__ = 1000
     __is_concurrent__ = True
     __edge_type__ = Edge
 
@@ -474,7 +484,6 @@ class Neo4j(GraphBase):
             shutil.copy(filepath, file_link)
             # https://neo4j.com/docs/cypher-manual/current/clauses/load-csv/#load-csv-importing-large-amounts-of-data
             pattern_full = '''
-            USING PERIODIC COMMIT %d
             LOAD CSV WITH HEADERS FROM '%s' AS row
             WITH
                 toInteger(row.v1) AS id_from,
@@ -487,11 +496,11 @@ class Neo4j(GraphBase):
             '''
             d = '->' if directed else '-'
             task = pattern_full % (
-                Neo4j.__max_batch_size__, 'file:///' + filename,
-                current_id, d
+                'file:///' + filename, current_id, d
             )
             task = task.replace('VERTEX', self._v)
             task = task.replace('EDGE', self._e)
+            print('task is:', task)
             self.session.run(task)
         finally:
             # Don't forget to copy temporary file!
