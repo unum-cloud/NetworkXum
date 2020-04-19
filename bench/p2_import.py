@@ -74,7 +74,7 @@ class BulkImporter(object):
                 if url is None:
                     continue
 
-                g = graph_type(url)
+                g = graph_type(url=url)
                 dataset_name = config.dataset_name(dataset_path)
                 wrapper_name = config.wrapper_name(g)
 
