@@ -59,6 +59,8 @@ Implements the same [interface](adapters/base.py) for every one of those backend
 - [x] Benchmark on small graphs.
 - [x] Benchmark on mid size graphs.
 - [x] Session management in SQL and Neo4J.
+- [ ] Make benchmarks easier to read and control execution time.
+- [ ] Add multithreaded benchmarks.
 - [ ] ArangoDB wrapper.
 - [ ] Mixed Read/Write benchmarks.
 - [ ] NetworkX analytical wrapper and benchmarks.

@@ -2,7 +2,7 @@ import os
 
 from pygraphdb.base_graph import GraphBase
 from pygraphdb.helpers import StatsCounter
-from pystats.file import StatsFile
+from pystats2md.file import StatsFile
 
 import config
 

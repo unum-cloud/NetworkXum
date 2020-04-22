@@ -18,7 +18,7 @@ setup(
     It can store big graphs in SQLite, MySQL, Postgres, MongoDB or Neo4J database.
     ''',
     long_description=long_description,
-    packages=['pygraphdb', 'pystats'],
+    packages=['pygraphdb'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
