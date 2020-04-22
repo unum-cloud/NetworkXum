@@ -1,7 +1,7 @@
 import platform
 
 import psutil
-from pystats.exporter import StatsExporter
+from pystats2md.exporter import StatsExporter
 
 import config
 

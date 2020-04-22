@@ -2,7 +2,7 @@ import os
 from typing import Optional
 import importlib
 
-from pystats.file import StatsFile
+from pystats2md.file import StatsFile
 
 from pygraphdb.table_sqlite import SQLite, SQLiteMem
 from pygraphdb.table_mysql import MySQL
