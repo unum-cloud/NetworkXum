@@ -2,9 +2,9 @@ from datetime import datetime
 import os
 import importlib
 
-from pygraphdb.helpers import StatsCounter
-from pygraphdb.helpers import export_edges_into_graph
+from pystats2md.micro_bench import MicroBench
 
+from pygraphdb.helpers import export_edges_into_graph
 import config
 
 
@@ -29,14 +29,6 @@ class BulkImporter(object):
         return f"{size:.{decimal_places}f}{unit}"
 
     def parse_without_importing_if_unknown(self, dataset_path):
-        # Avoid repeating ourselves.
-        dataset_name = config.dataset_name(dataset_path)
-        if config.stats.find_index(
-            wrapper_class='Parsing in Python',
-            operation_name='Insert Dump',
-            dataset=dataset_name,
-        ) != None:
-            return
 
         class PseudoGraph(object):
             __edge_type__ = dict
@@ -53,14 +45,15 @@ class BulkImporter(object):
                 return len(es)
 
         g = PseudoGraph()
-        counter = StatsCounter()
-        counter.handle(lambda: export_edges_into_graph(dataset_path, g))
-        config.stats.upsert(
-            wrapper_class='Parsing in Python',
-            operation_name='Insert Dump',
+        dataset_name = config.dataset_name(dataset_path)
+        counter = MicroBench(
+            benchmark_name='Sequential Writes: Import CSV',
+            func=lambda: export_edges_into_graph(dataset_path, g),
+            database='Parsing in Python',
             dataset=dataset_name,
-            stats=counter,
+            source=config.stats,
         )
+        counter.run_if_missing()
 
     def run(self):
         for dataset_path in config.datasets:
@@ -91,14 +84,15 @@ class BulkImporter(object):
                     g.insert_adjacency_list(dataset_path)
                     return g.count_edges()
 
-                counter = StatsCounter()
-                counter.handle(import_one)
-                config.stats.upsert(
-                    wrapper_class=wrapper_name,
-                    operation_name='Insert Dump',
+                counter = MicroBench(
+                    benchmark_name='Sequential Writes: Import CSV',
+                    func=import_one,
+                    database=wrapper_name,
                     dataset=dataset_name,
-                    stats=counter,
+                    source=config.stats,
                 )
+                counter.run_if_missing()
+
                 print(f'--- edges:', self.printable_count(counter.count_operations))
                 print(f'--- edges/second:',
                       self.printable_count(counter.ops_per_sec()))

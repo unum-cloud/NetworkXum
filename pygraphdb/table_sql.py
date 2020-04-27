@@ -99,6 +99,7 @@ class PlainSQL(GraphBase):
     __is_concurrent__ = True
     __max_batch_size__ = 1000000
     __edge_type__ = EdgeSQL
+    __in_memory__ = False
 
     def __init__(self, url='sqlite:///:memory:', **kwargs):
         GraphBase.__init__(self, **kwargs)

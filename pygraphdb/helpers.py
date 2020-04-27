@@ -101,36 +101,3 @@ def extract_database_name(url: str) -> str:
         return url_parts[0]
     else:
         return 'graph'
-
-
-class StatsCounter:
-    def __init__(self, time_elapsed=0, count_operations=0):
-        self.time_elapsed = time_elapsed
-        self.count_operations = count_operations
-
-    def handle(self, func):
-        before = time.time()
-        ops = func()
-        elapsed = time.time() - before
-        self.time_elapsed += elapsed
-        assert isinstance(ops, int), \
-            'Return value must contain the number of operations'
-        self.count_operations += ops
-
-    def secs_per_op(self) -> float:
-        if (self.count_operations == 0):
-            return 0
-        return self.time_elapsed / self.count_operations
-
-    def msecs_per_op(self) -> float:
-        if (self.count_operations == 0):
-            return 0
-        return self.secs_per_op() * 1000.0
-
-    def ops_per_sec(self) -> float:
-        if (self.count_operations == 0):
-            return 0
-        return self.count_operations / self.time_elapsed
-
-    def __repr__(self) -> str:
-        return f'<StatsCounter (#{self.count_operations} ops averaging ~{self.msecs_per_op()} msecs)>'
