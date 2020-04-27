@@ -47,12 +47,12 @@ _datasets = [
 
     # Average degree 90.
     # http://networkrepository.com/rec-eachmovie.php
-    # ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
+    ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
 
     # Patent Citation Network. 77 Mb.
     # Average degree: 8.
     # http://networkrepository.com/cit-patent.php
-    # ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
+    ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
 
     # Mouse gene regulatory network derived
     # from analyzing gene expression profiles. 162 Mb.
@@ -71,12 +71,12 @@ datasets = [x[0] for x in _datasets[1:]]
 
 wrapper_types = [
     # SQLiteMem,
-    SQLite,
+    # SQLite,
     # MongoDB,
     # MySQL,
     # PostgreSQL,
     # RocksMonolith,
-    # RocksChunked,
+    RocksChunked,
     # SQLiteCpp,
     # Neo4J,
 ]

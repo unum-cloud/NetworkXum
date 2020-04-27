@@ -52,6 +52,7 @@ class BulkImporter(object):
             database='Parsing in Python',
             dataset=dataset_name,
             source=config.stats,
+            device_name='MacbookPro',
         )
         counter.run_if_missing()
 
@@ -90,6 +91,7 @@ class BulkImporter(object):
                     database=wrapper_name,
                     dataset=dataset_name,
                     source=config.stats,
+                    device_name='MacbookPro',
                 )
                 counter.run_if_missing()
 

@@ -12,7 +12,7 @@ class StatsExporterPerOperation():
 
     def run(
         self,
-        device_name: str = None,
+        device_name='MacbookPro',
     ) -> str:
 
         ins = StatsFile()
@@ -52,8 +52,8 @@ class StatsExporterPerOperation():
             ''')
 
         out.add(ins.filtered(
-            device=device_name,
-            operation='Sequential Writes: Import CSV',
+            device_name=device_name,
+            benchmark_name='Sequential Writes: Import CSV',
         ).to_table(
             row_name_property='database',
             col_name_property='dataset',
@@ -71,8 +71,8 @@ class StatsExporterPerOperation():
         ''')
 
         out.add(ins.filtered(
-            device=device_name,
-            operation='Sequential Writes: Import CSV',
+            device_name=device_name,
+            benchmark_name='Sequential Writes: Import CSV',
         ).to_table(
             row_name_property='database',
             col_name_property='dataset',
@@ -123,8 +123,8 @@ class StatsExporterPerOperation():
             out.add(f'### {read_op}')
             out.add(description)
             out.add(ins.filtered(
-                device=device_name,
-                operation=read_op,
+                device_name=device_name,
+                benchmark_name=read_op,
             ).to_table(
                 row_name_property='database',
                 col_name_property='dataset',
@@ -154,8 +154,8 @@ class StatsExporterPerOperation():
         for write_op in write_ops:
             out.add(f'### {write_op}')
             out.add(ins.filtered(
-                device=device_name,
-                operation=write_op,
+                device_name=device_name,
+                benchmark_name=write_op,
             ).to_table(
                 row_name_property='database',
                 col_name_property='dataset',
@@ -178,7 +178,7 @@ class StatsExporterPerOperation():
             * OS: {platform.system()}
             ''')
 
-        out.export_to(config.report_path, overwrite=True)
+        out.print_to(config.report_path)
 
 
 if __name__ == "__main__":
