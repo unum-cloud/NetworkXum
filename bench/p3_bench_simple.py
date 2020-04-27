@@ -109,6 +109,7 @@ class SimpleBenchmark(object):
             database=wrapper_name,
             dataset=dataset_name,
             source=config.stats,
+            device_name='MacbookPro',
         )
 
         if not self.repeat_existing:
