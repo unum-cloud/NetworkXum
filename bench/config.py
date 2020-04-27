@@ -2,7 +2,7 @@ import os
 from typing import Optional
 import importlib
 
-from pystats2md.file import StatsFile
+from pystats2md.stats_file import StatsFile
 
 from pygraphdb.table_sqlite import SQLite, SQLiteMem
 from pygraphdb.table_mysql import MySQL
@@ -15,8 +15,13 @@ try:
     importlib.reload(unumdb_python)
 except NameError:
     import unumdb_python
-from unumdb_python import GraphLSM, SQLiteCpp
-# print('Using UnumDB version: ', unumdb_python.__dict__)
+from unumdb_python import SQLiteCpp
+from unumdb_python import RocksMonolith
+from unumdb_python import RocksChunked
+from unumdb_python import STLOrderedMap
+from unumdb_python import STLUnorderedMap
+from unumdb_python import TSLHopscotch
+from unumdb_python import TSLRobin
 
 
 count_nodes = int(os.getenv('COUNT_NODES', '0'))
@@ -38,7 +43,7 @@ _datasets = [
 
     # Average degree: ~8.
     # http://networkrepository.com/fb-pages-company.php
-    # ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
+    ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
 
     # Average degree 90.
     # http://networkrepository.com/rec-eachmovie.php
@@ -54,7 +59,7 @@ _datasets = [
     # Third column is the edge weights.
     # Average degree: 670.
     # http://networkrepository.com/bio-mouse-gene.php
-    ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
+    # ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
 
     # Human Brain Network. 227 Mb.
     # Average degree: 186.
@@ -67,18 +72,21 @@ datasets = [x[0] for x in _datasets[1:]]
 wrapper_types = [
     # SQLiteMem,
     SQLite,
-    MongoDB,
-    MySQL,
-    PostgreSQL,
-    GraphLSM,
-    SQLiteCpp,
+    # MongoDB,
+    # MySQL,
+    # PostgreSQL,
+    # RocksMonolith,
+    # RocksChunked,
+    # SQLiteCpp,
     # Neo4J,
 ]
 
 _wrappers = [
     # Type, Environment Variable, Default Value
-    (GraphLSM, 'URI_UNUMDB_LSM', '/Users/av/DBs/unumdb.GraphLSM/<dataset>'),
-    (SQLiteCpp, 'URI_UNUMDB_BPLUS', '/Users/av/DBs/unumdb.GraphBPLus/<dataset>.db3'),
+    (RocksChunked, 'URI_UNUMDB_RC', '/Users/av/DBs/unumdb.RocksChunked/<dataset>'),
+    (RocksMonolith, 'URI_UNUMDB_RM', '/Users/av/DBs/unumdb.RocksMonolith/<dataset>'),
+    (SQLiteCpp, 'URI_UNUMDB_SQLITE', '/Users/av/DBs/unumdb.SQLiteCpp/<dataset>.db3'),
+
     (SQLiteMem, 'URI_SQLITE_MEM', 'sqlite:///:memory:'),
     (SQLite, 'URI_SQLITE', 'sqlite:////Users/av/DBs/sqlite/<dataset>.db3'),
     (MySQL, 'URI_MYSQL', 'mysql://av:temptemp@0.0.0.0:3306/<dataset>'),

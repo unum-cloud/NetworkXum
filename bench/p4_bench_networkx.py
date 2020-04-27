@@ -1,8 +1,7 @@
 import os
 
 from pygraphdb.base_graph import GraphBase
-from pygraphdb.helpers import StatsCounter
-from pystats2md.file import StatsFile
+import pystats2md.stats_file as sf
 
 import config
 

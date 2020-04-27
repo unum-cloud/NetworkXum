@@ -17,6 +17,7 @@ class GraphBase(object):
     __max_batch_size__ = 100
     __is_concurrent__ = True
     __edge_type__ = Edge
+    __in_memory__ = False
 
     # --------------------------------
     # region: Adding and removing nodes and edges.

@@ -1,9 +1,10 @@
 import os
 from time import time
 
+from pystats2md.stats_file import StatsFile
+from pystats2md.micro_bench import MicroBench
+
 from pygraphdb.base_graph import GraphBase
-from pygraphdb.helpers import StatsCounter
-from pystats2md.file import StatsFile
 
 import config
 from tasks_sampler import TasksSampler
@@ -51,56 +52,74 @@ class SimpleBenchmark(object):
             self.dataset_path = None
 
     def run_one(self, remove_all_afterwards=False):
+
+        if type(self.graph).__in_memory__:
+            self.one('Sequential Writes: Import CSV',
+                     self.import_bulk)
+
         # Queries returning single object.
-        self.one('Retrieve Directed Edge', self.find_e_directed)
-        self.one('Retrieve Undirected Edge', self.find_e_undirected)
+        self.one('Random Reads: Find Directed Edge',
+                 self.find_e_directed)
+        self.one('Random Reads: Find Any Relation',
+                 self.find_e_undirected)
 
         # # Queries returning collections.
-        self.one('Retrieve Outgoing Edges', self.find_es_from)
-        self.one('Retrieve Ingoing Edges', self.find_es_to)
-        self.one('Retrieve Connected Edges', self.find_es_related)
-        self.one('Retrieve Friends', self.find_vs_related)
-        self.one('Retrieve Friends of Friends', self.find_vs_related_related)
+        self.one('Random Reads: Find Outgoing Edges',
+                 self.find_es_from)
+        self.one('Random Reads: Find Ingoing Edges',
+                 self.find_es_to)
+        self.one('Random Reads: Find Connected Edges',
+                 self.find_es_related)
+        self.one('Random Reads: Find Friends',
+                 self.find_vs_related)
+        self.one('Random Reads: Find Friends of Friends',
+                 self.find_vs_related_related)
 
         # Queries returning stats.
-        self.one('Count Friends', self.count_v_related)
-        self.one('Count Followers', self.count_v_followers)
-        self.one('Count Following', self.count_v_following)
+        self.one('Random Reads: Count Friends',
+                 self.count_v_related)
+        self.one('Random Reads: Count Followers',
+                 self.count_v_followers)
+        self.one('Random Reads: Count Following',
+                 self.count_v_following)
 
         # Reversable write operations.
-        self.one('Remove Edge', self.remove_e)  # Single edge removals
-        self.one('Upsert Edge', self.upsert_e)  # Single edge inserts
-        self.one('Remove Edges Batch', self.remove_es)  # Batched edge removals
-        self.one('Upsert Edges Batch', self.upsert_es)  # Batched edge inserts
+        self.one('Random Writes: Remove Edge',
+                 self.remove_e)  # Single edge removals
+        self.one('Random Writes: Upsert Edge',
+                 self.upsert_e)  # Single edge inserts
+        self.one('Random Writes: Remove Edges Batch',
+                 self.remove_es)  # Batched edge removals
+        self.one('Random Writes: Upsert Edges Batch',
+                 self.upsert_es)  # Batched edge inserts
 
         if remove_all_afterwards:
-            self.one('Remove Vertex', self.remove_v)
-            self.one('Remove All', self.remove_bulk)
+            self.one('Random Writes: Remove Vertex',
+                     self.remove_v)
+            self.one('Sequential Writes: Remove All',
+                     self.remove_bulk)
 
-    def one(self, operation_name, f):
-        counter = StatsCounter()
+    def one(self, benchmark_name, f):
         dataset_name = config.dataset_name(self.dataset_path)
         wrapper_name = config.wrapper_name(self.graph)
-        print(f'--- {wrapper_name}: {operation_name} @ {dataset_name}')
+        print(f'--- {wrapper_name}: {benchmark_name} @ {dataset_name}')
+        counter = MicroBench(
+            benchmark_name=benchmark_name,
+            func=f,
+            database=wrapper_name,
+            dataset=dataset_name,
+            source=config.stats,
+        )
+
         if not self.repeat_existing:
-            if config.stats.find_index(
-                wrapper_class=wrapper_name,
-                operation_name=operation_name,
-                dataset=dataset_name,
-            ) is not None:
+            if config.stats.contains(counter):
                 print('--- Skipping!')
                 return
-        counter.handle(f)
+        counter.run_if_missing()
         if counter.count_operations == 0:
             print(f'---- Didnt measure!')
             return
         print(f'---- Importing new stats!')
-        config.stats.upsert(
-            wrapper_class=wrapper_name,
-            operation_name=operation_name,
-            dataset=dataset_name,
-            stats=counter,
-        )
 
     # ---
     # Operations
@@ -286,6 +305,10 @@ class SimpleBenchmark(object):
         c = self.graph.count_edges()
         self.graph.remove_all()
         return c - self.graph.count_edges()
+
+    def import_bulk(self) -> int:
+        self.graph.insert_adjacency_list(self.dataset_path)
+        return self.graph.count_edges()
 
 
 if __name__ == "__main__":

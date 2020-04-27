@@ -8,6 +8,7 @@ class SQLiteMem(PlainSQL):
     __is_concurrent__ = False
     __max_batch_size__ = 5000000
     __edge_type__ = EdgeSQL
+    __in_memory__ = True
 
 
 class SQLite(PlainSQL):
@@ -24,6 +25,7 @@ class SQLite(PlainSQL):
     __is_concurrent__ = False
     __max_batch_size__ = 1000000
     __edge_type__ = EdgeSQL
+    __in_memory__ = False
 
     def __init__(self, url, **kwargs):
         PlainSQL.__init__(self, url, **kwargs)
