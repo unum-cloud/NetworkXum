@@ -14,14 +14,14 @@ class BulkImporter(object):
     Saves stats.
     """
 
-    def printable_bytes(self, size, decimal_places=3):
+    def printable_bytes(self, size, decimal_places=1):
         for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB']:
             if size < 1024.0:
                 break
             size /= 1024.0
         return f"{size:.{decimal_places}f}{unit}"
 
-    def printable_count(self, size, decimal_places=3):
+    def printable_count(self, size, decimal_places=1):
         for unit in ['', 'K', 'M', 'G', 'T']:
             if size < 1000.0:
                 break
@@ -53,6 +53,9 @@ class BulkImporter(object):
             dataset=dataset_name,
             source=config.stats,
             device_name='MacbookPro',
+            limit_iterations=1,
+            limit_seconds=None,
+            limit_operations=None,
         )
         counter.run_if_missing()
 

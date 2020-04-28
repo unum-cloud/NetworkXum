@@ -15,7 +15,7 @@ class StatsExporterPerOperation():
         device_name='MacbookPro',
     ) -> str:
 
-        ins = StatsFile()
+        ins = config.stats
         out = Report()
         dbs_pygraph = [
             'SQLite',
@@ -28,6 +28,7 @@ class StatsExporterPerOperation():
         dbs_unum = [
             'SQLiteCpp',
             'RocksMonolith',
+            'RocksChunked',
             # 'GraphGigaHash',
             # 'GraphTeraHash',
         ]
@@ -97,10 +98,10 @@ class StatsExporterPerOperation():
         ''')
 
         read_ops = [
-            ('Random Reads: Find Directed Edge',
-             'Given nodes A and B - find any directed edge that goes from A to B.'),
             ('Random Reads: Find Any Relation',
              'Given a pair of nodes - find any edge that connects them.'),
+            ('Random Reads: Find Directed Edge',
+             'Given nodes A and B - find any directed edge that goes from A to B.'),
             ('Random Reads: Find Connected Edges',
              'Find all edges that contain a specific node in any role.'),
             ('Random Reads: Find Outgoing Edges',
