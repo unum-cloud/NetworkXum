@@ -19,7 +19,7 @@ class SimpleBenchmark(object):
         5. Clearing all the data (if needed).
     """
 
-    def __init__(self, max_seconds_per_query=60):
+    def __init__(self, max_seconds_per_query=30):
         self.max_seconds_per_query = max_seconds_per_query
 
     def run(self, repeat_existing=False):
@@ -72,8 +72,8 @@ class SimpleBenchmark(object):
                  self.find_es_related)
         self.one('Random Reads: Find Friends',
                  self.find_vs_related)
-        self.one('Random Reads: Find Friends of Friends',
-                 self.find_vs_related_related)
+        # self.one('Random Reads: Find Friends of Friends',
+        #          self.find_vs_related_related)
 
         # Queries returning stats.
         self.one('Random Reads: Count Friends',
@@ -110,12 +110,16 @@ class SimpleBenchmark(object):
             dataset=dataset_name,
             source=config.stats,
             device_name='MacbookPro',
+            limit_iterations=1,
+            limit_seconds=None,
+            limit_operations=None,
         )
 
         if not self.repeat_existing:
             if config.stats.contains(counter):
                 print('--- Skipping!')
                 return
+        print(f'---- Running!')
         counter.run_if_missing()
         if counter.count_operations == 0:
             print(f'---- Didnt measure!')

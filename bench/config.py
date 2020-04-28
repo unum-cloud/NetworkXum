@@ -31,7 +31,7 @@ count_analytics = int(os.getenv('COUNT_ANALYTICS', '300'))
 count_changes = int(os.getenv('COUNT_CHANGES', '5000'))
 device_name = os.getenv('DEVICE_NAME', 'Unknown Device')
 
-report_path = 'bench/stats_macbookpro19/stats.md'
+report_path = 'bench/stats_macbookpro19/README.md'
 stats_path = 'bench/stats_macbookpro19/stats.json'
 stats = StatsFile(stats_path)
 
@@ -43,23 +43,23 @@ _datasets = [
 
     # Average degree: ~8.
     # http://networkrepository.com/fb-pages-company.php
-    ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
+    # ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
 
     # Average degree 90.
     # http://networkrepository.com/rec-eachmovie.php
-    ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
+    # ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
 
     # Patent Citation Network. 77 Mb.
     # Average degree: 8.
     # http://networkrepository.com/cit-patent.php
-    ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
+    # ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
 
     # Mouse gene regulatory network derived
     # from analyzing gene expression profiles. 162 Mb.
     # Third column is the edge weights.
     # Average degree: 670.
     # http://networkrepository.com/bio-mouse-gene.php
-    # ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
+    ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
 
     # Human Brain Network. 227 Mb.
     # Average degree: 186.
@@ -75,8 +75,8 @@ wrapper_types = [
     # MongoDB,
     # MySQL,
     # PostgreSQL,
-    # RocksMonolith,
     RocksChunked,
+    # RocksMonolith,
     # SQLiteCpp,
     # Neo4J,
 ]
