@@ -22,7 +22,7 @@ class SimpleBenchmark(object):
     def __init__(self, max_seconds_per_query=30):
         self.max_seconds_per_query = max_seconds_per_query
 
-    def run(self, repeat_existing=False):
+    def run(self, repeat_existing=True):
         self.repeat_existing = repeat_existing
         for dataset_path in config.datasets:
             self.dataset_path = dataset_path
@@ -120,7 +120,7 @@ class SimpleBenchmark(object):
                 print('--- Skipping!')
                 return
         print(f'---- Running!')
-        counter.run_if_missing()
+        counter.run()
         if counter.count_operations == 0:
             print(f'---- Didnt measure!')
             return

@@ -55,21 +55,21 @@ Given a pair of nodes - find any edge that connects them.
 | PostgreSQL    |      995.94       |         416.59          |         310.87         |      485.25      |          :thumbsdown:          |
 | MongoDB       |     3,535.67      |        2,251.54         |        1,550.38        |      567.44      |          :thumbsdown:          |
 | SQLiteCpp     |     1,354.79      |          4.29           |          0.73          |       0.82       |          :thumbsdown:          |
-| RocksMonolith |     37,151.93     |        13,107.86        |       25,168.34        |    27,644.30     |                                |
-| RocksChunked  |     49,507.37     |        24,028.33        |       37,912.62        |    32,383.20     |           :thumbsup:           |
+| RocksMonolith |     37,151.93     |        13,107.86        |       25,168.34        |    27,644.30     |           :thumbsup:           |
+| RocksChunked  |     38,845.21     |        17,747.67        |       24,301.70        |    26,235.98     |           :thumbsup:           |
 
 ### Random Reads: Find Directed Edge
 
 Given nodes A and B - find any directed edge that goes from A to B.
-|               | graph-communities | graph-eachmovie-ratings | graph-patent-citations | graph-mouse-gene |    Good in graph-patent-citations    |
-| :------------ | :---------------: | :---------------------: | :--------------------: | :--------------: | :----------------------------------: |
-| SQLite        |      534.89       |         629.05          |         487.21         |      462.52      |             :thumbsdown:             |
-| MySQL         |     1,067.25      |         757.05          |         649.42         |      534.80      |             :thumbsdown:             |
-| PostgreSQL    |      977.48       |         495.16          |         689.94         |      345.37      |             :thumbsdown:             |
-| MongoDB       |     3,396.74      |        2,503.34         |        1,373.88        |      317.53      |             :thumbsdown:             |
-| SQLiteCpp     |     1,339.74      |          4.28           |          0.55          |       0.81       |             :thumbsdown:             |
-| RocksMonolith |     20,917.97     |        1,509.78         |        1,378.05        |     1,259.01     |             :thumbsdown:             |
-| RocksChunked  |     54,180.59     |        7,314.20         |       14,849.80        |    34,401.87     | :strawberry::strawberry::strawberry: |
+|               | graph-communities | graph-eachmovie-ratings | graph-patent-citations | graph-mouse-gene | Good in graph-patent-citations |
+| :------------ | :---------------: | :---------------------: | :--------------------: | :--------------: | :----------------------------: |
+| SQLite        |      534.89       |         629.05          |         487.21         |      462.52      |          :thumbsdown:          |
+| MySQL         |     1,067.25      |         757.05          |         649.42         |      534.80      |          :thumbsdown:          |
+| PostgreSQL    |      977.48       |         495.16          |         689.94         |      345.37      |          :thumbsdown:          |
+| MongoDB       |     3,396.74      |        2,503.34         |        1,373.88        |      317.53      |          :thumbsdown:          |
+| SQLiteCpp     |     1,339.74      |          4.28           |          0.55          |       0.81       |          :thumbsdown:          |
+| RocksMonolith |     20,917.97     |        1,509.78         |        1,378.05        |     1,259.01     |          :thumbsdown:          |
+| RocksChunked  |     40,097.51     |        21,051.83        |       28,049.73        |    23,947.03     |       :fire::fire::fire:       |
 
 ### Random Reads: Find Connected Edges
 
@@ -82,7 +82,7 @@ Find all edges that contain a specific node in any role.
 | MongoDB       |     3,025.62      |          98.67          |        2,441.84        |      129.69      |          :thumbsdown:          |
 | SQLiteCpp     |     13,168.71     |         132.49          |        1,425.63        |      139.12      |          :thumbsdown:          |
 | RocksMonolith |     14,706.89     |          83.39          |        6,757.22        |      137.18      |           :thumbsup:           |
-| RocksChunked  |     25,728.56     |         165.90          |        9,080.48        |      126.89      |           :thumbsup:           |
+| RocksChunked  |     19,734.42     |         160.95          |        7,346.90        |      143.87      |           :thumbsup:           |
 
 ### Random Reads: Find Outgoing Edges
 
@@ -95,7 +95,7 @@ Find all directed edges that start in a specific node.
 | MongoDB       |     3,060.09      |          98.29          |        1,585.57        |      180.67      |          :thumbsdown:          |
 | SQLiteCpp     |     1,356.34      |          4.16           |          0.73          |       0.82       |          :thumbsdown:          |
 | RocksMonolith |     14,965.90     |          74.38          |         511.97         |      61.14       |          :thumbsdown:          |
-| RocksChunked  |     26,527.48     |         165.85          |        9,167.41        |      133.55      |           :thumbsup:           |
+| RocksChunked  |     25,511.36     |         154.03          |        7,471.93        |      146.01      |           :thumbsup:           |
 
 ### Random Reads: Find Ingoing Edges
 
@@ -108,7 +108,7 @@ Find all directed edges that end in a specific node.
 | MongoDB       |     3,002.81      |        1,441.00         |        1,558.45        |      305.64      |          :thumbsdown:          |
 | SQLiteCpp     |     1,336.23      |          4.15           |          0.71          |       0.70       |          :thumbsdown:          |
 | RocksMonolith |     16,972.30     |         117.07          |        7,013.42        |      148.18      |           :thumbsup:           |
-| RocksChunked  |     27,408.51     |         202.21          |        9,631.10        |      133.90      |           :thumbsup:           |
+| RocksChunked  |     25,135.32     |         167.15          |        7,775.67        |      147.73      |           :thumbsup:           |
 
 ### Random Reads: Find Friends
 
@@ -121,20 +121,20 @@ Get IDs of all nodes that share an edge with a given node.
 | MongoDB       |     3,005.61      |          92.26          |        2,334.31        |      127.35      |          :thumbsdown:          |
 | SQLiteCpp     |     18,836.18     |         551.95          |        8,555.51        |      343.85      |          :thumbsdown:          |
 | RocksMonolith |     17,263.29     |         104.68          |        7,182.86        |      153.27      |          :thumbsdown:          |
-| RocksChunked  |     88,498.09     |        11,271.10        |       68,164.01        |    10,477.19     |           :thumbsup:           |
+| RocksChunked  |     85,194.72     |        11,340.12        |       63,789.65        |    10,418.92     |           :thumbsup:           |
 
 ### Random Reads: Find Friends of Friends
 
 Get IDs of all nodes that share an edge with neighbors of a given node.
-|               | graph-communities | graph-eachmovie-ratings | graph-patent-citations | graph-mouse-gene | Good in graph-patent-citations |
-| :------------ | :---------------: | :---------------------: | :--------------------: | :--------------: | :----------------------------: |
-| SQLite        |      219.53       |          0.08           |         39.75          |       0.02       |          :thumbsdown:          |
-| MySQL         |      246.68       |          0.07           |         35.08          |       0.03       |          :thumbsdown:          |
-| PostgreSQL    |      225.07       |          0.07           |         34.86          |       0.03       |          :thumbsdown:          |
-| MongoDB       |      923.24       |          0.23           |         69.23          |       0.09       |          :thumbsdown:          |
-| SQLiteCpp     |      704.90       |          0.02           |         98.10          |       0.16       |          :thumbsdown:          |
-| RocksMonolith |      491.87       |          0.42           |         132.73         |       0.10       |          :thumbsdown:          |
-| RocksChunked  |     8,751.17      |          0.04           |        4,669.97        |                  | :underage::underage::underage: |
+|               | graph-communities | graph-eachmovie-ratings | graph-patent-citations | graph-mouse-gene |    Good in graph-patent-citations    |
+| :------------ | :---------------: | :---------------------: | :--------------------: | :--------------: | :----------------------------------: |
+| SQLite        |      219.53       |          0.08           |         39.75          |       0.02       |             :thumbsdown:             |
+| MySQL         |      246.68       |          0.07           |         35.08          |       0.03       |             :thumbsdown:             |
+| PostgreSQL    |      225.07       |          0.07           |         34.86          |       0.03       |             :thumbsdown:             |
+| MongoDB       |      923.24       |          0.23           |         69.23          |       0.09       |             :thumbsdown:             |
+| SQLiteCpp     |      704.90       |          0.02           |         98.10          |       0.16       |             :thumbsdown:             |
+| RocksMonolith |      491.87       |          0.42           |         132.73         |       0.10       |             :thumbsdown:             |
+| RocksChunked  |     8,751.17      |          0.04           |        4,669.97        |                  | :strawberry::strawberry::strawberry: |
 
 ### Random Reads: Count Friends
 
@@ -147,7 +147,7 @@ Count the number of edges containing a specific node and their total weight.
 | MongoDB       |     2,084.99      |         170.88          |        1,873.56        |      200.26      |          :thumbsdown:          |
 | SQLiteCpp     |     17,210.93     |         567.82          |        8,494.86        |      382.25      |           :thumbsup:           |
 | RocksMonolith |     27,874.63     |         286.21          |        2,134.54        |      108.58      |          :thumbsdown:          |
-| RocksChunked  |     28,081.10     |         188.23          |       10,219.11        |      145.66      |           :thumbsup:           |
+| RocksChunked  |     25,869.15     |         179.02          |        9,523.29        |      158.04      |           :thumbsup:           |
 
 ### Random Reads: Count Followers
 
@@ -160,7 +160,7 @@ Count the number of edges ending in a specific node and their total weight.
 | MongoDB       |     2,403.35      |        1,499.58         |        2,170.54        |      574.66      |          :thumbsdown:          |
 | SQLiteCpp     |     1,270.27      |          4.15           |          0.71          |       0.79       |          :thumbsdown:          |
 | RocksMonolith |     22,410.55     |         296.45          |        6,977.28        |      139.76      |           :thumbsup:           |
-| RocksChunked  |     30,243.65     |         198.61          |       10,248.68        |      139.23      |           :thumbsup:           |
+| RocksChunked  |     25,225.38     |         175.76          |        8,206.96        |      160.69      |           :thumbsup:           |
 
 ### Random Reads: Count Following
 
@@ -173,7 +173,7 @@ Count the number of edges starting in a specific node and their total weight.
 | MongoDB       |     2,258.81      |         182.71          |        2,221.77        |      304.79      |          :thumbsdown:          |
 | SQLiteCpp     |     1,249.34      |          4.24           |          0.72          |       0.80       |          :thumbsdown:          |
 | RocksMonolith |     26,658.37     |         253.00          |        7,160.12        |      153.99      |           :thumbsup:           |
-| RocksChunked  |     30,336.86     |         189.03          |       10,276.51        |      138.30      |           :thumbsup:           |
+| RocksChunked  |     23,983.96     |         173.15          |        8,662.68        |      146.21      |           :thumbsup:           |
 
 ## Write Operations
 
@@ -194,7 +194,7 @@ Concurrency is tested only in systems that explicitly support it.
 | MongoDB       |     3,347.44      |        3,064.88         |        2,516.66        |     2,483.28     |          :thumbsdown:          |
 | SQLiteCpp     |     1,750.36      |        1,528.97         |        1,246.90        |     1,761.80     |          :thumbsdown:          |
 | RocksMonolith |     13,777.14     |        3,999.12         |        9,570.64        |     6,048.25     |           :thumbsup:           |
-| RocksChunked  |     8,190.56      |        5,642.32         |        7,115.07        |     5,325.97     |           :thumbsup:           |
+| RocksChunked  |     7,290.38      |        5,109.77         |        7,187.28        |     4,845.59     |           :thumbsup:           |
 
 ### Random Writes: Upsert Edges Batch
 
@@ -206,7 +206,7 @@ Concurrency is tested only in systems that explicitly support it.
 | MongoDB       |     14,350.05     |        11,351.20        |        6,482.28        |     6,439.03     |          :thumbsdown:          |
 | SQLiteCpp     |     18,428.76     |        4,515.64         |        4,415.95        |     4,106.50     |          :thumbsdown:          |
 | RocksMonolith |     79,122.58     |        6,552.02         |       69,060.91        |    15,601.93     |           :thumbsup:           |
-| RocksChunked  |     35,060.64     |        13,386.19        |       32,770.30        |    14,120.03     |                                |
+| RocksChunked  |     27,814.54     |        11,589.88        |       28,057.08        |    13,644.80     |                                |
 
 ### Random Writes: Remove Edge
 
@@ -218,7 +218,7 @@ Concurrency is tested only in systems that explicitly support it.
 | MongoDB       |     3,159.98      |        1,310.84         |         572.77         |      359.21      |          :thumbsdown:          |
 | SQLiteCpp     |     1,762.28      |        1,371.72         |         956.39         |     1,478.62     |          :thumbsdown:          |
 | RocksMonolith |     10,819.78     |        4,115.75         |        3,220.58        |     3,882.20     |                                |
-| RocksChunked  |     7,733.76      |        6,085.80         |        6,468.81        |     6,270.64     |           :thumbsup:           |
+| RocksChunked  |     6,984.05      |        5,547.53         |        5,796.23        |     5,283.12     |           :thumbsup:           |
 
 ### Random Writes: Remove Edges Batch
 
@@ -230,7 +230,7 @@ Concurrency is tested only in systems that explicitly support it.
 | MongoDB       |     2,970.35      |        1,677.48         |        1,215.18        |      590.56      |          :thumbsdown:          |
 | SQLiteCpp     |     1,758.83      |        1,808.20         |        1,791.25        |     1,956.87     |          :thumbsdown:          |
 | RocksMonolith |     80,724.27     |        6,613.06         |       70,085.89        |    12,865.58     |           :thumbsup:           |
-| RocksChunked  |     30,900.45     |        14,738.22        |       26,120.85        |    16,680.84     |                                |
+| RocksChunked  |     25,292.37     |        12,019.47        |       21,332.70        |    15,128.70     |          :thumbsdown:          |
 
 ## Device
 
