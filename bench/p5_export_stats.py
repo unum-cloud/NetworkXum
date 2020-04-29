@@ -27,10 +27,16 @@ class StatsExporterPerOperation():
         ]
         dbs_unum = [
             'SQLiteCpp',
-            'RocksMonolith',
-            'RocksChunked',
-            # 'GraphGigaHash',
-            # 'GraphTeraHash',
+            'PontDBc32',
+            'PontDBc128',
+            'PontDBmono',
+        ]
+        dbs_mem = [
+            'SQLiteMem',
+            'PontDBstlo',
+            'PontDBstlu',
+            'PontDBtslh',
+            'PontDBtslr',
         ]
         dataset_names = [
             'graph-communities',
@@ -104,20 +110,22 @@ class StatsExporterPerOperation():
              'Given nodes A and B - find any directed edge that goes from A to B.'),
             ('Random Reads: Find Connected Edges',
              'Find all edges that contain a specific node in any role.'),
-            ('Random Reads: Find Outgoing Edges',
-             'Find all directed edges that start in a specific node.'),
             ('Random Reads: Find Ingoing Edges',
              'Find all directed edges that end in a specific node.'),
             ('Random Reads: Find Friends',
              'Get IDs of all nodes that share an edge with a given node.'),
-            ('Random Reads: Find Friends of Friends',
-             'Get IDs of all nodes that share an edge with neighbors of a given node.'),
             ('Random Reads: Count Friends',
              'Count the number of edges containing a specific node and their total weight.'),
             ('Random Reads: Count Followers',
              'Count the number of edges ending in a specific node and their total weight.'),
-            ('Random Reads: Count Following',
-             'Count the number of edges starting in a specific node and their total weight.'),
+
+            # These are essentially the same.
+            # ('Random Reads: Find Outgoing Edges',
+            #  'Find all directed edges that start in a specific node.'),
+            # ('Random Reads: Find Friends of Friends',
+            #  'Get IDs of all nodes that share an edge with neighbors of a given node.'),
+            # ('Random Reads: Count Following',
+            #  'Count the number of edges starting in a specific node and their total weight.'),
         ]
         for read_op, description in read_ops:
 
