@@ -27,7 +27,7 @@ class StatsExporterPerOperation():
         ]
         dbs_unum = [
             'PontDBchunk',
-            'PontDBmono',
+            # 'PontDBmono',
             # 'SQLiteCpp',
         ]
         dbs_mem = [

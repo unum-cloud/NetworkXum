@@ -28,7 +28,6 @@ Most DBs provide some form functionality for faster bulk imports, but not all of
 | MongoDB     |     8,863.45      |        14,832.76        |       14,199.87        |    15,448.18     |     15,171.61     |          :thumbsdown:          |
 | Neo4J       |      455.21       |                         |                        |                  |                   |                                |
 | PontDBchunk |    215,474.83     |       450,506.56        |       238,551.97       |    427,001.32    |    184,342.32     |           :thumbsup:           |
-| PontDBmono  |    119,314.66     |       534,250.90        |       135,714.61       |    429,779.53    |    508,604.78     |                                |
 
 ## Read Queries
 
@@ -47,14 +46,13 @@ can't be a bottleneck.
 ### Random Reads: Find Any Relation
 
 Given a pair of nodes - find any edge that connects them.
-|             | graph-communities | graph-eachmovie-ratings | graph-patent-citations | graph-mouse-gene | graph-human-brain | Good in graph-patent-citations |
-| :---------- | :---------------: | :---------------------: | :--------------------: | :--------------: | :---------------: | :----------------------------: |
-| SQLite      |      580.09       |         542.24          |         565.20         |      569.89      |       0.04        |          :thumbsdown:          |
-| MySQL       |     1,067.58      |         574.87          |         791.43         |      627.89      |      560.39       |          :thumbsdown:          |
-| PostgreSQL  |      995.94       |         416.59          |         310.87         |      485.25      |      569.41       |          :thumbsdown:          |
-| MongoDB     |     3,535.67      |        2,251.54         |        1,550.38        |      567.44      |      174.32       |          :thumbsdown:          |
-| PontDBchunk |     38,845.21     |        17,747.67        |       24,301.70        |    26,235.98     |     9,312.02      |           :thumbsup:           |
-| PontDBmono  |     37,151.93     |        13,107.86        |       25,168.34        |    27,644.30     |     31,718.74     |           :thumbsup:           |
+|             | graph-communities | graph-eachmovie-ratings | graph-patent-citations | graph-mouse-gene | graph-human-brain |    Good in graph-patent-citations    |
+| :---------- | :---------------: | :---------------------: | :--------------------: | :--------------: | :---------------: | :----------------------------------: |
+| SQLite      |      580.09       |         542.24          |         565.20         |      569.89      |       0.04        |             :thumbsdown:             |
+| MySQL       |     1,067.58      |         574.87          |         791.43         |      627.89      |      560.39       |             :thumbsdown:             |
+| PostgreSQL  |      995.94       |         416.59          |         310.87         |      485.25      |      569.41       |             :thumbsdown:             |
+| MongoDB     |     3,535.67      |        2,251.54         |        1,550.38        |      567.44      |      174.32       |             :thumbsdown:             |
+| PontDBchunk |     38,845.21     |        17,747.67        |       24,301.70        |    26,235.98     |     9,312.02      | :strawberry::strawberry::strawberry: |
 
 ### Random Reads: Find Directed Edge
 
@@ -65,8 +63,7 @@ Given nodes A and B - find any directed edge that goes from A to B.
 | MySQL       |     1,067.25      |         757.05          |         649.42         |      534.80      |      622.63       |          :thumbsdown:          |
 | PostgreSQL  |      977.48       |         495.16          |         689.94         |      345.37      |      488.56       |          :thumbsdown:          |
 | MongoDB     |     3,396.74      |        2,503.34         |        1,373.88        |      317.53      |      162.91       |          :thumbsdown:          |
-| PontDBchunk |     40,097.51     |        21,051.83        |       28,049.73        |    23,947.03     |     4,438.60      |       :fire::fire::fire:       |
-| PontDBmono  |     20,917.97     |        1,509.78         |        1,378.05        |     1,259.01     |     1,699.84      |          :thumbsdown:          |
+| PontDBchunk |     40,097.51     |        21,051.83        |       28,049.73        |    23,947.03     |     4,438.60      | :underage::underage::underage: |
 
 ### Random Reads: Find Connected Edges
 
@@ -78,7 +75,6 @@ Find all edges that contain a specific node in any role.
 | PostgreSQL  |      985.84       |          22.84          |         894.25         |      44.62       |       28.20       |          :thumbsdown:          |
 | MongoDB     |     3,025.62      |          98.67          |        2,441.84        |      129.69      |       67.33       |          :thumbsdown:          |
 | PontDBchunk |     19,734.42     |         160.95          |        7,346.90        |      143.87      |      654.22       |           :thumbsup:           |
-| PontDBmono  |     14,706.89     |          83.39          |        6,757.22        |      137.18      |      414.12       |           :thumbsup:           |
 
 ### Random Reads: Find Ingoing Edges
 
@@ -90,7 +86,6 @@ Find all directed edges that end in a specific node.
 | PostgreSQL  |     1,084.54      |         394.82          |         443.79         |      100.68      |       25.47       |          :thumbsdown:          |
 | MongoDB     |     3,002.81      |        1,441.00         |        1,558.45        |      305.64      |       78.23       |          :thumbsdown:          |
 | PontDBchunk |     25,135.32     |         167.15          |        7,775.67        |      147.73      |      279.35       |           :thumbsup:           |
-| PontDBmono  |     16,972.30     |         117.07          |        7,013.42        |      148.18      |      126.28       |           :thumbsup:           |
 
 ### Random Reads: Find Friends
 
@@ -101,8 +96,7 @@ Get IDs of all nodes that share an edge with a given node.
 | MySQL       |     1,014.85      |          1.08           |         837.92         |      33.89       |       75.76       |          :thumbsdown:          |
 | PostgreSQL  |      927.42       |          22.34          |         882.00         |      43.20       |       29.18       |          :thumbsdown:          |
 | MongoDB     |     3,005.61      |          92.26          |        2,334.31        |      127.35      |       69.23       |          :thumbsdown:          |
-| PontDBchunk |     85,194.72     |        11,340.12        |       63,789.65        |    10,418.92     |     29,423.62     |           :thumbsup:           |
-| PontDBmono  |     17,263.29     |         104.68          |        7,182.86        |      153.27      |     1,141.73      |          :thumbsdown:          |
+| PontDBchunk |     85,194.72     |        11,340.12        |       63,789.65        |    10,418.92     |     29,423.62     |       :fire::fire::fire:       |
 
 ### Random Reads: Count Friends
 
@@ -114,7 +108,6 @@ Count the number of edges containing a specific node and their total weight.
 | PostgreSQL  |      948.69       |         337.51          |         966.32         |      188.98      |       41.42       |          :thumbsdown:          |
 | MongoDB     |     2,084.99      |         170.88          |        1,873.56        |      200.26      |       80.04       |          :thumbsdown:          |
 | PontDBchunk |     25,869.15     |         179.02          |        9,523.29        |      158.04      |      772.93       |           :thumbsup:           |
-| PontDBmono  |     27,874.63     |         286.21          |        2,134.54        |      108.58      |      607.98       |          :thumbsdown:          |
 
 ### Random Reads: Count Followers
 
@@ -126,7 +119,6 @@ Count the number of edges ending in a specific node and their total weight.
 | PostgreSQL  |      976.35       |         791.99          |         982.84         |      731.73      |       47.05       |          :thumbsdown:          |
 | MongoDB     |     2,403.35      |        1,499.58         |        2,170.54        |      574.66      |       90.98       |          :thumbsdown:          |
 | PontDBchunk |     25,225.38     |         175.76          |        8,206.96        |      160.69      |      762.62       |           :thumbsup:           |
-| PontDBmono  |     22,410.55     |         296.45          |        6,977.28        |      139.76      |      608.95       |           :thumbsup:           |
 
 ## Write Operations
 
@@ -146,7 +138,6 @@ Concurrency is tested only in systems that explicitly support it.
 | PostgreSQL  |      763.39       |         631.47          |         547.85         |      702.21      |      521.75       |          :thumbsdown:          |
 | MongoDB     |     3,347.44      |        3,064.88         |        2,516.66        |     2,483.28     |      851.42       |          :thumbsdown:          |
 | PontDBchunk |     7,290.38      |        5,109.77         |        7,187.28        |     4,845.59     |     7,010.83      |           :thumbsup:           |
-| PontDBmono  |     13,777.14     |        3,999.12         |        9,570.64        |     6,048.25     |     10,425.65     |           :thumbsup:           |
 
 ### Random Writes: Upsert Edges Batch
 
@@ -156,8 +147,7 @@ Concurrency is tested only in systems that explicitly support it.
 | MySQL       |     1,055.15      |        1,014.81         |         849.62         |      856.45      |      828.88       |          :thumbsdown:          |
 | PostgreSQL  |     1,037.72      |         936.90          |         995.12         |      965.59      |      930.99       |          :thumbsdown:          |
 | MongoDB     |     14,350.05     |        11,351.20        |        6,482.28        |     6,439.03     |     1,446.09      |          :thumbsdown:          |
-| PontDBchunk |     27,814.54     |        11,589.88        |       28,057.08        |    13,644.80     |     19,912.78     |                                |
-| PontDBmono  |     79,122.58     |        6,552.02         |       69,060.91        |    15,601.93     |     26,245.27     |           :thumbsup:           |
+| PontDBchunk |     27,814.54     |        11,589.88        |       28,057.08        |    13,644.80     |     19,912.78     |           :thumbsup:           |
 
 ### Random Writes: Remove Edge
 
@@ -168,7 +158,6 @@ Concurrency is tested only in systems that explicitly support it.
 | PostgreSQL  |     1,448.48      |        1,093.10         |         897.67         |     1,061.85     |      917.14       |          :thumbsdown:          |
 | MongoDB     |     3,159.98      |        1,310.84         |         572.77         |      359.21      |       76.02       |          :thumbsdown:          |
 | PontDBchunk |     6,984.05      |        5,547.53         |        5,796.23        |     5,283.12     |     6,665.61      |           :thumbsup:           |
-| PontDBmono  |     10,819.78     |        4,115.75         |        3,220.58        |     3,882.20     |     8,356.26      |                                |
 
 ### Random Writes: Remove Edges Batch
 
@@ -178,8 +167,7 @@ Concurrency is tested only in systems that explicitly support it.
 | MySQL       |     1,000.71      |         926.02          |         739.35         |      732.53      |      744.90       |          :thumbsdown:          |
 | PostgreSQL  |     1,458.10      |        1,287.87         |        1,254.80        |     1,419.80     |     1,247.01      |          :thumbsdown:          |
 | MongoDB     |     2,970.35      |        1,677.48         |        1,215.18        |      590.56      |       84.37       |          :thumbsdown:          |
-| PontDBchunk |     25,292.37     |        12,019.47        |       21,332.70        |    15,128.70     |     19,617.54     |          :thumbsdown:          |
-| PontDBmono  |     80,724.27     |        6,613.06         |       70,085.89        |    12,865.58     |     28,088.73     |           :thumbsup:           |
+| PontDBchunk |     25,292.37     |        12,019.47        |       21,332.70        |    15,128.70     |     19,617.54     |       :fire::fire::fire:       |
 
 ## Device
 
