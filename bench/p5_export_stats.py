@@ -26,10 +26,9 @@ class StatsExporterPerOperation():
             # 'ArangoDB',
         ]
         dbs_unum = [
-            'SQLiteCpp',
-            'PontDBc32',
-            'PontDBc128',
+            'PontDBchunk',
             'PontDBmono',
+            # 'SQLiteCpp',
         ]
         dbs_mem = [
             'SQLiteMem',
@@ -43,6 +42,7 @@ class StatsExporterPerOperation():
             'graph-eachmovie-ratings',
             'graph-patent-citations',
             'graph-mouse-gene',
+            'graph-human-brain',
         ]
         dataset_for_comparison = dataset_names[2]
 
