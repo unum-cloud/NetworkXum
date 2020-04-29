@@ -36,6 +36,13 @@ class PontDBc128(RocksChunked):
         self.set_chunk_length(128)
 
 
+class PontDBchunk(RocksChunked):
+    def __init__(self, url):
+        RocksChunked.__init__(self, url=url)
+        # Thats the default chunk size.
+        # self.set_chunk_length(64)
+
+
 class PontDBmono(RocksMonolith):
     pass
 
@@ -58,9 +65,9 @@ class PontDBtslr(TSLRobin):
 
 count_nodes = int(os.getenv('COUNT_NODES', '0'))
 count_edges = int(os.getenv('COUNT_EDGES', '0'))
-count_finds = int(os.getenv('COUNT_FINDS', '5000'))
+count_finds = int(os.getenv('COUNT_FINDS', '20000'))
 count_analytics = int(os.getenv('COUNT_ANALYTICS', '300'))
-count_changes = int(os.getenv('COUNT_CHANGES', '5000'))
+count_changes = int(os.getenv('COUNT_CHANGES', '10000'))
 device_name = os.getenv('DEVICE_NAME', 'Unknown Device')
 
 report_path = 'bench/MacbookPro/README.md'
@@ -75,44 +82,49 @@ _datasets = [
 
     # Average degree: ~8.
     # http://networkrepository.com/fb-pages-company.php
-    ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
+    # ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
 
     # Average degree 90.
     # http://networkrepository.com/rec-eachmovie.php
-    ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
+    # ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
 
     # Patent Citation Network. 77 Mb.
     # Average degree: 8.
     # http://networkrepository.com/cit-patent.php
-    ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
+    # ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
 
     # Mouse gene regulatory network derived
-    # from analyzing gene expression profiles. 162 Mb.
+    # from analyzing gene expression profiles. 300 Mb in CSV.
     # Third column is the edge weights.
     # Average degree: 670.
     # http://networkrepository.com/bio-mouse-gene.php
-    ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
+    # ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
 
-    # Human Brain Network. 227 Mb.
+    # Human Brain Network. 4 Gb in CSV.
     # Average degree: 186.
+    # 87'273'967 edges.
     # http://networkrepository.com/bn-human-Jung2015-M87102575.php
     ('/Users/av/Datasets/graph-human-brain/all.csv', 0, 87273967),
+
+    # Wikipedia Graph. 26 Gb in CSV.
+    # Average degree: 186.
+    # http://networkrepository.com/bn-human-Jung2015-M87102575.php
+    # ('/Users/av/Datasets/graph-human-brain/all.csv', 0, 87273967),
 ]
 dataset_test = _datasets[0][0]
 datasets = [x[0] for x in _datasets[1:]]
 
 wrapper_types = [
-    # SQLite,
-    # MongoDB,
-    # MySQL,
-    # PostgreSQL,
+    SQLite,
+    MongoDB,
+    MySQL,
+    PostgreSQL,
     # Neo4J,
 
-    # SQLiteCpp,
-    PontDBc32,
-    PontDBc128,
-    # PontDBmono,
+    PontDBchunk,
+    PontDBmono,
 
+    # SQLiteCpp,
     # SQLiteMem,
     # PontDBstlo,
     # PontDBstlu,
@@ -122,8 +134,7 @@ wrapper_types = [
 
 _wrappers = [
     # Type, Environment Variable, Default Value
-    (PontDBc32, 'URI_UNUMDB_P32', '/Users/av/DBs/unumdb.PontDBc32/<dataset>'),
-    (PontDBc128, 'URI_UNUMDB_P128', '/Users/av/DBs/unumdb.PontDBc128/<dataset>'),
+    (PontDBchunk, 'URI_UNUMDB_PCHUNK', '/Users/av/DBs/unumdb.PontDBchunk/<dataset>'),
     (PontDBmono, 'URI_UNUMDB_PMONO', '/Users/av/DBs/unumdb.PontDBmono/<dataset>'),
     (PontDBstlo, 'URI_UNUMDB_PSTLO', '<dataset>'),
     (PontDBstlu, 'URI_UNUMDB_PSTLU', '<dataset>'),

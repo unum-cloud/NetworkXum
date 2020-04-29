@@ -19,7 +19,7 @@ class SimpleBenchmark(object):
         5. Clearing all the data (if needed).
     """
 
-    def __init__(self, max_seconds_per_query=30):
+    def __init__(self, max_seconds_per_query=120):
         self.max_seconds_per_query = max_seconds_per_query
 
     def run(self, repeat_existing=True):
