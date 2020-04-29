@@ -27,16 +27,32 @@ from unumdb_python import TSLRobin
 class PontDBc32(RocksChunked):
     def __init__(self, url):
         RocksChunked.__init__(self, url=url)
-        self.chunk_size = 32
+        self.set_chunk_length(32)
 
 
 class PontDBc128(RocksChunked):
     def __init__(self, url):
         RocksChunked.__init__(self, url=url)
-        self.chunk_size = 128
+        self.set_chunk_length(128)
 
 
 class PontDBmono(RocksMonolith):
+    pass
+
+
+class PontDBstlo(STLOrderedMap):
+    pass
+
+
+class PontDBstlu(STLUnorderedMap):
+    pass
+
+
+class PontDBtslh(TSLHopscotch):
+    pass
+
+
+class PontDBtslr(TSLRobin):
     pass
 
 
@@ -80,27 +96,40 @@ _datasets = [
     # Human Brain Network. 227 Mb.
     # Average degree: 186.
     # http://networkrepository.com/bn-human-Jung2015-M87102575.php
-    # ('/Users/av/Datasets/graph-human-brain/all.csv', 0, 87273967),
+    ('/Users/av/Datasets/graph-human-brain/all.csv', 0, 87273967),
 ]
 dataset_test = _datasets[0][0]
 datasets = [x[0] for x in _datasets[1:]]
 
 wrapper_types = [
-    # SQLiteMem,
     # SQLite,
     # MongoDB,
     # MySQL,
     # PostgreSQL,
-    RocksChunked,
-    # RocksMonolith,
-    # SQLiteCpp,
     # Neo4J,
+
+    # SQLiteCpp,
+    PontDBc32,
+    PontDBc128,
+    # PontDBmono,
+
+    # SQLiteMem,
+    # PontDBstlo,
+    # PontDBstlu,
+    # PontDBtslh,
+    # PontDBtslr,
 ]
 
 _wrappers = [
     # Type, Environment Variable, Default Value
-    (RocksChunked, 'URI_UNUMDB_RC', '/Users/av/DBs/unumdb.RocksChunked/<dataset>'),
-    (RocksMonolith, 'URI_UNUMDB_RM', '/Users/av/DBs/unumdb.RocksMonolith/<dataset>'),
+    (PontDBc32, 'URI_UNUMDB_P32', '/Users/av/DBs/unumdb.PontDBc32/<dataset>'),
+    (PontDBc128, 'URI_UNUMDB_P128', '/Users/av/DBs/unumdb.PontDBc128/<dataset>'),
+    (PontDBmono, 'URI_UNUMDB_PMONO', '/Users/av/DBs/unumdb.PontDBmono/<dataset>'),
+    (PontDBstlo, 'URI_UNUMDB_PSTLO', '<dataset>'),
+    (PontDBstlu, 'URI_UNUMDB_PSTLU', '<dataset>'),
+    (PontDBtslh, 'URI_UNUMDB_PTSLH', '<dataset>'),
+    (PontDBtslr, 'URI_UNUMDB_PTSLR', '<dataset>'),
+
     (SQLiteCpp, 'URI_UNUMDB_SQLITE', '/Users/av/DBs/unumdb.SQLiteCpp/<dataset>.db3'),
 
     (SQLiteMem, 'URI_SQLITE_MEM', 'sqlite:///:memory:'),

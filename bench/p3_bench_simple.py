@@ -36,8 +36,8 @@ class SimpleBenchmark(object):
                 url = config.database_url(graph_type, dataset_path)
                 if url is None:
                     continue
-                g = graph_type(url)
-                if (g.count_edges() == 0):
+                g = graph_type(url=url)
+                if (g.count_edges() == 0) and (not graph_type.__in_memory__):
                     continue
 
                 dataset_name = config.dataset_name(dataset_path)
@@ -52,7 +52,6 @@ class SimpleBenchmark(object):
             self.dataset_path = None
 
     def run_one(self, remove_all_afterwards=False):
-
         if type(self.graph).__in_memory__:
             self.one('Sequential Writes: Import CSV',
                      self.import_bulk)
@@ -64,8 +63,8 @@ class SimpleBenchmark(object):
                  self.find_e_undirected)
 
         # # Queries returning collections.
-        self.one('Random Reads: Find Outgoing Edges',
-                 self.find_es_from)
+        # self.one('Random Reads: Find Outgoing Edges',
+        #          self.find_es_from)
         self.one('Random Reads: Find Ingoing Edges',
                  self.find_es_to)
         self.one('Random Reads: Find Connected Edges',
@@ -80,8 +79,8 @@ class SimpleBenchmark(object):
                  self.count_v_related)
         self.one('Random Reads: Count Followers',
                  self.count_v_followers)
-        self.one('Random Reads: Count Following',
-                 self.count_v_following)
+        # self.one('Random Reads: Count Following',
+        #          self.count_v_following)
 
         # Reversable write operations.
         self.one('Random Writes: Remove Edge',
