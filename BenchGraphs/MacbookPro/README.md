@@ -34,11 +34,11 @@ Databases were configured to use 512 Mb of RAM for cache and 4 cores for query e
 
 ### Datasets
 
-* [Patent Citation Network](http://networkrepository.com/cit-patent.php).
+* [Patent Citations Network](http://networkrepository.com/cit-patent.php).
     * Size: 77 Mb.
     * Edges: 16,518,947.
     * Average Degree: 8.
-* [Mouse Gene Regulatory Network](http://networkrepository.com/bio-mouse-gene.php).
+* [Mouse Genes Regulatory Network](http://networkrepository.com/bio-mouse-gene.php).
     * Size: 300 Mb.
     * Edges: 14,506,199.
     * Average Degree: 670.
@@ -54,10 +54,10 @@ Let's see how long it will take to load an adjacency list into each DB.
 But before comparing DBs, let's see what our SSD is capable of by simply parsing the list (2 or 3 column CSV).
 This will be our baseline for estimating the time required to build the indexes in each DB.
 
-|                   | graph-patent-citations | graph-mouse-gene | graph-human-brain |
-| :---------------- | :--------------------: | :--------------: | :---------------: |
-| Parsing in Python |       622,782.99       |    546,260.93    |    443,102.25     |
-| SQLiteMem         |       71,887.72        |                  |                   |
+|                   | Patent Citations | Mouse Genes | Human Brain |
+| :---------------- | :--------------: | :---------: | :---------: |
+| Parsing in Python |    622,782.99    | 546,260.93  | 443,102.25  |
+| SQLiteMem         |    71,887.72     |             |             |
 
 Most DBs provide some form functionality for faster bulk imports, but not all of them where used in benchmarks for various reasons.
 
@@ -65,13 +65,13 @@ Most DBs provide some form functionality for faster bulk imports, but not all of
 * PostgreSQL and MySQL dialects of SQL have special functions for importing CSVs, but their functionality is very limited and performance gains aren't substantial. A better approach is to use unindexed table of incoming edges and later submit it into the main store once the data is absorbed. That's how we implemented it.
 * MongoDB provides a command line tool, but it wasn't used to limit the number of binary dependencies and simplify configuration.
 
-|            | graph-patent-citations | graph-mouse-gene | graph-human-brain | Good in graph-human-brain |
-| :--------- | :--------------------: | :--------------: | :---------------: | :-----------------------: |
-| SQLite     |       44,137.56        |    49,059.01     |     38,185.49     |       :thumbsdown:        |
-| MySQL      |       14,636.07        |    18,370.53     |     12,185.34     |       :thumbsdown:        |
-| PostgreSQL |        7,230.86        |     7,361.18     |     7,428.68      |       :thumbsdown:        |
-| MongoDB    |       14,199.87        |    15,448.18     |     15,171.61     |       :thumbsdown:        |
-| GraphDB    |       285,056.99       |    875,710.22    |    549,628.79     |    :fire::fire::fire:     |
+|            | Patent Citations | Mouse Genes | Human Brain |      Results       |
+| :--------- | :--------------: | :---------: | :---------: | :----------------: |
+| SQLite     |    44,137.56     |  49,059.01  |  38,185.49  |    :thumbsdown:    |
+| MySQL      |    14,636.07     |  18,370.53  |  12,185.34  |    :thumbsdown:    |
+| PostgreSQL |     7,230.86     |  7,361.18   |  7,428.68   |    :thumbsdown:    |
+| MongoDB    |    14,199.87     |  15,448.18  |  15,171.61  |    :thumbsdown:    |
+| GraphDB    |    285,056.99    | 875,710.22  | 549,628.79  | :fire::fire::fire: |
 
 ## Read Queries
 
@@ -85,101 +85,101 @@ As we are running on a local machine and within the same filesystem, the network
 
 ### Random Reads: Find Any Relation
 
-Input: 2 vertex identifiers.
-Output: edge that connects them.
-Metric: number of such edges returned per second.
+Input: 2 vertex identifiers.<br/>
+Output: edge that connects them.<br/>
+Metric: number of such edges returned per second.<br/>
 
-|            | graph-patent-citations | graph-mouse-gene | graph-human-brain |   Good in graph-human-brain    |
-| :--------- | :--------------------: | :--------------: | :---------------: | :----------------------------: |
-| SQLite     |         565.20         |      569.89      |       0.04        |          :thumbsdown:          |
-| MySQL      |         791.43         |      627.89      |      560.39       |          :thumbsdown:          |
-| PostgreSQL |         310.87         |      485.25      |      569.41       |          :thumbsdown:          |
-| MongoDB    |        1,550.38        |      567.44      |      174.32       |          :thumbsdown:          |
-| GraphDB    |        7,937.44        |    18,170.31     |     7,024.40      | :underage::underage::underage: |
+|            | Patent Citations | Mouse Genes | Human Brain |            Results             |
+| :--------- | :--------------: | :---------: | :---------: | :----------------------------: |
+| SQLite     |      565.20      |   569.89    |    0.04     |          :thumbsdown:          |
+| MySQL      |      791.43      |   627.89    |   560.39    |          :thumbsdown:          |
+| PostgreSQL |      310.87      |   485.25    |   569.41    |          :thumbsdown:          |
+| MongoDB    |     1,550.38     |   567.44    |   174.32    |          :thumbsdown:          |
+| GraphDB    |     7,937.44     |  18,170.31  |  7,024.40   | :underage::underage::underage: |
 
 ### Random Reads: Find Directed Edge
 
-Input: 2 vertex identifiers (order is important).
-Output: edge that connects them in given direction.
-Metric: number of such edges returned per second.
+Input: 2 vertex identifiers (order is important).<br/>
+Output: edge that connects them in given direction.<br/>
+Metric: number of such edges returned per second.<br/>
 
-|            | graph-patent-citations | graph-mouse-gene | graph-human-brain | Good in graph-human-brain |
-| :--------- | :--------------------: | :--------------: | :---------------: | :-----------------------: |
-| SQLite     |         487.21         |      462.52      |       0.03        |       :thumbsdown:        |
-| MySQL      |         649.42         |      534.80      |      622.63       |       :thumbsdown:        |
-| PostgreSQL |         689.94         |      345.37      |      488.56       |       :thumbsdown:        |
-| MongoDB    |        1,373.88        |      317.53      |      162.91       |       :thumbsdown:        |
-| GraphDB    |        3,797.41        |     8,211.14     |     3,816.05      |        :thumbsup:         |
+|            | Patent Citations | Mouse Genes | Human Brain |   Results    |
+| :--------- | :--------------: | :---------: | :---------: | :----------: |
+| SQLite     |      487.21      |   462.52    |    0.03     | :thumbsdown: |
+| MySQL      |      649.42      |   534.80    |   622.63    | :thumbsdown: |
+| PostgreSQL |      689.94      |   345.37    |   488.56    | :thumbsdown: |
+| MongoDB    |     1,373.88     |   317.53    |   162.91    | :thumbsdown: |
+| GraphDB    |     3,797.41     |  8,211.14   |  3,816.05   |  :thumbsup:  |
 
 ### Random Reads: Find Connected Edges
 
-Input: 1 vertex identifier.
-Output: all edges attached to it.
-Metric: number of such edges returned per second.
+Input: 1 vertex identifier.<br/>
+Output: all edges attached to it.<br/>
+Metric: number of such edges returned per second.<br/>
 
-|            | graph-patent-citations | graph-mouse-gene | graph-human-brain | Good in graph-human-brain |
-| :--------- | :--------------------: | :--------------: | :---------------: | :-----------------------: |
-| SQLite     |         381.21         |      40.21       |       31.85       |       :thumbsdown:        |
-| MySQL      |         857.91         |      33.90       |       85.09       |       :thumbsdown:        |
-| PostgreSQL |         894.25         |      44.62       |       28.20       |       :thumbsdown:        |
-| MongoDB    |        2,441.84        |      129.69      |       67.33       |       :thumbsdown:        |
-| GraphDB    |        4,062.32        |      103.42      |      315.89       |        :thumbsup:         |
+|            | Patent Citations | Mouse Genes | Human Brain |   Results    |
+| :--------- | :--------------: | :---------: | :---------: | :----------: |
+| SQLite     |      381.21      |    40.21    |    31.85    | :thumbsdown: |
+| MySQL      |      857.91      |    33.90    |    85.09    | :thumbsdown: |
+| PostgreSQL |      894.25      |    44.62    |    28.20    | :thumbsdown: |
+| MongoDB    |     2,441.84     |   129.69    |    67.33    | :thumbsdown: |
+| GraphDB    |     4,062.32     |   103.42    |   315.89    |  :thumbsup:  |
 
 ### Random Reads: Find Ingoing Edges
 
-Input: 1 vertex identifier.
-Output: all edges incoming into it.
-Metric: number of such edges returned per second.
+Input: 1 vertex identifier.<br/>
+Output: all edges incoming into it.<br/>
+Metric: number of such edges returned per second.<br/>
 
-|            | graph-patent-citations | graph-mouse-gene | graph-human-brain | Good in graph-human-brain |
-| :--------- | :--------------------: | :--------------: | :---------------: | :-----------------------: |
-| SQLite     |          0.13          |      95.55       |       0.02        |       :thumbsdown:        |
-| MySQL      |         791.89         |      66.36       |      128.18       |                           |
-| PostgreSQL |         443.79         |      100.68      |       25.47       |       :thumbsdown:        |
-| MongoDB    |        1,558.45        |      305.64      |       78.23       |       :thumbsdown:        |
-| GraphDB    |        3,610.75        |      97.86       |      316.31       |        :thumbsup:         |
+|            | Patent Citations | Mouse Genes | Human Brain |   Results    |
+| :--------- | :--------------: | :---------: | :---------: | :----------: |
+| SQLite     |       0.13       |    95.55    |    0.02     | :thumbsdown: |
+| MySQL      |      791.89      |    66.36    |   128.18    |              |
+| PostgreSQL |      443.79      |   100.68    |    25.47    | :thumbsdown: |
+| MongoDB    |     1,558.45     |   305.64    |    78.23    | :thumbsdown: |
+| GraphDB    |     3,610.75     |    97.86    |   316.31    |  :thumbsup:  |
 
 ### Random Reads: Find Friends
 
-Input: 1 vertex identifier.
-Output: the identifiers of all unique vertexes that share an edge with the input.
-Metric: number of neighbor identiefiers returned per second.
+Input: 1 vertex identifier.<br/>
+Output: the identifiers of all unique vertexes that share an edge with the input.<br/>
+Metric: number of neighbor identiefiers returned per second.<br/>
 
-|            | graph-patent-citations | graph-mouse-gene | graph-human-brain |      Good in graph-human-brain       |
-| :--------- | :--------------------: | :--------------: | :---------------: | :----------------------------------: |
-| SQLite     |         651.92         |      43.30       |       35.33       |             :thumbsdown:             |
-| MySQL      |         837.92         |      33.89       |       75.76       |             :thumbsdown:             |
-| PostgreSQL |         882.00         |      43.20       |       29.18       |             :thumbsdown:             |
-| MongoDB    |        2,334.31        |      127.35      |       69.23       |             :thumbsdown:             |
-| GraphDB    |       17,288.37        |     1,944.81     |     4,971.51      | :strawberry::strawberry::strawberry: |
+|            | Patent Citations | Mouse Genes | Human Brain |               Results                |
+| :--------- | :--------------: | :---------: | :---------: | :----------------------------------: |
+| SQLite     |      651.92      |    43.30    |    35.33    |             :thumbsdown:             |
+| MySQL      |      837.92      |    33.89    |    75.76    |             :thumbsdown:             |
+| PostgreSQL |      882.00      |    43.20    |    29.18    |             :thumbsdown:             |
+| MongoDB    |     2,334.31     |   127.35    |    69.23    |             :thumbsdown:             |
+| GraphDB    |    17,288.37     |  1,944.81   |  4,971.51   | :strawberry::strawberry::strawberry: |
 
 ### Random Reads: Count Friends
 
-Input: 1 vertex identifier.
-Output: the total number of attached edges and their accumulated weight.
-Metric: number queries per second.
+Input: 1 vertex identifier.<br/>
+Output: the total number of attached edges and their accumulated weight.<br/>
+Metric: number queries per second.<br/>
 
-|            | graph-patent-citations | graph-mouse-gene | graph-human-brain | Good in graph-human-brain |
-| :--------- | :--------------------: | :--------------: | :---------------: | :-----------------------: |
-| SQLite     |         692.86         |      283.86      |       51.63       |       :thumbsdown:        |
-| MySQL      |         862.79         |       7.10       |       64.27       |       :thumbsdown:        |
-| PostgreSQL |         966.32         |      188.98      |       41.42       |       :thumbsdown:        |
-| MongoDB    |        1,873.56        |      200.26      |       80.04       |       :thumbsdown:        |
-| GraphDB    |        4,361.97        |      113.43      |      344.57       |        :thumbsup:         |
+|            | Patent Citations | Mouse Genes | Human Brain |   Results    |
+| :--------- | :--------------: | :---------: | :---------: | :----------: |
+| SQLite     |      692.86      |   283.86    |    51.63    | :thumbsdown: |
+| MySQL      |      862.79      |    7.10     |    64.27    | :thumbsdown: |
+| PostgreSQL |      966.32      |   188.98    |    41.42    | :thumbsdown: |
+| MongoDB    |     1,873.56     |   200.26    |    80.04    | :thumbsdown: |
+| GraphDB    |     4,361.97     |   113.43    |   344.57    |  :thumbsup:  |
 
 ### Random Reads: Count Followers
 
-Input: 1 vertex identifier.
-Output: the total number of incoming edges and their accumulated weight.
-Metric: number queries per second.
+Input: 1 vertex identifier.<br/>
+Output: the total number of incoming edges and their accumulated weight.<br/>
+Metric: number queries per second.<br/>
 
-|            | graph-patent-citations | graph-mouse-gene | graph-human-brain | Good in graph-human-brain |
-| :--------- | :--------------------: | :--------------: | :---------------: | :-----------------------: |
-| SQLite     |          0.37          |      685.33      |       0.02        |       :thumbsdown:        |
-| MySQL      |         998.98         |      134.48      |      211.11       |                           |
-| PostgreSQL |         982.84         |      731.73      |       47.05       |       :thumbsdown:        |
-| MongoDB    |        2,170.54        |      574.66      |       90.98       |       :thumbsdown:        |
-| GraphDB    |        4,383.93        |      106.43      |      338.74       |        :thumbsup:         |
+|            | Patent Citations | Mouse Genes | Human Brain |   Results    |
+| :--------- | :--------------: | :---------: | :---------: | :----------: |
+| SQLite     |       0.37       |   685.33    |    0.02     | :thumbsdown: |
+| MySQL      |      998.98      |   134.48    |   211.11    |              |
+| PostgreSQL |      982.84      |   731.73    |    47.05    | :thumbsdown: |
+| MongoDB    |     2,170.54     |   574.66    |    90.98    | :thumbsdown: |
+| GraphDB    |     4,383.93     |   106.43    |   338.74    |  :thumbsup:  |
 
 ## Write Operations
 
@@ -189,57 +189,57 @@ Concurrency is tested only in systems that explicitly support it.
 
 ### Random Writes: Upsert Edge
 
-Input: 1 new edge.
-Output: success/failure indicator.
-Metric: number inserted edges per second.
+Input: 1 new edge.<br/>
+Output: success/failure indicator.<br/>
+Metric: number inserted edges per second.<br/>
 
-|            | graph-patent-citations | graph-mouse-gene | graph-human-brain | Good in graph-human-brain |
-| :--------- | :--------------------: | :--------------: | :---------------: | :-----------------------: |
-| SQLite     |         372.24         |      446.27      |      338.95       |       :thumbsdown:        |
-| MySQL      |         373.24         |      406.16      |      348.81       |       :thumbsdown:        |
-| PostgreSQL |         547.85         |      702.21      |      521.75       |       :thumbsdown:        |
-| MongoDB    |        2,516.66        |     2,483.28     |      851.42       |       :thumbsdown:        |
-| GraphDB    |        3,798.41        |     4,146.34     |     4,008.92      |        :thumbsup:         |
+|            | Patent Citations | Mouse Genes | Human Brain |   Results    |
+| :--------- | :--------------: | :---------: | :---------: | :----------: |
+| SQLite     |      372.24      |   446.27    |   338.95    | :thumbsdown: |
+| MySQL      |      373.24      |   406.16    |   348.81    | :thumbsdown: |
+| PostgreSQL |      547.85      |   702.21    |   521.75    | :thumbsdown: |
+| MongoDB    |     2,516.66     |  2,483.28   |   851.42    | :thumbsdown: |
+| GraphDB    |     3,798.41     |  4,146.34   |  4,008.92   |  :thumbsup:  |
 
 ### Random Writes: Upsert Edges Batch
 
-Input: 500 new edges.
-Output: 500 success/failure indicators.
-Metric: number inserted edges per second.
+Input: 500 new edges.<br/>
+Output: 500 success/failure indicators.<br/>
+Metric: number inserted edges per second.<br/>
 
-|            | graph-patent-citations | graph-mouse-gene | graph-human-brain | Good in graph-human-brain |
-| :--------- | :--------------------: | :--------------: | :---------------: | :-----------------------: |
-| SQLite     |        1,177.27        |     1,140.73     |     1,133.51      |       :thumbsdown:        |
-| MySQL      |         849.62         |      856.45      |      828.88       |       :thumbsdown:        |
-| PostgreSQL |         995.12         |      965.59      |      930.99       |       :thumbsdown:        |
-| MongoDB    |        6,482.28        |     6,439.03     |     1,446.09      |       :thumbsdown:        |
-| GraphDB    |       11,421.12        |    13,136.74     |     12,279.58     |        :thumbsup:         |
+|            | Patent Citations | Mouse Genes | Human Brain |   Results    |
+| :--------- | :--------------: | :---------: | :---------: | :----------: |
+| SQLite     |     1,177.27     |  1,140.73   |  1,133.51   | :thumbsdown: |
+| MySQL      |      849.62      |   856.45    |   828.88    | :thumbsdown: |
+| PostgreSQL |      995.12      |   965.59    |   930.99    | :thumbsdown: |
+| MongoDB    |     6,482.28     |  6,439.03   |  1,446.09   | :thumbsdown: |
+| GraphDB    |    11,421.12     |  13,136.74  |  12,279.58  |  :thumbsup:  |
 
 ### Random Writes: Remove Edge
 
-Input: 1 existing edge.
-Output: success/failure indicator.
-Metric: number removed edges per second.
+Input: 1 existing edge.<br/>
+Output: success/failure indicator.<br/>
+Metric: number removed edges per second.<br/>
 
-|            | graph-patent-citations | graph-mouse-gene | graph-human-brain | Good in graph-human-brain |
-| :--------- | :--------------------: | :--------------: | :---------------: | :-----------------------: |
-| SQLite     |         469.26         |      596.98      |      424.58       |       :thumbsdown:        |
-| MySQL      |         885.60         |      726.17      |      824.31       |       :thumbsdown:        |
-| PostgreSQL |         897.67         |     1,061.85     |      917.14       |       :thumbsdown:        |
-| MongoDB    |         572.77         |      359.21      |       76.02       |       :thumbsdown:        |
-| GraphDB    |        3,153.38        |     4,103.24     |     3,339.86      |        :thumbsup:         |
+|            | Patent Citations | Mouse Genes | Human Brain |   Results    |
+| :--------- | :--------------: | :---------: | :---------: | :----------: |
+| SQLite     |      469.26      |   596.98    |   424.58    | :thumbsdown: |
+| MySQL      |      885.60      |   726.17    |   824.31    | :thumbsdown: |
+| PostgreSQL |      897.67      |  1,061.85   |   917.14    | :thumbsdown: |
+| MongoDB    |      572.77      |   359.21    |    76.02    | :thumbsdown: |
+| GraphDB    |     3,153.38     |  4,103.24   |  3,339.86   |  :thumbsup:  |
 
 ### Random Writes: Remove Edges Batch
 
-Input: 500 existing edges.
-Output: 500 success/failure indicators.
-Metric: number removed edges per second.
+Input: 500 existing edges.<br/>
+Output: 500 success/failure indicators.<br/>
+Metric: number removed edges per second.<br/>
 
-|            | graph-patent-citations | graph-mouse-gene | graph-human-brain | Good in graph-human-brain |
-| :--------- | :--------------------: | :--------------: | :---------------: | :-----------------------: |
-| SQLite     |         643.42         |      630.82      |      645.67       |       :thumbsdown:        |
-| MySQL      |         739.35         |      732.53      |      744.90       |       :thumbsdown:        |
-| PostgreSQL |        1,254.80        |     1,419.80     |     1,247.01      |       :thumbsdown:        |
-| MongoDB    |        1,215.18        |      590.56      |       84.37       |       :thumbsdown:        |
-| GraphDB    |       11,524.81        |    13,074.22     |     12,387.68     |        :thumbsup:         |
+|            | Patent Citations | Mouse Genes | Human Brain |   Results    |
+| :--------- | :--------------: | :---------: | :---------: | :----------: |
+| SQLite     |      643.42      |   630.82    |   645.67    | :thumbsdown: |
+| MySQL      |      739.35      |   732.53    |   744.90    | :thumbsdown: |
+| PostgreSQL |     1,254.80     |  1,419.80   |  1,247.01   | :thumbsdown: |
+| MongoDB    |     1,215.18     |   590.56    |    84.37    | :thumbsdown: |
+| GraphDB    |    11,524.81     |  13,074.22  |  12,387.68  |  :thumbsup:  |
 
