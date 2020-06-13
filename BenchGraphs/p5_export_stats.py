@@ -154,45 +154,45 @@ class StatsExporterPerOperation():
         read_ops = [
             ('Random Reads: Find Any Relation',
              '''
-             Input: 2 vertex identifiers.
-             Output: edge that connects them.
-             Metric: number of such edges returned per second.
+             Input: 2 vertex identifiers.<br/>
+             Output: edge that connects them.<br/>
+             Metric: number of such edges returned per second.<br/>
              '''),
             ('Random Reads: Find Directed Edge',
              '''
-             Input: 2 vertex identifiers (order is important).
-             Output: edge that connects them in given direction.
-             Metric: number of such edges returned per second.
+             Input: 2 vertex identifiers (order is important).<br/>
+             Output: edge that connects them in given direction.<br/>
+             Metric: number of such edges returned per second.<br/>
              '''),
             ('Random Reads: Find Connected Edges',
              '''
-             Input: 1 vertex identifier.
-             Output: all edges attached to it.
-             Metric: number of such edges returned per second.
+             Input: 1 vertex identifier.<br/>
+             Output: all edges attached to it.<br/>
+             Metric: number of such edges returned per second.<br/>
              '''),
             ('Random Reads: Find Ingoing Edges',
              '''
-             Input: 1 vertex identifier.
-             Output: all edges incoming into it.
-             Metric: number of such edges returned per second.
+             Input: 1 vertex identifier.<br/>
+             Output: all edges incoming into it.<br/>
+             Metric: number of such edges returned per second.<br/>
              '''),
             ('Random Reads: Find Friends',
              '''
-             Input: 1 vertex identifier.
-             Output: the identifiers of all unique vertexes that share an edge with the input.
-             Metric: number of neighbor identiefiers returned per second.
+             Input: 1 vertex identifier.<br/>
+             Output: the identifiers of all unique vertexes that share an edge with the input.<br/>
+             Metric: number of neighbor identiefiers returned per second.<br/>
              '''),
             ('Random Reads: Count Friends',
              '''
-             Input: 1 vertex identifier.
-             Output: the total number of attached edges and their accumulated weight.
-             Metric: number queries per second.
+             Input: 1 vertex identifier.<br/>
+             Output: the total number of attached edges and their accumulated weight.<br/>
+             Metric: number queries per second.<br/>
              '''),
             ('Random Reads: Count Followers',
              '''
-             Input: 1 vertex identifier.
-             Output: the total number of incoming edges and their accumulated weight.
-             Metric: number queries per second.
+             Input: 1 vertex identifier.<br/>
+             Output: the total number of incoming edges and their accumulated weight.<br/>
+             Metric: number queries per second.<br/>
              ''')
         ]
 
@@ -224,30 +224,30 @@ class StatsExporterPerOperation():
         write_ops = [
             ('Random Writes: Upsert Edge',
              '''
-             Input: 1 new edge.
-             Output: success/failure indicator.
-             Metric: number inserted edges per second.
+             Input: 1 new edge.<br/>
+             Output: success/failure indicator.<br/>
+             Metric: number inserted edges per second.<br/>
              '''),
 
             ('Random Writes: Upsert Edges Batch',
              '''
-             Input: 500 new edges.
-             Output: 500 success/failure indicators.
-             Metric: number inserted edges per second.
+             Input: 500 new edges.<br/>
+             Output: 500 success/failure indicators.<br/>
+             Metric: number inserted edges per second.<br/>
              '''),
 
             ('Random Writes: Remove Edge',
              '''
-             Input: 1 existing edge.
-             Output: success/failure indicator.
-             Metric: number removed edges per second.
+             Input: 1 existing edge.<br/>
+             Output: success/failure indicator.<br/>
+             Metric: number removed edges per second.<br/>
              '''),
 
             ('Random Writes: Remove Edges Batch',
              '''
-             Input: 500 existing edges.
-             Output: 500 success/failure indicators.
-             Metric: number removed edges per second.
+             Input: 500 existing edges.<br/>
+             Output: 500 success/failure indicators.<br/>
+             Metric: number removed edges per second.<br/>
              '''),
         ]
         for write_op, description in write_ops:
