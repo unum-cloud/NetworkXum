@@ -1,7 +1,7 @@
-from pygraphdb.table_sql import PlainSQL, EdgeSQL
+from PyWrappedGraph.table_sql import BaseSQL, EdgeSQL
 
 
-class SQLiteMem(PlainSQL):
+class SQLiteMem(BaseSQL):
     """
         In-memory version of SQLite database.
     """
@@ -11,7 +11,7 @@ class SQLiteMem(PlainSQL):
     __in_memory__ = True
 
 
-class SQLite(PlainSQL):
+class SQLite(BaseSQL):
     """
         SQLite may be the fastest option for tiny databases 
         under 20 Mb. It's write aplification is huge. 
@@ -28,7 +28,7 @@ class SQLite(PlainSQL):
     __in_memory__ = False
 
     def __init__(self, url, **kwargs):
-        PlainSQL.__init__(self, url, **kwargs)
+        BaseSQL.__init__(self, url, **kwargs)
         self.set_pragmas_on_first_launch()
 
     def set_pragmas_on_first_launch(self):

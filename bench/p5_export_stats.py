@@ -47,7 +47,7 @@ class StatsExporterPerOperation():
         dataset_for_comparison = dataset_names[2]
 
         # Intro.
-        out.add('# PyGraphDB Benchmarks Overview')
+        out.add('# PyWrappedDBs Benchmarks Overview')
 
         # Sequential Writes: Import CSV
         out.add('## Sequential Writes: Import CSV (edges/sec)')

@@ -1,6 +1,6 @@
-from pygraphdb.base_graph import GraphBase
-from pygraphdb.base_edge import Edge
-from pygraphdb.helpers import export_edges_into_graph_parallel
+from PyWrappedGraph.BaseAPI import BaseAPI
+from PyWrappedGraph.Edge import Edge
+from PyWrappedGraph.Algorithms import export_edges_into_graph_parallel
 
 import config
 

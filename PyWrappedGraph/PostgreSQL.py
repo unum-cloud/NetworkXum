@@ -1,9 +1,9 @@
-from pygraphdb.table_sql import PlainSQL, EdgeNew, EdgeSQL
+from PyWrappedGraph.table_sql import BaseSQL, EdgeNew, EdgeSQL
 
 
-class PostgreSQL(PlainSQL):
+class PostgreSQL(BaseSQL):
     """
-        Extends PlainSQL functionality with optimized operations:
+        Extends BaseSQL functionality with optimized operations:
         *   Bulk imports and exports via:
             https://github.com/jmcarp/sqlalchemy-postgres-copy
         *   Async operations through less mature ORM: Gino (only PostgreSQL).
@@ -13,7 +13,7 @@ class PostgreSQL(PlainSQL):
     """
 
     def __init__(self, url, **kwargs):
-        PlainSQL.__init__(self, url, **kwargs)
+        BaseSQL.__init__(self, url, **kwargs)
         self.set_pragmas_on_first_launch()
 
     def set_pragmas_on_first_launch(self):

@@ -6,17 +6,17 @@ import pymongo
 from pymongo import MongoClient
 from pymongo import UpdateOne
 
-from pygraphdb.base_graph import GraphBase
-from pygraphdb.helpers import *
+from PyWrappedGraph.BaseAPI import BaseAPI
+from PyWrappedGraph.Algorithms import *
 
 
-class MongoDB(GraphBase):
+class MongoDB(BaseAPI):
     __max_batch_size__ = 1000
     __is_concurrent__ = True
     __edge_type__ = dict
 
     def __init__(self, url='mongodb://localhost:27017/graph', **kwargs):
-        GraphBase.__init__(self, **kwargs)
+        BaseAPI.__init__(self, **kwargs)
         db_name = extract_database_name(url)
         self.db = MongoClient(url)
         self.edges = self.db[db_name]['edges']

@@ -1,4 +1,4 @@
-# PyGraphDB Benchmarks Overview
+# PyWrappedDBs Benchmarks Overview
 
 ## Sequential Writes: Import CSV (edges/sec)
 

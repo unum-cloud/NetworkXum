@@ -4,7 +4,7 @@ class Edge(object):
         Shared Edge class with ID hashing for simpler collision avoidance.
         Advanced DBs can preserve object uniqness by comparing multiple keys/columns.
         Others only support 1 primary key, so we implement hashing and type
-        checking in this class to simplify queries in pygraphdb.
+        checking in this class to simplify queries in PyWrappedGraph.
     """
 
     def __init__(self, v1: int, v2: int, weight=1, _id=None, **kwargs):

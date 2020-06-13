@@ -1,6 +1,6 @@
 import os
 
-from pygraphdb.base_graph import GraphBase
+from PyWrappedGraph.BaseAPI import BaseAPI
 import pystats2md.stats_file as sf
 
 import config

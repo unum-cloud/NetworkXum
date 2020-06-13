@@ -11,9 +11,9 @@ from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy import text
 from sqlalchemy import Index, Table
 
-from pygraphdb.base_graph import GraphBase
-from pygraphdb.base_edge import Edge
-from pygraphdb.helpers import *
+from PyWrappedGraph.BaseAPI import BaseAPI
+from PyWrappedGraph.Edge import Edge
+from PyWrappedGraph.Algorithms import *
 
 BaseSQL = declarative_base()
 
@@ -60,7 +60,7 @@ class EdgeNew(BaseSQL, Edge):
         Edge.__init__(self, *args, **kwargs)
 
 
-class PlainSQL(GraphBase):
+class BaseSQL(BaseAPI):
     """
         A generic SQL-compatiable wrapper for Graph-shaped data.
         It's built on top of SQLAlchemy which supports following engines:
@@ -102,7 +102,7 @@ class PlainSQL(GraphBase):
     __in_memory__ = False
 
     def __init__(self, url='sqlite:///:memory:', **kwargs):
-        GraphBase.__init__(self, **kwargs)
+        BaseAPI.__init__(self, **kwargs)
         # https://stackoverflow.com/a/51184173
         if not database_exists(url):
             create_database(url)

@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 import concurrent.futures
 
-from pygraphdb.base_edge import Edge
-from pygraphdb.helpers import *
+from PyWrappedGraph.Edge import Edge
+from PyWrappedGraph.Algorithms import *
 
 
-class GraphBase(object):
+class BaseAPI(object):
     """
         Abstract base class for Graph Datastructures.
         It's designed for directed weighted graphs, but can be easily tweaked.
@@ -221,9 +221,5 @@ class GraphBase(object):
             return related_to_related.union(related).difference({v})
         else:
             return related_to_related.difference(related).difference({v})
-
-    @abstractmethod
-    def shortest_path(self, v1, v2) -> List[int]:
-        pass
 
     # endregion

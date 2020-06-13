@@ -1,0 +1,42 @@
+[
+    {
+        "database": "Parsing in Python",
+        "dataset": "graph-communities",
+        "date": "2020/06/18-16:05:16",
+        "num_cpus": 16,
+        "mhz_per_cpu": 2300,
+        "build_type": "debug",
+        "cpu_scaling_enabled": false,
+        "device_name": "MacbookPro",
+        "date_utc": 1589835976.458433,
+        "date_readable": "May 18, 2020",
+        "date_sortable": "2020/06/18",
+        "benchmark_name": "Sequential Writes: Import CSV",
+        "benchmark_code": "            func=lambda: export_edges_into_graph(dataset_path, g),\n",
+        "time_elapsed": 0.02056097984313965,
+        "count_iterations": 1,
+        "count_operations": 10000,
+        "msecs_per_operation": 0.002056097984313965,
+        "operations_per_second": 486358.1442270898
+    },
+    {
+        "database": "RockyGraph",
+        "dataset": "graph-communities",
+        "date": "2020/06/18-16:05:26",
+        "num_cpus": 16,
+        "mhz_per_cpu": 2300,
+        "build_type": "debug",
+        "cpu_scaling_enabled": false,
+        "device_name": "MacbookPro",
+        "date_utc": 1589835986.518114,
+        "date_readable": "May 18, 2020",
+        "date_sortable": "2020/06/18",
+        "benchmark_name": "Sequential Writes: Import CSV",
+        "benchmark_code": "                def import_one() -> int:\n                    g.insert_adjacency_list(dataset_path)\n                    return g.count_edges()\n",
+        "time_elapsed": 10.023779153823853,
+        "count_iterations": 7,
+        "count_operations": 700,
+        "msecs_per_operation": 14.319684505462646,
+        "operations_per_second": 69.83394079796395
+    }
+]

@@ -4,7 +4,7 @@ from time import time
 from pystats2md.stats_file import StatsFile
 from pystats2md.micro_bench import MicroBench
 
-from pygraphdb.base_graph import GraphBase
+from PyWrappedGraph.BaseAPI import BaseAPI
 
 import config
 from tasks_sampler import TasksSampler

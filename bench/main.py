@@ -9,7 +9,7 @@ from p4_bench_networkx import NetworkXBenchmark
 
 if __name__ == "__main__":
     try:
-        print('Welcome to PyGraphDB Benchmark!')
+        print('Welcome to PyWrappedDBs Benchmark!')
         print('- Testing DBs!')
         Tester().run()
         print('- Importing datasets!')

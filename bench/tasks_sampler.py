@@ -2,7 +2,7 @@ import random
 from random import SystemRandom
 from typing import List
 
-from pygraphdb.helpers import yield_edges_from, chunks
+from PyWrappedGraph.Algorithms import yield_edges_from, chunks
 
 
 class TasksSampler(object):
