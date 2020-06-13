@@ -55,13 +55,13 @@ class StatsExporterPerOperation():
         out.add('# How well can different DBs handle graphs (networks)?')
         out.add('''
         At [Unum](https://unum.xyz) we develop a neuro-symbolic AI, which means combining discrete structural representations of data and semi-continuous neural representations.
-        The common misconseeption is that CPU/GPU power is the bottleneck for designing AGI, but we would argue that it's the storage layer.
+        The common misconception is that CPU/GPU power is the bottleneck for designing AGI, but we would argue that it's the storage layer.
 
-        * CPU<->RAM bandwidth: ~100 GB/s.
-        * GPU<->VRAM bandwidth: ~1,000 GB/s.
-        * CPU<->GPU bandwidth: ~15 GB/s.
-        * GPU<->GPU bandwidth: ~300 GB/s.
-        * CPU<->SSD bandwidth: ~2 GB/s.
+        * CPU ⇌ RAM bandwidth: ~100 GB/s.
+        * GPU ⇌ VRAM bandwidth: ~1,000 GB/s.
+        * CPU ⇌ GPU bandwidth: ~15 GB/s.
+        * GPU ⇌ GPU bandwidth: ~300 GB/s.
+        * CPU ⇌ SSD bandwidth: ~2 GB/s.
 
         As we can see, the theoretical throughput between storage (SSD) and CPU is by far the biggest bottleneck.
         2 GB/s doesn't sound very scary, but the problem is that **most databases can hardly saturate 10%% of that capacity (or 200 MB/s)!**
@@ -72,19 +72,17 @@ class StatsExporterPerOperation():
         out.add('## Setup')
         out.add('### Databases')
         out.add('''
-        * Neo4J was designed specifically for graphs storage, but crashes consistently, so it was removed from comparison.
-        * SQLite, MySQL, PostgreSQL and other SQL DBs are the foundations of modern entrprise IT infrastructure.
-        * MongoDB is a new NoSQL database currently values at aound $10 Bln.
-        * GraphDB is our in-house solution.
+        * [Neo4J](https://neo4j.com) was designed specifically for graphs storage, but crashes consistently, so it was removed from comparison.
+        * [SQLite](https://www.sqlite.org), [MySQL](https://www.mysql.com), [PostgreSQL](https://www.postgresql.org) and other SQL DBs are the foundations of modern entrprise IT infrastructure.
+        * [MongoDB](https://www.sqlite.org/index.html) is a new NoSQL database currently values at aound $10 Bln.
+        * [GraphDB](https://unum.xyz) is our in-house solution.
+
+        Databases were configured to use 512 Mb of RAM for cache and 4 cores for query execution.
         ''')
         out.add('### Device')
         out.add_current_device_specs()
         out.add('### Datasets')
         out.add('''
-        * [Movie Recommendations Network](http://networkrepository.com/rec-eachmovie.php).
-            * Size: 33 Mb.
-            * Edges: 2,811,716.
-            * Average Degree: 90.
         * [Patent Citation Network](http://networkrepository.com/cit-patent.php).
             * Size: 77 Mb.
             * Edges: 16,518,947.
