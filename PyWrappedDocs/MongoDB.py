@@ -2,7 +2,7 @@ from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 
 import pymongo
 from pymongo import MongoClient
-from pymongo import UpdateOne
+from pymongo import UpdateOne, DeleteOne
 
 from PyWrappedDocs.BaseAPI import BaseAPI
 from PyWrappedGraph.Algorithms import *
@@ -13,7 +13,7 @@ class MongoDB(BaseAPI):
     __is_concurrent__ = True
     __edge_type__ = dict
 
-    def __init__(self, url='mongodb://localhost:27017/graph', **kwargs):
+    def __init__(self, url='mongodb://localhost:27017/texts', **kwargs):
         BaseAPI.__init__(self, **kwargs)
         db_name = extract_database_name(url)
         self.db = MongoClient(url)
@@ -33,7 +33,7 @@ class MongoDB(BaseAPI):
     def remove_all(self):
         self.docs_collection.drop()
 
-    def find_substring(self, field: str, query: str) -> Sequence[object]:
+    def find_with_substring(self, field: str, query: str) -> Sequence[object]:
         # https://docs.mongodb.com/manual/reference/operator/query/text/
         # https://docs.mongodb.com/manual/core/index-text/
         # https://docs.mongodb.com/manual/reference/text-search-languages/#text-search-languages
@@ -48,7 +48,7 @@ class MongoDB(BaseAPI):
             },
         })
 
-    def find_regex(self, field: str, query: str) -> Sequence[object]:
+    def find_with_regex(self, field: str, query: str) -> Sequence[object]:
         # https://docs.mongodb.com/manual/reference/operator/query/regex/
         return self.docs_collection.find(filter={
             field: {
@@ -70,11 +70,10 @@ class MongoDB(BaseAPI):
         return result.deleted_count >= 1
 
     def upsert_docs(self, docs: List[object]) -> int:
-        """Supports up to 1000 updates per batch"""
-        docs = list(docs)
-        if len(docs) == 0:
-            return 0
-
+        """
+            Supports up to 1000 updates per batch.
+            https://api.mongodb.com/python/current/examples/bulk.html#ordered-bulk-write-operations
+        """
         def make_upsert(doc):
             return UpdateOne(
                 filter={'_id': doc['_id'], },
@@ -84,7 +83,25 @@ class MongoDB(BaseAPI):
         ops = list(map(make_upsert, docs))
         try:
             result = self.docs_collection.bulk_write(requests=ops, ordered=False)
-            return len(result.bulk_api_result['upserted'])
+            return result.bulk_api_result['nUpserted'] + result.bulk_api_result['nInserted']
+        except pymongo.errors.BulkWriteError as bwe:
+            print(bwe)
+            print(bwe.details['writeErrors'])
+            return 0
+
+    def remove_docs(self, docs: List[object]) -> int:
+        """
+            Supports up to 1000 updates per batch.
+            https://api.mongodb.com/python/current/examples/bulk.html#ordered-bulk-write-operations
+        """
+        def make_upsert(doc):
+            return DeleteOne(
+                filter={'_id': doc['_id'], },
+            )
+        ops = list(map(make_upsert, docs))
+        try:
+            result = self.docs_collection.bulk_write(requests=ops, ordered=False)
+            return result.bulk_api_result['nUpserted'] + result.bulk_api_result['nInserted']
         except pymongo.errors.BulkWriteError as bwe:
             print(bwe)
             print(bwe.details['writeErrors'])

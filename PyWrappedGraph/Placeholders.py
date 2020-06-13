@@ -1,6 +1,6 @@
 from PyWrappedGraph.Algorithms import *
 from PyWrappedGraph.BaseAPI import BaseAPI
-from PyWrappedGraph.plain_sql import BaseSQL
+from PyWrappedGraph.BaseSQL import BaseSQL
 
 
 class Cayley(BaseAPI):
