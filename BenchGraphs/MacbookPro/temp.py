@@ -4,7 +4,7 @@ import json
 json_stats = []
 json_pontdb = []
 json_pygraphdb = []
-with open('bench/MacbookPro/stats.json', 'r') as file:
+with open('BenchGraphs/MacbookPro/stats.json', 'r') as file:
     json_stats = json.load(file)
 
 for obj in json_stats:
@@ -13,7 +13,7 @@ for obj in json_stats:
     else:
         json_pygraphdb.append(obj)
 
-with open("bench/MacbookPro/stats_pontdb.json", "w") as file:
+with open("BenchGraphs/MacbookPro/stats_pontdb.json", "w") as file:
     file.write(json.dumps(json_pontdb))
-with open("bench/MacbookPro/stats_pygraphdb.json", "w") as file:
+with open("BenchGraphs/MacbookPro/stats_pygraphdb.json", "w") as file:
     file.write(json.dumps(json_pygraphdb))

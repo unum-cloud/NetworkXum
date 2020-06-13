@@ -29,15 +29,15 @@ count_analytics = int(os.getenv('COUNT_ANALYTICS', '300'))
 count_changes = int(os.getenv('COUNT_CHANGES', '10000'))
 device_name = os.getenv('DEVICE_NAME', 'Unknown Device')
 
-report_path = 'bench/MacbookPro/README.md'
-stats_path = 'bench/MacbookPro/stats_rockydb.json'
+report_path = 'BenchGraphs/MacbookPro/README.md'
+stats_path = 'BenchGraphs/MacbookPro/stats_unumdb.json'
 stats = StatsFile(stats_path)
 
 _datasets = [
     # Path, Number of Nodes, Number of Edges
 
     # Test graph.
-    ('/Users/av/Code/PyWrappedDBs/datasets/graph-test/all.csv', 8, 10),
+    ('/Users/av/Code/PyWrappedDBs/Datasets/graph-test/all.csv', 8, 10),
 
     # Average degree: ~8.
     # http://networkrepository.com/fb-pages-company.php
@@ -57,13 +57,13 @@ _datasets = [
     # Third column is the edge weights.
     # Average degree: 670.
     # http://networkrepository.com/bio-mouse-gene.php
-    # ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
+    ('/Users/av/Datasets/graph-mouse-gene/all.csv', 0, 14506199),
 
     # Human Brain Network. 4 Gb in CSV.
     # Average degree: 186.
     # 87'273'967 edges.
     # http://networkrepository.com/bn-human-Jung2015-M87102575.php
-    # ('/Users/av/Datasets/graph-human-brain/all.csv', 0, 87273967),
+    ('/Users/av/Datasets/graph-human-brain/all.csv', 0, 87273967),
 
     # Wikipedia Graph. 26 Gb in CSV.
     # Average degree: 186.
@@ -74,17 +74,17 @@ dataset_test = _datasets[0][0]
 datasets = [x[0] for x in _datasets[1:]]
 
 wrapper_types = [
+    GraphDB,
     # SQLite,
     # MongoDB,
     # MySQL,
     # PostgreSQL,
     # Neo4J,
-    RockyGraph,
 ]
 
 _wrappers = [
     # Type, Environment Variable, Default Value
-    (RockyGraph, 'URI_UNUMDB_ROCKY', '/Users/av/DBs/unumdb.Rocky/<dataset>'),
+    (GraphDB, 'URI_UNUMDB_ROCKY', '/Users/av/DBs/unumdb.Rocky/<dataset>'),
     (SQLiteMem, 'URI_SQLITE_MEM', 'sqlite:///:memory:'),
     (SQLite, 'URI_SQLITE', 'sqlite:////Users/av/DBs/sqlite/<dataset>.db3'),
     (MySQL, 'URI_MYSQL', 'mysql://av:temptemp@0.0.0.0:3306/<dataset>'),

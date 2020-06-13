@@ -1,4 +1,4 @@
-from PyWrappedGraph.table_sql import BaseSQL, EdgeSQL
+from PyWrappedGraph.BaseSQL import BaseSQL, EdgeSQL
 
 
 class SQLiteMem(BaseSQL):

@@ -15,19 +15,19 @@ from PyWrappedGraph.BaseAPI import BaseAPI
 from PyWrappedGraph.Edge import Edge
 from PyWrappedGraph.Algorithms import *
 
-BaseSQL = declarative_base()
+DeclarativeSQL = declarative_base()
 
 
-class NodeSQL(BaseSQL):
+class NodeSQL(DeclarativeSQL):
     __tablename__ = 'table_nodes'
     _id = Column(BigInteger, primary_key=True)
     attributes_json = Column(Text)
 
     def __init__(self, *args, **kwargs):
-        BaseSQL.__init__(self)
+        DeclarativeSQL.__init__(self)
 
 
-class EdgeSQL(BaseSQL, Edge):
+class EdgeSQL(DeclarativeSQL, Edge):
     __tablename__ = 'table_edges'
     _id = Column(BigInteger, primary_key=True)
     v1 = Column(BigInteger)
@@ -37,11 +37,11 @@ class EdgeSQL(BaseSQL, Edge):
     attributes_json = Column(Text)
 
     def __init__(self, *args, **kwargs):
-        BaseSQL.__init__(self)
+        DeclarativeSQL.__init__(self)
         Edge.__init__(self, *args, **kwargs)
 
 
-class EdgeNew(BaseSQL, Edge):
+class EdgeNew(DeclarativeSQL, Edge):
     __tablename__ = 'new_edges'
     _id = Column(BigInteger, primary_key=True)
     v1 = Column(BigInteger)
@@ -56,7 +56,7 @@ class EdgeNew(BaseSQL, Edge):
     # TODO: Consider using different Integer types in different SQL DBs.
     # https://stackoverflow.com/a/60840921/2766161
     def __init__(self, *args, **kwargs):
-        BaseSQL.__init__(self)
+        DeclarativeSQL.__init__(self)
         Edge.__init__(self, *args, **kwargs)
 
 
@@ -107,7 +107,7 @@ class BaseSQL(BaseAPI):
         if not database_exists(url):
             create_database(url)
         self.engine = sa.create_engine(url)
-        BaseSQL.metadata.create_all(self.engine)
+        DeclarativeSQL.metadata.create_all(self.engine)
         self.session_maker = sessionmaker(bind=self.engine)
 
     @contextmanager
@@ -391,11 +391,11 @@ class BaseSQL(BaseAPI):
         with self.get_session() as s:
             s.execute(text(f'DELETE FROM {EdgeNew.__tablename__};'))
 
-    def validate_edge(self, e) -> BaseSQL:
+    def validate_edge(self, e) -> DeclarativeSQL:
         return self.validate_edge_and_convert(e, EdgeSQL)
 
-    def validate_edge_and_convert(self, e, e_type) -> BaseSQL:
-        if (not isinstance(e, BaseSQL)) and (e_type is not None):
+    def validate_edge_and_convert(self, e, e_type) -> DeclarativeSQL:
+        if (not isinstance(e, DeclarativeSQL)) and (e_type is not None):
             if isinstance(e, dict):
                 e = e_type(**e)
             else:

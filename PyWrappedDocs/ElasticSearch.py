@@ -81,7 +81,7 @@ class ElasticSearch(BaseAPI):
 
 
 if __name__ == '__main__':
-    sample_file = 'datasets/nlp/paper.json'
+    sample_file = 'Datasets/nlp-test/nanoformulations.json'
     es = ElasticSearch()
     assert es.cound_docs() == 0
     assert es.upsert_doc(File(sample_file).content)
