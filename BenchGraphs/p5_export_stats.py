@@ -49,7 +49,7 @@ class StatsExporterPerOperation():
             'graph-mouse-gene',
             'graph-human-brain',
         ]
-        dataset_for_comparison = dataset_names[2]
+        dataset_for_comparison = 'graph-human-brain'
 
         # Intro.
         out.add('# PyWrappedDBs Benchmarks Overview')
