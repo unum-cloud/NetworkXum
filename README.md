@@ -9,8 +9,8 @@ Implements the same [interface](adapters/base.py) for every one of those backend
 
 * [pygraphdb](pygraphdb) - contains Pythonic wrappers for DBs.
 * [bench](bench) - contains benchmark programs and results for different hardware.
-* [bench/stats_*/stats.json](bench/MacbookPro/stats.json) - contains machine-readable results of previous benchmarks.
-* [bench/stats_*/stats.md](bench/MacbookPro/stats.md) - contains human-readable results of previous benchmarks.
+* [BenchGraphs/stats_*/stats.json](BenchGraphs/MacbookPro/stats.json) - contains machine-readable results of previous benchmarks.
+* [BenchGraphs/stats_*/stats.md](BenchGraphs/MacbookPro/stats.md) - contains human-readable results of previous benchmarks.
 
 ## Implementation Details & Included DBs
 

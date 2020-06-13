@@ -5698,7 +5698,7 @@
         "count_iterations": 8,
         "count_operations": 800,
         "cpu_scaling_enabled": false,
-        "database": "RockyGraph",
+        "database": "GraphDB",
         "dataset": "graph-communities",
         "date": "2020/20/18-02:05:38",
         "date_readable": "May 18, 2020",

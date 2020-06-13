@@ -1,4 +1,4 @@
-from PyWrappedGraph.table_sql import BaseSQL, EdgeNew
+from PyWrappedGraph.BaseSQL import BaseSQL, EdgeNew
 
 
 class MySQL(BaseSQL):

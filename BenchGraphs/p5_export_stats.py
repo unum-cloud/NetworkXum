@@ -15,7 +15,13 @@ class StatsExporterPerOperation():
         device_name='MacbookPro',
     ) -> str:
 
-        ins = config.stats
+        ins = StatsFile()
+        for path in [
+            'BenchGraphs/MacbookPro/stats_pygraphdb.json',
+            'BenchGraphs/MacbookPro/stats_unumdb.json'
+        ]:
+            ins.append(StatsFile(path))
+
         out = Report()
         dbs_pygraph = [
             'SQLite',
@@ -26,16 +32,15 @@ class StatsExporterPerOperation():
             # 'ArangoDB',
         ]
         dbs_unum = [
-            'PontDBchunk',
-            # 'PontDBmono',
+            'GraphDB',
             # 'SQLiteCpp',
         ]
         dbs_mem = [
             'SQLiteMem',
-            'PontDBstlo',
-            'PontDBstlu',
-            'PontDBtslh',
-            'PontDBtslr',
+            # 'STLOrderedMap',
+            # 'STLUnorderedMap',
+            # 'TSLHopscotch',
+            # 'TSLRobin',
         ]
         dataset_names = [
             'graph-communities',

@@ -1,4 +1,4 @@
-from PyWrappedGraph.table_sql import BaseSQL, EdgeNew, EdgeSQL
+from PyWrappedGraph.BaseSQL import BaseSQL, EdgeNew, EdgeSQL
 
 
 class PostgreSQL(BaseSQL):
