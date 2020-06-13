@@ -1,4 +1,5 @@
 {
     // CI/CD.
-    "gitlab.instanceUrl": "https://gitlab.ashvardanian.com/unum/pygraphdb"
+    "gitlab.instanceUrl": "https://gitlab.ashvardanian.com/unum/pygraphdb",
+    "python.pythonPath": "/Users/av/miniconda3/bin/python"
 }

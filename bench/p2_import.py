@@ -4,7 +4,7 @@ import importlib
 
 from pystats2md.micro_bench import MicroBench
 
-from pygraphdb.helpers import export_edges_into_graph
+from PyWrappedGraph.Algorithms import export_edges_into_graph
 import config
 
 

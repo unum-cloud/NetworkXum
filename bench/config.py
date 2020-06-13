@@ -4,63 +4,22 @@ import importlib
 
 from pystats2md.stats_file import StatsFile
 
-from pygraphdb.table_sqlite import SQLite, SQLiteMem
-from pygraphdb.table_mysql import MySQL
-from pygraphdb.table_postgres import PostgreSQL
-from pygraphdb.docs_mongo import MongoDB
-from pygraphdb.graph_neo4j import Neo4J
+from PyWrappedGraph.SQLite import SQLite, SQLiteMem
+from PyWrappedGraph.MySQL import MySQL
+from PyWrappedGraph.PostgreSQL import PostgreSQL
+from PyWrappedGraph.MongoDB import MongoDB
+from PyWrappedGraph.Neo4J import Neo4J
 
 try:
     # pylint: disable=undefined-variable
-    importlib.reload(unumdb_python)
+    importlib.reload(PyUnumDB)
 except NameError:
-    import unumdb_python
-from unumdb_python import SQLiteCpp
-from unumdb_python import RocksMonolith
-from unumdb_python import RocksChunked
-from unumdb_python import STLOrderedMap
-from unumdb_python import STLUnorderedMap
-from unumdb_python import TSLHopscotch
-from unumdb_python import TSLRobin
-
-
-class PontDBc32(RocksChunked):
-    def __init__(self, url):
-        RocksChunked.__init__(self, url=url)
-        self.set_chunk_length(32)
-
-
-class PontDBc128(RocksChunked):
-    def __init__(self, url):
-        RocksChunked.__init__(self, url=url)
-        self.set_chunk_length(128)
-
-
-class PontDBchunk(RocksChunked):
-    def __init__(self, url):
-        RocksChunked.__init__(self, url=url)
-        # Thats the default chunk size.
-        # self.set_chunk_length(64)
-
-
-class PontDBmono(RocksMonolith):
-    pass
-
-
-class PontDBstlo(STLOrderedMap):
-    pass
-
-
-class PontDBstlu(STLUnorderedMap):
-    pass
-
-
-class PontDBtslh(TSLHopscotch):
-    pass
-
-
-class PontDBtslr(TSLRobin):
-    pass
+    import PyUnumDB
+from PyUnumDB import GraphDB
+# from PyUnumDB import STLOrderedMap
+# from PyUnumDB import STLUnorderedMap
+# from PyUnumDB import TSLHopscotch
+# from PyUnumDB import TSLRobin
 
 
 count_nodes = int(os.getenv('COUNT_NODES', '0'))
@@ -71,27 +30,27 @@ count_changes = int(os.getenv('COUNT_CHANGES', '10000'))
 device_name = os.getenv('DEVICE_NAME', 'Unknown Device')
 
 report_path = 'bench/MacbookPro/README.md'
-stats_path = 'bench/MacbookPro/stats.json'
+stats_path = 'bench/MacbookPro/stats_rockydb.json'
 stats = StatsFile(stats_path)
 
 _datasets = [
     # Path, Number of Nodes, Number of Edges
 
     # Test graph.
-    ('/Users/av/Code/PyGraphDB/datasets/graph-test/all.csv', 8, 10),
+    ('/Users/av/Code/PyWrappedDBs/datasets/graph-test/all.csv', 8, 10),
 
     # Average degree: ~8.
     # http://networkrepository.com/fb-pages-company.php
-    # ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
+    ('/Users/av/Datasets/graph-communities/all.csv', 0, 52310),
 
     # Average degree 90.
     # http://networkrepository.com/rec-eachmovie.php
-    # ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
+    ('/Users/av/Datasets/graph-eachmovie-ratings/all.csv', 0, 2811716),
 
     # Patent Citation Network. 77 Mb.
     # Average degree: 8.
     # http://networkrepository.com/cit-patent.php
-    # ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
+    ('/Users/av/Datasets/graph-patent-citations/all.csv', 0, 16518947),
 
     # Mouse gene regulatory network derived
     # from analyzing gene expression profiles. 300 Mb in CSV.
@@ -104,7 +63,7 @@ _datasets = [
     # Average degree: 186.
     # 87'273'967 edges.
     # http://networkrepository.com/bn-human-Jung2015-M87102575.php
-    ('/Users/av/Datasets/graph-human-brain/all.csv', 0, 87273967),
+    # ('/Users/av/Datasets/graph-human-brain/all.csv', 0, 87273967),
 
     # Wikipedia Graph. 26 Gb in CSV.
     # Average degree: 186.
@@ -115,34 +74,17 @@ dataset_test = _datasets[0][0]
 datasets = [x[0] for x in _datasets[1:]]
 
 wrapper_types = [
-    SQLite,
-    MongoDB,
-    MySQL,
-    PostgreSQL,
+    # SQLite,
+    # MongoDB,
+    # MySQL,
+    # PostgreSQL,
     # Neo4J,
-
-    PontDBchunk,
-    PontDBmono,
-
-    # SQLiteCpp,
-    # SQLiteMem,
-    # PontDBstlo,
-    # PontDBstlu,
-    # PontDBtslh,
-    # PontDBtslr,
+    RockyGraph,
 ]
 
 _wrappers = [
     # Type, Environment Variable, Default Value
-    (PontDBchunk, 'URI_UNUMDB_PCHUNK', '/Users/av/DBs/unumdb.PontDBchunk/<dataset>'),
-    (PontDBmono, 'URI_UNUMDB_PMONO', '/Users/av/DBs/unumdb.PontDBmono/<dataset>'),
-    (PontDBstlo, 'URI_UNUMDB_PSTLO', '<dataset>'),
-    (PontDBstlu, 'URI_UNUMDB_PSTLU', '<dataset>'),
-    (PontDBtslh, 'URI_UNUMDB_PTSLH', '<dataset>'),
-    (PontDBtslr, 'URI_UNUMDB_PTSLR', '<dataset>'),
-
-    (SQLiteCpp, 'URI_UNUMDB_SQLITE', '/Users/av/DBs/unumdb.SQLiteCpp/<dataset>.db3'),
-
+    (RockyGraph, 'URI_UNUMDB_ROCKY', '/Users/av/DBs/unumdb.Rocky/<dataset>'),
     (SQLiteMem, 'URI_SQLITE_MEM', 'sqlite:///:memory:'),
     (SQLite, 'URI_SQLITE', 'sqlite:////Users/av/DBs/sqlite/<dataset>.db3'),
     (MySQL, 'URI_MYSQL', 'mysql://av:temptemp@0.0.0.0:3306/<dataset>'),

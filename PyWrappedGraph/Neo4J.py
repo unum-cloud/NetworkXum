@@ -6,12 +6,12 @@ from urllib.parse import urlparse
 from neo4j import GraphDatabase
 from neo4j import BoltStatementResult
 
-from pygraphdb.base_edge import Edge
-from pygraphdb.base_graph import GraphBase
-from pygraphdb.helpers import *
+from PyWrappedGraph.Edge import Edge
+from PyWrappedGraph.BaseAPI import BaseAPI
+from PyWrappedGraph.Algorithms import *
 
 
-class Neo4J(GraphBase):
+class Neo4J(BaseAPI):
     """
         Uses Cypher DSL and Bolt API to access Neo4J graph database.
 
@@ -60,7 +60,7 @@ class Neo4J(GraphBase):
         use_indexes_over_constraints=True,
         **kwargs,
     ):
-        GraphBase.__init__(self, **kwargs)
+        BaseAPI.__init__(self, **kwargs)
         self.import_directory = import_directory
 
         # Neo4J can't resolve DB name, username or password on its own.

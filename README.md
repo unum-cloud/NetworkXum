@@ -1,4 +1,4 @@
-# PyGraphDB
+# PyWrappedDBs
 
 A library (and benchmark) of graph-like adaptors for conventional persistent storage engines. <br/>
 Supports both SQL and NoSQL backends, embedded databases and full scale servers. <br/>

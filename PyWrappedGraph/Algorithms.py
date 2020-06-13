@@ -6,7 +6,7 @@ import concurrent
 import math
 from urllib.parse import urlparse
 
-from pygraphdb.base_edge import Edge
+from PyWrappedGraph.Edge import Edge
 
 
 def map_compact(func, os: Sequence[object]) -> Sequence[object]:

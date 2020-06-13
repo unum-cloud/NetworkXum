@@ -1,4 +1,4 @@
-# Intro to Benchmarking with PyGraphDB
+# Intro to Benchmarking with PyWrappedDBs
 
 The intention of benchmarks was to see, how well various DBs can handle graph workloads.
 If you are not familiar with graphs, its just a mathematical term to describe relations between different points.

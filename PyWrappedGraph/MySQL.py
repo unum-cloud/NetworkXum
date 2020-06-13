@@ -1,10 +1,10 @@
-from pygraphdb.table_sql import PlainSQL, EdgeNew
+from PyWrappedGraph.table_sql import BaseSQL, EdgeNew
 
 
-class MySQL(PlainSQL):
+class MySQL(BaseSQL):
 
     def __init__(self, url, **kwargs):
-        PlainSQL.__init__(self, url, **kwargs)
+        BaseSQL.__init__(self, url, **kwargs)
         self.set_pragmas_on_first_launch()
 
     def set_pragmas_on_first_launch(self):

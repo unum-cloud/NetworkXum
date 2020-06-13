@@ -5,20 +5,21 @@ from setuptools import setup
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 setup(
-    name='pygraphdb',
+    name='PyWrappedDBs',
     version=__version__,
     author='Ashot Vardanian',
     author_email='ashvardanian@gmail.com',
-    url='https://github.com/ashvardanian/PyGraphDB',
+    url='https://github.com/ashvardanian/PyWrappedDBs',
     description='''
-    A generic persistent Graph structure compatiable with NetworkX. 
-    It can store big graphs in SQLite, MySQL, Postgres, MongoDB or Neo4J database.
+    A set of database wrappers with OOP-like interfaces.
+    Graph structures are backed by SQLite, MySQL, PostgreSQL, MongoDB and Neo4J and compatiable with NetworkX. 
+    Document collections are backed by SQLite, MySQL, PostgreSQL, MongoDB and Lucene.
     ''',
     long_description=long_description,
-    packages=['pygraphdb'],
+    packages=['PyWrappedGraph', 'PyWrappedDocs'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
