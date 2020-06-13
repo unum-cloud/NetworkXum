@@ -249,7 +249,7 @@ class MongoDB(BaseAPI):
         ops = list(map(make_upsert, es))
         try:
             result = self.edges.bulk_write(requests=ops, ordered=False)
-            return len(result.bulk_api_result['upserted'])
+            return result.bulk_api_result['nUpserted'] + result.bulk_api_result['nInserted']
         except pymongo.errors.BulkWriteError as bwe:
             print(bwe)
             print(bwe.details['writeErrors'])
