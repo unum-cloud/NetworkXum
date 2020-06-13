@@ -15,12 +15,12 @@ class StatsExporterPerOperation():
         device_name='MacbookPro',
     ) -> str:
 
-        ins = StatsFile()
+        ins = StatsFile(filename=None)
         for path in [
             'BenchGraphs/MacbookPro/stats_pygraphdb.json',
             'BenchGraphs/MacbookPro/stats_unumdb.json'
         ]:
-            ins.append(StatsFile(path))
+            ins.append(StatsFile(filename=path))
 
         out = Report()
         dbs_pygraph = [
