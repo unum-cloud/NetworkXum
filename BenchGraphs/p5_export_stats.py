@@ -18,7 +18,9 @@ class StatsExporterPerOperation():
         ins = StatsFile(filename=None)
         for path in [
             'BenchGraphs/MacbookPro/stats_pygraphdb.json',
-            'BenchGraphs/MacbookPro/stats_unumdb.json'
+            'BenchGraphs/MacbookPro/stats_mgraphdb.json',
+            'BenchGraphs/MacbookPro/stats_unumdb.json',
+            'BenchGraphs/MacbookPro/stats_pontdb.json',
         ]:
             ins.append(StatsFile(filename=path))
 
@@ -33,6 +35,7 @@ class StatsExporterPerOperation():
         ]
         dbs_unum = [
             'GraphDB',
+            # 'MGraphDB',
             # 'SQLiteCpp',
         ]
         dbs_mem = [
@@ -43,13 +46,13 @@ class StatsExporterPerOperation():
             # 'TSLRobin',
         ]
         dataset_names = [
-            # 'graph-communities',
-            # 'graph-eachmovie-ratings',
-            'graph-patent-citations',
-            'graph-mouse-gene',
-            'graph-human-brain',
+            # 'FB Communities',
+            # 'Movie Ratings',
+            'Patent Citations',
+            'Mouse Genes',
+            'Human Brain',
         ]
-        dataset_for_comparison = 'graph-human-brain'
+        dataset_for_comparison = 'Human Brain'
 
         # Intro.
         out.add('# How well can different DBs handle graphs (networks)?')
