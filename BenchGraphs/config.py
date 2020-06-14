@@ -37,7 +37,7 @@ _datasets = [
     # Path, Number of Nodes, Number of Edges
 
     # Test graph.
-    ('/Users/av/Code/PyWrappedDBs/Datasets/graph-test/all.csv', 8, 10),
+    ('/Users/av/Code/PyWrappedDBs/Datasets/graph-test/all.csv', 8, 10, 'Test'),
 
     # Average degree: ~8.
     # http://networkrepository.com/fb-pages-company.php
@@ -85,7 +85,7 @@ wrapper_types = [
 
 _wrappers = [
     # Type, Environment Variable, Default Value
-    (GraphDB, 'URI_UNUMDB_ROCKY', '/Users/av/DBs/unumdb.Rocky/<dataset>'),
+    (GraphDB, 'URI_UNUMDB_ROCKY', '/Users/av/DBs/unumdb.GraphDB/<dataset>'),
     (SQLiteMem, 'URI_SQLITE_MEM', 'sqlite:///:memory:'),
     (SQLite, 'URI_SQLITE', 'sqlite:////Users/av/DBs/sqlite/<dataset>.db3'),
     (MySQL, 'URI_MYSQL', 'mysql://av:temptemp@0.0.0.0:3306/<dataset>'),
@@ -107,10 +107,11 @@ def dataset_number_of_edges(dataset_path: str) -> int:
 
 
 def dataset_name(dataset_path: str) -> str:
-    parts = dataset_path.split('/')
-    if len(parts) > 1:
-        return parts[-2]
-    return dataset_path
+    for d in _datasets:
+        if d[0] != dataset_path:
+            continue
+        return d[3]
+    return 0
 
 
 def wrapper_name(cls: type) -> str:

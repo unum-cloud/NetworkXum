@@ -22,7 +22,7 @@ class SimpleBenchmark(object):
     def __init__(self, max_seconds_per_query=120):
         self.max_seconds_per_query = max_seconds_per_query
 
-    def run(self, repeat_existing=True):
+    def run(self, repeat_existing=False):
         self.repeat_existing = repeat_existing
         for dataset_path in config.datasets:
             self.dataset_path = dataset_path
