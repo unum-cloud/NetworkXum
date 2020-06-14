@@ -49,6 +49,7 @@ Every datascience project starts by importing the data.
 Let's see how long it will take to load an adjacency list into each DB.
 But before comparing DBs, let's see what our SSD is capable of by simply parsing the list (2 or 3 column CSV).
 This will be our baseline for estimating the time required to build the indexes in each DB.
+
 |                   | Patent Citations | Mouse Genes | Human Brain |
 | :---------------- | :--------------: | :---------: | :---------: |
 | Parsing in Python |    613,127.42    | 535,720.92  | 464,345.05  |
@@ -59,6 +60,7 @@ Most DBs provide some form functionality for faster bulk imports, but not all of
 * Neo4J supports CSV imports, but it requires duplicating the imported file and constantly crashes (due to Java heap management issues).
 * PostgreSQL and MySQL dialects of SQL have special functions for importing CSVs, but their functionality is very limited and performance gains aren't substantial. A better approach is to use unindexed table of incoming edges and later submit it into the main store once the data is absorbed. That's how we implemented it.
 * MongoDB provides a command line tool, but it wasn't used to limit the number of binary dependencies and simplify configuration.
+
 |            | Patent Citations | Mouse Genes | Human Brain | Gains in Human Brain |
 | :--------- | :--------------: | :---------: | :---------: | :------------------: |
 | PostgreSQL |     7,230.86     |  7,361.18   |  7,428.68   |          1x          |
@@ -85,6 +87,7 @@ can't be a bottleneck.
 Input: 2 vertex identifiers.<br/>
 Output: edge that connects them.<br/>
 Metric: number of such edges returned per second.<br/>
+
 |            | Patent Citations | Mouse Genes | Human Brain | Gains in Human Brain |
 | :--------- | :--------------: | :---------: | :---------: | :------------------: |
 | PostgreSQL |      310.87      |   485.25    |   569.41    |          1x          |
@@ -99,6 +102,7 @@ Metric: number of such edges returned per second.<br/>
 Input: 2 vertex identifiers (order is important).<br/>
 Output: edge that connects them in given direction.<br/>
 Metric: number of such edges returned per second.<br/>
+
 |            | Patent Citations | Mouse Genes | Human Brain | Gains in Human Brain |
 | :--------- | :--------------: | :---------: | :---------: | :------------------: |
 | PostgreSQL |      689.94      |   345.37    |   488.56    |          1x          |
@@ -113,6 +117,7 @@ Metric: number of such edges returned per second.<br/>
 Input: 1 vertex identifier.<br/>
 Output: all edges attached to it.<br/>
 Metric: number of such edges returned per second.<br/>
+
 |            | Patent Citations | Mouse Genes | Human Brain | Gains in Human Brain |
 | :--------- | :--------------: | :---------: | :---------: | :------------------: |
 | PostgreSQL |      894.25      |    44.62    |    28.20    |          1x          |
@@ -127,6 +132,7 @@ Metric: number of such edges returned per second.<br/>
 Input: 1 vertex identifier.<br/>
 Output: all edges incoming into it.<br/>
 Metric: number of such edges returned per second.<br/>
+
 |            | Patent Citations | Mouse Genes | Human Brain | Gains in Human Brain |
 | :--------- | :--------------: | :---------: | :---------: | :------------------: |
 | PostgreSQL |      443.79      |   100.68    |    25.47    |          1x          |
@@ -141,6 +147,7 @@ Metric: number of such edges returned per second.<br/>
 Input: 1 vertex identifier.<br/>
 Output: the identifiers of all unique vertexes that share an edge with the input.<br/>
 Metric: number of neighbor identiefiers returned per second.<br/>
+
 |            | Patent Citations | Mouse Genes | Human Brain | Gains in Human Brain |
 | :--------- | :--------------: | :---------: | :---------: | :------------------: |
 | PostgreSQL |      882.00      |    43.20    |    29.18    |          1x          |
@@ -155,6 +162,7 @@ Metric: number of neighbor identiefiers returned per second.<br/>
 Input: 1 vertex identifier.<br/>
 Output: the total number of attached edges and their accumulated weight.<br/>
 Metric: number queries per second.<br/>
+
 |            | Patent Citations | Mouse Genes | Human Brain | Gains in Human Brain |
 | :--------- | :--------------: | :---------: | :---------: | :------------------: |
 | PostgreSQL |      966.32      |   188.98    |    41.42    |          1x          |
@@ -169,6 +177,7 @@ Metric: number queries per second.<br/>
 Input: 1 vertex identifier.<br/>
 Output: the total number of incoming edges and their accumulated weight.<br/>
 Metric: number queries per second.<br/>
+
 |            | Patent Citations | Mouse Genes | Human Brain | Gains in Human Brain |
 | :--------- | :--------------: | :---------: | :---------: | :------------------: |
 | PostgreSQL |      982.84      |   731.73    |    47.05    |          1x          |
@@ -190,6 +199,7 @@ Concurrency is tested only in systems that explicitly support it.
 Input: 1 new edge.<br/>
 Output: success/failure indicator.<br/>
 Metric: number inserted edges per second.<br/>
+
 |            | Patent Citations | Mouse Genes | Human Brain | Gains in Human Brain |
 | :--------- | :--------------: | :---------: | :---------: | :------------------: |
 | PostgreSQL |      547.85      |   702.21    |   521.75    |          1x          |
@@ -204,6 +214,7 @@ Metric: number inserted edges per second.<br/>
 Input: 500 new edges.<br/>
 Output: 500 success/failure indicators.<br/>
 Metric: number inserted edges per second.<br/>
+
 |            | Patent Citations | Mouse Genes | Human Brain | Gains in Human Brain |
 | :--------- | :--------------: | :---------: | :---------: | :------------------: |
 | PostgreSQL |      995.12      |   965.59    |   930.99    |          1x          |
@@ -218,6 +229,7 @@ Metric: number inserted edges per second.<br/>
 Input: 1 existing edge.<br/>
 Output: success/failure indicator.<br/>
 Metric: number removed edges per second.<br/>
+
 |            | Patent Citations | Mouse Genes | Human Brain | Gains in Human Brain |
 | :--------- | :--------------: | :---------: | :---------: | :------------------: |
 | PostgreSQL |      897.67      |  1,061.85   |   917.14    |          1x          |
@@ -232,6 +244,7 @@ Metric: number removed edges per second.<br/>
 Input: 500 existing edges.<br/>
 Output: 500 success/failure indicators.<br/>
 Metric: number removed edges per second.<br/>
+
 |            | Patent Citations | Mouse Genes | Human Brain | Gains in Human Brain |
 | :--------- | :--------------: | :---------: | :---------: | :------------------: |
 | PostgreSQL |     1,254.80     |  1,419.80   |  1,247.01   |          1x          |
