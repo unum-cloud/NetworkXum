@@ -26,16 +26,16 @@ class StatsExporterPerOperation():
 
         out = Report()
         dbs_pygraph = [
-            'SQLite',
-            'MySQL',
             'PostgreSQL',
+            'MySQL',
+            'SQLite',
             'MongoDB',
             # 'Neo4J',
             # 'ArangoDB',
         ]
         dbs_unum = [
+            'MGraphDB',
             'GraphDB',
-            # 'MGraphDB',
             # 'SQLiteCpp',
         ]
         dbs_mem = [
@@ -78,7 +78,7 @@ class StatsExporterPerOperation():
         * [Neo4J](https://neo4j.com) was designed specifically for graphs storage, but crashes consistently, so it was removed from comparison.
         * [SQLite](https://www.sqlite.org), [MySQL](https://www.mysql.com), [PostgreSQL](https://www.postgresql.org) and other SQL DBs are the foundations of modern entrprise IT infrastructure.
         * [MongoDB](https://www.sqlite.org/index.html) is a new NoSQL database currently values at aound $10 Bln.
-        * [GraphDB](https://unum.xyz) is our in-house solution.
+        * [GraphDB and MGraphDB](https://unum.xyz) are our in-house solution. The second one is ~30% more compact.
 
         Databases were configured to use 512 Mb of RAM for cache and 4 cores for query execution.
         ''')
@@ -137,7 +137,7 @@ class StatsExporterPerOperation():
             cell_content_property='operations_per_second',
             row_names=[*dbs_pygraph, *dbs_unum],
             col_names=dataset_names,
-        ).add_emoji(dataset_for_comparison))
+        ).add_gains())
 
         # Read Queries.
         out.add('## Read Queries')
@@ -212,7 +212,7 @@ class StatsExporterPerOperation():
                 cell_content_property='operations_per_second',
                 row_names=[*dbs_pygraph, *dbs_unum],
                 col_names=dataset_names
-            ).add_emoji(dataset_for_comparison))
+            ).add_gains())
 
         # Write Operations.
         out.add('## Write Operations')
@@ -265,7 +265,7 @@ class StatsExporterPerOperation():
                 cell_content_property='operations_per_second',
                 row_names=[*dbs_pygraph, *dbs_unum],
                 col_names=dataset_names
-            ).add_emoji(dataset_for_comparison))
+            ).add_gains())
 
         out.print_to(config.report_path)
 
