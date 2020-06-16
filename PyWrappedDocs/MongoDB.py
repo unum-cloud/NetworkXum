@@ -6,6 +6,7 @@ from pymongo import UpdateOne, DeleteOne
 
 from PyWrappedDocs.BaseAPI import BaseAPI
 from PyWrappedGraph.Algorithms import *
+from PyWrappedDocs.TextFile import TextFile
 
 
 class MongoDB(BaseAPI):
@@ -21,11 +22,13 @@ class MongoDB(BaseAPI):
         for field in self.indexed_fields:
             self.create_index(field)
 
-    def create_index(self, field:str, background=False):
-        self.docs_collection.create_index({field: 'text'}, background=background, sparse=True)
+    def create_index(self, field: str, background=False):
+        self.docs_collection.create_index(
+            [(field, pymongo.TEXT)], background=background, sparse=True)
 
     def create_index_for_all_strings(self, background=False):
-        self.docs_collection.create_index({'$**': 'text'}, background=background, sparse=True)
+        self.docs_collection.create_index(
+            {'$**': 'text'}, background=background, sparse=True)
 
     def count_docs(self) -> int:
         return self.docs_collection.count_documents(filter={})
@@ -63,7 +66,7 @@ class MongoDB(BaseAPI):
             update={'$set': doc, },
             upsert=True,
         )
-        return result.modified_count >= 1
+        return (result.modified_count >= 1) or (result.upserted_id is not None)
 
     def remove_doc(self, doc: object) -> bool:
         result = self.docs_collection.delete_one(filter={'_id': doc['_id'], })
@@ -82,7 +85,8 @@ class MongoDB(BaseAPI):
             )
         ops = list(map(make_upsert, docs))
         try:
-            result = self.docs_collection.bulk_write(requests=ops, ordered=False)
+            result = self.docs_collection.bulk_write(
+                requests=ops, ordered=False)
             return result.bulk_api_result['nUpserted'] + result.bulk_api_result['nInserted']
         except pymongo.errors.BulkWriteError as bwe:
             print(bwe)
@@ -100,9 +104,24 @@ class MongoDB(BaseAPI):
             )
         ops = list(map(make_upsert, docs))
         try:
-            result = self.docs_collection.bulk_write(requests=ops, ordered=False)
+            result = self.docs_collection.bulk_write(
+                requests=ops, ordered=False)
             return result.bulk_api_result['nUpserted'] + result.bulk_api_result['nInserted']
         except pymongo.errors.BulkWriteError as bwe:
             print(bwe)
             print(bwe.details['writeErrors'])
             return 0
+
+
+if __name__ == '__main__':
+    sample_file = 'Datasets/nlp-test/nanoformulations.txt'
+    db = MongoDB(url='mongodb://localhost:27017/nlp-test',
+                 indexed_fields=['plain'])
+    db.remove_all()
+    assert db.count_docs() == 0
+    assert db.upsert_doc(TextFile(sample_file).to_dict())
+    assert db.count_docs() == 1
+    assert db.find_with_substring('plain', 'Atripla-trimethyl')
+    assert db.find_with_regex('plain', 'Atripla-trimeth[a-z]{2}')
+    # assert db.remove_doc(TextFile(sample_file).to_dict())
+    # assert db.count_docs() == 0

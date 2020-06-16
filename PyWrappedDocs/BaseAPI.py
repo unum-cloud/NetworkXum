@@ -4,8 +4,9 @@ from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 import concurrent.futures
 from pathlib import Path
 
-from PyWrappedDocs.File import File
+from PyWrappedDocs.TextFile import TextFile
 from PyWrappedGraph.Algorithms import *
+
 
 class BaseAPI(object):
     """
@@ -22,14 +23,14 @@ class BaseAPI(object):
 
     def __init__(
         self,
-        indexed_fields: Sequence[str],
+        indexed_fields: Sequence[str] = [],
         **kwargs,
     ):
         object.__init__(self)
         self.indexed_fields = indexed_fields
 
     @abstractmethod
-    def cound_docs(self) -> int:
+    def count_docs(self) -> int:
         pass
 
     # endregion
@@ -61,7 +62,7 @@ class BaseAPI(object):
         cnt_success = 0
         paths = [pth for pth in Path(directory).iterdir()]
         for paths_chunk in chunks(paths, __max_batch_size__):
-            files_chunk = map(File, paths_chunk)
+            files_chunk = map(TextFile, paths_chunk)
             cnt_success += self.upsert_docs(files_chunk)
         return cnt_success
 
@@ -83,7 +84,7 @@ class BaseAPI(object):
     def find_with_regex(self, field: str, query: str) -> Sequence[object]:
         pass
 
-    def find_by_id(self, identifier:str) -> object:
+    def find_by_id(self, identifier: str) -> object:
         pass
 
     # endregion

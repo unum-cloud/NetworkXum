@@ -91,7 +91,7 @@ def export_edges_into_graph_parallel(filepath: str, g, thread_count=8) -> int:
     return g.count_edges() - count_edges_before
 
 
-def extract_database_name(url: str) -> str:
+def extract_database_name(url: str, default='graph') -> str:
     url_parts = urlparse(url).path
     url_parts = url_parts.split('/')
     url_parts = [v for v in url_parts if (v != '/' and v != '')]
@@ -100,4 +100,4 @@ def extract_database_name(url: str) -> str:
             print('Will avoid remaining url parts:', url_parts[2:])
         return url_parts[0]
     else:
-        return 'graph'
+        return default
