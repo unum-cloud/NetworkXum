@@ -17,10 +17,10 @@ class StatsExporterPerOperation():
 
         ins = StatsFile(filename=None)
         for path in [
-            'BenchGraphs/MacbookPro/stats_pygraphdb.json',
-            'BenchGraphs/MacbookPro/stats_mgraphdb.json',
             'BenchGraphs/MacbookPro/stats_unumdb.json',
-            'BenchGraphs/MacbookPro/stats_pontdb.json',
+            # 'BenchGraphs/MacbookPro/stats_pygraphdb.json',
+            # 'BenchGraphs/MacbookPro/stats_mgraphdb.json',
+            # 'BenchGraphs/MacbookPro/stats_pontdb.json',
         ]:
             ins.append(StatsFile(filename=path))
 
@@ -34,25 +34,25 @@ class StatsExporterPerOperation():
             # 'ArangoDB',
         ]
         dbs_unum = [
-            'MGraphDB',
             'GraphDB',
+            # 'MGraphDB',
             # 'SQLiteCpp',
         ]
         dbs_mem = [
-            'SQLiteMem',
+            # 'SQLiteMem',
             # 'STLOrderedMap',
             # 'STLUnorderedMap',
             # 'TSLHopscotch',
             # 'TSLRobin',
         ]
         dataset_names = [
-            # 'FB Communities',
-            # 'Movie Ratings',
-            'Patent Citations',
-            'Mouse Genes',
-            'Human Brain',
+            # 'CommunitiesFB',
+            # 'MovieRatings',
+            'PatentCitations',
+            'MouseGenes',
+            'HumanBrain',
         ]
-        dataset_for_comparison = 'Human Brain'
+        dataset_for_comparison = 'HumanBrain'
 
         # Intro.
         out.add('# How well can different DBs handle graphs (networks)?')
@@ -75,12 +75,15 @@ class StatsExporterPerOperation():
         out.add('## Setup')
         out.add('### Databases')
         out.add('''
+        * [SQLite](https://www.sqlite.org) is the most minimalistic SQL database. 
+        * [MySQL](https://www.mysql.com) is the most widely used Open-Source DB in the world. 
+        * [PostgreSQL](https://www.postgresql.org) is the 2nd most popular Open-Source DB.
+        * [MongoDB](https://www.sqlite.org/index.html) is the most popular NoSQL database. `$MDB` is values at aound $10 Bln.
         * [Neo4J](https://neo4j.com) was designed specifically for graphs storage, but crashes consistently, so it was removed from comparison.
-        * [SQLite](https://www.sqlite.org), [MySQL](https://www.mysql.com), [PostgreSQL](https://www.postgresql.org) and other SQL DBs are the foundations of modern entrprise IT infrastructure.
-        * [MongoDB](https://www.sqlite.org/index.html) is a new NoSQL database currently values at aound $10 Bln.
-        * [GraphDB and MGraphDB](https://unum.xyz) are our in-house solution. The second one is ~30% more compact.
+        * [GraphDB](https://unum.xyz) is our in-house solution.
 
         Databases were configured to use 512 Mb of RAM for cache and 4 cores for query execution.
+        Links: [The Most Popular Open Source Databases 2020](https://www.percona.com/blog/2020/04/22/the-state-of-the-open-source-database-industry-in-2020-part-three/).
         ''')
         out.add('### Device')
         out.add_current_device_specs()
@@ -94,7 +97,7 @@ class StatsExporterPerOperation():
             * Size: 300 Mb.
             * Edges: 14,506,199.
             * Average Degree: 670.
-        * [Human Brain Network](http://networkrepository.com/bn-human-Jung2015-M87102575.php).
+        * [HumanBrain Network](http://networkrepository.com/bn-human-Jung2015-M87102575.php).
             * Size: 4 Gb.
             * Edges: 87'273'967.
             * Average Degree: 186.
@@ -116,7 +119,7 @@ class StatsExporterPerOperation():
             row_name_property='database',
             col_name_property='dataset',
             cell_content_property='operations_per_second',
-            row_names=['Parsing in Python', 'SQLiteMem'],
+            row_names=['Parsing in Python'],
             col_names=dataset_names,
         ))
 
@@ -138,6 +141,33 @@ class StatsExporterPerOperation():
             row_names=[*dbs_pygraph, *dbs_unum],
             col_names=dataset_names,
         ).add_gains())
+
+        out.add('''
+        The benchmarks were repeated dozens of times. 
+        These numbers translate into following import duration for each dataset.
+        ''')
+
+        out.add(ins.filtered(
+            device_name=device_name,
+            benchmark_name='Sequential Writes: Import CSV',
+        ).to_table(
+            row_name_property='database',
+            col_name_property='dataset',
+            cell_content_property='time_elapsed',
+            row_names=[*dbs_pygraph, *dbs_unum],
+            col_names=dataset_names,
+        ).printable_seconds())
+
+        out.add('''
+        Those benchmarks only tell half of the story. 
+        We should not only consider performance, but also the used disk space and the affect on the hardware lifetime, as SSDs don't last too long.
+        Unum has not only the highest performance, but also the most compact representation. For the `HumanBrain` graph results are:
+
+        * MongoDB: 1,1 Gb for data + 2,5 Gb for indexes = 3,6 Gb. Wrote ~25 Gb to disk.
+        * MySQL: 8.5 Gb for data + 6.4 Gb for indexes = 14.9 Gb. Wrote ~300 Gb to disk.
+        * PostgreSQL: 6 Gb for data + 9 Gb for indexes = 15 Gb. Wrote ~25 Gb to disk. Furthermore, after flushing the changes, it didn't reclaim 8 Gb of space from the temporary table.
+        * Unum: 1.5 Gb total volume. Extra 3.8 Gb of space were (optionally) used requested to slighly accelerate the import time. All of that space was reclaimed. A total of 5.3 was written to disk.
+        ''')
 
         # Read Queries.
         out.add('## Read Queries')

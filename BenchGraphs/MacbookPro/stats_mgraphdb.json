@@ -1,7 +1,7 @@
 [
     {
         "database": "Parsing in Python",
-        "dataset": "FB Communities",
+        "dataset": "CommunitiesFB",
         "date": "2020/48/13-16:06:33",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -21,7 +21,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "FB Communities",
+        "dataset": "CommunitiesFB",
         "date": "2020/48/13-16:06:33",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -41,7 +41,7 @@
     },
     {
         "database": "Parsing in Python",
-        "dataset": "Movie Ratings",
+        "dataset": "MovieRatings",
         "date": "2020/48/13-16:06:38",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -61,7 +61,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Movie Ratings",
+        "dataset": "MovieRatings",
         "date": "2020/48/13-16:06:43",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -81,7 +81,7 @@
     },
     {
         "database": "Parsing in Python",
-        "dataset": "Patent Citations",
+        "dataset": "PatentCitations",
         "date": "2020/49/13-16:06:09",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -101,7 +101,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Patent Citations",
+        "dataset": "PatentCitations",
         "date": "2020/50/13-16:06:07",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -121,7 +121,7 @@
     },
     {
         "database": "Parsing in Python",
-        "dataset": "Mouse Genes",
+        "dataset": "MouseGenes",
         "date": "2020/50/13-16:06:34",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -141,7 +141,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Mouse Genes",
+        "dataset": "MouseGenes",
         "date": "2020/50/13-16:06:50",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -161,7 +161,7 @@
     },
     {
         "database": "Parsing in Python",
-        "dataset": "Human Brain",
+        "dataset": "HumanBrain",
         "date": "2020/54/13-16:06:07",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -181,7 +181,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Human Brain",
+        "dataset": "HumanBrain",
         "date": "2020/56/13-16:06:46",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -201,7 +201,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "FB Communities",
+        "dataset": "CommunitiesFB",
         "date": "2020/02/13-17:06:10",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -221,7 +221,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "FB Communities",
+        "dataset": "CommunitiesFB",
         "date": "2020/02/13-17:06:10",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -241,7 +241,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "FB Communities",
+        "dataset": "CommunitiesFB",
         "date": "2020/02/13-17:06:10",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -261,7 +261,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "FB Communities",
+        "dataset": "CommunitiesFB",
         "date": "2020/02/13-17:06:11",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -281,7 +281,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "FB Communities",
+        "dataset": "CommunitiesFB",
         "date": "2020/02/13-17:06:11",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -301,7 +301,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "FB Communities",
+        "dataset": "CommunitiesFB",
         "date": "2020/02/13-17:06:11",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -321,7 +321,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "FB Communities",
+        "dataset": "CommunitiesFB",
         "date": "2020/02/13-17:06:11",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -341,7 +341,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "FB Communities",
+        "dataset": "CommunitiesFB",
         "date": "2020/02/13-17:06:12",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -361,7 +361,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "FB Communities",
+        "dataset": "CommunitiesFB",
         "date": "2020/02/13-17:06:14",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -381,7 +381,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "FB Communities",
+        "dataset": "CommunitiesFB",
         "date": "2020/02/13-17:06:15",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -401,7 +401,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "FB Communities",
+        "dataset": "CommunitiesFB",
         "date": "2020/02/13-17:06:15",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -421,7 +421,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Movie Ratings",
+        "dataset": "MovieRatings",
         "date": "2020/02/13-17:06:23",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -441,7 +441,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Movie Ratings",
+        "dataset": "MovieRatings",
         "date": "2020/02/13-17:06:24",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -461,7 +461,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Movie Ratings",
+        "dataset": "MovieRatings",
         "date": "2020/02/13-17:06:45",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -481,7 +481,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Movie Ratings",
+        "dataset": "MovieRatings",
         "date": "2020/02/13-17:06:59",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -501,7 +501,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Movie Ratings",
+        "dataset": "MovieRatings",
         "date": "2020/03/13-17:06:00",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -521,7 +521,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Movie Ratings",
+        "dataset": "MovieRatings",
         "date": "2020/03/13-17:06:12",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -541,7 +541,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Movie Ratings",
+        "dataset": "MovieRatings",
         "date": "2020/03/13-17:06:33",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -561,7 +561,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Movie Ratings",
+        "dataset": "MovieRatings",
         "date": "2020/03/13-17:06:36",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -581,7 +581,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Movie Ratings",
+        "dataset": "MovieRatings",
         "date": "2020/03/13-17:06:38",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -601,7 +601,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Movie Ratings",
+        "dataset": "MovieRatings",
         "date": "2020/03/13-17:06:38",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -621,7 +621,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Movie Ratings",
+        "dataset": "MovieRatings",
         "date": "2020/03/13-17:06:39",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -641,7 +641,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Patent Citations",
+        "dataset": "PatentCitations",
         "date": "2020/04/13-17:06:25",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -661,7 +661,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Patent Citations",
+        "dataset": "PatentCitations",
         "date": "2020/04/13-17:06:28",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -681,7 +681,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Patent Citations",
+        "dataset": "PatentCitations",
         "date": "2020/04/13-17:06:33",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -701,7 +701,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Patent Citations",
+        "dataset": "PatentCitations",
         "date": "2020/04/13-17:06:38",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -721,7 +721,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Patent Citations",
+        "dataset": "PatentCitations",
         "date": "2020/04/13-17:06:39",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -741,7 +741,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Patent Citations",
+        "dataset": "PatentCitations",
         "date": "2020/04/13-17:06:44",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -761,7 +761,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Patent Citations",
+        "dataset": "PatentCitations",
         "date": "2020/04/13-17:06:48",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -781,7 +781,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Patent Citations",
+        "dataset": "PatentCitations",
         "date": "2020/04/13-17:06:51",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -801,7 +801,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Patent Citations",
+        "dataset": "PatentCitations",
         "date": "2020/04/13-17:06:54",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -821,7 +821,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Patent Citations",
+        "dataset": "PatentCitations",
         "date": "2020/04/13-17:06:55",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -841,7 +841,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Patent Citations",
+        "dataset": "PatentCitations",
         "date": "2020/04/13-17:06:56",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -861,7 +861,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Mouse Genes",
+        "dataset": "MouseGenes",
         "date": "2020/05/13-17:06:35",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -881,7 +881,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Mouse Genes",
+        "dataset": "MouseGenes",
         "date": "2020/05/13-17:06:37",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -901,7 +901,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Mouse Genes",
+        "dataset": "MouseGenes",
         "date": "2020/07/13-17:06:37",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -921,7 +921,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Mouse Genes",
+        "dataset": "MouseGenes",
         "date": "2020/09/13-17:06:36",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -941,7 +941,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Mouse Genes",
+        "dataset": "MouseGenes",
         "date": "2020/09/13-17:06:42",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -961,7 +961,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Mouse Genes",
+        "dataset": "MouseGenes",
         "date": "2020/11/13-17:06:31",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -981,7 +981,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Mouse Genes",
+        "dataset": "MouseGenes",
         "date": "2020/13/13-17:06:27",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1001,7 +1001,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Mouse Genes",
+        "dataset": "MouseGenes",
         "date": "2020/13/13-17:06:29",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1021,7 +1021,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Mouse Genes",
+        "dataset": "MouseGenes",
         "date": "2020/13/13-17:06:32",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1041,7 +1041,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Mouse Genes",
+        "dataset": "MouseGenes",
         "date": "2020/13/13-17:06:32",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1061,7 +1061,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Mouse Genes",
+        "dataset": "MouseGenes",
         "date": "2020/13/13-17:06:33",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1081,7 +1081,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Human Brain",
+        "dataset": "HumanBrain",
         "date": "2020/17/13-17:06:46",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1101,7 +1101,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Human Brain",
+        "dataset": "HumanBrain",
         "date": "2020/17/13-17:06:49",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1121,7 +1121,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Human Brain",
+        "dataset": "HumanBrain",
         "date": "2020/18/13-17:06:51",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1141,7 +1141,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Human Brain",
+        "dataset": "HumanBrain",
         "date": "2020/19/13-17:06:53",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1161,7 +1161,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Human Brain",
+        "dataset": "HumanBrain",
         "date": "2020/19/13-17:06:57",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1181,7 +1181,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Human Brain",
+        "dataset": "HumanBrain",
         "date": "2020/20/13-17:06:53",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1201,7 +1201,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Human Brain",
+        "dataset": "HumanBrain",
         "date": "2020/21/13-17:06:51",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1221,7 +1221,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Human Brain",
+        "dataset": "HumanBrain",
         "date": "2020/21/13-17:06:54",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1241,7 +1241,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Human Brain",
+        "dataset": "HumanBrain",
         "date": "2020/21/13-17:06:56",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1261,7 +1261,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Human Brain",
+        "dataset": "HumanBrain",
         "date": "2020/21/13-17:06:57",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -1281,7 +1281,7 @@
     },
     {
         "database": "MGraphDB",
-        "dataset": "Human Brain",
+        "dataset": "HumanBrain",
         "date": "2020/21/13-17:06:58",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
