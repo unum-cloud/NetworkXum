@@ -49,7 +49,7 @@ services:
       COUNT_EDGES: '14506196'
       SAMPLE_FROM_REAL_DATA: '1'
 
-  # Human Brain Network. 227 Mb.
+  # HumanBrain Network. 227 Mb.
   # Average degree: 186.
   # http://networkrepository.com/bn-human-Jung2015-M87102575.php
   graphdb-task-human-brain:
