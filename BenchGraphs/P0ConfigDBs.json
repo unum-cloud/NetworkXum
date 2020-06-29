@@ -1,37 +1,58 @@
-{
-    "UnumDB.Graph": {
+[
+    {
+        "module_name": "PyUnumDB.GraphDB",
+        "class_name": "GraphDB",
+        "name": "UnumDB.Graph",
         "url_variable_name": "URI_UNUMDB_GRAPH",
         "url_default": "~/DBs/unumdb.Graph/${DATASET_NAME}",
-        "enabled": true
+        "enabled": false
     },
-    "SQLite": {
+    {
+        "module_name": "PyWrappedGraph.SQLite",
+        "class_name": "SQLite",
+        "name": "SQLite",
         "url_variable_name": "URI_SQLITE",
         "url_default": "sqlite:////Users/av/DBs/sqlite/${DATASET_NAME}.db3",
         "enabled": true
     },
-    "SQLite (In-Memory)": {
+    {
+        "module_name": "PyWrappedGraph.SQLite",
+        "class_name": "SQLiteMem",
+        "name": "SQLite (In-Memory)",
         "url_variable_name": "URI_SQLITE_RAM",
         "url_default": "sqlite:///:memory:",
         "enabled": true
     },
-    "MySQL": {
+    {
+        "module_name": "PyWrappedGraph.MySQL",
+        "class_name": "MySQL",
+        "name": "MySQL",
         "url_variable_name": "URI_MYSQL",
         "url_default": "mysql://av:temptemp@0.0.0.0:3306/${DATASET_NAME}",
         "enabled": true
     },
-    "PostgreSQL": {
+    {
+        "module_name": "PyWrappedGraph.PostgreSQL",
+        "class_name": "PostgreSQL",
+        "name": "PostgreSQL",
         "url_variable_name": "URI_POSTGRESQL",
         "url_default": "postgres://av:temptemp@0.0.0.0:5432/${DATASET_NAME}",
         "enabled": true
     },
-    "Neo4J": {
-        "url_variable_name": "URI_NEO4J",
-        "url_default": "bolt://neo4j:temptemp@localhost:7687/${DATASET_NAME}",
-        "enabled": false
-    },
-    "MongoDB": {
+    {
+        "module_name": "PyWrappedGraph.MongoDB",
+        "class_name": "MongoDB",
+        "name": "MongoDB",
         "url_variable_name": "URI_MONGODB",
         "url_default": "mongodb://0.0.0.0:27017/${DATASET_NAME}",
         "enabled": true
+    },
+    {
+        "module_name": "PyWrappedGraph.Neo4J",
+        "class_name": "Neo4J",
+        "name": "Neo4J",
+        "url_variable_name": "URI_NEO4J",
+        "url_default": "bolt://neo4j:temptemp@localhost:7687/${DATASET_NAME}",
+        "enabled": false
     }
-}
+]

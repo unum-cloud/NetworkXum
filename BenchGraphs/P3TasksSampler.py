@@ -3,6 +3,7 @@ from random import SystemRandom
 from typing import List
 
 from PyWrappedGraph.Algorithms import yield_edges_from, chunks
+from P0Config import P0Config
 
 
 class P3TasksSampler(object):
@@ -13,15 +14,19 @@ class P3TasksSampler(object):
     """
 
     def __init__(self):
+        self.conf = P0Config.shared()
+        self.count_finds = self.conf.count_finds
+        self.count_analytics = self.conf.count_analytics
+        self.count_changes = self.conf.count_changes
+        self.clear()
+
+    def clear(self):
         self.edges_to_query = []
         self.nodes_to_query = []
         self.nodes_to_analyze = []
         self.edges_to_change_by_one = []
         self.edges_to_change_batched = [[]]
-        self.count_finds = 10000
-        self.count_analytics = 1000
-        self.count_changes = 10000
-        self._buffer_edges = list()
+        self._buffer_edges = []
 
     def number_of_needed_samples(self) -> int:
         return max(self.count_finds,
@@ -29,7 +34,7 @@ class P3TasksSampler(object):
                    self.count_changes)
 
     def sample_reservoir(self, filename: str) -> int:
-        self._buffer_edges = []
+        self.clear()
         count_seen = 0
         count_needed = self.number_of_needed_samples()
         for e in yield_edges_from(filename):
@@ -78,7 +83,3 @@ class P3TasksSampler(object):
             self._buffer_edges[:self.count_changes],
             100,
         ))
-
-        # Clear the memory
-        # self._buffer_edges = None
-        # self._select_nodes = None

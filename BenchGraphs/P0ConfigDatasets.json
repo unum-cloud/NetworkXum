@@ -6,7 +6,8 @@
         "nodes": 0,
         "edges": 52310,
         "degree": 8,
-        "size_mb": 1
+        "size_mb": 1,
+        "enabled": true
     },
     {
         "name": "MovieRatings",
@@ -15,7 +16,8 @@
         "nodes": 0,
         "edges": 2811716,
         "degree": 90,
-        "size_mb": 33
+        "size_mb": 33,
+        "enabled": false
     },
     {
         "name": "PatentCitations",
@@ -24,7 +26,8 @@
         "nodes": 0,
         "edges": 16518947,
         "degree": 8,
-        "size_mb": 272
+        "size_mb": 272,
+        "enabled": false
     },
     {
         "name": "MouseGenes",
@@ -33,7 +36,8 @@
         "nodes": 0,
         "edges": 14506199,
         "degree": 670,
-        "size_mb": 295
+        "size_mb": 295,
+        "enabled": false
     },
     {
         "name": "HumanBrain",
@@ -42,7 +46,8 @@
         "nodes": 0,
         "edges": 87273967,
         "degree": 186,
-        "size_mb": 3840
+        "size_mb": 3840,
+        "enabled": false
     },
     {
         "name": "Wikipedia",
@@ -50,6 +55,7 @@
         "url": "http://networkrepository.com/web-wikipedia-link-en13-all.php",
         "nodes": 0,
         "edges": 591044737,
-        "size_mb": 26000
+        "size_mb": 26000,
+        "enabled": false
     }
 ]

@@ -1,32 +1,33 @@
 import platform
+import glob
 
 import psutil
 from pystats2md.stats_file import StatsFile
 from pystats2md.stats_subset import StatsSubset
 from pystats2md.report import Report
 
-import P0Config
+from P0Config import P0Config
 
 
 class P4Print():
 
-    def run(
-        self,
-        device_name='',
-    ) -> str:
+    def __init__(self):
+        self.conf = P0Config.shared()
 
+    def run(self) -> str:
+
+        device_name = self.conf.device_name
         ins = StatsFile(filename=None)
-        if len(device_name) == 0:
-            device_name = P0Config.device_name
-        for path in [
-            f'BenchGraphs/{device_name}/PyGraphDB.json',
-            f'BenchGraphs/{device_name}/UnumDB.json',
-        ]:
-            ins.append(StatsFile(filename=path))
+        stats_paths = [f for f in glob.glob(
+            f'BenchGraphs/{device_name}/**/*.json', recursive=True)]
+        for stats_path in stats_paths:
+            ins.append(StatsFile(filename=stats_path))
 
         out = Report()
-        dbs = ins.subset().get_unique('database')
-        dataset_names = ins.subset().get_unique('dataset')
+        dbs = ['PostgreSQL', 'MySQL', 'SQLite', 'MongoDB',
+               'UnumDB.Graph']  # ins.subset().unique('database')
+        dataset_names = ['PatentCitations', 'MouseGenes',
+                         'HumanBrain']  # ins.subset().unique('dataset')
         dataset_for_comparison = 'HumanBrain'
 
         # Intro.
@@ -272,8 +273,9 @@ class P4Print():
                 col_names=dataset_names
             ).add_gains())
 
-        out.print_to(P0Config.report_path)
+        out.print_to(f'BenchGraphs/{device_name}/README.md')
 
 
 if __name__ == "__main__":
-    P4Print(device_name='MacbookPro').run()
+    P0Config(device_name='MacbookPro').run()
+    P4Print().run()

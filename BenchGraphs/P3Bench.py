@@ -6,8 +6,8 @@ from pystats2md.micro_bench import MicroBench
 
 from PyWrappedGraph.BaseAPI import BaseAPI
 
-import P0Config
-from tasks_sampler import P3TasksSampler
+from P0Config import P0Config
+from P3TasksSampler import P3TasksSampler
 
 
 class P3Bench(object):
@@ -20,110 +20,128 @@ class P3Bench(object):
     """
 
     def __init__(self, max_seconds_per_query=60):
+        self.conf = P0Config.shared()
         self.max_seconds_per_query = max_seconds_per_query
+        self.tasks = P3TasksSampler()
 
     def run(self, repeat_existing=True):
         self.repeat_existing = repeat_existing
-        for dataset_path in P0Config.datasets:
-            self.dataset_path = dataset_path
-            self.tasks = P3TasksSampler()
-            self.tasks.count_finds = P0Config.count_finds
-            self.tasks.count_analytics = P0Config.count_analytics
-            self.tasks.count_changes = P0Config.count_changes
+        for dataset in self.conf.datasets:
+            dataset_path = self.conf.normalize_path(dataset['path'])
             self.tasks.sample_reservoir(dataset_path)
 
-            for graph_type in P0Config.wrapper_types:
-                url = P0Config.database_url(graph_type, dataset_path)
-                if url is None:
-                    continue
-                g = graph_type(url=url)
-                if (g.count_edges() == 0) and (not graph_type.__in_memory__):
-                    continue
+            for db in self.conf.databases:
+                self.g = self.conf.make_db(database=db, dataset=dataset)
+                self.database = db
+                self.dataset = dataset
+                self.bench_buffered_graph()
+                self.conf.default_stats_file.dump_to_file()
 
-                dataset_name = P0Config.dataset_name(dataset_path)
-                wrapper_name = P0Config.wrapper_name(g)
-                print(f'-- Benchmarking: {dataset_name} @ {wrapper_name}')
-                self.graph = g
-                self.run_one()
-                self.graph = None
-                P0Config.stats.dump_to_file()
+    def bench_buffered_graph(self, remove_all_afterwards=False):
+        if self.g is None:
+            return
+        is_in_ram = bool(type(self.g).__in_memory__)
+        if (self.g.count_edges() == 0) and (not is_in_ram):
+            return
+        print('- Benchmarking: {} @ {}'.format(
+            self.dataset['name'],
+            self.db['name']
+        ))
 
-            self.tasks = None
-            self.dataset_path = None
-
-    def run_one(self, remove_all_afterwards=False):
-        if type(self.graph).__in_memory__:
-            self.one('Sequential Writes: Import CSV',
-                     self.import_bulk)
+        if is_in_ram:
+            self.bench_task(
+                name='Sequential Writes: Import CSV',
+                func=self.import_bulk
+            )
 
         # Queries returning single object.
-        self.one('Random Reads: Find Directed Edge',
-                 self.find_e_directed)
-        self.one('Random Reads: Find Any Relation',
-                 self.find_e_undirected)
+        self.bench_task(
+            name='Random Reads: Find Directed Edge',
+            func=self.find_e_directed
+        )
+        self.bench_task(
+            name='Random Reads: Find Any Relation',
+            func=self.find_e_undirected
+        )
 
         # # Queries returning collections.
-        # self.one('Random Reads: Find Outgoing Edges',
-        #          self.find_es_from)
-        self.one('Random Reads: Find Ingoing Edges',
-                 self.find_es_to)
-        self.one('Random Reads: Find Connected Edges',
-                 self.find_es_related)
-        self.one('Random Reads: Find Friends',
-                 self.find_vs_related)
-        # self.one('Random Reads: Find Friends of Friends',
-        #          self.find_vs_related_related)
+        self.bench_task(
+            name='Random Reads: Find Ingoing Edges',
+            func=self.find_es_to
+        )
+        self.bench_task(
+            name='Random Reads: Find Connected Edges',
+            func=self.find_es_related
+        )
+        self.bench_task(
+            name='Random Reads: Find Friends',
+            func=self.find_vs_related
+        )
 
         # Queries returning stats.
-        self.one('Random Reads: Count Friends',
-                 self.count_v_related)
-        self.one('Random Reads: Count Followers',
-                 self.count_v_followers)
-        # self.one('Random Reads: Count Following',
-        #          self.count_v_following)
+        self.bench_task(
+            name='Random Reads: Count Friends',
+            func=self.count_v_related
+        )
+        self.bench_task(
+            name='Random Reads: Count Followers',
+            func=self.count_v_followers
+        )
 
         # Reversable write operations.
-        self.one('Random Writes: Remove Edge',
-                 self.remove_e)  # Single edge removals
-        self.one('Random Writes: Upsert Edge',
-                 self.upsert_e)  # Single edge inserts
-        self.one('Random Writes: Remove Edges Batch',
-                 self.remove_es)  # Batched edge removals
-        self.one('Random Writes: Upsert Edges Batch',
-                 self.upsert_es)  # Batched edge inserts
+        self.bench_task(
+            name='Random Writes: Remove Edge',
+            func=self.remove_e
+        )
+        self.bench_task(
+            name='Random Writes: Upsert Edge',
+            func=self.upsert_e
+        )
+        self.bench_task(
+            name='Random Writes: Remove Edges Batch',
+            func=self.remove_es
+        )
+        self.bench_task(
+            name='Random Writes: Upsert Edges Batch',
+            func=self.upsert_es
+        )
 
         if remove_all_afterwards:
-            self.one('Random Writes: Remove Vertex',
-                     self.remove_v)
-            self.one('Sequential Writes: Remove All',
-                     self.remove_bulk)
+            self.bench_task(
+                name='Random Writes: Remove Vertex',
+                func=self.remove_v
+            )
+            self.bench_task(
+                name='Sequential Writes: Remove All',
+                func=self.remove_bulk
+            )
 
-    def one(self, benchmark_name, f):
-        dataset_name = P0Config.dataset_name(self.dataset_path)
-        wrapper_name = P0Config.wrapper_name(self.graph)
-        print(f'--- {wrapper_name}: {benchmark_name} @ {dataset_name}')
+    def bench_task(self, name, func):
+        dataset_name = self.dataset['name']
+        db_name = self.db['name']
+        print(f'--- {db_name}: {name} @ {dataset_name}')
         counter = MicroBench(
-            benchmark_name=benchmark_name,
-            func=f,
-            database=wrapper_name,
+            name=name,
+            func=func,
+            database=db_name,
             dataset=dataset_name,
-            source=P0Config.stats,
-            device_name='MacbookPro',
+            source=self.conf.default_stats_file,
+            device_name=self.conf.device_name,
             limit_iterations=1,
             limit_seconds=None,
             limit_operations=None,
         )
 
         if not self.repeat_existing:
-            if P0Config.stats.contains(counter):
+            if self.conf.default_stats_file.contains(counter):
                 print('--- Skipping!')
                 return
-        print(f'---- Running!')
+        print('---- Running!')
         counter.run()
         if counter.count_operations == 0:
-            print(f'---- Didnt measure!')
+            print('---- Didn\'t measure!')
             return
-        print(f'---- Importing new stats!')
+        print('---- Importing new stats!')
 
     # ---
     # Operations
@@ -136,7 +154,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for e in self.tasks.edges_to_query[:half]:
-            match = self.graph.edge_directed(e['v1'], e['v2'])
+            match = self.g.edge_directed(e['v1'], e['v2'])
             cnt += 1
             cnt_found += 0 if (match is None) else 1
             dt = time() - t0
@@ -144,7 +162,7 @@ class P3Bench(object):
                 break
         t0 = time()
         for e in self.tasks.edges_to_query[half:]:
-            match = self.graph.edge_directed(e['v2'], e['v1'])
+            match = self.g.edge_directed(e['v2'], e['v1'])
             cnt += 1
             cnt_found += 0 if (match is None) else 1
             dt = time() - t0
@@ -158,7 +176,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for e in self.tasks.edges_to_query:
-            match = self.graph.edge_directed(e['v1'], e['v2'])
+            match = self.g.edge_directed(e['v1'], e['v2'])
             cnt += 1
             cnt_found += 0 if (match is None) else 1
             dt = time() - t0
@@ -172,7 +190,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            es = self.graph.edges_related(v)
+            es = self.g.edges_related(v)
             cnt += 1
             cnt_found += len(es)
             dt = time() - t0
@@ -186,7 +204,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            es = self.graph.edges_from(v)
+            es = self.g.edges_from(v)
             cnt += 1
             cnt_found += len(es)
             dt = time() - t0
@@ -200,7 +218,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            es = self.graph.edges_to(v)
+            es = self.g.edges_to(v)
             cnt += 1
             cnt_found += len(es)
             dt = time() - t0
@@ -214,7 +232,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            vs = self.graph.nodes_related(v)
+            vs = self.g.nodes_related(v)
             cnt += 1
             cnt_found += len(vs)
             dt = time() - t0
@@ -227,7 +245,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.graph.count_related(v)
+            self.g.count_related(v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -238,7 +256,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.graph.count_followers(v)
+            self.g.count_followers(v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -249,7 +267,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.graph.count_following(v)
+            self.g.count_following(v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -261,7 +279,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_analyze:
-            vs = self.graph.nodes_related_to_related(v)
+            vs = self.g.nodes_related_to_related(v)
             cnt += 1
             cnt_found += len(vs)
             dt = time() - t0
@@ -273,50 +291,50 @@ class P3Bench(object):
     def remove_e(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_change_by_one:
-            self.graph.remove_edge(e)
+            self.g.remove_edge(e)
             cnt += 1
         return cnt
 
     def upsert_e(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_change_by_one:
-            self.graph.upsert_edge(e)
+            self.g.upsert_edge(e)
             cnt += 1
         return cnt
 
     def remove_es(self) -> int:
         cnt = 0
         for es in self.tasks.edges_to_change_batched:
-            self.graph.remove_edges(es)
+            self.g.remove_edges(es)
             cnt += len(es)
         return cnt
 
     def upsert_es(self) -> int:
         cnt = 0
         for es in self.tasks.edges_to_change_batched:
-            self.graph.upsert_edges(es)
+            self.g.upsert_edges(es)
             cnt += len(es)
         return cnt
 
     def remove_v(self) -> int:
         cnt = 0
         for v in self.tasks.nodes_to_change_by_one:
-            self.graph.remove_node(v)
+            self.g.remove_node(v)
             cnt += 1
         return cnt
 
     def remove_bulk(self) -> int:
-        c = self.graph.count_edges()
-        self.graph.remove_all()
-        return c - self.graph.count_edges()
+        c = self.g.count_edges()
+        self.g.remove_all()
+        return c - self.g.count_edges()
 
     def import_bulk(self) -> int:
-        self.graph.insert_adjacency_list(self.dataset_path)
-        return self.graph.count_edges()
+        self.g.insert_adjacency_list(self.dataset_path)
+        return self.g.count_edges()
 
 
 if __name__ == "__main__":
     try:
         P3Bench().run()
     finally:
-        P0Config.stats.dump_to_file()
+        P0Config.shared().default_stats_file.dump_to_file()

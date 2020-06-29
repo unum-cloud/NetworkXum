@@ -3,32 +3,69 @@ import os
 import importlib
 
 from pystats2md.micro_bench import MicroBench
+from pystats2md.helpers import metric2str, bytes2str
 
 from PyWrappedGraph.Algorithms import export_edges_into_graph
-import P0Config
+from P0Config import P0Config
 
 
 class P2Import(object):
     """
-    Performs multithreaded bulk import into DB.
-    Saves stats.
+        Performs multithreaded bulk import into DB.
+        Saves stats.
     """
 
-    def printable_bytes(self, size, decimal_places=1):
-        for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB']:
-            if size < 1024.0:
-                break
-            size /= 1024.0
-        return f"{size:.{decimal_places}f}{unit}"
+    def __init__(self):
+        self.conf = P0Config.shared()
 
-    def printable_count(self, size, decimal_places=1):
-        for unit in ['', 'K', 'M', 'G', 'T']:
-            if size < 1000.0:
-                break
-            size /= 1000.0
-        return f"{size:.{decimal_places}f}{unit}"
+    def run(self):
+        for dataset in self.conf.datasets:
+            # Define a baseline, so we know how much time it took
+            # to read the data vs actually importing it into DB
+            # and building indexes.
+            self.benchmark_parsing_speed(dataset)
 
-    def parse_without_importing_if_unknown(self, dataset_path):
+            for db in self.conf.databases:
+                g = self.conf.make_db(database=db, dataset=dataset)
+                self.import_graph(g=g, database=db, dataset=dataset)
+
+    def import_graph(self, g, database: dict, dataset: dict):
+        if g is None:
+            return
+
+        db_name = database['name']
+        dataset_name = dataset['name']
+        if (g.count_edges() != 0):
+            print(f'-- Skipping: {dataset_name} -> {db_name}')
+            return
+
+        dataset_path = self.conf.normalize_path(dataset['path'])
+        file_size = os.path.getsize(dataset_path)
+        print(f'-- Bulk importing: {dataset_name} -> {db_name}')
+        print(f'--- started at:', datetime.now().strftime('%H:%M:%S'))
+        print(f'--- file size:', bytes2str(file_size))
+
+        def import_one() -> int:
+            g.insert_adjacency_list(dataset_path)
+            return g.count_edges()
+
+        counter = MicroBench(
+            benchmark_name='Sequential Writes: Import CSV',
+            func=import_one,
+            database=db_name,
+            dataset=dataset_name,
+            source=self.conf.default_stats_file,
+            device_name='MacbookPro',
+        )
+        counter.run_if_missing()
+
+        print(f'--- edges:', metric2str(counter.count_operations))
+        print(f'--- edges/second:', metric2str(counter.ops_per_sec()))
+        print(f'--- bytes/second:', bytes2str(file_size / counter.time_elapsed))
+        print(f'--- finished at:', datetime.now().strftime('%H:%M:%S'))
+        self.conf.default_stats_file.dump_to_file()
+
+    def benchmark_parsing_speed(self, dataset: dict):
 
         class PseudoGraph(object):
             __edge_type__ = dict
@@ -45,70 +82,24 @@ class P2Import(object):
                 return len(es)
 
         g = PseudoGraph()
-        dataset_name = P0Config.dataset_name(dataset_path)
+        p = self.conf.normalize_path(dataset['path'])
         counter = MicroBench(
             benchmark_name='Sequential Writes: Import CSV',
-            func=lambda: export_edges_into_graph(dataset_path, g),
+            func=lambda: export_edges_into_graph(p, g),
             database='Parsing in Python',
-            dataset=dataset_name,
-            source=P0Config.stats,
-            device_name='MacbookPro',
+            dataset=dataset['name'],
+            source=self.conf.default_stats_file,
+            device_name=self.conf.device_name,
             limit_iterations=1,
             limit_seconds=None,
             limit_operations=None,
         )
         counter.run_if_missing()
 
-    def run(self):
-        for dataset_path in P0Config.datasets:
-            # Define a baseline, so we know how much time it took
-            # to read the data vs actually importing it into DB
-            # and building indexes.
-            self.parse_without_importing_if_unknown(dataset_path)
-
-            for graph_type in P0Config.wrapper_types:
-                url = P0Config.database_url(graph_type, dataset_path)
-                if url is None:
-                    continue
-
-                g = graph_type(url=url)
-                dataset_name = P0Config.dataset_name(dataset_path)
-                wrapper_name = P0Config.wrapper_name(g)
-
-                if (g.count_edges() != 0):
-                    print(f'-- Skipping: {dataset_name} -> {wrapper_name}')
-                    continue
-                file_size = os.path.getsize(dataset_path)
-                expected_edges = P0Config.dataset_number_of_edges(dataset_path)
-                print(f'-- Bulk importing: {dataset_name} -> {wrapper_name}')
-                print(f'--- started at:', datetime.now().strftime('%H:%M:%S'))
-                print(f'--- file size:', self.printable_bytes(file_size))
-
-                def import_one() -> int:
-                    g.insert_adjacency_list(dataset_path)
-                    return g.count_edges()
-
-                counter = MicroBench(
-                    benchmark_name='Sequential Writes: Import CSV',
-                    func=import_one,
-                    database=wrapper_name,
-                    dataset=dataset_name,
-                    source=P0Config.stats,
-                    device_name='MacbookPro',
-                )
-                counter.run_if_missing()
-
-                print(f'--- edges:', self.printable_count(counter.count_operations))
-                print(f'--- edges/second:',
-                      self.printable_count(counter.ops_per_sec()))
-                print(f'--- bytes/second:',
-                      self.printable_bytes(file_size / counter.time_elapsed))
-                print(f'--- finished at:', datetime.now().strftime('%H:%M:%S'))
-                P0Config.stats.dump_to_file()
-
 
 if __name__ == "__main__":
+    c = P0Config(device_name='MacbookPro')
     try:
         P2Import().run()
     finally:
-        P0Config.stats.dump_to_file()
+        c.default_stats_file.dump_to_file()
