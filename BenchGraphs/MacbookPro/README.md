@@ -46,11 +46,11 @@ Links: [The Most Popular Open Source Databases 2020](https://www.percona.com/blo
 
 
 * [Patent Citation Network](http://networkrepository.com/cit-patent.php).
-    * Size: 77 Mb.
+    * Size: 272 Mb.
     * Edges: 16,518,947.
     * Average Degree: 8.
 * [Mouse Gene Regulatory Network](http://networkrepository.com/bio-mouse-gene.php).
-    * Size: 300 Mb.
+    * Size: 295 Mb.
     * Edges: 14,506,199.
     * Average Degree: 670.
 * [HumanBrain Network](http://networkrepository.com/bn-human-Jung2015-M87102575.php).
@@ -70,7 +70,7 @@ This will be our baseline for estimating the time required to build the indexes 
 
 |                   | PatentCitations | MouseGenes | HumanBrain |
 | :---------------- | :-------------: | :--------: | :--------: |
-| Parsing in Python |   606,288.73    | 532,980.66 | 465,800.36 |
+| Parsing in Python |   626,679.01    | 532,980.66 | 465,800.36 |
 
 Most DBs provide some form functionality for faster bulk imports, but not all of them where used in benchmarks for various reasons.
 
@@ -85,7 +85,7 @@ Most DBs provide some form functionality for faster bulk imports, but not all of
 | MySQL        |    14,698.93    | 18,549.58  | 12,144.30  |        1.63x        |
 | SQLite       |    50,057.93    | 43,819.69  | 34,728.02  |        4.65x        |
 | MongoDB      |    15,135.22    | 14,759.00  | 15,125.21  |        2.02x        |
-| UnumDB.Graph |   213,415.62    | 633,552.81 | 414,012.72 |       55.43x        |
+| UnumDB.Graph |   213,415.62    | 633,552.81 | 414,012.72 |     **55.43x**      |
 
 The benchmarks were repeated dozens of times. 
 These numbers translate into following import duration for each dataset.
@@ -138,7 +138,7 @@ Metric: number of such edges returned per second.<br/>
 | MySQL        |     659.80      |   778.07   |   503.36   |        0.94x        |
 | SQLite       |     295.62      |   389.14   |   51.15    |        0.10x        |
 | MongoDB      |     990.73      |   980.28   |   136.46   |        0.26x        |
-| UnumDB.Graph |    19,947.87    | 60,166.34  | 36,392.62  |       68.22x        |
+| UnumDB.Graph |    19,947.87    | 60,166.34  | 36,392.62  |     **68.22x**      |
 
 ### Random Reads: Find Directed Edge
 
@@ -154,7 +154,7 @@ Metric: number of such edges returned per second.<br/>
 | MySQL        |     672.81      |   616.83   |   547.84   |        1.19x        |
 | SQLite       |     282.41      |   375.69   |   47.57    |        0.10x        |
 | MongoDB      |    1,002.83     |   734.23   |   145.53   |        0.32x        |
-| UnumDB.Graph |    9,879.49     | 55,039.13  | 17,609.57  |       38.32x        |
+| UnumDB.Graph |    9,879.49     | 55,039.13  | 17,609.57  |     **38.32x**      |
 
 ### Random Reads: Find Connected Edges
 
@@ -170,7 +170,7 @@ Metric: number of such edges returned per second.<br/>
 | MySQL        |     540.34      |   35.92    |   90.80    |        3.76x        |
 | SQLite       |     312.83      |   17.94    |   28.93    |        1.20x        |
 | MongoDB      |     779.87      |   128.89   |   58.69    |        2.43x        |
-| UnumDB.Graph |    13,079.72    |   448.47   |  1,265.66  |       52.36x        |
+| UnumDB.Graph |    13,079.72    |   448.47   |  1,265.66  |     **52.36x**      |
 
 ### Random Reads: Find Ingoing Edges
 
@@ -186,7 +186,7 @@ Metric: number of such edges returned per second.<br/>
 | MySQL        |     760.76      |   80.79    |   132.62   |        5.44x        |
 | SQLite       |     281.01      |   84.61    |   30.81    |        1.26x        |
 | MongoDB      |    1,225.93     |   373.95   |   67.70    |        2.78x        |
-| UnumDB.Graph |    14,139.46    |  1,682.84  |  4,313.47  |       177.04x       |
+| UnumDB.Graph |    14,139.46    |  1,682.84  |  4,313.47  |     **177.04x**     |
 
 ### Random Reads: Find Friends
 
@@ -202,7 +202,7 @@ Metric: number of neighbor identiefiers returned per second.<br/>
 | MySQL        |     505.74      |   34.54    |   83.49    |        3.41x        |
 | SQLite       |     301.06      |   39.58    |   28.94    |        1.18x        |
 | MongoDB      |     986.09      |   137.81   |   59.64    |        2.43x        |
-| UnumDB.Graph |    17,127.20    |  1,970.54  |  4,942.23  |       201.70x       |
+| UnumDB.Graph |    17,127.20    |  1,970.54  |  4,942.23  |     **201.70x**     |
 
 ### Random Reads: Count Friends
 
@@ -218,7 +218,7 @@ Metric: number queries per second.<br/>
 | MySQL        |     616.57      |    7.83    |   51.40    |        1.69x        |
 | SQLite       |     324.47      |   195.61   |   39.07    |        1.28x        |
 | MongoDB      |     912.83      |   218.61   |   67.06    |        2.20x        |
-| UnumDB.Graph |    15,867.33    |   605.78   |  1,859.41  |       61.09x        |
+| UnumDB.Graph |    15,867.33    |   605.78   |  1,859.41  |     **61.09x**      |
 
 ### Random Reads: Count Followers
 
@@ -234,7 +234,7 @@ Metric: number queries per second.<br/>
 | MySQL        |     821.91      |   132.29   |   214.55   |        6.35x        |
 | SQLite       |     360.58      |   646.95   |   40.73    |        1.21x        |
 | MongoDB      |    1,241.53     |   601.68   |   77.26    |        2.29x        |
-| UnumDB.Graph |    16,800.24    |  4,275.98  |  9,572.43  |       283.34x       |
+| UnumDB.Graph |    16,800.24    |  4,275.98  |  9,572.43  |     **283.34x**     |
 
 ## Write Operations
 
@@ -260,7 +260,7 @@ Metric: number inserted edges per second.<br/>
 | MySQL        |     396.75      |   407.14   |   309.22   |        0.68x        |
 | SQLite       |     347.70      |   364.13   |   278.15   |        0.61x        |
 | MongoDB      |    1,524.28     |  2,064.84  |   845.99   |        1.86x        |
-| UnumDB.Graph |    4,065.29     |  4,164.98  |  3,938.13  |        8.66x        |
+| UnumDB.Graph |    4,065.29     |  4,164.98  |  3,938.13  |      **8.66x**      |
 
 ### Random Writes: Upsert Edges Batch
 
@@ -276,7 +276,7 @@ Metric: number inserted edges per second.<br/>
 | MySQL        |     812.79      |   795.84   |   786.82   |        1.05x        |
 | SQLite       |    1,073.77     |  1,115.09  |  1,004.13  |        1.34x        |
 | MongoDB      |    4,192.98     |  5,427.22  |  1,639.07  |        2.19x        |
-| UnumDB.Graph |    11,190.59    | 11,032.29  | 10,223.71  |       13.69x        |
+| UnumDB.Graph |    11,190.59    | 11,032.29  | 10,223.71  |     **13.69x**      |
 
 ### Random Writes: Remove Edge
 
@@ -292,7 +292,7 @@ Metric: number removed edges per second.<br/>
 | MySQL        |     822.14      |   732.72   |   745.51   |        0.87x        |
 | SQLite       |     422.41      |   444.84   |   382.08   |        0.45x        |
 | MongoDB      |     525.93      |   297.69   |   71.89    |        0.08x        |
-| UnumDB.Graph |    3,552.51     |  4,230.23  |  3,947.07  |        4.61x        |
+| UnumDB.Graph |    3,552.51     |  4,230.23  |  3,947.07  |      **4.61x**      |
 
 ### Random Writes: Remove Edges Batch
 
@@ -308,5 +308,5 @@ Metric: number removed edges per second.<br/>
 | MySQL        |     689.72      |   641.08   |   649.54   |        0.51x        |
 | SQLite       |     605.12      |   615.77   |   595.16   |        0.46x        |
 | MongoDB      |     916.13      |   436.58   |   82.23    |        0.06x        |
-| UnumDB.Graph |    11,185.17    | 11,124.88  | 10,176.45  |        7.94x        |
+| UnumDB.Graph |    11,185.17    | 11,124.88  | 10,176.45  |      **7.94x**      |
 

@@ -1,93 +1,82 @@
-import os
 from typing import Optional
+import os
+import json
 import importlib
 
 from pystats2md.stats_file import StatsFile
-
-from PyWrappedGraph.SQLite import SQLite, SQLiteMem
-from PyWrappedGraph.MySQL import MySQL
-from PyWrappedGraph.PostgreSQL import PostgreSQL
-from PyWrappedGraph.MongoDB import MongoDB
-from PyWrappedGraph.Neo4J import Neo4J
+from PyWrappedHelpers.SingletonMeta import SingletonMeta
 
 
-count_nodes = int(os.getenv('COUNT_NODES', '0'))
-count_edges = int(os.getenv('COUNT_EDGES', '0'))
-count_finds = int(os.getenv('COUNT_FINDS', '20000'))
-count_analytics = int(os.getenv('COUNT_ANALYTICS', '300'))
-count_changes = int(os.getenv('COUNT_CHANGES', '10000'))
-device_name = os.getenv('DEVICE_NAME', 'UnknownDevice')
+class P0Config(object):
+    """
+        A singleton configuration class.
+        Retreives and parses environment variables and generates
+        DB server URLs based on configuration files: `P0ConfigDBs.json`
+        and `P0ConfigDatasets.json`.
+    """
 
-datasets = json.load_from('BenchGraphs/P0ConfigDatasets.json')
-wrappers = json.load_from('BenchGraphs/P0ConfigDBs.json')
-report_path = 'BenchGraphs/MacbookPro/README.md'
-stats_path = 'BenchGraphs/MacbookPro/stats_pygraphdb.json'
-stats = StatsFile(stats_path)
+    __shared = None
 
-dataset_test = {
-    "name": "Test",
-    "path": "Datasets/graph-test/edges.csv",
-    "nodes": 8,
-    "edges": 10,
-    "size_mb": 1,
-}
+    @staticmethod
+    def shared():
+        if P0Config.__shared is None:
+            P0Config()
+        return P0Config.__shared
 
-wrapper_types = [
-    SQLite,
-    MongoDB,
-    PostgreSQL,
-    MySQL,
-    Neo4J,
-]
+    def __init__(self, device_name='UnknownDevice'):
+        if P0Config.__shared is not None:
+            raise Exception("This class is a singleton!")
 
-try:
-    # pylint: disable=undefined-variable
-    importlib.reload(PyUnumDB)
-    from PyUnumDB import GraphDB
-    wrapper_types.append(GraphDB)
-except NameError:
-    try:
-        import PyUnumDB
-        from PyUnumDB import GraphDB
-        wrapper_types.append(GraphDB)
-    except:
+        self.device_name = os.getenv('DEVICE_NAME', device_name)
+        self.count_finds = int(os.getenv('COUNT_FINDS', '20000'))
+        self.count_analytics = int(os.getenv('COUNT_ANALYTICS', '300'))
+        self.count_changes = int(os.getenv('COUNT_CHANGES', '10000'))
+
+        self.default_stats_file = StatsFile(
+            f'BenchGraphs/{device_name}/PyWrappedDBs.json')
+        self.databases = self.load_json('BenchGraphs/P0ConfigDBs.json')
+        self.datasets = self.load_json('BenchGraphs/P0ConfigDatasets.json')
+        self.test_dataset = {
+            "name": "Test",
+            "path": "Datasets/graph-test/edges.csv",
+            "nodes": 8,
+            "edges": 10,
+            "size_mb": 1,
+            "enabled": True
+        }
+        P0Config.__shared = self
+
+    def make_db(self, database: dict, dataset: dict) -> Optional[object]:
+        if (not database['enabled']) or (not dataset['enabled']):
+            return None
+
+        url = os.getenv(database['url_variable_name'],
+                        database['url_default'])
+        url = url.replace('${DATASET_NAME}', dataset['name'])
+
+        module = importlib.import_module(database['module_name'])
+        class_ = getattr(module, database['class_name'])
+        instance = class_(url=url)
+
+        return instance
+
+    def normalize_path(self, path: str) -> str:
+        return os.path.abspath(os.path.expanduser(path))
+
+    def load_json(self, path: str) -> dict:
+        with open(path, 'r') as f:
+            return json.load(f)
+
+    def run(self):
         pass
 
 
-def dataset_number_of_edges(dataset_path: str) -> int:
-    for d in _datasets:
-        if d[0] != dataset_path:
-            continue
-        return d[2]
-    return 0
-
-
-def dataset_name(dataset_path: str) -> str:
-    for d in _datasets:
-        if d[0] != dataset_path:
-            continue
-        return d[3]
-    return 0
-
-
-def wrapper_name(cls: type) -> Optional[str]:
-    for w in _wrappers:
-        if w[0] != cls:
-            continue
-        return w[2]
-    # If no name was found - generate one.
+def class_name(cls: type) -> str:
     if isinstance(cls, type):
         return cls.__name__
     else:
         return cls.__class__.__name__
 
 
-def database_url(cls: type, dataset_path: str) -> Optional[str]:
-    name = dataset_name(dataset_path)
-    for w in _wrappers:
-        if w[0] != cls:
-            continue
-        url = os.getenv(w[1], w[2])
-        url = url.replace('${DATASET_NAME}', name)
-        return url
-    return None
+if __name__ == "__main__":
+    P0Config().run()

@@ -2,16 +2,18 @@ from PyWrappedGraph.BaseAPI import BaseAPI
 from PyWrappedGraph.Edge import Edge
 from PyWrappedGraph.Algorithms import export_edges_into_graph_parallel
 
-import P0Config
+from P0Config import P0Config, class_name
 
 
 class P1Test(object):
     """
-    Test basic operations over a tiny graph.
-    Use this ONLY for empty databases!
+        Test basic operations over a tiny graph.
+        Use this ONLY for empty databases, as it will 
+        clear the data before and after execution!
     """
 
     def __init__(self):
+        self.conf = P0Config.shared()
         self.edges = [
             Edge(1, 2, weight=4, _id=100).__dict__,
             Edge(2, 3, weight=20, _id=1100).__dict__,
@@ -26,16 +28,14 @@ class P1Test(object):
         ]
 
     def run(self):
-        for graph_type in P0Config.wrapper_types:
-            file_path = P0Config.dataset_test
-            url = P0Config.database_url(graph_type, file_path)
-            if url is None:
+        for db in self.conf.databases:
+            g = self.conf.make_db(database=db, dataset=self.conf.test_dataset)
+            if g is None:
                 continue
-            g = graph_type(url=url)
             self.run_one(g)
 
     def run_one(self, g):
-        print(f'-- Starting testing of: {P0Config.wrapper_name(g)}')
+        print(f'-- Starting testing of: {class_name(g)}')
 
         print(f'--- Cleaning')
         g.remove_all()
@@ -57,14 +57,14 @@ class P1Test(object):
         self.validate_empty_edges(g)
 
         print(f'--- Bulk Insert')
-        g.insert_adjacency_list(P0Config.dataset_test)
+        g.insert_adjacency_list(self.conf.test_dataset['path'])
         self.validate_contents(g)
         g.remove_all()
         self.validate_empty_edges(g)
         self.validate_empty_nodes(g)
 
         print(f'--- Bulk Upsert')
-        g.upsert_adjacency_list(P0Config.dataset_test)
+        g.upsert_adjacency_list(self.conf.test_dataset['path'])
         self.validate_contents(g)
         g.remove_all()
         self.validate_empty_edges(g)
