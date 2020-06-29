@@ -15,6 +15,7 @@ brew services start neo4j
 # brew tap mongodb/brew
 # brew install mongodb-community@4.2
 # mongod --dbpath /usr/local/var/mongodb --directoryperdb --wiredTigerDirectoryForIndexes
+# mongod --dbpath=/Users/av/DBs/mongo/ --directoryperdb --wiredTigerCacheSizeGB=2 --wiredTigerDirectoryForIndexes &!
 brew services start mongodb/brew/mongodb-community
 
 # brew install redis
@@ -23,3 +24,8 @@ brew services start redis
 brew services start memcached
 
 brew services list
+
+
+# For text search:
+elasticsearch &!
+mongod --dbpath=/Users/av/DBs/mongo/ --directoryperdb --wiredTigerCacheSizeGB=2 --wiredTigerDirectoryForIndexes &!
