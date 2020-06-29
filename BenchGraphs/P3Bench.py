@@ -6,11 +6,11 @@ from pystats2md.micro_bench import MicroBench
 
 from PyWrappedGraph.BaseAPI import BaseAPI
 
-import config
-from tasks_sampler import TasksSampler
+import P0Config
+from tasks_sampler import P3TasksSampler
 
 
-class SimpleBenchmark(object):
+class P3Bench(object):
     """
         Benchmarks groups of operations in following order:
         2. Edge lookups and simple queries.
@@ -24,29 +24,29 @@ class SimpleBenchmark(object):
 
     def run(self, repeat_existing=True):
         self.repeat_existing = repeat_existing
-        for dataset_path in config.datasets:
+        for dataset_path in P0Config.datasets:
             self.dataset_path = dataset_path
-            self.tasks = TasksSampler()
-            self.tasks.count_finds = config.count_finds
-            self.tasks.count_analytics = config.count_analytics
-            self.tasks.count_changes = config.count_changes
+            self.tasks = P3TasksSampler()
+            self.tasks.count_finds = P0Config.count_finds
+            self.tasks.count_analytics = P0Config.count_analytics
+            self.tasks.count_changes = P0Config.count_changes
             self.tasks.sample_reservoir(dataset_path)
 
-            for graph_type in config.wrapper_types:
-                url = config.database_url(graph_type, dataset_path)
+            for graph_type in P0Config.wrapper_types:
+                url = P0Config.database_url(graph_type, dataset_path)
                 if url is None:
                     continue
                 g = graph_type(url=url)
                 if (g.count_edges() == 0) and (not graph_type.__in_memory__):
                     continue
 
-                dataset_name = config.dataset_name(dataset_path)
-                wrapper_name = config.wrapper_name(g)
+                dataset_name = P0Config.dataset_name(dataset_path)
+                wrapper_name = P0Config.wrapper_name(g)
                 print(f'-- Benchmarking: {dataset_name} @ {wrapper_name}')
                 self.graph = g
                 self.run_one()
                 self.graph = None
-                config.stats.dump_to_file()
+                P0Config.stats.dump_to_file()
 
             self.tasks = None
             self.dataset_path = None
@@ -99,15 +99,15 @@ class SimpleBenchmark(object):
                      self.remove_bulk)
 
     def one(self, benchmark_name, f):
-        dataset_name = config.dataset_name(self.dataset_path)
-        wrapper_name = config.wrapper_name(self.graph)
+        dataset_name = P0Config.dataset_name(self.dataset_path)
+        wrapper_name = P0Config.wrapper_name(self.graph)
         print(f'--- {wrapper_name}: {benchmark_name} @ {dataset_name}')
         counter = MicroBench(
             benchmark_name=benchmark_name,
             func=f,
             database=wrapper_name,
             dataset=dataset_name,
-            source=config.stats,
+            source=P0Config.stats,
             device_name='MacbookPro',
             limit_iterations=1,
             limit_seconds=None,
@@ -115,7 +115,7 @@ class SimpleBenchmark(object):
         )
 
         if not self.repeat_existing:
-            if config.stats.contains(counter):
+            if P0Config.stats.contains(counter):
                 print('--- Skipping!')
                 return
         print(f'---- Running!')
@@ -317,6 +317,6 @@ class SimpleBenchmark(object):
 
 if __name__ == "__main__":
     try:
-        SimpleBenchmark().run()
+        P3Bench().run()
     finally:
-        config.stats.dump_to_file()
+        P0Config.stats.dump_to_file()

@@ -1,24 +1,20 @@
-import config
-from p1_test import Tester
-from p2_import import BulkImporter
-from p3_bench_simple import SimpleBenchmark
-from p4_bench_networkx import NetworkXBenchmark
-# from p5_export_stats_operation import StatsExporter
-# from p6_export_stats_dataset import StatsExporter
+import P0Config
+from P1Test import P1Test
+from P2Import import P2Import
+from P3Bench import P3Bench
+from P4Print import P4Print
 
 
 if __name__ == "__main__":
     try:
         print('Welcome to PyWrappedDBs Benchmark!')
         print('- Testing DBs!')
-        Tester().run()
+        P1Test().run()
         print('- Importing datasets!')
-        BulkImporter().run()
-        # print('- Benchmarking simple queries!')
-        # SimpleBenchmark().run()
-        # print('- Benchmarking complex algorithms!')
-        # NetworkXBenchmark().run()
-        # print('- Exporting stats!')
-        # StatsExporter().run()
+        P2Import().run()
+        print('- Benchmarking!')
+        P3Bench().run()
+        print('- Exporting stats!')
+        P4Print().run()
     finally:
-        config.stats.dump_to_file()
+        P0Config.stats.dump_to_file()

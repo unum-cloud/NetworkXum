@@ -2,10 +2,10 @@ from PyWrappedGraph.BaseAPI import BaseAPI
 from PyWrappedGraph.Edge import Edge
 from PyWrappedGraph.Algorithms import export_edges_into_graph_parallel
 
-import config
+import P0Config
 
 
-class Tester(object):
+class P1Test(object):
     """
     Test basic operations over a tiny graph.
     Use this ONLY for empty databases!
@@ -26,16 +26,16 @@ class Tester(object):
         ]
 
     def run(self):
-        for graph_type in config.wrapper_types:
-            file_path = config.dataset_test
-            url = config.database_url(graph_type, file_path)
+        for graph_type in P0Config.wrapper_types:
+            file_path = P0Config.dataset_test
+            url = P0Config.database_url(graph_type, file_path)
             if url is None:
                 continue
             g = graph_type(url=url)
             self.run_one(g)
 
     def run_one(self, g):
-        print(f'-- Starting testing of: {config.wrapper_name(g)}')
+        print(f'-- Starting testing of: {P0Config.wrapper_name(g)}')
 
         print(f'--- Cleaning')
         g.remove_all()
@@ -57,14 +57,14 @@ class Tester(object):
         self.validate_empty_edges(g)
 
         print(f'--- Bulk Insert')
-        g.insert_adjacency_list(config.dataset_test)
+        g.insert_adjacency_list(P0Config.dataset_test)
         self.validate_contents(g)
         g.remove_all()
         self.validate_empty_edges(g)
         self.validate_empty_nodes(g)
 
         print(f'--- Bulk Upsert')
-        g.upsert_adjacency_list(config.dataset_test)
+        g.upsert_adjacency_list(P0Config.dataset_test)
         self.validate_contents(g)
         g.remove_all()
         self.validate_empty_edges(g)
@@ -108,4 +108,4 @@ class Tester(object):
 
 
 if __name__ == "__main__":
-    Tester().run()
+    P1Test().run()

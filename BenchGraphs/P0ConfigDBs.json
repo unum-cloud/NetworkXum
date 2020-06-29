@@ -1,0 +1,37 @@
+{
+    "UnumDB.Graph": {
+        "url_variable_name": "URI_UNUMDB_GRAPH",
+        "url_default": "~/DBs/unumdb.Graph/${DATASET_NAME}",
+        "enabled": true
+    },
+    "SQLite": {
+        "url_variable_name": "URI_SQLITE",
+        "url_default": "sqlite:////Users/av/DBs/sqlite/${DATASET_NAME}.db3",
+        "enabled": true
+    },
+    "SQLite (In-Memory)": {
+        "url_variable_name": "URI_SQLITE_RAM",
+        "url_default": "sqlite:///:memory:",
+        "enabled": true
+    },
+    "MySQL": {
+        "url_variable_name": "URI_MYSQL",
+        "url_default": "mysql://av:temptemp@0.0.0.0:3306/${DATASET_NAME}",
+        "enabled": true
+    },
+    "PostgreSQL": {
+        "url_variable_name": "URI_POSTGRESQL",
+        "url_default": "postgres://av:temptemp@0.0.0.0:5432/${DATASET_NAME}",
+        "enabled": true
+    },
+    "Neo4J": {
+        "url_variable_name": "URI_NEO4J",
+        "url_default": "bolt://neo4j:temptemp@localhost:7687/${DATASET_NAME}",
+        "enabled": false
+    },
+    "MongoDB": {
+        "url_variable_name": "URI_MONGODB",
+        "url_default": "mongodb://0.0.0.0:27017/${DATASET_NAME}",
+        "enabled": true
+    }
+}

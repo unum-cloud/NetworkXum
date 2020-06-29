@@ -5,53 +5,28 @@ from pystats2md.stats_file import StatsFile
 from pystats2md.stats_subset import StatsSubset
 from pystats2md.report import Report
 
-import config
+import P0Config
 
 
-class StatsExporterPerOperation():
+class P4Print():
 
     def run(
         self,
-        device_name='MacbookPro',
+        device_name='',
     ) -> str:
 
         ins = StatsFile(filename=None)
+        if len(device_name) == 0:
+            device_name = P0Config.device_name
         for path in [
-            'BenchGraphs/MacbookPro/stats_unumdb.json',
-            # 'BenchGraphs/MacbookPro/stats_pygraphdb.json',
-            # 'BenchGraphs/MacbookPro/stats_mgraphdb.json',
-            # 'BenchGraphs/MacbookPro/stats_pontdb.json',
+            f'BenchGraphs/{device_name}/PyGraphDB.json',
+            f'BenchGraphs/{device_name}/UnumDB.json',
         ]:
             ins.append(StatsFile(filename=path))
 
         out = Report()
-        dbs_pygraph = [
-            'PostgreSQL',
-            'MySQL',
-            'SQLite',
-            'MongoDB',
-            # 'Neo4J',
-            # 'ArangoDB',
-        ]
-        dbs_unum = [
-            'GraphDB',
-            # 'MGraphDB',
-            # 'SQLiteCpp',
-        ]
-        dbs_mem = [
-            # 'SQLiteMem',
-            # 'STLOrderedMap',
-            # 'STLUnorderedMap',
-            # 'TSLHopscotch',
-            # 'TSLRobin',
-        ]
-        dataset_names = [
-            # 'CommunitiesFB',
-            # 'MovieRatings',
-            'PatentCitations',
-            'MouseGenes',
-            'HumanBrain',
-        ]
+        dbs = ins.subset().get_unique('database')
+        dataset_names = ins.subset().get_unique('dataset')
         dataset_for_comparison = 'HumanBrain'
 
         # Intro.
@@ -67,8 +42,8 @@ class StatsExporterPerOperation():
         * CPU ⇌ SSD bandwidth: ~2 GB/s.
 
         As we can see, the theoretical throughput between storage (SSD) and CPU is by far the biggest bottleneck.
-        2 GB/s doesn't sound very scary, but the problem is that **most databases can hardly saturate 10%% of that capacity (or 200 MB/s)!**
-        When it comes to random (opposed to sequential) read operations the performance drops further to <1%% of channel capacity.
+        2 GB/s doesn't sound very scary, but the problem is that **most databases can hardly saturate 10% of that capacity (or 200 MB/s)!**
+        When it comes to random (opposed to sequential) read operations the performance drops further to <1% of channel capacity.
         That's why it's crucial for us to store the data in the most capable database!
         ''')
 
@@ -80,7 +55,7 @@ class StatsExporterPerOperation():
         * [PostgreSQL](https://www.postgresql.org) is the 2nd most popular Open-Source DB.
         * [MongoDB](https://www.sqlite.org/index.html) is the most popular NoSQL database. `$MDB` is values at aound $10 Bln.
         * [Neo4J](https://neo4j.com) was designed specifically for graphs storage, but crashes consistently, so it was removed from comparison.
-        * [GraphDB](https://unum.xyz) is our in-house solution.
+        * [UnumDB.Graph](https://unum.xyz/db) is our in-house solution.
 
         Databases were configured to use 512 Mb of RAM for cache and 4 cores for query execution.
         Links: [The Most Popular Open Source Databases 2020](https://www.percona.com/blog/2020/04/22/the-state-of-the-open-source-database-industry-in-2020-part-three/).
@@ -90,11 +65,11 @@ class StatsExporterPerOperation():
         out.add('### Datasets')
         out.add('''
         * [Patent Citation Network](http://networkrepository.com/cit-patent.php).
-            * Size: 77 Mb.
+            * Size: 272 Mb.
             * Edges: 16,518,947.
             * Average Degree: 8.
         * [Mouse Gene Regulatory Network](http://networkrepository.com/bio-mouse-gene.php).
-            * Size: 300 Mb.
+            * Size: 295 Mb.
             * Edges: 14,506,199.
             * Average Degree: 670.
         * [HumanBrain Network](http://networkrepository.com/bn-human-Jung2015-M87102575.php).
@@ -138,7 +113,7 @@ class StatsExporterPerOperation():
             row_name_property='database',
             col_name_property='dataset',
             cell_content_property='operations_per_second',
-            row_names=[*dbs_pygraph, *dbs_unum],
+            row_names=dbs,
             col_names=dataset_names,
         ).add_gains())
 
@@ -154,7 +129,7 @@ class StatsExporterPerOperation():
             row_name_property='database',
             col_name_property='dataset',
             cell_content_property='time_elapsed',
-            row_names=[*dbs_pygraph, *dbs_unum],
+            row_names=dbs,
             col_names=dataset_names,
         ).printable_seconds())
 
@@ -240,7 +215,7 @@ class StatsExporterPerOperation():
                 row_name_property='database',
                 col_name_property='dataset',
                 cell_content_property='operations_per_second',
-                row_names=[*dbs_pygraph, *dbs_unum],
+                row_names=dbs,
                 col_names=dataset_names
             ).add_gains())
 
@@ -293,12 +268,12 @@ class StatsExporterPerOperation():
                 row_name_property='database',
                 col_name_property='dataset',
                 cell_content_property='operations_per_second',
-                row_names=[*dbs_pygraph, *dbs_unum],
+                row_names=dbs,
                 col_names=dataset_names
             ).add_gains())
 
-        out.print_to(config.report_path)
+        out.print_to(P0Config.report_path)
 
 
 if __name__ == "__main__":
-    StatsExporterPerOperation().run()
+    P4Print(device_name='MacbookPro').run()

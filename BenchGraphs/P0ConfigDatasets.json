@@ -1,0 +1,55 @@
+[
+    {
+        "name": "CommunitiesFB",
+        "path": "~/Datasets/networks/communities/edges.csv",
+        "url": "http://networkrepository.com/fb-pages-company.php",
+        "nodes": 0,
+        "edges": 52310,
+        "degree": 8,
+        "size_mb": 1
+    },
+    {
+        "name": "MovieRatings",
+        "path": "~/Datasets/networks/eachmovie-ratings/edges.csv",
+        "url": "http://networkrepository.com/rec-eachmovie.php",
+        "nodes": 0,
+        "edges": 2811716,
+        "degree": 90,
+        "size_mb": 33
+    },
+    {
+        "name": "PatentCitations",
+        "path": "~/Datasets/networks/patent-citations/edges.csv",
+        "url": "http://networkrepository.com/cit-patent.php",
+        "nodes": 0,
+        "edges": 16518947,
+        "degree": 8,
+        "size_mb": 272
+    },
+    {
+        "name": "MouseGenes",
+        "path": "~/Datasets/networks/mouse-gene/edges.csv",
+        "url": "http://networkrepository.com/bio-mouse-gene.php",
+        "nodes": 0,
+        "edges": 14506199,
+        "degree": 670,
+        "size_mb": 295
+    },
+    {
+        "name": "HumanBrain",
+        "path": "~/Datasets/networks/human-brain/edges.csv",
+        "url": "http://networkrepository.com/bn-human-Jung2015-M87102575.php",
+        "nodes": 0,
+        "edges": 87273967,
+        "degree": 186,
+        "size_mb": 3840
+    },
+    {
+        "name": "Wikipedia",
+        "path": "~/Datasets/networks/wiki/edges.csv",
+        "url": "http://networkrepository.com/web-wikipedia-link-en13-all.php",
+        "nodes": 0,
+        "edges": 591044737,
+        "size_mb": 26000
+    }
+]

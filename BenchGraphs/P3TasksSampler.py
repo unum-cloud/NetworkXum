@@ -5,7 +5,7 @@ from typing import List
 from PyWrappedGraph.Algorithms import yield_edges_from, chunks
 
 
-class TasksSampler(object):
+class P3TasksSampler(object):
     """
         Select this data beforehand to:
         - avoid affecting the runtime of benchmark.

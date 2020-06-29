@@ -5,10 +5,10 @@ import importlib
 from pystats2md.micro_bench import MicroBench
 
 from PyWrappedGraph.Algorithms import export_edges_into_graph
-import config
+import P0Config
 
 
-class BulkImporter(object):
+class P2Import(object):
     """
     Performs multithreaded bulk import into DB.
     Saves stats.
@@ -45,13 +45,13 @@ class BulkImporter(object):
                 return len(es)
 
         g = PseudoGraph()
-        dataset_name = config.dataset_name(dataset_path)
+        dataset_name = P0Config.dataset_name(dataset_path)
         counter = MicroBench(
             benchmark_name='Sequential Writes: Import CSV',
             func=lambda: export_edges_into_graph(dataset_path, g),
             database='Parsing in Python',
             dataset=dataset_name,
-            source=config.stats,
+            source=P0Config.stats,
             device_name='MacbookPro',
             limit_iterations=1,
             limit_seconds=None,
@@ -60,26 +60,26 @@ class BulkImporter(object):
         counter.run_if_missing()
 
     def run(self):
-        for dataset_path in config.datasets:
+        for dataset_path in P0Config.datasets:
             # Define a baseline, so we know how much time it took
             # to read the data vs actually importing it into DB
             # and building indexes.
             self.parse_without_importing_if_unknown(dataset_path)
 
-            for graph_type in config.wrapper_types:
-                url = config.database_url(graph_type, dataset_path)
+            for graph_type in P0Config.wrapper_types:
+                url = P0Config.database_url(graph_type, dataset_path)
                 if url is None:
                     continue
 
                 g = graph_type(url=url)
-                dataset_name = config.dataset_name(dataset_path)
-                wrapper_name = config.wrapper_name(g)
+                dataset_name = P0Config.dataset_name(dataset_path)
+                wrapper_name = P0Config.wrapper_name(g)
 
                 if (g.count_edges() != 0):
                     print(f'-- Skipping: {dataset_name} -> {wrapper_name}')
                     continue
                 file_size = os.path.getsize(dataset_path)
-                expected_edges = config.dataset_number_of_edges(dataset_path)
+                expected_edges = P0Config.dataset_number_of_edges(dataset_path)
                 print(f'-- Bulk importing: {dataset_name} -> {wrapper_name}')
                 print(f'--- started at:', datetime.now().strftime('%H:%M:%S'))
                 print(f'--- file size:', self.printable_bytes(file_size))
@@ -93,7 +93,7 @@ class BulkImporter(object):
                     func=import_one,
                     database=wrapper_name,
                     dataset=dataset_name,
-                    source=config.stats,
+                    source=P0Config.stats,
                     device_name='MacbookPro',
                 )
                 counter.run_if_missing()
@@ -104,11 +104,11 @@ class BulkImporter(object):
                 print(f'--- bytes/second:',
                       self.printable_bytes(file_size / counter.time_elapsed))
                 print(f'--- finished at:', datetime.now().strftime('%H:%M:%S'))
-                config.stats.dump_to_file()
+                P0Config.stats.dump_to_file()
 
 
 if __name__ == "__main__":
     try:
-        BulkImporter().run()
+        P2Import().run()
     finally:
-        config.stats.dump_to_file()
+        P0Config.stats.dump_to_file()

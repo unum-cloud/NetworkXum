@@ -1,144 +1,21 @@
 version: '3.5'
 services:
-  
-  # --------------------------
-  # Separate application for every dataset:
-  # --------------------------
 
-  # http://networkrepository.com/fb-pages-company.php
-  # Average degree: ~8.
-  graphdb-task-communities:
-    container_name: graphdb-task-communities
-    image: 'unum/pycler/graphdb:latest'
+  benchgraphs-client:
+    container_name: benchgraphs-client
+    image: 'unum/pywrappeddbs:latest'
     volumes:
-      - '~/benchmarks/rocksdb/communities/:/var/lib/rocksdb'
-      - '~/benchmarks/sqlite/communities/:/var/lib/sqlite'
-    environment: 
-      URI_FILE: '/Users/av/Datasets/graph-communities/all.edges'
-      COUNT_NODES: '14092'
-      COUNT_EDGES: '52309'
-      SAMPLE_FROM_REAL_DATA: '1'
-    
-  # Patent Citation Network. 77 Mb.
-  # Average degree: 8.
-  # http://networkrepository.com/cit-patent.php
-  graphdb-task-patent-citations:
-    container_name: graphdb-task-patent-citations
-    image: 'unum/pycler/graphdb:latest'
-    volumes:
-      - '~/benchmarks/rocksdb/patent-citations:/var/lib/rocksdb'
-      - '~/benchmarks/sqlite/patent-citations:/var/lib/sqlite'
-    environment: 
-      URI_FILE: '/Users/av/Datasets/graph-patent-citations/all.edges'
-      SAMPLE_FROM_REAL_DATA: '1'
-
-  # Mouse gene regulatory network derived 
-  # from analyzing gene expression profiles. 162 Mb.
-  # Third column is the edge weights.
-  # Average degree: 670.
-  # http://networkrepository.com/bio-mouse-gene.php
-  graphdb-task-mouse-gene:
-    container_name: graphdb-task-mouse-gene
-    image: 'unum/pycler/graphdb:latest'
-    volumes:
-      - '~/benchmarks/rocksdb/mouse-gene:/var/lib/rocksdb'
-      - '~/benchmarks/sqlite/mouse-gene:/var/lib/sqlite'
-    environment: 
-      URI_FILE: '/Users/av/Datasets/graph-mouse-gene/all.edges'
-      COUNT_NODES: '45101'
-      COUNT_EDGES: '14506196'
-      SAMPLE_FROM_REAL_DATA: '1'
-
-  # HumanBrain Network. 227 Mb.
-  # Average degree: 186.
-  # http://networkrepository.com/bn-human-Jung2015-M87102575.php
-  graphdb-task-human-brain:
-    container_name: graphdb-task-human-brain
-    image: 'unum/pycler/graphdb:latest'
-    volumes:
-      - '~/benchmarks/rocksdb/human-brain:/var/lib/rocksdb'
-      - '~/benchmarks/sqlite/human-brain:/var/lib/sqlite'
-    environment: 
-      URI_FILE: '/Users/av/Datasets/graph-human-brain/all.edges'
-      SAMPLE_FROM_REAL_DATA: '1'
-
-  # Orkut Communities.
-  # http://networkrepository.com/orkut.php
-  # Average degree: 320.
-  # Which means: 2560 bytes for each memberships list.
-  graphdb-task-orkut:
-    container_name: graphdb-task-orkut
-    image: 'unum/pycler/graphdb:latest'
-    volumes:
-      - '~/benchmarks/rocksdb/orkut/:/var/lib/rocksdb'
-      - '~/benchmarks/sqlite/orkut/:/var/lib/sqlite'
-    environment: 
-      URI_FILE: '/Users/av/Datasets/graph-friendster/all.edges'
-      COUNT_NODES: '2783196'
-      COUNT_EDGES: '444222386'
-
-  # Sina Weibo social network.
-  # http://networkrepository.com/soc-sinaweibo.php
-  # Average degree: ~9.
-  graphdb-task-sinaweibo:
-    container_name: graphdb-task-sinaweibo
-    image: 'unum/pycler/graphdb:latest'
-    volumes:
-      - '~/benchmarks/rocksdb/sinaweibo:/var/lib/rocksdb'
-      - '~/benchmarks/sqlite/sinaweibo:/var/lib/sqlite'
-    environment: 
-      URI_FILE: '/Users/av/Datasets/graph-sinaweibo/all.mtx'
-      COUNT_NODES: '58655849'
-      COUNT_EDGES: '261321071'
-
-  # Twitter social network.
-  # http://networkrepository.com/soc-twitter.php
-  # Average degree: 170.
-  graphdb-task-twitter:
-    container_name: graphdb-task-twitter
-    image: 'unum/pycler/graphdb:latest'
-    volumes:
-      - '~/benchmarks/rocksdb/twitter:/var/lib/rocksdb'
-      - '~/benchmarks/sqlite/twitter:/var/lib/sqlite'
-    environment: 
-      URI_FILE: '/Users/av/Datasets/graph-twitter/all.edges'
-      COUNT_NODES: '16751863'
-      COUNT_EDGES: '1468365182'
-
-  # Friendster social network.
-  # http://networkrepository.com/soc-friendster.php
-  # Average degree: 55.
-  graphdb-task-friendster:
-    container_name: graphdb-task-friendster
-    image: 'unum/pycler/graphdb:latest'
-    volumes:
-      - '~/benchmarks/rocksdb/friendster:/var/lib/rocksdb'
-      - '~/benchmarks/sqlite/friendster:/var/lib/sqlite'
-    environment: 
-      URI_FILE: '/Users/av/Datasets/graph-friendster/all.mtx'
-      COUNT_NODES: '65608366'
-      COUNT_EDGES: '1806067135'
-
-  # Amazon ratings recommendations graph. 160 Mb.
-  # http://networkrepository.com/rec-amazon-ratings.php
-  # Average degree: 5.
-
-  # Movielens movies recommendations graph. 130 Mb.
-  # http://networkrepository.com/rec-movielens.php
-  # Average degree 285.
-
-  # Eachmovie recommendations graph. 130 Mb.
-  # http://networkrepository.com/rec-eachmovie.php
-  # Average degree 90.
-
+      - '~/DBs/UnumDB.Graph/communities/:/var/lib/unumdb'
+      - '~/DBs/SQLite/communities/:/var/lib/sqlite'
+      - '~/Datasets:~/Datasets'
 
   # --------------------------
-  # The infrastructure required for all of that to work:
+  # DB Servers:
   # --------------------------
 
   # https://hub.docker.com/_/mongo
-  graphdb-store-mongo:
-    container_name: graphdb-store-mongo
+  benchgraphs-store-mongo:
+    container_name: benchgraphs-store-mongo
     image: 'mongo'
     volumes:
       - '~/benchmarks/mongo:/data/db'
@@ -148,8 +25,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: 'root'
       MONGO_INITDB_ROOT_PASSWORD: 'temptemp'
 
-  graphdb-store-postgres:
-    container_name: graphdb-store-postgres
+  benchgraphs-store-postgres:
+    container_name: benchgraphs-store-postgres
     image: 'postgres'
     volumes:
       - '~/benchmarks/postgres:/var/lib/postgresql/data'
@@ -160,8 +37,8 @@ services:
       POSTGRES_PASSWORD: 'temptemp'
 
   # https://hub.docker.com/_/mysql
-  graphdb-store-mysql:
-    container_name: graphdb-store-mysql
+  benchgraphs-store-mysql:
+    container_name: benchgraphs-store-mysql
     image: 'mysql'
     command: --default-authentication-plugin=mysql_native_password
     volumes:
@@ -174,19 +51,19 @@ services:
       MYSQL_PASSWORD: 'temptemp'
 
   # https://hub.docker.com/_/arangodb
-  graphdb-store-arangodb:
-    container_name: graphdb-store-arangodb
+  benchgraphs-store-arangodb:
+    container_name: benchgraphs-store-arangodb
     image: 'arangodb'
     volumes:
       - '~/benchmarks/arangodb:/var/lib/arangodb3'
     ports:
       - '8529:8529'
     environment:
-      ARANGO_STORAGE_ENGINE: 'mmfiles' # 'rocksdb'
+      ARANGO_STORAGE_ENGINE: 'mmfiles' # 'unumdb'
       ARANGO_ROOT_PASSWORD: 'temptemp'
 
-  graphdb-store-neo4j:
-    container_name: graphdb-store-neo4j
+  benchgraphs-store-neo4j:
+    container_name: benchgraphs-store-neo4j
     image: 'neo4j'
     volumes:
       - '~/benchmarks/neo4j:/data'
