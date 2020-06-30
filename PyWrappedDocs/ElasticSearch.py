@@ -87,7 +87,7 @@ class ElasticSearch(BaseAPI):
     def find_by_id(self, identifier: str):
         return self.elastic.get(index=self.db_name, id=identifier)
 
-    def find_with_substring(self, field, query):
+    def find_with_substring(self, query: str, field: str = 'plain'):
         # https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-term-query.html
         docs = self.elastic.search(index=self.db_name, body={
             'query': {
@@ -98,7 +98,7 @@ class ElasticSearch(BaseAPI):
         })
         return docs['hits']
 
-    def find_with_regex(self, field, query):
+    def find_with_regex(self, query: str, field: str = 'plain'):
         # https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-regexp-query.html
         # https://lucene.apache.org/core/4_9_0/core/org/apache/lucene/util/automaton/RegExp.html
         docs = self.elastic.search(index=self.db_name, body={
@@ -117,13 +117,12 @@ class ElasticSearch(BaseAPI):
 if __name__ == '__main__':
     sample_file = 'Datasets/nlp-test/nanoformulations.txt'
     db = ElasticSearch(url='http://localhost:9200/',
-                       db_name='nlp-test',
-                       indexed_fields=['plain'])
+                       db_name='nlp-test')
     db.remove_all()
     assert db.count_docs() == 0
     assert db.upsert_doc(TextFile(sample_file).to_dict())
     assert db.count_docs() == 1
-    assert db.find_with_substring('plain', 'nanoparticles')
-    assert db.find_with_regex('plain', 'nanoparticles')
+    assert db.find_with_substring('nanoparticles')
+    assert db.find_with_regex('nanoparticles')
     assert db.remove_doc(TextFile(sample_file).to_dict())
     assert db.count_docs() == 0

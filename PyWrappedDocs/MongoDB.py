@@ -36,7 +36,7 @@ class MongoDB(BaseAPI):
     def remove_all(self):
         self.docs_collection.drop()
 
-    def find_with_substring(self, field: str, query: str) -> Sequence[object]:
+    def find_with_substring(self, query: str, field: str = 'plain') -> Sequence[object]:
         # https://docs.mongodb.com/manual/reference/operator/query/text/
         # https://docs.mongodb.com/manual/core/index-text/
         # https://docs.mongodb.com/manual/reference/text-search-languages/#text-search-languages
@@ -51,7 +51,7 @@ class MongoDB(BaseAPI):
             },
         })
 
-    def find_with_regex(self, field: str, query: str) -> Sequence[object]:
+    def find_with_regex(self, query: str, field: str = 'plain') -> Sequence[object]:
         # https://docs.mongodb.com/manual/reference/operator/query/regex/
         return self.docs_collection.find(filter={
             field: {
@@ -115,13 +115,12 @@ class MongoDB(BaseAPI):
 
 if __name__ == '__main__':
     sample_file = 'Datasets/nlp-test/nanoformulations.txt'
-    db = MongoDB(url='mongodb://localhost:27017/nlp-test',
-                 indexed_fields=['plain'])
+    db = MongoDB(url='mongodb://localhost:27017/nlp-test')
     db.remove_all()
     assert db.count_docs() == 0
     assert db.upsert_doc(TextFile(sample_file).to_dict())
     assert db.count_docs() == 1
-    assert db.find_with_substring('plain', 'Atripla-trimethyl')
-    assert db.find_with_regex('plain', 'Atripla-trimeth[a-z]{2}')
+    assert db.find_with_substring('Atripla-trimethyl')
+    assert db.find_with_regex('Atripla-trimeth[a-z]{2}')
     # assert db.remove_doc(TextFile(sample_file).to_dict())
     # assert db.count_docs() == 0

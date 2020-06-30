@@ -6,9 +6,9 @@ from P4Print import P4Print
 
 
 if __name__ == "__main__":
+    print('Welcome to PyWrappedDBs Graphs Benchmark!')
+    conf = P0Config.shared()
     try:
-        print('Welcome to PyWrappedDBs Benchmark!')
-        P0Config.shared().run()
         print('- Testing DBs!')
         P1Test().run()
         print('- Importing datasets!')
@@ -18,4 +18,4 @@ if __name__ == "__main__":
         print('- Exporting stats!')
         P4Print().run()
     finally:
-        P0Config.shared().default_stats_file.dump_to_file()
+        conf.default_stats_file.dump_to_file()
