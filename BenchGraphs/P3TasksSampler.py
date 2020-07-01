@@ -1,8 +1,6 @@
 import random
-from random import SystemRandom
 from typing import List
-
-from PyWrappedGraph.Algorithms import yield_edges_from, chunks
+from PyWrappedHelpers.Algorithms import yield_edges_from_csv, chunks
 from P0Config import P0Config
 
 
@@ -33,19 +31,12 @@ class P3TasksSampler(object):
                    self.count_analytics,
                    self.count_changes)
 
-    def sample_reservoir(self, filename: str) -> int:
+    def sample_file(self, filename: str) -> int:
         self.clear()
-        count_seen = 0
-        count_needed = self.number_of_needed_samples()
-        for e in yield_edges_from(filename):
-            count_seen += 1
-            if len(self._buffer_edges) < count_needed:
-                self._buffer_edges.append(e)
-            else:
-                s = int(random.random() * count_seen)
-                if s < count_needed:
-                    self._buffer_edges[s] = e
+        self._buffer_edges = sample_reservoir(
+            yield_edges_from_csv(filename), self.number_of_needed_samples())
         self._split_samples_into_tasks()
+        return len(self._buffer_edges)
 
     def sample_from_distribution(self, count_nodes):
         count_needed = self.number_of_needed_samples()
@@ -59,8 +50,23 @@ class P3TasksSampler(object):
                 'v2': v2,
             })
         self._split_samples_into_tasks()
+        return len(self._buffer_edges)
 
-    def sample_nodes_from_edges(self, cnt) -> List[int]:
+    def _split_samples_into_tasks(self):
+        self.count_finds = min(len(self._buffer_edges), self.count_finds)
+        self.edges_to_query = random.sample(
+            self._buffer_edges, self.count_finds)
+        self.nodes_to_query = self._sample_nodes_from_edges(
+            self.count_finds)
+        self.nodes_to_analyze = self._sample_nodes_from_edges(
+            self.count_analytics)
+        self.edges_to_change_by_one = self._buffer_edges[:self.count_changes]
+        self.edges_to_change_batched = list(chunks(
+            self._buffer_edges[:self.count_changes],
+            100,
+        ))
+
+    def _sample_nodes_from_edges(self, cnt) -> List[int]:
         cnt = min(len(self._buffer_edges), cnt)
         es = random.sample(self._buffer_edges, cnt)
         # Save only unique values, but don't forget to shuffle.
@@ -69,17 +75,3 @@ class P3TasksSampler(object):
         vs = list(vs)
         random.shuffle(vs)
         return vs
-
-    def _split_samples_into_tasks(self):
-        self.count_finds = min(len(self._buffer_edges), self.count_finds)
-        self.edges_to_query = random.sample(
-            self._buffer_edges, self.count_finds)
-        self.nodes_to_query = self.sample_nodes_from_edges(
-            self.count_finds)
-        self.nodes_to_analyze = self.sample_nodes_from_edges(
-            self.count_analytics)
-        self.edges_to_change_by_one = self._buffer_edges[:self.count_changes]
-        self.edges_to_change_batched = list(chunks(
-            self._buffer_edges[:self.count_changes],
-            100,
-        ))

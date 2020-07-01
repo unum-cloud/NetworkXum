@@ -12,8 +12,8 @@ from sqlalchemy import text
 from sqlalchemy import Index, Table
 
 from PyWrappedGraph.BaseAPI import BaseAPI
-from PyWrappedGraph.Edge import Edge
-from PyWrappedGraph.Algorithms import *
+from PyWrappedHelpers.Edge import Edge
+from PyWrappedHelpers.Algorithms import *
 
 DeclarativeSQL = declarative_base()
 
@@ -306,7 +306,7 @@ class BaseSQL(BaseAPI):
             current_id = self.biggest_edge_id() + 1
             # Build the new table.
             chunk_len = type(self).__max_batch_size__
-            for es in chunks(yield_edges_from(path, edge_type=dict), chunk_len):
+            for es in chunks(yield_edges_from_csv(path, edge_type=dict), chunk_len):
                 for i, e in enumerate(es):
                     e['_id'] = current_id
                     es[i] = e
@@ -345,7 +345,7 @@ class BaseSQL(BaseAPI):
         with self.get_session() as s:
             # Build the new table.
             chunk_len = type(self).__max_batch_size__
-            for es in chunks(yield_edges_from(path), chunk_len):
+            for es in chunks(yield_edges_from_csv(path), chunk_len):
                 es = map_compact(
                     lambda e: self.validate_edge_and_convert(e, EdgeNew), es)
                 es = list(map(s.merge, es))

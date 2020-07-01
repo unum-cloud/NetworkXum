@@ -14,7 +14,7 @@ The application is split into multiple stages, each with it's own file, so you c
 * [P1Test.py](P1Test.py) - Validates if connections can be established, basic operations work as intended and dump file paths are accessible.
 * [P2Import.py](P2Import.py) - Bulk-loads data into DBs for future analysis. Files must be CSVs with a header row: `v1,v2,weight`.
 * [P3Bench.py](P3Bench.py) - Benchmarks simple `GET`, `PUT` for single nodes/edges and batches of them.
-* [P4Print.py](p5_export_stats_operation.py) - Exports stats about each type of operations from `stats.json` into a single `stats.md` report.
+* [P4Print.py](P4Print.py) - Exports stats about each type of operations from `stats.json` into a single `stats.md` report.
 
 ## Setup
 

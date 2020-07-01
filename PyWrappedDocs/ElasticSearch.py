@@ -1,8 +1,8 @@
 from elasticsearch import Elasticsearch
 
 from PyWrappedDocs.BaseAPI import BaseAPI
-from PyWrappedGraph.Algorithms import *
-from PyWrappedDocs.TextFile import TextFile
+from PyWrappedHelpers.Algorithms import *
+from PyWrappedHelpers.TextFile import TextFile
 
 
 class ElasticSearch(BaseAPI):

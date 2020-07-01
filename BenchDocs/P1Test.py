@@ -1,5 +1,5 @@
 from PyWrappedGraph.BaseAPI import BaseAPI
-from PyWrappedHelpers.Edge import Edge
+from PyWrappedHelpers.TextFile import TextFile
 from PyWrappedHelpers.Algorithms import export_edges_into_graph_parallel, class_name
 
 from P0Config import P0Config
@@ -14,17 +14,10 @@ class P1Test(object):
 
     def __init__(self):
         self.conf = P0Config.shared()
-        self.edges = [
-            Edge(1, 2, weight=4, _id=100).__dict__,
-            Edge(2, 3, weight=20, _id=1100).__dict__,
-            Edge(3, 4, weight=10, _id=1200).__dict__,
-            Edge(4, 5, weight=3, _id=1300).__dict__,
-            Edge(5, 3, weight=2, _id=1400).__dict__,
-            Edge(4, 1, weight=5, _id=1500).__dict__,
-            Edge(8, 6, weight=4, _id=1600).__dict__,
-            Edge(8, 7, weight=2, _id=1700).__dict__,
-            Edge(6, 1, weight=3, _id=1800).__dict__,
-            Edge(7, 1, weight=2, _id=1900).__dict__,
+        self.docs = [
+            TextFile('1', 'the big brown fox').__dict__,
+            TextFile('2', 'as.the.day;passes').__dict__,
+            TextFile('3', 'along the:way').__dict__,
         ]
 
     def run(self):
@@ -40,8 +33,7 @@ class P1Test(object):
 
         print(f'--- Cleaning')
         g.remove_all()
-        self.validate_empty_edges(g)
-        self.validate_empty_nodes(g)
+        self.validate_empty(g)
 
         print(f'--- Single Operations')
         for e in self.edges:
@@ -49,37 +41,25 @@ class P1Test(object):
         self.validate_contents(g)
         for e in self.edges:
             g.remove_edge(e)
-        self.validate_empty_edges(g)
+        self.validate_empty(g)
 
         print(f'--- Batch Operations')
         g.upsert_edges(self.edges)
         self.validate_contents(g)
         g.remove_edges(self.edges)
-        self.validate_empty_edges(g)
+        self.validate_empty(g)
 
-        print(f'--- Bulk Insert')
-        g.insert_adjacency_list(self.conf.test_dataset['path'])
-        self.validate_contents(g)
-        g.remove_all()
-        self.validate_empty_edges(g)
-        self.validate_empty_nodes(g)
-
-        print(f'--- Bulk Upsert')
-        g.upsert_adjacency_list(self.conf.test_dataset['path'])
-        self.validate_contents(g)
-        g.remove_all()
-        self.validate_empty_edges(g)
-        self.validate_empty_nodes(g)
+        # print(f'--- Bulk Insert')
+        # g.insert_adjacency_list(self.conf.test_dataset['path'])
+        # self.validate_contents(g)
+        # g.remove_all()
+        # self.validate_empty(g)
 
         print(f'--- Passed All!')
 
-    def validate_empty_edges(self, g):
-        assert g.count_edges() == 0, \
-            f'count_edges must be =0: {g.count_edges()}'
-
-    def validate_empty_nodes(self, g):
-        assert g.count_nodes() == 0, \
-            f'count_nodes must be =0: {g.count_nodes()}'
+    def validate_empty(self, g):
+        assert g.count_docs() == 0, \
+            f'count_docs() must be =0: {g.count_docs()}'
 
     def validate_contents(self, g):
         for e in self.edges:
@@ -88,8 +68,8 @@ class P1Test(object):
             assert g.edge_undirected(e['v1'], e['v2']), \
                 f'No undirected edge: {e}'
 
-        assert g.count_edges() == 10, \
-            f'count_edges: {g.count_edges()}'
+        assert g.count_docs() == 10, \
+            f'count_docs: {g.count_docs()}'
         assert g.count_nodes() == 8, \
             f'count_nodes: {g.count_nodes()}'
         assert g.count_followers(1) == (3, 10.0), \

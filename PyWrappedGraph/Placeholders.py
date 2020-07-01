@@ -1,4 +1,4 @@
-from PyWrappedGraph.Algorithms import *
+from PyWrappedHelpers.Algorithms import *
 from PyWrappedGraph.BaseAPI import BaseAPI
 from PyWrappedGraph.BaseSQL import BaseSQL
 
@@ -25,4 +25,3 @@ class BlazingSQL(BaseSQL):
         https://blazingsql.com/
     """
     pass
-

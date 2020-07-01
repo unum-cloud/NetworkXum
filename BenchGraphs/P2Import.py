@@ -5,7 +5,7 @@ import importlib
 from pystats2md.micro_bench import MicroBench
 from pystats2md.helpers import metric2str, bytes2str
 
-from PyWrappedGraph.Algorithms import export_edges_into_graph
+from PyWrappedHelpers.Algorithms import export_edges_into_graph
 from P0Config import P0Config
 
 
@@ -55,7 +55,7 @@ class P2Import(object):
             database=db_name,
             dataset=dataset_name,
             source=self.conf.default_stats_file,
-            device_name='MacbookPro',
+            device_name=self.conf.device_name,
         )
         counter.run_if_missing()
 

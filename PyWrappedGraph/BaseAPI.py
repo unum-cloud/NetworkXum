@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 import concurrent.futures
 
-from PyWrappedGraph.Edge import Edge
-from PyWrappedGraph.Algorithms import *
+from PyWrappedHelpers.Edge import Edge
+from PyWrappedHelpers.Algorithms import *
 
 
 class BaseAPI(object):

@@ -31,28 +31,21 @@ class P3Bench(object):
             self.tasks.sample_file(dataset_path)
 
             for db in self.conf.databases:
-                self.g = self.conf.make_db(database=db, dataset=dataset)
+                self.tdb = self.conf.make_db(database=db, dataset=dataset)
                 self.database = db
                 self.dataset = dataset
                 self.bench_buffered_graph()
                 self.conf.default_stats_file.dump_to_file()
 
     def bench_buffered_graph(self, remove_all_afterwards=False):
-        if self.g is None:
+        if self.tdb is None:
             return
-        is_in_ram = bool(type(self.g).__in_memory__)
-        if (self.g.count_edges() == 0) and (not is_in_ram):
+        if self.tdb.count_docs() == 0:
             return
         print('- Benchmarking: {} @ {}'.format(
             self.dataset['name'],
             self.db['name']
         ))
-
-        if is_in_ram:
-            self.bench_task(
-                name='Sequential Writes: Import CSV',
-                func=self.import_bulk
-            )
 
         # Queries returning single object.
         self.bench_task(
@@ -147,36 +140,12 @@ class P3Bench(object):
     # Operations
     # ---
 
-    def find_e_directed(self) -> int:
-        # Try both existing and potentially missing edges
-        half = int(len(self.tasks.edges_to_query) / 2)
-        cnt = 0
-        cnt_found = 0
-        t0 = time()
-        for e in self.tasks.edges_to_query[:half]:
-            match = self.g.edge_directed(e['v1'], e['v2'])
-            cnt += 1
-            cnt_found += 0 if (match is None) else 1
-            dt = time() - t0
-            if dt > self.max_seconds_per_query:
-                break
-        t0 = time()
-        for e in self.tasks.edges_to_query[half:]:
-            match = self.g.edge_directed(e['v2'], e['v1'])
-            cnt += 1
-            cnt_found += 0 if (match is None) else 1
-            dt = time() - t0
-            if dt > self.max_seconds_per_query:
-                break
-        print(f'---- {cnt} ops: {cnt_found} directed matches')
-        return cnt
-
     def find_e_undirected(self) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
         for e in self.tasks.edges_to_query:
-            match = self.g.edge_directed(e['v1'], e['v2'])
+            match = self.tdb.edge_directed(e['v1'], e['v2'])
             cnt += 1
             cnt_found += 0 if (match is None) else 1
             dt = time() - t0
@@ -190,7 +159,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            es = self.g.edges_related(v)
+            es = self.tdb.edges_related(v)
             cnt += 1
             cnt_found += len(es)
             dt = time() - t0
@@ -204,7 +173,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            es = self.g.edges_from(v)
+            es = self.tdb.edges_from(v)
             cnt += 1
             cnt_found += len(es)
             dt = time() - t0
@@ -218,7 +187,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            es = self.g.edges_to(v)
+            es = self.tdb.edges_to(v)
             cnt += 1
             cnt_found += len(es)
             dt = time() - t0
@@ -232,7 +201,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            vs = self.g.nodes_related(v)
+            vs = self.tdb.nodes_related(v)
             cnt += 1
             cnt_found += len(vs)
             dt = time() - t0
@@ -245,7 +214,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.g.count_related(v)
+            self.tdb.count_related(v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -256,7 +225,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.g.count_followers(v)
+            self.tdb.count_followers(v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -267,7 +236,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.g.count_following(v)
+            self.tdb.count_following(v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -279,7 +248,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_analyze:
-            vs = self.g.nodes_related_to_related(v)
+            vs = self.tdb.nodes_related_to_related(v)
             cnt += 1
             cnt_found += len(vs)
             dt = time() - t0
@@ -291,46 +260,46 @@ class P3Bench(object):
     def remove_e(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_change_by_one:
-            self.g.remove_edge(e)
+            self.tdb.remove_edge(e)
             cnt += 1
         return cnt
 
     def upsert_e(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_change_by_one:
-            self.g.upsert_edge(e)
+            self.tdb.upsert_edge(e)
             cnt += 1
         return cnt
 
     def remove_es(self) -> int:
         cnt = 0
         for es in self.tasks.edges_to_change_batched:
-            self.g.remove_edges(es)
+            self.tdb.remove_edges(es)
             cnt += len(es)
         return cnt
 
     def upsert_es(self) -> int:
         cnt = 0
         for es in self.tasks.edges_to_change_batched:
-            self.g.upsert_edges(es)
+            self.tdb.upsert_edges(es)
             cnt += len(es)
         return cnt
 
     def remove_v(self) -> int:
         cnt = 0
         for v in self.tasks.nodes_to_change_by_one:
-            self.g.remove_node(v)
+            self.tdb.remove_node(v)
             cnt += 1
         return cnt
 
     def remove_bulk(self) -> int:
-        c = self.g.count_edges()
-        self.g.remove_all()
-        return c - self.g.count_edges()
+        c = self.tdb.count_edges()
+        self.tdb.remove_all()
+        return c - self.tdb.count_edges()
 
     def import_bulk(self) -> int:
-        self.g.insert_adjacency_list(self.dataset_path)
-        return self.g.count_edges()
+        self.tdb.insert_adjacency_list(self.dataset_path)
+        return self.tdb.count_edges()
 
 
 if __name__ == "__main__":

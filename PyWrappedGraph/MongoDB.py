@@ -7,7 +7,7 @@ from pymongo import MongoClient
 from pymongo import UpdateOne
 
 from PyWrappedGraph.BaseAPI import BaseAPI
-from PyWrappedGraph.Algorithms import *
+from PyWrappedHelpers.Algorithms import *
 
 
 class MongoDB(BaseAPI):
