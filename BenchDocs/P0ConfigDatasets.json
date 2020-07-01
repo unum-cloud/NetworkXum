@@ -1,16 +1,25 @@
 [
     {
-        "name": "COVID-19 Papers",
-        "path": "~/Datasets/UnumDB/texts/covid-19/all.csv",
+        "name": "Covid19",
+        "path": "~/Datasets/UnumDB/Texts/Covid19/all.csv",
         "url": "",
         "docs": 45941,
         "sections": 1604649,
-        "size_mb": 5700,
+        "size_mb": 1700,
         "enabled": true
     },
     {
-        "name": "English Wikipedia",
-        "path": "~/Datasets/UnumDB/texts/enwiki-20170820/all.csv",
+        "name": "PoliticalTweets",
+        "path": "~/Datasets/UnumDB/Texts/PoliticalTweets/all.csv",
+        "url": "",
+        "docs": 12488144,
+        "sections": 12488144,
+        "size_mb": 2300,
+        "enabled": true
+    },
+    {
+        "name": "EnglishWikipedia",
+        "path": "~/Datasets/UnumDB/Texts/EnglishWikipedia/all.csv",
         "url": "https://www.kaggle.com/jkkphys/english-wikipedia-articles-20170820-sqlite",
         "docs": 4902648,
         "sections": 23046187,

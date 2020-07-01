@@ -61,7 +61,7 @@ class BaseAPI(object):
     def upsert_docs_from_directory(self, directory: str) -> int:
         cnt_success = 0
         paths = [pth for pth in Path(directory).iterdir()]
-        for paths_chunk in chunks(paths, __max_batch_size__):
+        for paths_chunk in chunks(paths, BaseAPI.__max_batch_size__):
             files_chunk = map(TextFile, paths_chunk)
             cnt_success += self.upsert_docs(files_chunk)
         return cnt_success
@@ -69,7 +69,7 @@ class BaseAPI(object):
     @abstractmethod
     def upsert_docs_from_csv(self, filepath: str) -> int:
         cnt_success = 0
-        for files_chunk in chunks(yield_texts_from_sectioned_csv(filepath), __max_batch_size__):
+        for files_chunk in chunks(yield_texts_from_sectioned_csv(filepath), BaseAPI.__max_batch_size__):
             cnt_success += self.upsert_docs(files_chunk)
         return cnt_success
 
@@ -84,14 +84,15 @@ class BaseAPI(object):
     # --------------------------------
 
     @abstractmethod
+    def find_with_id(self, query: str) -> object:
+        pass
+
+    @abstractmethod
     def find_with_substring(self, field: str, query: str) -> Sequence[object]:
         pass
 
     @abstractmethod
     def find_with_regex(self, field: str, query: str) -> Sequence[object]:
-        pass
-
-    def find_by_id(self, identifier: str) -> object:
         pass
 
     # endregion

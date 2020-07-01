@@ -30,7 +30,7 @@ class P2Import(object):
 
         db_name = database['name']
         dataset_name = dataset['name']
-        if (tdb.count_edges() != 0):
+        if (tdb.count_docs() != 0):
             print(f'-- Skipping: {dataset_name} -> {db_name}')
             return
 
@@ -42,7 +42,7 @@ class P2Import(object):
 
         def import_one() -> int:
             tdb.upsert_docs_from_csv(dataset_path)
-            return tdb.count_edges()
+            return tdb.count_docs()
 
         counter = MicroBench(
             benchmark_name='Sequential Writes: Import CSV',

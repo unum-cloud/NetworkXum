@@ -37,7 +37,7 @@ class P3Bench(object):
                 self.bench_buffered_graph()
                 self.conf.default_stats_file.dump_to_file()
 
-    def bench_buffered_graph(self, remove_all_afterwards=False):
+    def bench_buffered_graph(self):
         if self.tdb is None:
             return
         if self.tdb.count_docs() == 0:
@@ -47,67 +47,45 @@ class P3Bench(object):
             self.db['name']
         ))
 
+        self.doc_ids_to_query = []
+        self.substrings_to_query = []
+        self.regexs_to_query = []
+        self.docs_to_change_by_one = []
+        self.docs_to_change_batched = [[]]
+
         # Queries returning single object.
         self.bench_task(
-            name='Random Reads: Find Directed Edge',
-            func=self.find_e_directed
-        )
-        self.bench_task(
-            name='Random Reads: Find Any Relation',
-            func=self.find_e_undirected
+            name='Random Reads: Retreive Doc by ID',
+            func=self.retreive_doc_by_id
         )
 
         # Queries returning collections.
         self.bench_task(
-            name='Random Reads: Find Ingoing Edges',
-            func=self.find_es_to
+            name='Random Reads: Find Docs with Substring',
+            func=self.find_docs_with_substring
         )
         self.bench_task(
-            name='Random Reads: Find Connected Edges',
-            func=self.find_es_related
-        )
-        self.bench_task(
-            name='Random Reads: Find Friends',
-            func=self.find_vs_related
-        )
-
-        # Queries returning stats.
-        self.bench_task(
-            name='Random Reads: Count Friends',
-            func=self.count_v_related
-        )
-        self.bench_task(
-            name='Random Reads: Count Followers',
-            func=self.count_v_followers
+            name='Random Reads: Find Docs with RegEx',
+            func=self.find_docs_with_regex
         )
 
         # Reversable write operations.
         self.bench_task(
-            name='Random Writes: Remove Edge',
-            func=self.remove_e
+            name='Random Writes: Remove Doc',
+            func=self.remove_doc
         )
         self.bench_task(
-            name='Random Writes: Upsert Edge',
-            func=self.upsert_e
+            name='Random Writes: Upsert Doc',
+            func=self.upsert_doc
         )
         self.bench_task(
-            name='Random Writes: Remove Edges Batch',
-            func=self.remove_es
+            name='Random Writes: Remove Docs Batch',
+            func=self.remove_docs
         )
         self.bench_task(
-            name='Random Writes: Upsert Edges Batch',
-            func=self.upsert_es
+            name='Random Writes: Upsert Docs Batch',
+            func=self.upsert_docs
         )
-
-        if remove_all_afterwards:
-            self.bench_task(
-                name='Random Writes: Remove Vertex',
-                func=self.remove_v
-            )
-            self.bench_task(
-                name='Sequential Writes: Remove All',
-                func=self.remove_bulk
-            )
 
     def bench_task(self, name, func):
         dataset_name = self.dataset['name']
@@ -140,7 +118,7 @@ class P3Bench(object):
     # Operations
     # ---
 
-    def find_e_undirected(self) -> int:
+    def retreive_doc_by_id(self) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
@@ -182,7 +160,7 @@ class P3Bench(object):
         print(f'---- {cnt} ops: {cnt_found} edges found')
         return cnt
 
-    def find_es_to(self) -> int:
+    def find_docs_with_regex(self) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
@@ -257,28 +235,28 @@ class P3Bench(object):
         print(f'---- {cnt} ops: {cnt_found} related to related nodes')
         return cnt
 
-    def remove_e(self) -> int:
+    def remove_doc(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_change_by_one:
             self.tdb.remove_edge(e)
             cnt += 1
         return cnt
 
-    def upsert_e(self) -> int:
+    def upsert_doc(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_change_by_one:
             self.tdb.upsert_edge(e)
             cnt += 1
         return cnt
 
-    def remove_es(self) -> int:
+    def remove_docs(self) -> int:
         cnt = 0
         for es in self.tasks.edges_to_change_batched:
             self.tdb.remove_edges(es)
             cnt += len(es)
         return cnt
 
-    def upsert_es(self) -> int:
+    def upsert_docs(self) -> int:
         cnt = 0
         for es in self.tasks.edges_to_change_batched:
             self.tdb.upsert_edges(es)

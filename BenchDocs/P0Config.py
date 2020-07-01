@@ -37,10 +37,10 @@ class P0Config(object):
         self.databases = self.load_json('BenchDocs/P0ConfigDBs.json')
         self.datasets = self.load_json('BenchDocs/P0ConfigDatasets.json')
         self.test_dataset = {
-            "name": "Test",
-            "path": "Datasets/nlp-test/all.csv",
-            "docs": 8,
-            "sections": 10,
+            "name": "TextTest",
+            "path": "Datasets/TextTest/all.csv",
+            "docs": 3,
+            "sections": 3,
             "size_mb": 1,
             "enabled": True
         }

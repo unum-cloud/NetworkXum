@@ -1,7 +1,7 @@
 [
     {
         "name": "CommunitiesFB",
-        "path": "~/Datasets/UnumDB/networks/communities/edges.csv",
+        "path": "~/Datasets/UnumDB/Graphs/CommunitiesFB/edges.csv",
         "url": "http://networkrepository.com/fb-pages-company.php",
         "edges": 52310,
         "degree": 8,
@@ -10,7 +10,7 @@
     },
     {
         "name": "MovieRatings",
-        "path": "~/Datasets/UnumDB/networks/eachmovie-ratings/edges.csv",
+        "path": "~/Datasets/UnumDB/Graphs/MovieRatings/edges.csv",
         "url": "http://networkrepository.com/rec-eachmovie.php",
         "edges": 2811716,
         "degree": 90,
@@ -19,7 +19,7 @@
     },
     {
         "name": "PatentCitations",
-        "path": "~/Datasets/UnumDB/networks/patent-citations/edges.csv",
+        "path": "~/Datasets/UnumDB/Graphs/PatentCitations/edges.csv",
         "url": "http://networkrepository.com/cit-patent.php",
         "edges": 16518947,
         "degree": 8,
@@ -28,7 +28,7 @@
     },
     {
         "name": "MouseGenes",
-        "path": "~/Datasets/UnumDB/networks/mouse-gene/edges.csv",
+        "path": "~/Datasets/UnumDB/Graphs/MouseGenes/edges.csv",
         "url": "http://networkrepository.com/bio-mouse-gene.php",
         "edges": 14506199,
         "degree": 670,
@@ -37,7 +37,7 @@
     },
     {
         "name": "HumanBrain",
-        "path": "~/Datasets/UnumDB/networks/human-brain/edges.csv",
+        "path": "~/Datasets/UnumDB/Graphs/HumanBrain/edges.csv",
         "url": "http://networkrepository.com/bn-human-Jung2015-M87102575.php",
         "edges": 87273967,
         "degree": 186,
@@ -46,7 +46,7 @@
     },
     {
         "name": "Wikipedia",
-        "path": "~/Datasets/UnumDB/networks/wiki/edges.csv",
+        "path": "~/Datasets/UnumDB/Graphs/Wikipedia/edges.csv",
         "url": "http://networkrepository.com/web-wikipedia-link-en13-all.php",
         "edges": 591044737,
         "size_mb": 26000,

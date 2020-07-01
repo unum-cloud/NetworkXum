@@ -78,13 +78,13 @@ def yield_texts_from_sectioned_csv(filepath: str) -> Generator[TextFile, None, N
                 continue
             new_article_id = str(columns[0])
             if new_article_id != current.path:
-                if len(current.content):
+                if len(current.content.get('plain', '')):
                     yield current
-                current.content = str()
+                current.content['plain'] = str()
             current.path = new_article_id
-            current.content += str(columns[3])
+            current.content['plain'] += str(columns[3])
 
-    if len(current.content):
+    if len(current.content.get('plain', '')):
         yield current
 
 

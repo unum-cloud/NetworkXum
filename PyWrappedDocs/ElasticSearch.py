@@ -84,7 +84,7 @@ class ElasticSearch(BaseAPI):
             return True
         return False
 
-    def find_by_id(self, identifier: str):
+    def find_with_id(self, identifier: str):
         return self.elastic.get(index=self.db_name, id=identifier)
 
     def find_with_substring(self, query: str, field: str = 'plain'):
@@ -115,9 +115,9 @@ class ElasticSearch(BaseAPI):
 
 
 if __name__ == '__main__':
-    sample_file = 'Datasets/nlp-test/nanoformulations.txt'
+    sample_file = 'Datasets/text-test/nanoformulations.txt'
     db = ElasticSearch(url='http://localhost:9200/',
-                       db_name='nlp-test')
+                       db_name='text-test')
     db.remove_all()
     assert db.count_docs() == 0
     assert db.upsert_doc(TextFile(sample_file).to_dict())

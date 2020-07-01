@@ -37,8 +37,8 @@ class P0Config(object):
         self.databases = self.load_json('BenchGraphs/P0ConfigDBs.json')
         self.datasets = self.load_json('BenchGraphs/P0ConfigDatasets.json')
         self.test_dataset = {
-            "name": "Test",
-            "path": "Datasets/graph-test/edges.csv",
+            "name": "GraphTest",
+            "path": "Datasets/GraphTest/edges.csv",
             "nodes": 8,
             "edges": 10,
             "size_mb": 1,
