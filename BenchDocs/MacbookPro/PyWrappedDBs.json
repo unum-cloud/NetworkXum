@@ -1,0 +1,42 @@
+[
+    {
+        "database": "MongoDB",
+        "dataset": "Covid19",
+        "date": "2020/40/01-21:07:12",
+        "num_cpus": 16,
+        "mhz_per_cpu": 2300,
+        "build_type": "debug",
+        "cpu_scaling_enabled": false,
+        "device_name": "MacbookPro",
+        "date_utc": 1593657612.669001,
+        "date_readable": "Jul 01, 2020",
+        "date_sortable": "2020/40/01",
+        "benchmark_name": "Sequential Writes: Import CSV",
+        "benchmark_code": "        def import_one() -> int:\n            tdb.upsert_docs_from_csv(dataset_path)\n            return tdb.count_docs()\n",
+        "time_elapsed": 1144.8063321113586,
+        "count_iterations": 1,
+        "count_operations": 45941,
+        "msecs_per_operation": 24.919055573700152,
+        "operations_per_second": 40.12993177219008
+    },
+    {
+        "database": "ElasticSearch",
+        "dataset": "Covid19",
+        "date": "2020/15/01-22:07:14",
+        "num_cpus": 16,
+        "mhz_per_cpu": 2300,
+        "build_type": "debug",
+        "cpu_scaling_enabled": false,
+        "device_name": "MacbookPro",
+        "date_utc": 1593659714.332032,
+        "date_readable": "Jul 01, 2020",
+        "date_sortable": "2020/15/01",
+        "benchmark_name": "Sequential Writes: Import CSV",
+        "benchmark_code": "        def import_one() -> int:\n            tdb.upsert_docs_from_csv(dataset_path)\n            return tdb.count_docs()\n",
+        "time_elapsed": 2100.964653968811,
+        "count_iterations": 1,
+        "count_operations": 45941,
+        "msecs_per_operation": 45.731800656685984,
+        "operations_per_second": 21.86662203631818
+    }
+]

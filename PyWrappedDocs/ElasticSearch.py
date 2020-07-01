@@ -133,6 +133,8 @@ class ElasticSearch(BaseAPI):
                 }
             },
             # We don't need the document contents, just the IDs.
+            # It's done to minimize the communication time and reduce the load on TCP/IP stack.
+            # We are benchmarking the DBs and not networking implementatinos, after all.
             'stored_fields': [],
         })
         hits_arr = docs.get('hits', {}).get('hits', [])
@@ -151,6 +153,8 @@ class ElasticSearch(BaseAPI):
                 }
             },
             # We don't need the document contents, just the IDs.
+            # It's done to minimize the communication time and reduce the load on TCP/IP stack.
+            # We are benchmarking the DBs and not networking implementatinos, after all.
             'stored_fields': [],
         })
         hits_arr = docs.get('hits', {}).get('hits', [])
