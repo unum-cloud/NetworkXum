@@ -56,18 +56,18 @@ class P3Bench(object):
         # Queries returning single object.
         self.bench_task(
             name='Random Reads: Retreive Doc by ID',
-            func=self.retreive_doc_by_id
+            func=self.find_with_id
         )
 
         # Queries returning collections.
         self.bench_task(
             name='Random Reads: Find Docs with Substring',
-            func=self.find_docs_with_substring
+            func=self.find_with_substring
         )
-        self.bench_task(
-            name='Random Reads: Find Docs with RegEx',
-            func=self.find_docs_with_regex
-        )
+        # self.bench_task(
+        #     name='Random Reads: Find Docs with RegEx',
+        #     func=self.find_with_regex
+        # )
 
         # Reversable write operations.
         self.bench_task(
@@ -118,166 +118,75 @@ class P3Bench(object):
     # Operations
     # ---
 
-    def retreive_doc_by_id(self) -> int:
+    def find_with_id(self) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
-        for e in self.tasks.edges_to_query:
-            match = self.tdb.edge_directed(e['v1'], e['v2'])
+        for doc_id in self.tasks.doc_ids_to_query:
+            match = self.tdb.find_with_id(doc_id)
             cnt += 1
             cnt_found += 0 if (match is None) else 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
                 break
-        print(f'---- {cnt} ops: {cnt_found} undirected matches')
+        print(f'---- {cnt} ops: {cnt_found} ID matches')
         return cnt
 
-    def find_es_related(self) -> int:
+    def find_with_substring(self) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
-        for v in self.tasks.nodes_to_query:
-            es = self.tdb.edges_related(v)
+        for word in self.tasks.substrings_to_query:
+            doc_ids = self.tdb.find_with_substring(word)
             cnt += 1
-            cnt_found += len(es)
+            cnt_found += len(doc_ids)
             dt = time() - t0
             if dt > self.max_seconds_per_query:
                 break
-        print(f'---- {cnt} ops: {cnt_found} edges found')
+        print(f'---- {cnt} ops: {cnt_found} matches found')
         return cnt
 
-    def find_es_from(self) -> int:
+    def find_with_regex(self) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
-        for v in self.tasks.nodes_to_query:
-            es = self.tdb.edges_from(v)
+        for regex in self.tasks.regexs_to_query:
+            doc_ids = self.tdb.find_with_regex(regex)
             cnt += 1
-            cnt_found += len(es)
+            cnt_found += len(doc_ids)
             dt = time() - t0
             if dt > self.max_seconds_per_query:
                 break
-        print(f'---- {cnt} ops: {cnt_found} edges found')
-        return cnt
-
-    def find_docs_with_regex(self) -> int:
-        cnt = 0
-        cnt_found = 0
-        t0 = time()
-        for v in self.tasks.nodes_to_query:
-            es = self.tdb.edges_to(v)
-            cnt += 1
-            cnt_found += len(es)
-            dt = time() - t0
-            if dt > self.max_seconds_per_query:
-                break
-        print(f'---- {cnt} ops: {cnt_found} edges found')
-        return cnt
-
-    def find_vs_related(self) -> int:
-        cnt = 0
-        cnt_found = 0
-        t0 = time()
-        for v in self.tasks.nodes_to_query:
-            vs = self.tdb.nodes_related(v)
-            cnt += 1
-            cnt_found += len(vs)
-            dt = time() - t0
-            if dt > self.max_seconds_per_query:
-                break
-        print(f'---- {cnt} ops: {cnt_found} related nodes')
-        return cnt
-
-    def count_v_related(self) -> int:
-        cnt = 0
-        t0 = time()
-        for v in self.tasks.nodes_to_query:
-            self.tdb.count_related(v)
-            cnt += 1
-            dt = time() - t0
-            if dt > self.max_seconds_per_query:
-                break
-        return cnt
-
-    def count_v_followers(self) -> int:
-        cnt = 0
-        t0 = time()
-        for v in self.tasks.nodes_to_query:
-            self.tdb.count_followers(v)
-            cnt += 1
-            dt = time() - t0
-            if dt > self.max_seconds_per_query:
-                break
-        return cnt
-
-    def count_v_following(self) -> int:
-        cnt = 0
-        t0 = time()
-        for v in self.tasks.nodes_to_query:
-            self.tdb.count_following(v)
-            cnt += 1
-            dt = time() - t0
-            if dt > self.max_seconds_per_query:
-                break
-        return cnt
-
-    def find_vs_related_related(self) -> int:
-        cnt = 0
-        cnt_found = 0
-        t0 = time()
-        for v in self.tasks.nodes_to_analyze:
-            vs = self.tdb.nodes_related_to_related(v)
-            cnt += 1
-            cnt_found += len(vs)
-            dt = time() - t0
-            if dt > self.max_seconds_per_query:
-                break
-        print(f'---- {cnt} ops: {cnt_found} related to related nodes')
+        print(f'---- {cnt} ops: {cnt_found} matches found')
         return cnt
 
     def remove_doc(self) -> int:
         cnt = 0
-        for e in self.tasks.edges_to_change_by_one:
-            self.tdb.remove_edge(e)
+        for doc in self.tasks.docs_to_change_by_one:
+            self.tdb.remove_edge(doc)
             cnt += 1
         return cnt
 
     def upsert_doc(self) -> int:
         cnt = 0
-        for e in self.tasks.edges_to_change_by_one:
-            self.tdb.upsert_edge(e)
+        for doc in self.tasks.docs_to_change_by_one:
+            self.tdb.upsert_edge(doc)
             cnt += 1
         return cnt
 
     def remove_docs(self) -> int:
         cnt = 0
-        for es in self.tasks.edges_to_change_batched:
-            self.tdb.remove_edges(es)
-            cnt += len(es)
+        for docs in self.tasks.docs_to_change_batched:
+            self.tdb.remove_edges(docs)
+            cnt += len(docs)
         return cnt
 
     def upsert_docs(self) -> int:
         cnt = 0
-        for es in self.tasks.edges_to_change_batched:
-            self.tdb.upsert_edges(es)
-            cnt += len(es)
+        for docs in self.tasks.docs_to_change_batched:
+            self.tdb.upsert_edges(docs)
+            cnt += len(docs)
         return cnt
-
-    def remove_v(self) -> int:
-        cnt = 0
-        for v in self.tasks.nodes_to_change_by_one:
-            self.tdb.remove_node(v)
-            cnt += 1
-        return cnt
-
-    def remove_bulk(self) -> int:
-        c = self.tdb.count_edges()
-        self.tdb.remove_all()
-        return c - self.tdb.count_edges()
-
-    def import_bulk(self) -> int:
-        self.tdb.insert_adjacency_list(self.dataset_path)
-        return self.tdb.count_edges()
 
 
 if __name__ == "__main__":
