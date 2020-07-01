@@ -119,16 +119,18 @@ def export_edges_into_graph_parallel(filepath: str, g, thread_count=8) -> int:
     return g.count_edges() - count_edges_before
 
 
-def extract_database_name(url: str, default='graph') -> str:
-    url_parts = urlparse(url).path
-    url_parts = url_parts.split('/')
-    url_parts = [v for v in url_parts if (v != '/' and v != '')]
-    if len(url_parts) >= 1:
-        if len(url_parts) > 1:
-            print('Will avoid remaining url parts:', url_parts[2:])
-        return url_parts[0]
+def extract_database_name(url: str, default='graph') -> (str, str):
+    url = urlparse(url)
+    address = f'{url.scheme}://{url.netloc}'
+
+    path_parts = url.path.split('/')
+    path_parts = [v for v in path_parts if (v != '/' and v != '')]
+    if len(path_parts) >= 1:
+        if len(path_parts) > 1:
+            print('Will avoid remaining url parts:', path_parts[2:])
+        return address, path_parts[0].lower()
     else:
-        return default
+        return address, default
 
 
 def sample_reservoir(iterable, count_needed: int) -> list:

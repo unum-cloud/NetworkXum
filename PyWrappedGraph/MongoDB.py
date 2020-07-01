@@ -17,7 +17,7 @@ class MongoDB(BaseAPI):
 
     def __init__(self, url='mongodb://localhost:27017/graph', **kwargs):
         BaseAPI.__init__(self, **kwargs)
-        db_name = extract_database_name(url)
+        _, db_name = extract_database_name(url)
         self.db = MongoClient(url)
         self.edges = self.db[db_name]['edges']
         self.nodes = self.db[db_name]['nodes']
