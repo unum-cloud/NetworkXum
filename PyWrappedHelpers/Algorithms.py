@@ -5,8 +5,10 @@ import time
 import concurrent
 import math
 from urllib.parse import urlparse
+from random import SystemRandom
 
-from PyWrappedGraph.Edge import Edge
+from PyWrappedHelpers.Edge import Edge
+from PyWrappedHelpers.TextFile import TextFile
 
 
 def map_compact(func, os: Sequence[object]) -> Sequence[object]:
@@ -48,7 +50,7 @@ def chunks(iterable, size) -> Generator[list, None, None]:
         yield current
 
 
-def yield_edges_from(filepath: str, edge_type: type = Edge, directed=True) -> Generator[object, None, None]:
+def yield_edges_from_csv(filepath: str, edge_type: type = Edge, directed=True) -> Generator[object, None, None]:
     with open(filepath, 'r') as f:
         reader = csv.reader(f, delimiter=',')
         # Skip the header line.
@@ -64,12 +66,34 @@ def yield_edges_from(filepath: str, edge_type: type = Edge, directed=True) -> Ge
             yield edge_type(v1=v1, v2=v2, weight=w, _id=idx, directed=directed)
 
 
+def yield_texts_from_sectioned_csv(filepath: str) -> Generator[TextFile, None, None]:
+    current = TextFile()
+
+    with open(filepath, 'r') as f:
+        reader = csv.reader(f, delimiter=',')
+        # Skip the header line.
+        next(reader)
+        for idx, columns in enumerate(reader):
+            if len(columns) < 4:
+                continue
+            new_article_id = str(columns[0])
+            if new_article_id != current.path:
+                if len(current.content):
+                    yield current
+                current.content = str()
+            current.path = new_article_id
+            current.content += str(columns[3])
+
+    if len(current.content):
+        yield current
+
+
 def export_edges_into_graph(filepath: str, g) -> int:
     e_type = type(g).__edge_type__
     chunk_len = type(g).__max_batch_size__
     count_edges_added = 0
     starting_id = g.biggest_edge_id()
-    for es in chunks(yield_edges_from(filepath, e_type), chunk_len):
+    for es in chunks(yield_edges_from_csv(filepath, e_type), chunk_len):
         for i, e in enumerate(es):
             es[i]['_id'] += starting_id
         count_edges_added += g.upsert_edges(es)
@@ -82,7 +106,7 @@ def export_edges_into_graph_parallel(filepath: str, g, thread_count=8) -> int:
     chunk_len = thread_count * batch_per_thread
     count_edges_before = g.count_edges()
     with concurrent.futures.ThreadPoolExecutor(max_workers=thread_count) as executor:
-        for es in chunks(yield_edges_from(filepath, e_type), chunk_len):
+        for es in chunks(yield_edges_from_csv(filepath, e_type), chunk_len):
             x_len = int(math.ceil(len(es) / thread_count))
             es_per_thread = [es[x:x+x_len] for x in range(0, len(es), x_len)]
             print(f'-- Importing part: {x_len} rows x {thread_count} threads')
@@ -101,3 +125,28 @@ def extract_database_name(url: str, default='graph') -> str:
         return url_parts[0]
     else:
         return default
+
+
+def sample_reservoir(iterable, count_needed: int) -> list:
+    count_seen = 0
+    ret = list()
+    for e in iterable:
+        count_seen += 1
+        if len(ret) < count_needed:
+            ret.append(e)
+        else:
+            s = int(random.random() * count_seen)
+            if s < count_needed:
+                ret[s] = e
+    return ret
+
+
+def class_name(cls: type) -> str:
+    if isinstance(cls, type):
+        return cls.__name__
+    else:
+        return cls.__class__.__name__
+
+
+def flatten(iterable) -> list:
+    return reduce(lambda x, y: x+y, iterable)

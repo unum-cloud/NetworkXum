@@ -4,8 +4,8 @@ from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 import concurrent.futures
 from pathlib import Path
 
-from PyWrappedDocs.TextFile import TextFile
-from PyWrappedGraph.Algorithms import *
+from PyWrappedHelpers.TextFile import TextFile
+from PyWrappedHelpers.Algorithms import *
 
 
 class BaseAPI(object):
@@ -63,6 +63,13 @@ class BaseAPI(object):
         paths = [pth for pth in Path(directory).iterdir()]
         for paths_chunk in chunks(paths, __max_batch_size__):
             files_chunk = map(TextFile, paths_chunk)
+            cnt_success += self.upsert_docs(files_chunk)
+        return cnt_success
+
+    @abstractmethod
+    def upsert_docs_from_csv(self, filepath: str) -> int:
+        cnt_success = 0
+        for files_chunk in chunks(yield_texts_from_sectioned_csv(filepath), __max_batch_size__):
             cnt_success += self.upsert_docs(files_chunk)
         return cnt_success
 

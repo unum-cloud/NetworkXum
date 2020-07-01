@@ -12,7 +12,7 @@ from sqlalchemy import text
 from sqlalchemy import Index, Table
 
 from PyWrappedDocs.BaseAPI import BaseAPI
-from PyWrappedGraph.Algorithms import *
+from PyWrappedHelpers.Algorithms import *
 
 DeclarativeDocsSQL = declarative_base()
 

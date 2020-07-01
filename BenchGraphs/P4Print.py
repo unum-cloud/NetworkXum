@@ -7,6 +7,7 @@ from pystats2md.stats_subset import StatsSubset
 from pystats2md.report import Report
 
 from P0Config import P0Config
+from PyWrappedHelpers.Config import unumdb_purpose
 
 
 class P4Print():
@@ -24,29 +25,17 @@ class P4Print():
             ins.append(StatsFile(filename=stats_path))
 
         out = Report()
-        dbs = ['PostgreSQL', 'MySQL', 'SQLite', 'MongoDB',
-               'UnumDB.Graph']  # ins.subset().unique('database')
-        dataset_names = ['PatentCitations', 'MouseGenes',
-                         'HumanBrain']  # ins.subset().unique('dataset')
+        dbs = [
+            'PostgreSQL', 'MySQL', 'SQLite', 'MongoDB', 'UnumDB.Graph',
+        ]  # ins.subset().unique('database')
+        dataset_names = [
+            'PatentCitations', 'MouseGenes', 'HumanBrain',
+        ]  # ins.subset().unique('dataset')
         dataset_for_comparison = 'HumanBrain'
 
         # Intro.
         out.add('# How well can different DBs handle graphs (networks)?')
-        out.add('''
-        At [Unum](https://unum.xyz) we develop a neuro-symbolic AI, which means combining discrete structural representations of data and semi-continuous neural representations.
-        The common misconception is that CPU/GPU power is the bottleneck for designing AGI, but we would argue that it's the storage layer.
-
-        * CPU ⇌ RAM bandwidth: ~100 GB/s.
-        * GPU ⇌ VRAM bandwidth: ~1,000 GB/s.
-        * CPU ⇌ GPU bandwidth: ~15 GB/s.
-        * GPU ⇌ GPU bandwidth: ~300 GB/s.
-        * CPU ⇌ SSD bandwidth: ~2 GB/s.
-
-        As we can see, the theoretical throughput between storage (SSD) and CPU is by far the biggest bottleneck.
-        2 GB/s doesn't sound very scary, but the problem is that **most databases can hardly saturate 10% of that capacity (or 200 MB/s)!**
-        When it comes to random (opposed to sequential) read operations the performance drops further to <1% of channel capacity.
-        That's why it's crucial for us to store the data in the most capable database!
-        ''')
+        out.add(unumdb_purpose)
 
         out.add('## Setup')
         out.add('### Databases')

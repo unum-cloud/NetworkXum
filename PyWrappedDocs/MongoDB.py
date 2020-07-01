@@ -5,8 +5,8 @@ from pymongo import MongoClient
 from pymongo import UpdateOne, DeleteOne
 
 from PyWrappedDocs.BaseAPI import BaseAPI
-from PyWrappedGraph.Algorithms import *
-from PyWrappedDocs.TextFile import TextFile
+from PyWrappedHelpers.Algorithms import *
+from PyWrappedHelpers.TextFile import TextFile
 
 
 class MongoDB(BaseAPI):

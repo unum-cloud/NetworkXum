@@ -1,0 +1,20 @@
+[
+    {
+        "name": "COVID-19 Papers",
+        "path": "~/Datasets/UnumDB/texts/covid-19/all.csv",
+        "url": "",
+        "docs": 45941,
+        "sections": 1604649,
+        "size_mb": 5700,
+        "enabled": true
+    },
+    {
+        "name": "English Wikipedia",
+        "path": "~/Datasets/UnumDB/texts/enwiki-20170820/all.csv",
+        "url": "https://www.kaggle.com/jkkphys/english-wikipedia-articles-20170820-sqlite",
+        "docs": 4902648,
+        "sections": 23046187,
+        "size_mb": 18200,
+        "enabled": false
+    }
+]

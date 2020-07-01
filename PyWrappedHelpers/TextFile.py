@@ -7,9 +7,9 @@ class TextFile(object):
 
     def __init__(self, path: str = ''):
         object.__init__(self)
-        self.reset(path)
+        self.pull_from_path(path)
 
-    def reset(self, path: str):
+    def pull_from_path(self, path: str):
         self.path = path
         self.content = dict()
 

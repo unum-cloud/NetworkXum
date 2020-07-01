@@ -6,9 +6,9 @@ from urllib.parse import urlparse
 from neo4j import GraphDatabase
 from neo4j import BoltStatementResult
 
-from PyWrappedGraph.Edge import Edge
+from PyWrappedHelpers.Edge import Edge
 from PyWrappedGraph.BaseAPI import BaseAPI
-from PyWrappedGraph.Algorithms import *
+from PyWrappedHelpers.Algorithms import *
 
 
 class Neo4J(BaseAPI):
@@ -456,7 +456,7 @@ class Neo4J(BaseAPI):
     def insert_adjacency_list(self, filepath: str) -> int:
         chunk_len = Neo4J.__max_batch_size__
         count_edges_added = 0
-        for es in chunks(yield_edges_from(filepath), chunk_len):
+        for es in chunks(yield_edges_from_csv(filepath), chunk_len):
             count_edges_added += self.insert_edges(es)
         return count_edges_added
 

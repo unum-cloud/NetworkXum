@@ -1,0 +1,26 @@
+[
+    {
+        "module_name": "PyUnumDB.TextDB",
+        "class_name": "TextDB",
+        "name": "UnumDB.Text",
+        "url_variable_name": "URI_UNUMDB_TEXT",
+        "url_default": "~/DBs/unumdb.Text/${DATASET_NAME}",
+        "enabled": false
+    },
+    {
+        "module_name": "PyWrappedGraph.MongoDB",
+        "class_name": "MongoDB",
+        "name": "MongoDB",
+        "url_variable_name": "URI_MONGODB",
+        "url_default": "mongodb://0.0.0.0:27017/${DATASET_NAME}",
+        "enabled": true
+    },
+    {
+        "module_name": "PyWrappedGraph.ElasticSearch",
+        "class_name": "ElasticSearch",
+        "name": "ElasticSearch",
+        "url_variable_name": "URI_ELASTIC_SEARCH",
+        "url_default": "http://localhost:9200/${DATASET_NAME}",
+        "enabled": true
+    }
+]
