@@ -76,7 +76,7 @@ class Neo4J(BaseAPI):
 
         # Resolve the name (for CAUTION 2):
         name = str()
-        for c in extract_database_name(url):
+        for _, c in extract_database_name(url):
             if (c in "qwertyuiopasdfghjklzxcvbnm") or\
                 (c in "QWERTYUIOPAFGHJKLZXCVBNM") or\
                     (c in "1234567890"):

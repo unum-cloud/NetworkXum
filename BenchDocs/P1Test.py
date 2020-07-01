@@ -66,7 +66,7 @@ class P1Test(object):
 
     def validate_contents(self, t):
         for d in self.docs:
-            assert t.find_with_id(d)['plain'] == d['plain'], \
+            assert t.find_with_id(d['_id'])['plain'] == d['plain'], \
                 f'No document: {d}'
 
         assert t.count_docs() == 3, \

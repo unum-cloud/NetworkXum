@@ -15,7 +15,7 @@ class MongoDB(BaseAPI):
 
     def __init__(self, url='mongodb://localhost:27017/texts', **kwargs):
         BaseAPI.__init__(self, **kwargs)
-        db_name = extract_database_name(url)
+        _, db_name = extract_database_name(url)
         self.db = MongoClient(url)
         self.docs_collection = self.db[db_name]['docs']
         self.create_indexes()
