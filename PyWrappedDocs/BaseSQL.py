@@ -124,7 +124,7 @@ class BaseSQL(BaseAPI):
     def find_with_regex(self, field: str, query: str) -> Sequence[object]:
         pass
 
-    def find_by_id(self, identifier: str) -> object:
+    def find_with_id(self, identifier: str) -> object:
         pass
 
     # endregion

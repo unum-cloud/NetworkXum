@@ -8,7 +8,7 @@
         "enabled": false
     },
     {
-        "module_name": "PyWrappedGraph.MongoDB",
+        "module_name": "PyWrappedDocs.MongoDB",
         "class_name": "MongoDB",
         "name": "MongoDB",
         "url_variable_name": "URI_MONGODB",
@@ -16,7 +16,7 @@
         "enabled": true
     },
     {
-        "module_name": "PyWrappedGraph.ElasticSearch",
+        "module_name": "PyWrappedDocs.ElasticSearch",
         "class_name": "ElasticSearch",
         "name": "ElasticSearch",
         "url_variable_name": "URI_ELASTIC_SEARCH",

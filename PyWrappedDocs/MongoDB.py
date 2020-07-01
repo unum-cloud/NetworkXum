@@ -12,55 +12,82 @@ from PyWrappedHelpers.TextFile import TextFile
 class MongoDB(BaseAPI):
     __max_batch_size__ = 1000
     __is_concurrent__ = True
-    __edge_type__ = dict
 
     def __init__(self, url='mongodb://localhost:27017/texts', **kwargs):
         BaseAPI.__init__(self, **kwargs)
         db_name = extract_database_name(url)
         self.db = MongoClient(url)
         self.docs_collection = self.db[db_name]['docs']
+        self.create_indexes()
+
+    def create_indexes(self):
         for field in self.indexed_fields:
             self.create_index(field)
+        # As MongoDB can't search in a specific index,
+        # we can create a generic index for all fields.
+        # self.create_index_for_all_strings()
 
     def create_index(self, field: str, background=False):
         self.docs_collection.create_index(
-            [(field, pymongo.TEXT)], background=background, sparse=True)
+            [(field, pymongo.TEXT)],
+            background=background,
+        )
 
     def create_index_for_all_strings(self, background=False):
+        # https://docs.mongodb.com/manual/core/index-text/#wildcard-text-indexes
         self.docs_collection.create_index(
-            {'$**': 'text'}, background=background, sparse=True)
+            {'$**': 'text'},
+            background=background,
+        )
 
     def count_docs(self) -> int:
         return self.docs_collection.count_documents(filter={})
 
     def remove_all(self):
         self.docs_collection.drop()
+        self.create_indexes()
 
-    def find_with_substring(self, query: str, field: str = 'plain') -> Sequence[object]:
+    def find_with_id(self, query: str) -> object:
+        return self.docs_collection.find_one(filter={
+            '_id': query if isinstance(query, (str, int)) else query['_id'],
+        })
+
+    def find_with_substring(self, query: str, field: str = 'plain') -> Sequence[str]:
+        """
+            CAUTION: Seems like MongoDB doesn't support text search limited 
+            to a specific field, so it's inapplicable to more complex cases.
+        """
         # https://docs.mongodb.com/manual/reference/operator/query/text/
         # https://docs.mongodb.com/manual/core/index-text/
         # https://docs.mongodb.com/manual/reference/text-search-languages/#text-search-languages
-        return self.docs_collection.find(filter={
-            field: {
-                '$text': {
-                    '$search': query,
-                    '$language': 'en',
-                    '$caseSensitive': True,
-                    '$diacriticSensitive': False,
-                }
+        dicts = self.docs_collection.find(filter={
+            '$text': {
+                '$search': f'\"{query}\"',
+                '$caseSensitive': True,
+                '$diacriticSensitive': False,
             },
-        })
+        }, projection=['_id'])
+        return [d['_id'] for d in dicts]
 
-    def find_with_regex(self, query: str, field: str = 'plain') -> Sequence[object]:
+    def find_with_regex(self, query: str, field: str = 'plain') -> Sequence[str]:
         # https://docs.mongodb.com/manual/reference/operator/query/regex/
-        return self.docs_collection.find(filter={
+        dicts = self.docs_collection.find(filter={
             field: {
                 '$regex': query,
                 '$options': 'm',
             },
-        })
+        }, projection=['_id'])
+        return [d['_id'] for d in dicts]
+
+    def validate_doc(self, doc: object) -> dict:
+        if isinstance(doc, dict):
+            return doc
+        if isinstance(doc, TextFile):
+            return doc.to_dict()
+        return doc.__dict__
 
     def upsert_doc(self, doc: object) -> bool:
+        doc = self.validate_doc(doc)
         result = self.docs_collection.update_one(
             filter={'_id': doc['_id'], },
             update={'$set': doc, },
@@ -69,6 +96,7 @@ class MongoDB(BaseAPI):
         return (result.modified_count >= 1) or (result.upserted_id is not None)
 
     def remove_doc(self, doc: object) -> bool:
+        doc = self.validate_doc(doc)
         result = self.docs_collection.delete_one(filter={'_id': doc['_id'], })
         return result.deleted_count >= 1
 
@@ -83,6 +111,8 @@ class MongoDB(BaseAPI):
                 update={'$set': doc, },
                 upsert=True,
             )
+
+        docs = map(self.validate_doc, docs)
         ops = list(map(make_upsert, docs))
         try:
             result = self.docs_collection.bulk_write(
@@ -102,6 +132,8 @@ class MongoDB(BaseAPI):
             return DeleteOne(
                 filter={'_id': doc['_id'], },
             )
+
+        docs = map(self.validate_doc, docs)
         ops = list(map(make_upsert, docs))
         try:
             result = self.docs_collection.bulk_write(
@@ -114,8 +146,8 @@ class MongoDB(BaseAPI):
 
 
 if __name__ == '__main__':
-    sample_file = 'Datasets/nlp-test/nanoformulations.txt'
-    db = MongoDB(url='mongodb://localhost:27017/nlp-test')
+    sample_file = 'Datasets/TextTest/nanoformulations.txt'
+    db = MongoDB(url='mongodb://localhost:27017/SingleTextTest')
     db.remove_all()
     assert db.count_docs() == 0
     assert db.upsert_doc(TextFile(sample_file).to_dict())

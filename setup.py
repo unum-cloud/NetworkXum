@@ -19,7 +19,7 @@ setup(
     Document collections are backed by SQLite, MySQL, PostgreSQL, MongoDB and Lucene.
     ''',
     long_description=long_description,
-    packages=['PyWrappedGraph', 'PyWrappedDocs'],
+    packages=['PyWrappedGraph', 'PyWrappedDocs', 'PyWrappedHelpers'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

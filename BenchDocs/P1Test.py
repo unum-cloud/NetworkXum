@@ -1,4 +1,4 @@
-from PyWrappedGraph.BaseAPI import BaseAPI
+from PyWrappedDocs.BaseAPI import BaseAPI
 from PyWrappedHelpers.TextFile import TextFile
 from PyWrappedHelpers.Algorithms import export_edges_into_graph_parallel, class_name
 
@@ -15,77 +15,66 @@ class P1Test(object):
     def __init__(self):
         self.conf = P0Config.shared()
         self.docs = [
-            TextFile('1', 'the big brown fox').__dict__,
-            TextFile('2', 'as.the.day;passes').__dict__,
-            TextFile('3', 'along the:way').__dict__,
+            TextFile('1', 'the big brown fox').to_dict(),
+            TextFile('2', 'as.the.day;passes').to_dict(),
+            TextFile('3', 'along the:way').to_dict(),
         ]
 
     def run(self):
         for db in self.conf.databases:
-            g = self.conf.make_db(
-                database=db, dataset=self.conf.test_dataset)
-            if g is None:
-                continue
-            self.run_one(g)
+            t = self.conf.make_db(
+                database=db,
+                dataset=self.conf.test_dataset,
+            )
+            self.run_one(t)
 
-    def run_one(self, g):
-        print(f'-- Starting testing of: {class_name(g)}')
+    def run_one(self, t):
+        if t is None:
+            return
+
+        print(f'-- Starting testing of: {class_name(t)}')
 
         print(f'--- Cleaning')
-        g.remove_all()
-        self.validate_empty(g)
+        t.remove_all()
+        self.validate_empty(t)
 
         print(f'--- Single Operations')
-        for e in self.edges:
-            g.upsert_edge(e)
-        self.validate_contents(g)
-        for e in self.edges:
-            g.remove_edge(e)
-        self.validate_empty(g)
+        for doc in self.docs:
+            t.upsert_doc(doc)
+        self.validate_contents(t)
+        for doc in self.docs:
+            t.remove_doc(doc)
+        self.validate_empty(t)
 
         print(f'--- Batch Operations')
-        g.upsert_edges(self.edges)
-        self.validate_contents(g)
-        g.remove_edges(self.edges)
-        self.validate_empty(g)
+        t.upsert_docs(self.docs)
+        self.validate_contents(t)
+        t.remove_docs(self.docs)
+        self.validate_empty(t)
 
-        # print(f'--- Bulk Insert')
-        # g.insert_adjacency_list(self.conf.test_dataset['path'])
-        # self.validate_contents(g)
-        # g.remove_all()
-        # self.validate_empty(g)
+        print(f'--- Bulk Insert')
+        t.upsert_docs_from_csv(self.conf.test_dataset['path'])
+        self.validate_contents(t)
+        t.remove_all()
+        self.validate_empty(t)
 
         print(f'--- Passed All!')
 
-    def validate_empty(self, g):
-        assert g.count_docs() == 0, \
-            f'count_docs() must be =0: {g.count_docs()}'
+    def validate_empty(self, t):
+        assert t.count_docs() == 0, \
+            f'count_docs() must be =0: {t.count_docs()}'
 
-    def validate_contents(self, g):
-        for e in self.edges:
-            assert g.edge_directed(e['v1'], e['v2']), \
-                f'No directed edge: {e}'
-            assert g.edge_undirected(e['v1'], e['v2']), \
-                f'No undirected edge: {e}'
+    def validate_contents(self, t):
+        for d in self.docs:
+            assert t.find_with_id(d)['plain'] == d['plain'], \
+                f'No document: {d}'
 
-        assert g.count_docs() == 10, \
-            f'count_docs: {g.count_docs()}'
-        assert g.count_nodes() == 8, \
-            f'count_nodes: {g.count_nodes()}'
-        assert g.count_followers(1) == (3, 10.0), \
-            f'count_followers: {g.count_followers(1)}'
-        assert g.count_following(1) == (1, 4.0), \
-            f'count_following: {g.count_following(1)}'
-        assert g.count_related(1) == (4, 14.0), \
-            f'count_related: {g.count_related(1)}'
-        assert set(g.nodes_related(1)) == {2, 4, 6, 7}, \
-            f'nodes_related: {g.nodes_related(1)}'
-        assert set(g.nodes_related_to_related(8)) == {1}, \
-            f'nodes_related_to_related: {g.nodes_related_to_related(8)}'
-        assert g.count_followers(5) == (1, 3.0), \
-            f'count_followers: {g.count_followers(5)}'
-        assert g.count_following(5) == (1, 2.0), \
-            f'count_following: {g.count_following(5)}'
+        assert t.count_docs() == 3, \
+            f'count_docs: {t.count_docs()}'
+        assert set(t.find_with_substring('big')) == {'1'}, \
+            f'find_with_substring: {t.find_with_substring("big")}'
+        assert set(t.find_with_regex('big')) == {'1'}, \
+            f'find_with_regex: {t.find_with_regex("big")}'
 
 
 if __name__ == "__main__":
