@@ -67,7 +67,8 @@ def yield_edges_from_csv(filepath: str, edge_type: type = Edge, directed=True) -
 
 
 def yield_texts_from_sectioned_csv(filepath: str) -> Generator[TextFile, None, None]:
-    current = TextFile()
+    last_text = str()
+    last_path = str()
 
     with open(filepath, 'r') as f:
         reader = csv.reader(f, delimiter=',')
@@ -77,15 +78,18 @@ def yield_texts_from_sectioned_csv(filepath: str) -> Generator[TextFile, None, N
             if len(columns) < 4:
                 continue
             new_article_id = str(columns[0])
-            if new_article_id != current.path:
-                if len(current.content.get('plain', '')):
-                    yield current
-                current.content['plain'] = str()
-            current.path = new_article_id
-            current.content['plain'] += str(columns[3])
+            new_text = str(columns[3])
 
-    if len(current.content.get('plain', '')):
-        yield current
+            if new_article_id != last_path:
+                if len(last_text) > 0:
+                    yield TextFile(last_path, last_text)
+                last_path = new_article_id
+                last_text = new_text
+            else:
+                last_text += new_text
+
+    if len(last_text) > 0:
+        yield TextFile(last_path, last_text)
 
 
 def export_edges_into_graph(filepath: str, g) -> int:

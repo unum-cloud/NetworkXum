@@ -7,35 +7,33 @@ class TextFile(object):
 
     def __init__(self, path: str = '', content: str = ''):
         object.__init__(self)
-        self.content = {}
-        if isinstance(content, str) and len(content):
-            self.path = path
-            self.content['plain'] = content
-        else:
-            self.pull_from_path(path)
+        self.reset(path, content)
 
-    def pull_from_path(self, path: str):
+    def reset(self, path: str, content: str):
         self.path = path
-        self.content = dict()
+        self.content_dict = dict()
 
-        if len(path):
-            filename_w_ext = os.path.basename(path)
-            self.content['_id'] = filename_w_ext
-            if path.endswith('.txt'):
+        if len(content) == 0:
+            if len(path) > 0:
                 with open(path, 'r') as plain_file:
-                    self.content['plain'] = plain_file.read()
-            elif path.endswith('.json'):
-                with open(path, 'r') as plain_file:
-                    self.content = json.load(plain_file)
+                    if path.endswith('.json'):
+                        self.content_dict = json.load(plain_file)
+                    else:
+                        self.content_dict = {'plain': plain_file.read()}
             else:
-                self.content['plain'] = ''
+                self.content_dict = {'plain': ''}
         else:
-            self.content['plain'] = ''
+            self.content_dict = {'plain': content}
 
+        if '_id' not in self.content_dict:
+            self.content_dict['_id'] = os.path.basename(path)
         return self
 
+    def is_empty(self) -> bool:
+        return len(self.content_dict.get('plain', '')) == 0
+
     def to_dict(self) -> dict:
-        d = copy.deepcopy(self.content)
+        d = copy.deepcopy(self.content_dict)
         if '_id' not in d:
             d['_id'] = self.path
         return d
