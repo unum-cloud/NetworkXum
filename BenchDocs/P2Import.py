@@ -41,7 +41,7 @@ class P2Import(object):
         print(f'--- file size:', bytes2str(file_size))
 
         def import_one() -> int:
-            tdb.upsert_docs_from_csv(dataset_path)
+            tdb.import_docs_from_csv(dataset_path)
             return tdb.count_docs()
 
         counter = MicroBench(

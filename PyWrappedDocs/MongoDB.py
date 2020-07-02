@@ -10,7 +10,15 @@ from PyWrappedHelpers.TextFile import TextFile
 
 
 class MongoDB(BaseAPI):
-    __max_batch_size__ = 1000
+    """
+        MongoDB until v2.6 had 1'000 element limit for the batch size.
+        It was later pushed to 100'000, but there isn't much improvement 
+        beyond this point and not every document is small enough to fit 
+        in RAM with such batch sizes.
+        https://stackoverflow.com/q/51250036/2766161
+        https://docs.mongodb.com/manual/reference/limits/#Write-Command-Batch-Limit-Size
+    """
+    __max_batch_size__ = 10000
     __is_concurrent__ = True
 
     def __init__(self, url='mongodb://localhost:27017/texts', **kwargs):
@@ -95,10 +103,12 @@ class MongoDB(BaseAPI):
         return [d['_id'] for d in dicts]
 
     def validate_doc(self, doc: object) -> dict:
-        if isinstance(doc, dict):
-            return doc
+        if isinstance(doc, (str, int)):
+            return {'_id': doc}
         if isinstance(doc, TextFile):
             return doc.to_dict()
+        if isinstance(doc, dict):
+            return doc
         return doc.__dict__
 
     def upsert_doc(self, doc: object) -> bool:
@@ -158,6 +168,18 @@ class MongoDB(BaseAPI):
             print(bwe)
             print(bwe.details['writeErrors'])
             return 0
+
+    def import_docs_from_csv(self, filepath: str) -> int:
+        # https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_many
+        def produce_validated():
+            for doc in yield_texts_from_sectioned_csv(filepath):
+                yield self.validate_doc(doc)
+
+        result = self.docs_collection.insert_many(
+            documents=produce_validated(),
+            ordered=False,
+        )
+        return len(result.inserted_ids)
 
 
 if __name__ == '__main__':

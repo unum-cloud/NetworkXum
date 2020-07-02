@@ -1,6 +1,7 @@
 import copy
 
 from elasticsearch import Elasticsearch
+from elasticsearch.helpers import streaming_bulk
 
 from PyWrappedDocs.BaseAPI import BaseAPI
 from PyWrappedHelpers.Algorithms import *
@@ -63,11 +64,13 @@ class ElasticSearch(BaseAPI):
         return self.elastic.count(index=self.db_name).pop('count', 0)
 
     def validate_doc(self, doc: object) -> dict:
-        if isinstance(doc, dict):
-            return copy.deepcopy(doc)
+        if isinstance(doc, (str, int)):
+            return {'_id': doc}
         if isinstance(doc, TextFile):
             return doc.to_dict()
-        return doc.__dict__
+        if isinstance(doc, dict):
+            return copy.deepcopy(doc)
+        return copy.deepcopy(doc.__dict__)
 
     def upsert_doc(self, doc, sync=True) -> bool:
         # https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
@@ -151,7 +154,7 @@ class ElasticSearch(BaseAPI):
         if max_matches is not None:
             query_dict['from'] = 0
             query_dict['size'] = max_matches
-        docs = self.elastic.search(index=self.db_name, body=max_matches)
+        docs = self.elastic.search(index=self.db_name, body=query_dict)
         hits_arr = docs.get('hits', {}).get('hits', [])
         return [h['_id'] for h in hits_arr]
 
@@ -185,6 +188,21 @@ class ElasticSearch(BaseAPI):
         docs = self.elastic.search(index=self.db_name, body=query_dict)
         hits_arr = docs.get('hits', {}).get('hits', [])
         return [h['_id'] for h in hits_arr]
+
+    def import_docs_from_csv(self, filepath: str) -> int:
+        # https://elasticsearch-py.readthedocs.io/en/master/helpers.html
+        def produce_validated():
+            for doc in yield_texts_from_sectioned_csv(filepath):
+                yield self.validate_doc(doc)
+
+        cnt_success = 0
+        for ok, action in streaming_bulk(
+            client=self.elastic,
+            index=self.db_name,
+            actions=produce_validated(),
+        ):
+            cnt_success += ok
+        return cnt_success
 
 
 if __name__ == '__main__':

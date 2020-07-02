@@ -11,7 +11,15 @@ from PyWrappedHelpers.Algorithms import *
 
 
 class MongoDB(BaseAPI):
-    __max_batch_size__ = 1000
+    """
+        MongoDB until v2.6 had 1'000 element limit for the batch size.
+        It was later pushed to 100'000, but there isn't much improvement 
+        beyond this point and not every document is small enough to fit 
+        in RAM with such batch sizes.
+        https://stackoverflow.com/q/51250036/2766161
+        https://docs.mongodb.com/manual/reference/limits/#Write-Command-Batch-Limit-Size
+    """
+    __max_batch_size__ = 10000
     __is_concurrent__ = True
     __edge_type__ = dict
 

@@ -1,6 +1,6 @@
 from PyWrappedDocs.BaseAPI import BaseAPI
 from PyWrappedHelpers.TextFile import TextFile
-from PyWrappedHelpers.Algorithms import export_edges_into_graph_parallel, class_name
+from PyWrappedHelpers.Algorithms import *
 
 from P0Config import P0Config
 
@@ -40,10 +40,10 @@ class P1Test(object):
 
         print(f'--- Single Operations')
         for doc in self.docs:
-            t.upsert_doc(doc)
+            assert t.upsert_doc(doc)
         self.validate_contents(t)
         for doc in self.docs:
-            t.remove_doc(doc)
+            assert t.remove_doc(doc['_id'])
         self.validate_empty(t)
 
         print(f'--- Batch Operations')
@@ -53,7 +53,7 @@ class P1Test(object):
         self.validate_empty(t)
 
         print(f'--- Bulk Insert')
-        t.upsert_docs_from_csv(self.conf.test_dataset['path'])
+        t.import_docs_from_csv(self.conf.test_dataset['path'])
         self.validate_contents(t)
         t.remove_all()
         self.validate_empty(t)
