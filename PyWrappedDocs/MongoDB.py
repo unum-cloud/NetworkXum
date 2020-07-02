@@ -52,7 +52,12 @@ class MongoDB(BaseAPI):
             '_id': query if isinstance(query, (str, int)) else query['_id'],
         })
 
-    def find_with_substring(self, query: str, field: str = 'plain') -> Sequence[str]:
+    def find_with_substring(
+        self,
+        query: str,
+        field: str = 'plain',
+        max_matches: int = None,
+    ) -> Sequence[str]:
         """
             CAUTION: Seems like MongoDB doesn't support text search limited 
             to a specific field, so it's inapplicable to more complex cases.
@@ -67,9 +72,17 @@ class MongoDB(BaseAPI):
                 '$diacriticSensitive': False,
             },
         }, projection=['_id'])
+        if max_matches is not None:
+            dicts = dicts.limit(max_matches)
         return [d['_id'] for d in dicts]
 
-    def find_with_regex(self, query: str, field: str = 'plain') -> Sequence[str]:
+    def find_with_regex(
+        self,
+        query: str,
+        field: str = 'plain',
+        max_matches: int = None,
+    ) -> Sequence[str]:
+
         # https://docs.mongodb.com/manual/reference/operator/query/regex/
         dicts = self.docs_collection.find(filter={
             field: {
@@ -77,6 +90,8 @@ class MongoDB(BaseAPI):
                 '$options': 'm',
             },
         }, projection=['_id'])
+        if max_matches is not None:
+            dicts = dicts.limit(max_matches)
         return [d['_id'] for d in dicts]
 
     def validate_doc(self, doc: object) -> dict:

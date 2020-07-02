@@ -1,10 +1,11 @@
 from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence, Generator
-from itertools import groupby, count, filterfalse
+from itertools import groupby, count, filterfalse, chain
 import csv
 import time
 import concurrent
 import math
 from urllib.parse import urlparse
+import random
 from random import SystemRandom
 
 from PyWrappedHelpers.Edge import Edge
@@ -155,4 +156,4 @@ def class_name(cls: type) -> str:
 
 
 def flatten(iterable) -> list:
-    return reduce(lambda x, y: x+y, iterable)
+    return list(chain(*iterable))

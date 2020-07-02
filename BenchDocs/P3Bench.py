@@ -19,12 +19,12 @@ class P3Bench(object):
         5. Clearing all the data (if needed).
     """
 
-    def __init__(self, max_seconds_per_query=60):
+    def __init__(self, max_seconds_per_query=30):
         self.conf = P0Config.shared()
         self.max_seconds_per_query = max_seconds_per_query
         self.tasks = P3TasksSampler()
 
-    def run(self, repeat_existing=True):
+    def run(self, repeat_existing=False):
         self.repeat_existing = repeat_existing
         for dataset in self.conf.datasets:
             dataset_path = self.conf.normalize_path(dataset['path'])
@@ -44,25 +44,33 @@ class P3Bench(object):
             return
         print('- Benchmarking: {} @ {}'.format(
             self.dataset['name'],
-            self.db['name']
+            self.database['name']
         ))
 
         self.doc_ids_to_query = []
-        self.substrings_to_query = []
-        self.regexs_to_query = []
+        self.words_to_search = []
+        self.regexs_to_search = []
         self.docs_to_change_by_one = []
         self.docs_to_change_batched = [[]]
 
         # Queries returning single object.
         self.bench_task(
-            name='Random Reads: Retreive Doc by ID',
+            name='Random Reads: Lookup Doc by ID',
             func=self.find_with_id
         )
 
         # Queries returning collections.
         self.bench_task(
-            name='Random Reads: Find Docs with Substring',
-            func=self.find_with_substring
+            name='Random Reads: Find All Docs with Substring',
+            func=lambda: self.find_with_substring(None)
+        )
+        self.bench_task(
+            name='Random Reads: Find 20 Docs with Substring',
+            func=lambda: self.find_with_substring(20)
+        )
+        self.bench_task(
+            name='Random Reads: Find All Docs with Bigram',
+            func=lambda: self.find_with_phrase(None)
         )
         # self.bench_task(
         #     name='Random Reads: Find Docs with RegEx',
@@ -89,10 +97,10 @@ class P3Bench(object):
 
     def bench_task(self, name, func):
         dataset_name = self.dataset['name']
-        db_name = self.db['name']
+        db_name = self.database['name']
         print(f'--- {db_name}: {name} @ {dataset_name}')
         counter = MicroBench(
-            name=name,
+            benchmark_name=name,
             func=func,
             database=db_name,
             dataset=dataset_name,
@@ -132,12 +140,12 @@ class P3Bench(object):
         print(f'---- {cnt} ops: {cnt_found} ID matches')
         return cnt
 
-    def find_with_substring(self) -> int:
+    def find_with_substring(self, max_matches: int = None) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
-        for word in self.tasks.substrings_to_query:
-            doc_ids = self.tdb.find_with_substring(word)
+        for word in self.tasks.words_to_search:
+            doc_ids = self.tdb.find_with_substring(word, max_matches)
             cnt += 1
             cnt_found += len(doc_ids)
             dt = time() - t0
@@ -146,12 +154,26 @@ class P3Bench(object):
         print(f'---- {cnt} ops: {cnt_found} matches found')
         return cnt
 
-    def find_with_regex(self) -> int:
+    def find_with_phrase(self, max_matches: int = None) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
-        for regex in self.tasks.regexs_to_query:
-            doc_ids = self.tdb.find_with_regex(regex)
+        for word in self.tasks.phrases_to_search:
+            doc_ids = self.tdb.find_with_substring(word, max_matches)
+            cnt += 1
+            cnt_found += len(doc_ids)
+            dt = time() - t0
+            if dt > self.max_seconds_per_query:
+                break
+        print(f'---- {cnt} ops: {cnt_found} matches found')
+        return cnt
+
+    def find_with_regex(self, max_matches: int = None) -> int:
+        cnt = 0
+        cnt_found = 0
+        t0 = time()
+        for regex in self.tasks.regexs_to_search:
+            doc_ids = self.tdb.find_with_regex(regex, max_matches)
             cnt += 1
             cnt_found += len(doc_ids)
             dt = time() - t0
@@ -163,34 +185,35 @@ class P3Bench(object):
     def remove_doc(self) -> int:
         cnt = 0
         for doc in self.tasks.docs_to_change_by_one:
-            self.tdb.remove_edge(doc)
+            self.tdb.remove_doc(doc)
             cnt += 1
         return cnt
 
     def upsert_doc(self) -> int:
         cnt = 0
         for doc in self.tasks.docs_to_change_by_one:
-            self.tdb.upsert_edge(doc)
+            self.tdb.upsert_doc(doc)
             cnt += 1
         return cnt
 
     def remove_docs(self) -> int:
         cnt = 0
         for docs in self.tasks.docs_to_change_batched:
-            self.tdb.remove_edges(docs)
+            self.tdb.remove_docs(docs)
             cnt += len(docs)
         return cnt
 
     def upsert_docs(self) -> int:
         cnt = 0
         for docs in self.tasks.docs_to_change_batched:
-            self.tdb.upsert_edges(docs)
+            self.tdb.upsert_docs(docs)
             cnt += len(docs)
         return cnt
 
 
 if __name__ == "__main__":
+    c = P0Config(device_name='MacbookPro')
     try:
         P3Bench().run()
     finally:
-        P0Config.shared().default_stats_file.dump_to_file()
+        c.default_stats_file.dump_to_file()

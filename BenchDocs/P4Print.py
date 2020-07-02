@@ -26,16 +26,18 @@ class P4Print():
 
         out = Report()
         dbs = [
-            'MongoDB', 'ElasticSearch', 'UnumDB.Graph'
+            'MongoDB', 'ElasticSearch',
+            # 'UnumDB.Text',
         ]  # ins.subset().unique('database')
         dataset_names = [
-            'COVID-19', 'EnglishWiki',
+            'Covid19',
+            # 'EnglishWiki',
         ]  # ins.subset().unique('dataset')
-        dataset_for_comparison = 'HumanBrain'
+        dataset_for_comparison = 'Covid19'
 
         # Intro.
         out.add('# How well can different DBs handle texts?')
-        out.add()
+        # out.add()
 
         out.add('## Setup')
         out.add('### Databases')
@@ -68,18 +70,18 @@ class P4Print():
         out.add(ins.filtered(
             device_name=device_name,
             benchmark_name='Sequential Writes: Import CSV',
-        ).to_table(
+        ).table(
             row_name_property='database',
             col_name_property='dataset',
             cell_content_property='operations_per_second',
             row_names=dbs,
             col_names=dataset_names,
-        ).add_gains())
+        ))
 
         out.add(ins.filtered(
             device_name=device_name,
             benchmark_name='Sequential Writes: Import CSV',
-        ).to_table(
+        ).table(
             row_name_property='database',
             col_name_property='dataset',
             cell_content_property='time_elapsed',
@@ -101,13 +103,25 @@ class P4Print():
         out.add('## Read Queries')
 
         read_ops = [
-            ('Random Reads: Find a Word',
+            ('Random Reads: Lookup Doc by ID',
              '''
-             Input: 1 randomly selected word.<br/>
-             Output: all documents containing it.<br/>
+             Input: 1 document identifier.<br/>
+             Output: text content.<br/>
              Metric: number of such queries returned per second.<br/>
              '''),
-            ('Random Reads: Find a Substring',
+            ('Random Reads: Find All Docs with Substring',
+             '''
+             Input: 1 randomly selected word.<br/>
+             Output: all documents IDs containing it.<br/>
+             Metric: number of such queries returned per second.<br/>
+             '''),
+            ('Random Reads: Find 20 Docs with Substring',
+             '''
+             Input: 1 randomly selected word.<br/>
+             Output: up to 20 documents IDs containing it.<br/>
+             Metric: number of such queries returned per second.<br/>
+             '''),
+            ('Random Reads: Find All Docs with Bigram',
              '''
              Input: a combination of randomly selected words.<br/>
              Output: all documents containing it.<br/>
@@ -128,13 +142,13 @@ class P4Print():
             out.add(ins.filtered(
                 device_name=device_name,
                 benchmark_name=read_op,
-            ).to_table(
+            ).table(
                 row_name_property='database',
                 col_name_property='dataset',
                 cell_content_property='operations_per_second',
                 row_names=dbs,
                 col_names=dataset_names
-            ).add_gains())
+            ))
 
         # Write Operations.
         out.add('## Write Operations')
@@ -145,28 +159,28 @@ class P4Print():
         ''')
 
         write_ops = [
-            ('Random Writes: Upsert a Document',
+            ('Random Writes: Upsert Doc',
              '''
              Input: 1 new document.<br/>
              Output: success/failure indicator.<br/>
              Metric: number inserted docs per second.<br/>
              '''),
 
-            ('Random Writes: Upsert a Batch of Documents',
+            ('Random Writes: Upsert Docs Batch',
              '''
              Input: 500 new docs.<br/>
              Output: 500 success/failure indicators.<br/>
              Metric: number inserted docs per second.<br/>
              '''),
 
-            ('Random Writes: Remove a Document',
+            ('Random Writes: Remove Doc',
              '''
              Input: 1 existing document.<br/>
              Output: success/failure indicator.<br/>
              Metric: number removed docs per second.<br/>
              '''),
 
-            ('Random Writes: Remove a Batch of Documents',
+            ('Random Writes: Remove Docs Batch',
              '''
              Input: 500 existing docs.<br/>
              Output: 500 success/failure indicators.<br/>
@@ -179,13 +193,13 @@ class P4Print():
             out.add(ins.filtered(
                 device_name=device_name,
                 benchmark_name=write_op,
-            ).to_table(
+            ).table(
                 row_name_property='database',
                 col_name_property='dataset',
                 cell_content_property='operations_per_second',
                 row_names=dbs,
                 col_names=dataset_names
-            ).add_gains())
+            ))
 
         out.print_to(f'BenchDocs/{device_name}/README.md')
 

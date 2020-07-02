@@ -9,7 +9,7 @@ from PyWrappedHelpers.TextFile import TextFile
 
 class ElasticSearch(BaseAPI):
     """
-        ElasticSearch is built on top of Lucene, but Lucene is very 
+        ElasticSearch is built on top of Lucene, but Lucene is  
         hard to install on its own. So we run the full version.
 
         https://www.elastic.co
@@ -28,7 +28,6 @@ class ElasticSearch(BaseAPI):
         self.create_index()
 
     def create_index(self):
-        # https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-exists.html
         if self.index_exists():
             return
         properties = dict()
@@ -46,6 +45,7 @@ class ElasticSearch(BaseAPI):
         })
 
     def index_exists(self):
+        # https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-exists.html
         return self.elastic.indices.exists(self.db_name)
 
     def commit_all(self):
@@ -116,7 +116,11 @@ class ElasticSearch(BaseAPI):
         return content
 
     def find_with_id(self, identifier: str):
-        # https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html
+        """ 
+            Returns the document together with it's system ID, that may be different from original once.
+            It's done to reduce the DB size and accelerate the search.
+            https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html
+        """
         doc = self.elastic.get(index=self.db_name, id=identifier)
         if doc is None:
             return None
@@ -124,26 +128,47 @@ class ElasticSearch(BaseAPI):
             return None
         return self.hit_to_dict(doc)
 
-    def find_with_substring(self, query: str, field: str = 'plain'):
-        # https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-term-query.html
-        docs = self.elastic.search(index=self.db_name, body={
+    def find_with_substring(
+        self,
+        query: str,
+        field: str = 'plain',
+        max_matches: int = None,
+    ):
+        """
+            Returns only document IDs without the content or match range.
+            It's done to minimize the communication time and reduce the load on TCP/IP stack.
+            We are benchmarking the DBs and not networking implementatinos, after all.
+            https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-term-query.html
+        """
+        query_dict = {
             'query': {
                 'term': {
                     field: query,
                 }
             },
-            # We don't need the document contents, just the IDs.
-            # It's done to minimize the communication time and reduce the load on TCP/IP stack.
-            # We are benchmarking the DBs and not networking implementatinos, after all.
             'stored_fields': [],
-        })
+        }
+        if max_matches is not None:
+            query_dict['from'] = 0
+            query_dict['size'] = max_matches
+        docs = self.elastic.search(index=self.db_name, body=max_matches)
         hits_arr = docs.get('hits', {}).get('hits', [])
         return [h['_id'] for h in hits_arr]
 
-    def find_with_regex(self, query: str, field: str = 'plain'):
-        # https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-regexp-query.html
-        # https://lucene.apache.org/core/4_9_0/core/org/apache/lucene/util/automaton/RegExp.html
-        docs = self.elastic.search(index=self.db_name, body={
+    def find_with_regex(
+        self,
+        query: str,
+        field: str = 'plain',
+        max_matches: int = None,
+    ):
+        """
+            Returns only document IDs without the content or match range.
+            It's done to minimize the communication time and reduce the load on TCP/IP stack.
+            We are benchmarking the DBs and not networking implementatinos, after all.
+            https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-regexp-query.html
+            https://lucene.apache.org/core/4_9_0/core/org/apache/lucene/util/automaton/RegExp.html
+        """
+        query_dict = {
             'query': {
                 'regexp': {
                     field: {
@@ -152,11 +177,12 @@ class ElasticSearch(BaseAPI):
                     }
                 }
             },
-            # We don't need the document contents, just the IDs.
-            # It's done to minimize the communication time and reduce the load on TCP/IP stack.
-            # We are benchmarking the DBs and not networking implementatinos, after all.
             'stored_fields': [],
-        })
+        }
+        if max_matches is not None:
+            query_dict['from'] = 0
+            query_dict['size'] = max_matches
+        docs = self.elastic.search(index=self.db_name, body=query_dict)
         hits_arr = docs.get('hits', {}).get('hits', [])
         return [h['_id'] for h in hits_arr]
 
