@@ -13,7 +13,7 @@ class BaseAPI(object):
         Abstract base class for Documents Datastore.
         It's designed with JSON files in mind.
     """
-    __max_batch_size__ = 500
+    __max_batch_size__ = 1000
     __is_concurrent__ = True
     __in_memory__ = False
 
@@ -58,18 +58,18 @@ class BaseAPI(object):
         return int(sum(successes))
 
     @abstractmethod
-    def upsert_docs_from_directory(self, directory: str) -> int:
+    def import_docs_from_directory(self, directory: str) -> int:
         cnt_success = 0
         paths = [pth for pth in Path(directory).iterdir()]
-        for paths_chunk in chunks(paths, BaseAPI.__max_batch_size__):
+        for paths_chunk in chunks(paths, type(self).__max_batch_size__):
             files_chunk = map(TextFile, paths_chunk)
             cnt_success += self.upsert_docs(files_chunk)
         return cnt_success
 
     @abstractmethod
-    def upsert_docs_from_csv(self, filepath: str) -> int:
+    def import_docs_from_csv(self, filepath: str) -> int:
         cnt_success = 0
-        for files_chunk in chunks(yield_texts_from_sectioned_csv(filepath), BaseAPI.__max_batch_size__):
+        for files_chunk in chunks(yield_texts_from_sectioned_csv(filepath), type(self).__max_batch_size__):
             cnt_success += self.upsert_docs(files_chunk)
         return cnt_success
 

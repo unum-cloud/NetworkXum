@@ -12,7 +12,7 @@
         "date_readable": "Jul 01, 2020",
         "date_sortable": "2020/40/01",
         "benchmark_name": "Sequential Writes: Import CSV",
-        "benchmark_code": "        def import_one() -> int:\n            tdb.upsert_docs_from_csv(dataset_path)\n            return tdb.count_docs()\n",
+        "benchmark_code": "        def import_one() -> int:\n            tdb.import_docs_from_csv(dataset_path)\n            return tdb.count_docs()\n",
         "time_elapsed": 1144.8063321113586,
         "count_iterations": 1,
         "count_operations": 45941,
@@ -32,7 +32,7 @@
         "date_readable": "Jul 01, 2020",
         "date_sortable": "2020/15/01",
         "benchmark_name": "Sequential Writes: Import CSV",
-        "benchmark_code": "        def import_one() -> int:\n            tdb.upsert_docs_from_csv(dataset_path)\n            return tdb.count_docs()\n",
+        "benchmark_code": "        def import_one() -> int:\n            tdb.import_docs_from_csv(dataset_path)\n            return tdb.count_docs()\n",
         "time_elapsed": 2100.964653968811,
         "count_iterations": 1,
         "count_operations": 45941,
@@ -40,7 +40,6 @@
         "operations_per_second": 21.86662203631818
     },
     {
-        "name": "Random Reads: Retreive Doc by ID",
         "database": "MongoDB",
         "dataset": "Covid19",
         "date": "2020/22/02-00:07:14",
@@ -61,7 +60,6 @@
         "operations_per_second": 875.99419387851
     },
     {
-        "name": "Random Reads: Find Docs with Substring",
         "database": "MongoDB",
         "dataset": "Covid19",
         "date": "2020/23/02-00:07:23",
@@ -82,7 +80,6 @@
         "operations_per_second": 0.13129232493277782
     },
     {
-        "name": "Random Reads: Lookup Doc by ID",
         "database": "MongoDB",
         "dataset": "Covid19",
         "date": "2020/43/02-00:07:45",
@@ -103,7 +100,6 @@
         "operations_per_second": 2652.0965788916255
     },
     {
-        "name": "Random Reads: Find All Docs with Substring",
         "database": "MongoDB",
         "dataset": "Covid19",
         "date": "2020/44/02-00:07:24",
@@ -124,7 +120,6 @@
         "operations_per_second": 0.15177266324837854
     },
     {
-        "name": "Random Reads: Find 20 Docs with Substring",
         "database": "MongoDB",
         "dataset": "Covid19",
         "date": "2020/45/02-00:07:00",
@@ -145,7 +140,6 @@
         "operations_per_second": 0.16680690847116442
     },
     {
-        "name": "Random Reads: Find All Docs with Bigram",
         "database": "MongoDB",
         "dataset": "Covid19",
         "date": "2020/45/02-00:07:39",
@@ -166,7 +160,6 @@
         "operations_per_second": 0.10196202196041752
     },
     {
-        "name": "Random Writes: Remove Doc",
         "database": "MongoDB",
         "dataset": "Covid19",
         "date": "2020/46/02-00:07:16",
@@ -187,7 +180,6 @@
         "operations_per_second": 27.235317758609575
     },
     {
-        "name": "Random Writes: Upsert Doc",
         "database": "MongoDB",
         "dataset": "Covid19",
         "date": "2020/46/02-00:07:53",
@@ -208,7 +200,6 @@
         "operations_per_second": 27.424158474778075
     },
     {
-        "name": "Random Writes: Remove Docs Batch",
         "database": "MongoDB",
         "dataset": "Covid19",
         "date": "2020/47/02-00:07:25",
@@ -229,7 +220,6 @@
         "operations_per_second": 30.84873691558393
     },
     {
-        "name": "Random Writes: Upsert Docs Batch",
         "database": "MongoDB",
         "dataset": "Covid19",
         "date": "2020/47/02-00:07:59",
@@ -250,7 +240,6 @@
         "operations_per_second": 29.355611727202604
     },
     {
-        "name": "Random Reads: Lookup Doc by ID",
         "database": "ElasticSearch",
         "dataset": "Covid19",
         "date": "2020/48/02-00:07:02",
@@ -271,7 +260,6 @@
         "operations_per_second": 447.9847700490163
     },
     {
-        "name": "Random Reads: Find All Docs with Substring",
         "database": "ElasticSearch",
         "dataset": "Covid19",
         "date": "2020/48/02-00:07:10",
@@ -292,7 +280,6 @@
         "operations_per_second": 1192.9222460204749
     },
     {
-        "name": "Random Reads: Find 20 Docs with Substring",
         "database": "ElasticSearch",
         "dataset": "Covid19",
         "date": "2020/48/02-00:07:16",
@@ -313,7 +300,6 @@
         "operations_per_second": 1838.3499248386772
     },
     {
-        "name": "Random Reads: Find All Docs with Bigram",
         "database": "ElasticSearch",
         "dataset": "Covid19",
         "date": "2020/48/02-00:07:21",
@@ -334,7 +320,6 @@
         "operations_per_second": 1876.190930325538
     },
     {
-        "name": "Random Writes: Remove Doc",
         "database": "ElasticSearch",
         "dataset": "Covid19",
         "date": "2020/49/02-00:07:34",
@@ -355,7 +340,6 @@
         "operations_per_second": 13.631674147326319
     },
     {
-        "name": "Random Writes: Upsert Doc",
         "database": "ElasticSearch",
         "dataset": "Covid19",
         "date": "2020/50/02-00:07:50",
@@ -376,7 +360,6 @@
         "operations_per_second": 13.282327950608801
     },
     {
-        "name": "Random Writes: Remove Docs Batch",
         "database": "ElasticSearch",
         "dataset": "Covid19",
         "date": "2020/51/02-00:07:28",
@@ -397,7 +380,6 @@
         "operations_per_second": 25.96928130988031
     },
     {
-        "name": "Random Writes: Upsert Docs Batch",
         "database": "ElasticSearch",
         "dataset": "Covid19",
         "date": "2020/52/02-00:07:11",
