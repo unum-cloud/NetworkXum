@@ -45,7 +45,7 @@ class P3Bench(object):
             return
         print('- Benchmarking: {} @ {}'.format(
             self.dataset['name'],
-            self.db['name']
+            self.database['name']
         ))
 
         if is_in_ram:
@@ -118,10 +118,10 @@ class P3Bench(object):
 
     def bench_task(self, name, func):
         dataset_name = self.dataset['name']
-        db_name = self.db['name']
+        db_name = self.database['name']
         print(f'--- {db_name}: {name} @ {dataset_name}')
         counter = MicroBench(
-            name=name,
+            benchmark_name=name,
             func=func,
             database=db_name,
             dataset=dataset_name,
@@ -334,7 +334,8 @@ class P3Bench(object):
 
 
 if __name__ == "__main__":
+    c = P0Config(device_name='MacbookPro')
     try:
         P3Bench().run()
     finally:
-        P0Config.shared().default_stats_file.dump_to_file()
+        c.default_stats_file.dump_to_file()

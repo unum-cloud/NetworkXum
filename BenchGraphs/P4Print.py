@@ -80,7 +80,7 @@ class P4Print():
         out.add(ins.filtered(
             device_name=device_name,
             benchmark_name='Sequential Writes: Import CSV',
-        ).to_table(
+        ).table(
             row_name_property='database',
             col_name_property='dataset',
             cell_content_property='operations_per_second',
@@ -99,7 +99,7 @@ class P4Print():
         out.add(ins.filtered(
             device_name=device_name,
             benchmark_name='Sequential Writes: Import CSV',
-        ).to_table(
+        ).table(
             row_name_property='database',
             col_name_property='dataset',
             cell_content_property='operations_per_second',
@@ -115,7 +115,7 @@ class P4Print():
         out.add(ins.filtered(
             device_name=device_name,
             benchmark_name='Sequential Writes: Import CSV',
-        ).to_table(
+        ).table(
             row_name_property='database',
             col_name_property='dataset',
             cell_content_property='time_elapsed',
@@ -201,7 +201,7 @@ class P4Print():
             out.add(ins.filtered(
                 device_name=device_name,
                 benchmark_name=read_op,
-            ).to_table(
+            ).table(
                 row_name_property='database',
                 col_name_property='dataset',
                 cell_content_property='operations_per_second',
@@ -254,7 +254,7 @@ class P4Print():
             out.add(ins.filtered(
                 device_name=device_name,
                 benchmark_name=write_op,
-            ).to_table(
+            ).table(
                 row_name_property='database',
                 col_name_property='dataset',
                 cell_content_property='operations_per_second',
