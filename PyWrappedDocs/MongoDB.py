@@ -7,6 +7,7 @@ from pymongo import UpdateOne, DeleteOne
 from PyWrappedDocs.BaseAPI import BaseAPI
 from PyWrappedHelpers.Algorithms import *
 from PyWrappedHelpers.TextFile import TextFile
+from PyWrappedHelpers.Config import allow_big_csv_fields
 
 
 class MongoDB(BaseAPI):
@@ -148,11 +149,13 @@ class MongoDB(BaseAPI):
             print(bwe.details['writeErrors'])
             return 0
 
+    def insert_docs(self, docs: List[object]) -> int:
+        docs = map(self.validate_doc, docs)
+        result = self.docs_collection.insert_many(
+            documents=docs, ordered=False)
+        return len(result.inserted_ids)
+
     def remove_docs(self, docs: List[object]) -> int:
-        """
-            Supports up to 1000 updates per batch.
-            https://api.mongodb.com/python/current/examples/bulk.html#ordered-bulk-write-operations
-        """
         def make_upsert(doc):
             return DeleteOne(
                 filter={'_id': doc['_id'], },
@@ -170,16 +173,22 @@ class MongoDB(BaseAPI):
             return 0
 
     def import_docs_from_csv(self, filepath: str) -> int:
+        # Current version of MongoDB driver is incapable of chunking the iterable input,
+        # so it loads everything into RAM forcing the OS to allocate GBs of swap pages.
         # https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_many
-        def produce_validated():
-            for doc in yield_texts_from_sectioned_csv(filepath):
-                yield self.validate_doc(doc)
-
-        result = self.docs_collection.insert_many(
-            documents=produce_validated(),
-            ordered=False,
-        )
-        return len(result.inserted_ids)
+        # def produce_validated():
+        #     for doc in yield_texts_from_sectioned_csv(filepath):
+        #         yield self.validate_doc(doc)
+        # result = self.docs_collection.insert_many(
+        #     documents=produce_validated(),
+        #     ordered=False,
+        # )
+        # return len(result.inserted_ids)
+        allow_big_csv_fields()
+        cnt_success = 0
+        for files_chunk in chunks(yield_texts_from_sectioned_csv(filepath), type(self).__max_batch_size__):
+            cnt_success += self.insert_docs(files_chunk)
+        return cnt_success
 
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ from elasticsearch.helpers import streaming_bulk
 from PyWrappedDocs.BaseAPI import BaseAPI
 from PyWrappedHelpers.Algorithms import *
 from PyWrappedHelpers.TextFile import TextFile
-import PyWrappedHelpers.Config as Config
+from PyWrappedHelpers.Config import allow_big_csv_fields
 
 
 class ElasticSearch(BaseAPI):
@@ -191,7 +191,7 @@ class ElasticSearch(BaseAPI):
         return [h['_id'] for h in hits_arr]
 
     def import_docs_from_csv(self, filepath: str) -> int:
-        Config.allow_big_csv_fields()
+        allow_big_csv_fields()
         # https://elasticsearch-py.readthedocs.io/en/master/helpers.html
 
         def produce_validated():
