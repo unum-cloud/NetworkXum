@@ -1,5 +1,8 @@
+import sys
+import csv
+
 max_threads = 4
-ram_limit = (2 ** 30)
+ram_limit = (2 ** 30)  # 1 GB
 performance_over_reliability = True
 
 unumdb_purpose = '''
@@ -17,3 +20,21 @@ unumdb_purpose = '''
     When it comes to random (opposed to sequential) read operations the performance drops further to <1% of channel capacity.
     That's why it's crucial for us to store the data in the most capable database!
 '''
+
+
+def allow_big_csv_fields():
+    """
+        When dealing with big docs in ElasticSearch - 
+        an error may occur when bulk-loading:
+        >>> _csv.Error: field larger than field limit (131072)        
+    """
+    max_field_len = sys.maxsize
+    while True:
+        # decrease the max_field_len value by factor 10
+        # as long as the OverflowError occurs.
+        # https://stackoverflow.com/a/15063941/2766161
+        try:
+            csv.field_size_limit(max_field_len)
+            break
+        except OverflowError:
+            max_field_len = int(max_field_len/10)
