@@ -34,7 +34,7 @@ class P4Print():
         dataset_names = [
             'Covid19',
             'PoliticalTweets',
-            'EnglishWiki',
+            'EnglishWikipedia',
         ]  # ins.subset().unique('dataset')
         dataset_for_comparison = 'Covid19'
 
@@ -49,22 +49,22 @@ class P4Print():
         out.add_current_device_specs()
         out.add('### Datasets')
         out.add('''
-        * [Covid19](https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge).
+        * [Covid19](https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge) Scientific Papers.
             * Documents: 45,941.
             * Sections: 1,604,649.
             * Size: 1,7 GB.
-        * [PoliticalTweets](https://www.kaggle.com/iamyoginth/facthub).
+        * [PoliticalTweets](https://www.kaggle.com/iamyoginth/facthub) Posts.
             * Documents: 12,488,144.
             * Sections: 12,488,144.
             * Size: 2,3 GB.
-        * [EnglishWikipedia](https://www.kaggle.com/jkkphys/english-wikipedia-articles-20170820-sqlite).
+        * [EnglishWikipedia](https://www.kaggle.com/jkkphys/english-wikipedia-articles-20170820-sqlite) Dump from 2017.
             * Documents: 4,902,648.
             * Sections: 23,046,187.
             * Size: 18,2 GB.
         ''')
 
         # Sequential Writes: Import CSV
-        out.add('## Sequential Writes: Import CSV (edges/sec)')
+        out.add('## Sequential Writes: Import CSV (docs/sec)')
         out.add('''
         Every datascience project starts by importing the data.
         Let's see how long it will take to load every dataset into each DB.
@@ -104,10 +104,10 @@ class P4Print():
         ], header_col=[
             'MongoDB', 'ElasticSearch', 'UnumDB.Text',
         ], content=[
-            [1.9, 3.2, 0],
-            [2.5, 2.9, 33.5],
-            [1, 1, 1],
-        ]).add_gains())
+            ['1,9 GB', '3,2 GB', 'Expected 60,7 GB'],
+            ['2,5 GB', '2,9 GB', '33,5 GB'],
+            ['1', '1', '1'],
+        ]))
 
         # Read Queries.
         out.add('## Read Queries')
@@ -117,8 +117,8 @@ class P4Print():
         As a result they will be forced to run a full-scan against all documents stored in the DB.
         It means having at least 2 bottlenecks:
 
-            1. If you are scanning all the data in the DB you are limited by the sequential read performance of the SSD (accounting for the read amplification dependant on the data locality).
-            2. The speed of your RegEx engine.
+        1. If you are scanning all the data in the DB you are limited by the sequential read performance of the SSD (accounting for the read amplification dependant on the data locality).
+        2. The speed of your RegEx engine.
 
         The (1.) point is pretty clear, but the (2.) is much more complex. Most DBs use the [PCRE/PCRE2](http://www.pcre.org) C library which was first released back in 1997 with a major upgrade in 2015.
         Implementing full RegEx support is complex, especially if you want to beat C code in performance, so most programming languages and libraries just wrap PCRE.
@@ -128,11 +128,11 @@ class P4Print():
         However, the constant multiplier in our case is much lower, so the new algorithm ends-up beating the classical solutions from Intel, Google and other companies at least in some cases. 
         On our test bench the timings are:
 
-            *   Intel Hyperscan on 1 Intel Core: 4 GB/s consistent performance.
-            *   Unum.RegEx on 1 Intel Core: up to 3 GB/s.
-            *   Unum.RegEx on 1 Intel Core (after text preprocessing): up to 15 GB/s.
-            *   Unum.RegEx on Titan V GPU: ? GB/s.
-            *   Unum.RegEx on Titan V GPU (after text preprocessing): ? GB/s.
+        *   Intel Hyperscan on 1 Intel Core: 4 GB/s consistent performance.
+        *   Unum.RegEx on 1 Intel Core: up to 3 GB/s.
+        *   Unum.RegEx on 1 Intel Core (after text preprocessing): up to 15 GB/s.
+        *   Unum.RegEx on Titan V GPU: ? GB/s.
+        *   Unum.RegEx on Titan V GPU (after text preprocessing): ? GB/s.
 
         The best part is that it can use statistics and cleverly organizind search indexes to vastly reduce the number of documents to be scanned.
         To our knowledge, no modern piece of software has such level of mutually-benefitial communication between the storage layer and the application layer.
@@ -149,19 +149,19 @@ class P4Print():
              Output: text content.<br/>
              Metric: number of such queries returned per second.<br/>
              '''),
-            ('Random Reads: Find All Docs with Substring',
+            ('Random Reads: Find up to 10,000 Docs with Substring',
              '''
              Input: 1 randomly selected word.<br/>
-             Output: all documents IDs containing it.<br/>
+             Output: up to 10,000 documents IDs containing it.<br/>
              Metric: number of such queries returned per second.<br/>
              '''),
-            ('Random Reads: Find 20 Docs with Substring',
+            ('Random Reads: Find up to 20 Docs with Substring',
              '''
              Input: 1 randomly selected word.<br/>
              Output: up to 20 documents IDs containing it.<br/>
              Metric: number of such queries returned per second.<br/>
              '''),
-            ('Random Reads: Find All Docs with Bigram',
+            ('Random Reads: Find up to 20 Docs with Bigram',
              '''
              Input: a combination of randomly selected words.<br/>
              Output: all documents IDs containing it.<br/>
