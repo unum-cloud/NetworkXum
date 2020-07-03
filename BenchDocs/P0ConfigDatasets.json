@@ -2,7 +2,7 @@
     {
         "name": "Covid19",
         "path": "~/Datasets/UnumDB/Texts/Covid19/all.csv",
-        "url": "",
+        "url": "https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge",
         "docs": 45941,
         "sections": 1604649,
         "size_mb": 1700,
@@ -11,11 +11,11 @@
     {
         "name": "PoliticalTweets",
         "path": "~/Datasets/UnumDB/Texts/PoliticalTweets/all.csv",
-        "url": "",
+        "url": "https://www.kaggle.com/iamyoginth/facthub",
         "docs": 12488144,
         "sections": 12488144,
         "size_mb": 2300,
-        "enabled": false
+        "enabled": true
     },
     {
         "name": "EnglishWikipedia",
@@ -24,6 +24,6 @@
         "docs": 4902648,
         "sections": 23046187,
         "size_mb": 18200,
-        "enabled": false
+        "enabled": true
     }
 ]

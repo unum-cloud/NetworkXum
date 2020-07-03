@@ -4,9 +4,11 @@ import glob
 import psutil
 from pystats2md.stats_file import StatsFile
 from pystats2md.stats_subset import StatsSubset
+from pystats2md.stats_table import StatsTable
 from pystats2md.report import Report
 
 from P0Config import P0Config
+from P3TasksSampler import P3TasksSampler
 from PyWrappedHelpers.Config import unumdb_purpose
 
 
@@ -31,7 +33,8 @@ class P4Print():
         ]  # ins.subset().unique('database')
         dataset_names = [
             'Covid19',
-            # 'EnglishWiki',
+            'PoliticalTweets',
+            'EnglishWiki',
         ]  # ins.subset().unique('dataset')
         dataset_for_comparison = 'Covid19'
 
@@ -46,18 +49,18 @@ class P4Print():
         out.add_current_device_specs()
         out.add('### Datasets')
         out.add('''
-        * [Patent Citation Network](http://networkrepository.com/cit-patent.php).
-            * Size: 272 Mb.
-            * Edges: 16,518,947.
-            * Average Degree: 8.
-        * [Mouse Gene Regulatory Network](http://networkrepository.com/bio-mouse-gene.php).
-            * Size: 295 Mb.
-            * Edges: 14,506,199.
-            * Average Degree: 670.
-        * [HumanBrain Network](http://networkrepository.com/bn-human-Jung2015-M87102575.php).
-            * Size: 4 Gb.
-            * Edges: 87'273'967.
-            * Average Degree: 186.
+        * [Covid19](https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge).
+            * Documents: 45,941.
+            * Sections: 1,604,649.
+            * Size: 1,7 GB.
+        * [PoliticalTweets](https://www.kaggle.com/iamyoginth/facthub).
+            * Documents: 12,488,144.
+            * Sections: 12,488,144.
+            * Size: 2,3 GB.
+        * [EnglishWikipedia](https://www.kaggle.com/jkkphys/english-wikipedia-articles-20170820-sqlite).
+            * Documents: 4,902,648.
+            * Sections: 23,046,187.
+            * Size: 18,2 GB.
         ''')
 
         # Sequential Writes: Import CSV
@@ -76,7 +79,7 @@ class P4Print():
             cell_content_property='operations_per_second',
             row_names=dbs,
             col_names=dataset_names,
-        ))
+        ).add_gains())
 
         out.add(ins.filtered(
             device_name=device_name,
@@ -93,14 +96,48 @@ class P4Print():
         Those benchmarks only tell half of the story. 
         We should not only consider performance, but also the used disk space and the affect on the hardware lifetime, as SSDs don't last too long.
         Unum has not only the highest performance, but also the most compact representation. For the `HumanBrain` graph results are:
-
-        * MongoDB: 1,1 Gb for data + 2,5 Gb for indexes = 3,6 Gb. Wrote ~25 Gb to disk.
-        * ElasticSearch: .
-        * Unum: 1.5 Gb total volume. Extra 3.8 Gb of space were (optionally) used requested to slighly accelerate the import time. All of that space was reclaimed. A total of 5.3 was written to disk.
         ''')
+        out.add(StatsTable(header_row=[
+            'Covid19', 'PoliticalTweets', 'EnglishWikipedia',
+        ], header_col=[
+            'MongoDB', 'ElasticSearch', 'UnumDB.Text',
+        ], content=[
+            [1.9, 3.2, 0],
+            [2.48, 2.86, 0],
+            [0, 0, 0],
+        ]).add_gains())
 
         # Read Queries.
         out.add('## Read Queries')
+        out.add('''
+            Regular Expressions are the most computational intesive operations in textual database.
+            If the pattern is complex, even the most advanced DBs may not be able to utilize the pre-constructed search index.
+            As a result they will be forced to run a full-scan against all documents stored in the DB.
+            It means having at least 2 bottlenecks:
+
+                1. If you are scanning all the data in the DB you are limited by the sequential read performance of the SSD (accounting for the read amplification dependant on the data locality).
+                2. The speed of your RegEx engine.
+
+            The (1.) point is pretty clear, but the (2.) is much more complex. Most DBs use the [PCRE/PCRE2](http://www.pcre.org) C library which was first released back in 1997 with a major upgrade in 2015.
+            Implementing full RegEx support is complex, especially if you want to beat C code in performance, so most programming languages and libraries just wrap PCRE.
+            That said, the performance is still laughable. It varies a lot between different different queries, but [can be orders of magniture slower](https://rust-leipzig.github.io/regex/2017/03/28/comparison-of-regex-engines/) than [Intel Hyperscan](https://software.intel.com/content/www/us/en/develop/articles/introduction-to-hyperscan.html) State-of-theArt library.
+            Most (if not all) of those libraries use the classical DFA-based algorithm with `~O(n)` worst case time complexity for search (assuming the automata is already constructed).
+            As always, we are not limiting ourselves to using existing algorithms, we design our own. In `Unum.ReGex` we have developed an algorithm with worst-case-complexity harder than the DFA approach, but the average complexity is also `~O(n)`.
+            However, the constant multiplier in our case is much lower, so the new algorithm ends-up beating the classical solutions from Intel, Google and other companies at least in some cases. 
+            On our test bench with an Intel CPU the timings are following:
+
+                *   Intel Hyperscan: 4 GB/s consistent performance.
+                *   Unum.RegEx: up to 3 GB/s.
+                *   Unum.RegEx after text preprocessing: up to 15 GB/s.
+                *   Unum.RegEx on Titan V GPU: ? GB/s.
+
+            The best part is that it can use statistics and cleverly organizind search indexes to vastly reduce the number of documents to be scanned.
+            To our knowledge, no modern piece of software has such level of mutually-benefitial communication between the storage layer and the application layer.
+            The results below speak for themselves, but before we go further I would like to note, that comparing randomly generated RegEx queries makes little sense, as such results wouldn't translate into real-world benefits for potential users.
+            There are not too many universally used RegEx patterns, so the DBs can use the cache to fetch previously computed results.
+            Such benchmarks are not representative as well, so I took the most common RegEx patterns (dates, numbers, IP addresses, E-mail addresses, XML tags...) and concatentated them with randomly sampled words from each of the datasets.
+            That way we are still getting results similar to real-world queries, but avoid cache hits.
+        ''')
 
         read_ops = [
             ('Random Reads: Lookup Doc by ID',
@@ -124,16 +161,20 @@ class P4Print():
             ('Random Reads: Find All Docs with Bigram',
              '''
              Input: a combination of randomly selected words.<br/>
-             Output: all documents containing it.<br/>
-             Metric: number of such queries returned per second.<br/>
-             '''),
-            ('Random Reads: Find a RegEx',
-             '''
-             Input: a regular expression.<br/>
-             Output: all documents containing it.<br/>
+             Output: all documents IDs containing it.<br/>
              Metric: number of such queries returned per second.<br/>
              '''),
         ]
+        for regex_template in P3TasksSampler.__regex_templates__:
+            read_op = 'Random Reads: Find a RegEx ({})'.format(
+                regex_template['Name'])
+            description = '''
+                Input: a regular expression: `{}`.<br/>
+                Output: all documents IDs containing it.<br/>
+                Metric: number of such queries returned per second.<br/>
+                Match Example: `{}`.<br/>
+            '''.format(regex_template['Template'], regex_template['Example'])
+            read_ops.append((read_ops, description))
 
         for read_op, description in read_ops:
 
@@ -148,7 +189,7 @@ class P4Print():
                 cell_content_property='operations_per_second',
                 row_names=dbs,
                 col_names=dataset_names
-            ))
+            ).add_gains())
 
         # Write Operations.
         out.add('## Write Operations')
@@ -199,7 +240,7 @@ class P4Print():
                 cell_content_property='operations_per_second',
                 row_names=dbs,
                 col_names=dataset_names
-            ))
+            ).add_gains())
 
         out.print_to(f'BenchDocs/{device_name}/README.md')
 

@@ -26,8 +26,8 @@ That's why it's crucial for us to store the data in the most capable database!
 
 
 * CPU: 8 cores, 16 threads @ 2300.00 Mhz.
-* RAM: 16.00 Gb
-* Disk: 931.55 Gb
+* RAM: 16.00 GB
+* Disk: 931.55 GB
 * OS: Darwin
 
 
@@ -35,15 +35,15 @@ That's why it's crucial for us to store the data in the most capable database!
 
 
 * [Patent Citation Network](http://networkrepository.com/cit-patent.php).
-    * Size: 272 Mb.
+    * Size: 272 MB.
     * Edges: 16,518,947.
     * Average Degree: 8.
 * [Mouse Gene Regulatory Network](http://networkrepository.com/bio-mouse-gene.php).
-    * Size: 295 Mb.
+    * Size: 295 MB.
     * Edges: 14,506,199.
     * Average Degree: 670.
 * [HumanBrain Network](http://networkrepository.com/bn-human-Jung2015-M87102575.php).
-    * Size: 4 Gb.
+    * Size: 4 GB.
     * Edges: 87'273'967.
     * Average Degree: 186.
 
@@ -69,9 +69,9 @@ Those benchmarks only tell half of the story.
 We should not only consider performance, but also the used disk space and the affect on the hardware lifetime, as SSDs don't last too long.
 Unum has not only the highest performance, but also the most compact representation. For the `HumanBrain` graph results are:
 
-* MongoDB: 1,1 Gb for data + 2,5 Gb for indexes = 3,6 Gb. Wrote ~25 Gb to disk.
+* MongoDB: 1,1 GB for data + 2,5 GB for indexes = 3,6 GB. Wrote ~25 GB to disk.
 * ElasticSearch: .
-* Unum: 1.5 Gb total volume. Extra 3.8 Gb of space were (optionally) used requested to slighly accelerate the import time. All of that space was reclaimed. A total of 5.3 was written to disk.
+* Unum: 1.5 GB total volume. Extra 3.8 GB of space were (optionally) used requested to slighly accelerate the import time. All of that space was reclaimed. A total of 5.3 was written to disk.
 
 
 ## Read Queries
