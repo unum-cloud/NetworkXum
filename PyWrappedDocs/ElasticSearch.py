@@ -143,12 +143,26 @@ class ElasticSearch(BaseAPI):
             It's done to minimize the communication time and reduce the load on TCP/IP stack.
             We are benchmarking the DBs and not networking implementatinos, after all.
             https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-term-query.html
+            https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-match-query.html
         """
+        # query_dict = {
+        #     'query': {
+        #         'match': {
+        #             field: {
+        #                 'query': query,
+        #                 'operator': 'and',
+        #                 'zero_terms_query': 'all',
+        #                 'auto_generate_synonyms_phrase_query': False,
+        #             },
+        #         },
+        #     },
+        #     'stored_fields': [],
+        # }
         query_dict = {
             'query': {
-                'term': {
+                'match_phrase': {
                     field: query,
-                }
+                },
             },
             'stored_fields': [],
         }
@@ -178,8 +192,8 @@ class ElasticSearch(BaseAPI):
                     field: {
                         'value': query,
                         'flags': 'INTERVAL',
-                    }
-                }
+                    },
+                },
             },
             'stored_fields': [],
         }

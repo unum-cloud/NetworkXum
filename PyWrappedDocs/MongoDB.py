@@ -187,7 +187,10 @@ class MongoDB(BaseAPI):
         allow_big_csv_fields()
         cnt_success = 0
         for files_chunk in chunks(yield_texts_from_sectioned_csv(filepath), type(self).__max_batch_size__):
-            cnt_success += self.insert_docs(files_chunk)
+            try:
+                cnt_success += self.insert_docs(files_chunk)
+            except:
+                pass
         return cnt_success
 
 
