@@ -47,7 +47,7 @@ class P4Print():
         * [Neo4J](https://neo4j.com) was designed specifically for graphs storage, but crashes consistently, so it was removed from comparison.
         * [UnumDB.Graph](https://unum.xyz/db) is our in-house solution.
 
-        Databases were configured to use 512 Mb of RAM for cache and 4 cores for query execution.
+        Databases were configured to use 512 MB of RAM for cache and 4 cores for query execution.
         Links: [The Most Popular Open Source Databases 2020](https://www.percona.com/blog/2020/04/22/the-state-of-the-open-source-database-industry-in-2020-part-three/).
         ''')
         out.add('### Device')
@@ -55,15 +55,15 @@ class P4Print():
         out.add('### Datasets')
         out.add('''
         * [Patent Citation Network](http://networkrepository.com/cit-patent.php).
-            * Size: 272 Mb.
+            * Size: 272 MB.
             * Edges: 16,518,947.
             * Average Degree: 8.
         * [Mouse Gene Regulatory Network](http://networkrepository.com/bio-mouse-gene.php).
-            * Size: 295 Mb.
+            * Size: 295 MB.
             * Edges: 14,506,199.
             * Average Degree: 670.
         * [HumanBrain Network](http://networkrepository.com/bn-human-Jung2015-M87102575.php).
-            * Size: 4 Gb.
+            * Size: 4 GB.
             * Edges: 87'273'967.
             * Average Degree: 186.
         ''')
@@ -128,10 +128,10 @@ class P4Print():
         We should not only consider performance, but also the used disk space and the affect on the hardware lifetime, as SSDs don't last too long.
         Unum has not only the highest performance, but also the most compact representation. For the `HumanBrain` graph results are:
 
-        * MongoDB: 1,1 Gb for data + 2,5 Gb for indexes = 3,6 Gb. Wrote ~25 Gb to disk.
-        * MySQL: 8.5 Gb for data + 6.4 Gb for indexes = 14.9 Gb. Wrote ~300 Gb to disk.
-        * PostgreSQL: 6 Gb for data + 9 Gb for indexes = 15 Gb. Wrote ~25 Gb to disk. Furthermore, after flushing the changes, it didn't reclaim 8 Gb of space from the temporary table.
-        * Unum: 1.5 Gb total volume. Extra 3.8 Gb of space were (optionally) used requested to slighly accelerate the import time. All of that space was reclaimed. A total of 5.3 was written to disk.
+        * MongoDB: 1,1 GB for data + 2,5 GB for indexes = 3,6 GB. Wrote ~25 GB to disk.
+        * MySQL: 8.5 GB for data + 6.4 GB for indexes = 14.9 GB. Wrote ~300 GB to disk.
+        * PostgreSQL: 6 GB for data + 9 GB for indexes = 15 GB. Wrote ~25 GB to disk. Furthermore, after flushing the changes, it didn't reclaim 8 GB of space from the temporary table.
+        * Unum: 1.5 GB total volume. Extra 3.8 GB of space were (optionally) used requested to slighly accelerate the import time. All of that space was reclaimed. A total of 5.3 was written to disk.
         ''')
 
         # Read Queries.

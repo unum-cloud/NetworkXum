@@ -14,10 +14,10 @@ class SQLiteMem(BaseSQL):
 class SQLite(BaseSQL):
     """
         SQLite may be the fastest option for tiny databases 
-        under 20 Mb. It's write aplification is huge. 
-        Bulk inserting 250 Mb unweighted undirected graph 
-        will write ~200 Gb of data to disk.
-        The resulting file size will be ~1 Gb.
+        under 20 MB. It's write aplification is huge. 
+        Bulk inserting 250 MB unweighted undirected graph 
+        will write ~200 GB of data to disk.
+        The resulting file size will be ~1 GB.
 
         https://www.sqlite.org/faq.html#q19
         https://stackoverflow.com/a/6533930/2766161
