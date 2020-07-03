@@ -95,7 +95,9 @@ class P4Print():
         out.add('''
         Those benchmarks only tell half of the story. 
         We should not only consider performance, but also the used disk space and the affect on the hardware lifetime, as SSDs don't last too long.
-        Unum has not only the highest performance, but also the most compact representation. For the `HumanBrain` graph results are:
+        Unum has not only the highest performance, but also the most compact representation.
+        MongoDB generally performs well across different benchmarks, but it failed to import the English Wikipedia in 10 hours.
+        I suspect a bug in the implementation of the text index, as some batch import operations took over 10 mins for a modest batch size of 10,000 docs.
         ''')
         out.add(StatsTable(header_row=[
             'Covid19', 'PoliticalTweets', 'EnglishWikipedia',
@@ -104,7 +106,7 @@ class P4Print():
         ], content=[
             [1.9, 3.2, 0],
             [2.5, 2.9, 33.5],
-            [0, 0, 0],
+            [1, 1, 1],
         ]).add_gains())
 
         # Read Queries.
@@ -166,16 +168,16 @@ class P4Print():
              Metric: number of such queries returned per second.<br/>
              '''),
         ]
-        for regex_template in P3TasksSampler.__regex_templates__:
-            read_op = 'Random Reads: Find a RegEx ({})'.format(
-                regex_template['Name'])
-            description = '''
-                Input: a regular expression: `{}`.<br/>
-                Output: all documents IDs containing it.<br/>
-                Metric: number of such queries returned per second.<br/>
-                Match Example: `{}`.<br/>
-            '''.format(regex_template['Template'], regex_template['Example'])
-            read_ops.append((read_ops, description))
+        # for regex_template in P3TasksSampler.__regex_templates__:
+        #     read_op = 'Random Reads: Find a RegEx ({})'.format(
+        #         regex_template['Name'])
+        #     description = '''
+        #         Input: a regular expression: `{}`.<br/>
+        #         Output: all documents IDs containing it.<br/>
+        #         Metric: number of such queries returned per second.<br/>
+        #         Match Example: `{}`.<br/>
+        #     '''.format(regex_template['Template'], regex_template['Example'])
+        #     read_ops.append([read_ops, description])
 
         for read_op, description in read_ops:
 

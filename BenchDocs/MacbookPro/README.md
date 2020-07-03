@@ -25,27 +25,32 @@ That's why it's crucial for us to store the data in the most capable database!
 ### Device
 
 
-* CPU: 8 cores, 16 threads @ 2300.00 Mhz.
-* RAM: 16.00 GB
-* Disk: 931.55 GB
+* CPU:
+    * Model: `Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz`.
+    * Cores: 8 (16 threads @ 2.3 Mhz).
+* RAM: 16.0 GB.
+* Disk: 931.5 GB.
+
 * OS: Darwin
+* Python Version: 
+* Filesystems
 
 
 ### Datasets
 
 
-* [Patent Citation Network](http://networkrepository.com/cit-patent.php).
-    * Size: 272 MB.
-    * Edges: 16,518,947.
-    * Average Degree: 8.
-* [Mouse Gene Regulatory Network](http://networkrepository.com/bio-mouse-gene.php).
-    * Size: 295 MB.
-    * Edges: 14,506,199.
-    * Average Degree: 670.
-* [HumanBrain Network](http://networkrepository.com/bn-human-Jung2015-M87102575.php).
-    * Size: 4 GB.
-    * Edges: 87'273'967.
-    * Average Degree: 186.
+* [Covid19](https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge).
+    * Documents: 45,941.
+    * Sections: 1,604,649.
+    * Size: 1,7 GB.
+* [PoliticalTweets](https://www.kaggle.com/iamyoginth/facthub).
+    * Documents: 12,488,144.
+    * Sections: 12,488,144.
+    * Size: 2,3 GB.
+* [EnglishWikipedia](https://www.kaggle.com/jkkphys/english-wikipedia-articles-20170820-sqlite).
+    * Documents: 4,902,648.
+    * Sections: 23,046,187.
+    * Size: 18,2 GB.
 
 
 ## Sequential Writes: Import CSV (edges/sec)
@@ -55,26 +60,60 @@ Every datascience project starts by importing the data.
 Let's see how long it will take to load every dataset into each DB.
 
 
-|               | Covid19 |
-| :------------ | :-----: |
-| MongoDB       |  40.13  |
-| ElasticSearch |  21.87  |
+|  | Covid19 | PoliticalTweets | EnglishWiki | Mean Gains |
+| :--- | :---: | :---: | :---: | :---: |
+| MongoDB | 42.98 | 3,339.69 |  | 1x |
+| ElasticSearch | 210.14 | 6,649.18 |  | **2.03x** |
 
-|               |     Covid19     |
-| :------------ | :-------------: |
-| MongoDB       | 19 mins, 5 secs |
-| ElasticSearch | 35 mins, 1 secs |
+|  | Covid19 | PoliticalTweets | EnglishWiki |
+| :--- | :---: | :---: | :---: |
+| MongoDB | 17 mins, 49 secs | 49 mins, 54 secs |  |
+| ElasticSearch | 3 mins, 39 secs | 25 mins, 4 secs |  |
 
 Those benchmarks only tell half of the story. 
 We should not only consider performance, but also the used disk space and the affect on the hardware lifetime, as SSDs don't last too long.
-Unum has not only the highest performance, but also the most compact representation. For the `HumanBrain` graph results are:
+Unum has not only the highest performance, but also the most compact representation.
+MongoDB generally performs well across different benchmarks, but it failed to import the English Wikipedia in 10 hours.
+I suspect a bug in the implementation of the text index, as some batch import operations took over 10 mins for a modest batch size of 10,000 docs.
 
-* MongoDB: 1,1 GB for data + 2,5 GB for indexes = 3,6 GB. Wrote ~25 GB to disk.
-* ElasticSearch: .
-* Unum: 1.5 GB total volume. Extra 3.8 GB of space were (optionally) used requested to slighly accelerate the import time. All of that space was reclaimed. A total of 5.3 was written to disk.
 
+|  | Covid19 | PoliticalTweets | EnglishWikipedia | Mean Gains |
+| :--- | :---: | :---: | :---: | :---: |
+| MongoDB | 1.90 | 3.20 | 0.00 | 1x |
+| ElasticSearch | 2.50 | 2.90 | 33.50 | **7.63x** |
+| UnumDB.Text | 1.00 | 1.00 | 1.00 | 0.59x |
 
 ## Read Queries
+
+
+Regular Expressions are the most computational intesive operations in textual database.
+If the pattern is complex, even the most advanced DBs may not be able to utilize the pre-constructed search index.
+As a result they will be forced to run a full-scan against all documents stored in the DB.
+It means having at least 2 bottlenecks:
+
+    1. If you are scanning all the data in the DB you are limited by the sequential read performance of the SSD (accounting for the read amplification dependant on the data locality).
+    2. The speed of your RegEx engine.
+
+The (1.) point is pretty clear, but the (2.) is much more complex. Most DBs use the [PCRE/PCRE2](http://www.pcre.org) C library which was first released back in 1997 with a major upgrade in 2015.
+Implementing full RegEx support is complex, especially if you want to beat C code in performance, so most programming languages and libraries just wrap PCRE.
+That said, the performance is still laughable. It varies a lot between different different queries, but [can be orders of magniture slower](https://rust-leipzig.github.io/regex/2017/03/28/comparison-of-regex-engines/) than [Intel Hyperscan](https://software.intel.com/content/www/us/en/develop/articles/introduction-to-hyperscan.html) State-of-theArt library.
+Most (if not all) of those libraries use the classical DFA-based algorithm with `~O(n)` worst case time complexity for search (assuming the automata is already constructed).
+As always, we are not limiting ourselves to using existing algorithms, we design our own. In `Unum.ReGex` we have developed an algorithm with worst-case-complexity harder than the DFA approach, but the average complexity is also `~O(n)`.
+However, the constant multiplier in our case is much lower, so the new algorithm ends-up beating the classical solutions from Intel, Google and other companies at least in some cases. 
+On our test bench the timings are:
+
+    *   Intel Hyperscan on 1 Intel Core: 4 GB/s consistent performance.
+    *   Unum.RegEx on 1 Intel Core: up to 3 GB/s.
+    *   Unum.RegEx on 1 Intel Core (after text preprocessing): up to 15 GB/s.
+    *   Unum.RegEx on Titan V GPU: ? GB/s.
+    *   Unum.RegEx on Titan V GPU (after text preprocessing): ? GB/s.
+
+The best part is that it can use statistics and cleverly organizind search indexes to vastly reduce the number of documents to be scanned.
+To our knowledge, no modern piece of software has such level of mutually-benefitial communication between the storage layer and the application layer.
+The results below speak for themselves, but before we go further I would like to note, that comparing randomly generated RegEx queries makes little sense, as such results wouldn't translate into real-world benefits for potential users.
+There are not too many universally used RegEx patterns, so the DBs can use the cache to fetch previously computed results.
+Such benchmarks are not representative as well, so I took the most common RegEx patterns (dates, numbers, IP addresses, E-mail addresses, XML tags...) and concatentated them with randomly sampled words from each of the datasets.
+That way we are still getting results similar to real-world queries, but avoid cache hits.
 
 
 ### Random Reads: Lookup Doc by ID
@@ -85,10 +124,10 @@ Output: text content.<br/>
 Metric: number of such queries returned per second.<br/>
 
 
-|               | Covid19  |
-| :------------ | :------: |
-| MongoDB       | 2,652.10 |
-| ElasticSearch |  447.98  |
+|  | Covid19 | PoliticalTweets | EnglishWiki | Mean Gains |
+| :--- | :---: | :---: | :---: | :---: |
+| MongoDB | 2,704.44 | 337.08 |  | 1x |
+| ElasticSearch | 566.13 | 630.50 |  | 0.39x |
 
 ### Random Reads: Find All Docs with Substring
 
@@ -98,10 +137,10 @@ Output: all documents IDs containing it.<br/>
 Metric: number of such queries returned per second.<br/>
 
 
-|               | Covid19  |
-| :------------ | :------: |
-| MongoDB       |   0.15   |
-| ElasticSearch | 1,192.92 |
+|  | Covid19 | PoliticalTweets | EnglishWiki | Mean Gains |
+| :--- | :---: | :---: | :---: | :---: |
+| MongoDB | 0.23 | 0.21 |  | 1x |
+| ElasticSearch | 360.44 | 326.58 |  | **1,571.00x** |
 
 ### Random Reads: Find 20 Docs with Substring
 
@@ -111,36 +150,23 @@ Output: up to 20 documents IDs containing it.<br/>
 Metric: number of such queries returned per second.<br/>
 
 
-|               | Covid19  |
-| :------------ | :------: |
-| MongoDB       |   0.17   |
-| ElasticSearch | 1,838.35 |
+|  | Covid19 | PoliticalTweets | EnglishWiki | Mean Gains |
+| :--- | :---: | :---: | :---: | :---: |
+| MongoDB | 2.74 | 173.51 |  | 1x |
+| ElasticSearch | 381.31 | 304.10 |  | **3.89x** |
 
 ### Random Reads: Find All Docs with Bigram
 
 
 Input: a combination of randomly selected words.<br/>
-Output: all documents containing it.<br/>
+Output: all documents IDs containing it.<br/>
 Metric: number of such queries returned per second.<br/>
 
 
-|               | Covid19  |
-| :------------ | :------: |
-| MongoDB       |   0.10   |
-| ElasticSearch | 1,876.19 |
-
-### Random Reads: Find a RegEx
-
-
-Input: a regular expression.<br/>
-Output: all documents containing it.<br/>
-Metric: number of such queries returned per second.<br/>
-
-
-|               | Covid19 |
-| :------------ | :-----: |
-| MongoDB       |         |
-| ElasticSearch |         |
+|  | Covid19 | PoliticalTweets | EnglishWiki | Mean Gains |
+| :--- | :---: | :---: | :---: | :---: |
+| MongoDB | 0.12 | 0.06 |  | 1x |
+| ElasticSearch | 1,414.77 | 1,584.31 |  | **17,414.32x** |
 
 ## Write Operations
 
@@ -158,10 +184,10 @@ Output: success/failure indicator.<br/>
 Metric: number inserted docs per second.<br/>
 
 
-|               | Covid19 |
-| :------------ | :-----: |
-| MongoDB       |  27.42  |
-| ElasticSearch |  13.28  |
+|  | Covid19 | PoliticalTweets | EnglishWiki | Mean Gains |
+| :--- | :---: | :---: | :---: | :---: |
+| MongoDB | 27.42 | 509.45 |  | 1x |
+| ElasticSearch | 13.28 | 14.16 |  | 0.05x |
 
 ### Random Writes: Upsert Docs Batch
 
@@ -171,10 +197,10 @@ Output: 500 success/failure indicators.<br/>
 Metric: number inserted docs per second.<br/>
 
 
-|               | Covid19 |
-| :------------ | :-----: |
-| MongoDB       |  29.36  |
-| ElasticSearch |  23.15  |
+|  | Covid19 | PoliticalTweets | EnglishWiki | Mean Gains |
+| :--- | :---: | :---: | :---: | :---: |
+| MongoDB | 29.36 | 1,672.29 |  | 1x |
+| ElasticSearch | 23.15 | 20.88 |  | 0.03x |
 
 ### Random Writes: Remove Doc
 
@@ -184,10 +210,10 @@ Output: success/failure indicator.<br/>
 Metric: number removed docs per second.<br/>
 
 
-|               | Covid19 |
-| :------------ | :-----: |
-| MongoDB       |  27.24  |
-| ElasticSearch |  13.63  |
+|  | Covid19 | PoliticalTweets | EnglishWiki | Mean Gains |
+| :--- | :---: | :---: | :---: | :---: |
+| MongoDB | 27.24 | 221.75 |  | 1x |
+| ElasticSearch | 13.63 | 12.67 |  | 0.11x |
 
 ### Random Writes: Remove Docs Batch
 
@@ -197,8 +223,8 @@ Output: 500 success/failure indicators.<br/>
 Metric: number removed docs per second.<br/>
 
 
-|               | Covid19 |
-| :------------ | :-----: |
-| MongoDB       |  30.85  |
-| ElasticSearch |  25.97  |
+|  | Covid19 | PoliticalTweets | EnglishWiki | Mean Gains |
+| :--- | :---: | :---: | :---: | :---: |
+| MongoDB | 30.85 | 1,772.88 |  | 1x |
+| ElasticSearch | 25.97 | 20.58 |  | 0.03x |
 

@@ -8,6 +8,7 @@ from PyWrappedGraph.BaseAPI import BaseAPI
 
 from P0Config import P0Config
 from P3TasksSampler import P3TasksSampler
+from PyWrappedHelpers.Config import allow_big_csv_fields
 
 
 class P3Bench(object):
@@ -23,6 +24,7 @@ class P3Bench(object):
         self.conf = P0Config.shared()
         self.max_seconds_per_query = max_seconds_per_query
         self.tasks = P3TasksSampler()
+        allow_big_csv_fields()
 
     def run(self, repeat_existing=False):
         self.repeat_existing = repeat_existing
@@ -47,12 +49,6 @@ class P3Bench(object):
             self.database['name']
         ))
 
-        self.doc_ids_to_query = []
-        self.words_to_search = []
-        self.regexs_to_search = []
-        self.docs_to_change_by_one = []
-        self.docs_to_change_batched = [[]]
-
         # Queries returning single object.
         self.bench_task(
             name='Random Reads: Lookup Doc by ID',
@@ -61,21 +57,26 @@ class P3Bench(object):
 
         # Queries returning collections.
         self.bench_task(
-            name='Random Reads: Find All Docs with Substring',
-            func=lambda: self.find_with_substring(None)
+            name='Random Reads: Find up to 10,000 Docs with Substring',
+            func=lambda: self.find_with_substring(max_matches=10000)
         )
         self.bench_task(
-            name='Random Reads: Find 20 Docs with Substring',
-            func=lambda: self.find_with_substring(20)
+            name='Random Reads: Find up to 20 Docs with Substring',
+            func=lambda: self.find_with_substring(max_matches=20)
         )
         self.bench_task(
-            name='Random Reads: Find All Docs with Bigram',
-            func=lambda: self.find_with_phrase(None)
+            name='Random Reads: Find up to 20 Docs with Bigram',
+            func=lambda: self.find_with_phrase(max_matches=20)
         )
-        # self.bench_task(
-        #     name='Random Reads: Find Docs with RegEx',
-        #     func=self.find_with_regex
-        # )
+        # for regex_template in self.tasks.regexs_to_search:
+        #     name = 'Random Reads: Find up to 20 RegEx Matches ({})'.format(
+        #         regex_template['Name'])
+        #     regexs = regex_template['Tasks']
+        #     self.bench_task(
+        #         name=name,
+        #         func=lambda: self.find_with_regex(
+        #             regexs=regexs, max_matches=20)
+        #     )
 
         # Reversable write operations.
         self.bench_task(
@@ -145,7 +146,8 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for word in self.tasks.words_to_search:
-            doc_ids = self.tdb.find_with_substring(word, max_matches)
+            doc_ids = self.tdb.find_with_substring(
+                query=word, max_matches=max_matches)
             cnt += 1
             cnt_found += len(doc_ids)
             dt = time() - t0
@@ -159,7 +161,8 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for word in self.tasks.phrases_to_search:
-            doc_ids = self.tdb.find_with_substring(word, max_matches)
+            doc_ids = self.tdb.find_with_substring(
+                query=word, max_matches=max_matches)
             cnt += 1
             cnt_found += len(doc_ids)
             dt = time() - t0
@@ -168,12 +171,13 @@ class P3Bench(object):
         print(f'---- {cnt} ops: {cnt_found} matches found')
         return cnt
 
-    def find_with_regex(self, max_matches: int = None) -> int:
+    def find_with_regex(self, regexs, max_matches: int = None) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
-        for regex in self.tasks.regexs_to_search:
-            doc_ids = self.tdb.find_with_regex(regex, max_matches)
+        for regex in regexs:
+            doc_ids = self.tdb.find_with_regex(
+                query=regex, max_matches=max_matches)
             cnt += 1
             cnt_found += len(doc_ids)
             dt = time() - t0

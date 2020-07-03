@@ -36,7 +36,7 @@ class P3TasksSampler(object):
         {
             "Name": "A Time + Random Word",
             "Example": "04:30, 21:55 am RANDOM",
-            "Template": r"[0-2][0-9]:[0-5][0-9][ ]?(am|pm)? {}",
+            "Template": r"[0-2][0-9]:[0-5][0-9][ ]?(am|pm)? ${RANDOM}",
             "Tasks": [],
         },
         {
