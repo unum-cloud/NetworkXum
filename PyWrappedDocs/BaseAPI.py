@@ -6,6 +6,7 @@ from pathlib import Path
 
 from PyWrappedHelpers.TextFile import TextFile
 from PyWrappedHelpers.Algorithms import *
+from PyWrappedHelpers.Config import allow_big_csv_fields
 
 
 class BaseAPI(object):
@@ -68,6 +69,7 @@ class BaseAPI(object):
 
     @abstractmethod
     def import_docs_from_csv(self, filepath: str) -> int:
+        allow_big_csv_fields()
         cnt_success = 0
         for files_chunk in chunks(yield_texts_from_sectioned_csv(filepath), type(self).__max_batch_size__):
             cnt_success += self.upsert_docs(files_chunk)
