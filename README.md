@@ -1,58 +1,74 @@
 # PyWrappedDBs
 
-A library (and benchmark) of graph-like adaptors for conventional persistent storage engines. <br/>
-Supports both SQL and NoSQL backends, embedded databases and full scale servers. <br/>
-Was benchmarked with MongoDB, Neo4J, *ArangoDB*, SQLite, PostgreSQL and MySQL backends. <br/>
-Implements the same [interface](adapters/base.py) for every one of those backends.
+A library (and set of benchmarks) of DB wrappers, which hide their unique interfaces behind simple-to-use purpose-specific wrappers for:
+
+* Graphs (Networks),
+* Textual Documents,
+* Time Series.
+
+The intention of this project was to find the best storage layer for [Unum](https://unum.xyz) neuro-symbolic AI models, so we compared all kinds of DBs: SQL & NoSQL, distributed & single-node, embedded databases & full scale servers. This library was tested with following backends: 
+
+* [MongoDB](#mongodb) - modern (yet mature) distributed document DB with good performance in most workloads,
+* [ElasticSearch](#elasticsearch) - extremely popular text-indexing software, 
+* [Neo4J](#neo4j) - disturbingly slow and unstable DB positioned as the go-to Graph database, 
+* [SQLite3](#sqlite3) - ubiquitous compact relation DB with basic `SQL` support, 
+* [PostgreSQL](#postgresql) - most feature-rich open-source relational DB,
+* [MySQL](#mysql) - the most commonly-used relational DB.
 
 ## Project Structure
 
-* [pygraphdb](pygraphdb) - contains Pythonic wrappers for DBs.
-* [bench](bench) - contains benchmark programs and results for different hardware.
-* [BenchGraphs/stats_*/stats.json](BenchGraphs/MacbookPro/stats.json) - contains machine-readable results of previous benchmarks.
-* [BenchGraphs/stats_*/stats.md](BenchGraphs/MacbookPro/stats.md) - contains human-readable results of previous benchmarks.
+* [PyWrappedGraph](PyWrappedGraph) - Python wrappers for Graph (Network) datastructures backed by persistent DBs.
+* [BenchGraphs](BenchGraphs) - benchmarking tools and performance results for [PyWrappedGraph](PyWrappedGraph).
+* [PyWrappedDocs](PyWrappedDocs) - Python wrappers for search-able containers of strings backed by persistent DBs.
+* [BenchDocs](BenchDocs) - benchmarking tools and performance results for [PyWrappedDocs](PyWrappedDocs).
+
+## Performance Considerations
+
+After months-long analysis on different datasets and hardware - we decided to write a new high-performance database from scratch ([UnumDB](https://unum.xyz/db)). Below are some of the bottlenecks we have identified in most modern DBs. If you decide to write your own, those are the points to consider. 
+
+|                           |          Common Solutions          |            What we use in UnumDB            |               **Result**                |
+| :------------------------ | :--------------------------------: | :-----------------------------------------: | :-------------------------------------: |
+| Data layout               |        Row-wise or columnar        |          Optimal for each datatype          |            Less random jumps            |
+| Compression               |  Generic, but slow (Snappy, zlib)  | Newly invented algorithms for each datatype |         Writes/reads less data          |
+| Query language            | SQL-like with big parsing overhead |           Simple Python-interface           |   Lower latency for simple operations   |
+| Inter-node communications |               TCP/IP               |    DMA or Infiniband RDMA (in a cluster)    | Faster data exchange across the cluster |
+| Data exchange format      |         Plain text or JSON         |                   Binary                    |        Avoids serialization step        |
+
+Or just use [UnumDB](https://unum.xyz/db).
 
 ## Implementation Details & Included DBs
 
 ### MongoDB
 
-* A distributed document storage. Fast growing project, but performance isnt the primary objective.
-* Each edge is a separate BSON document with 2 separate indexes for source and target nodes.
-* Each dataset is stored in it's own database within MongoDB instance. MongoDB is configured to put them in separate directories.
-* We connect to it using `pymongo` bindings.
+* A distributed document storage. 
+* Internally uses the `BSON` binary format.
+* Very popular open-source project backed by the publicly traded `$MDB` enterprise.
+* Provides bindings for most programming languages (including `pymongo` for Python).
 
-### Neo4J
-
-* A graph database. Best known product in its segment.
-* All datasets are stored in the same database (but with different labels), as Neo4J doesnt provide and easy way to switch between collections.
-* The implementation isn't properly optimized due to compatiability issues between API versions 3.5 and 4, constant crashes and limited community edition.
-* We were not able to index properties of edges, as its a paid feature.
-* We connect to it over BOLT API and encode requests manually into CYPHER query DSL.
+### ElasticSearch
 
 ### SQLite3
 
-* Embedded tabular SQL database with extreme level of adoption.
-* They provide a nice C API, but we use SQL for queries to make results comparable to PostgreSQL and MySQL. We use SQLAlchemy library for Object-Relational-Mapping in Python, which is by far the most common tool for that.
-* We also include in-memory variant of SQLite for comparison purposes. If you wish to see how other DBs perform in-memory, just mount them on RAM drive.
-* SQlite is a single file databse, which makes it very easy configure for every workload. We cutomize the page size, Write-Ahead-Log format and concurrency settings for higher performance.
-* As in other SQL databases we store 3 tables of data (`table_nodes`, `table_edges` and `new_edges` for bulk imports), but no relations between them to make queries less complex. However, the main properties of each edge (`v1`, `v2`, `directed`) are indexed which must easily compensate the lack of direct connection between tables.
+* Embedded tabular SQL database with an extreme level of adoption.
+* They provide a nice C API, but we use SQL for queries to make results comparable to PostgreSQL and MySQL. 
+* We use SQLAlchemy library for Object-Relational-Mapping in Python, which is by far the most common Python ORM tool.
+* SQlite is a single file databse, which makes it very easy configure for every workload. We overwrite the page size, Write-Ahead-Log format and concurrency settings for higher performance.
 
 ### PostgreSQL
 
 * One of the most common open-source SQL databases.
-* Data layout that we use is the same as for SQLite3, but with less configuration.
-* Each dataset is stored in it's own database within Postregres instance.
 
 ### MySQL
 
 * One of the most common open-source SQL databases.
-* Data layout that we use is the same as for SQLite3, but with less configuration.
-* Each dataset is stored in it's own database within MySQL instance.
 
-### UnumDB
+### Neo4J
 
-* Our in-house closed-source solution for storing graphs.
-* The binaries aren't included, now we can only share some benchmarks.
+* The best known graph database with >10 year history.
+* Instead of SQL uses CYPHER DSL for queries, which are transmitted over the BOLT API.
+* There are some compatiability issues between API versions 3.5 and 4.
+* Some of the essential indexing capabilities are not availiable in the free version.
+* In our experience, extremely unstable and doesn't scale beyond tiny datasets.
 
 ## TODO
 
