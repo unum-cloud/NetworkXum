@@ -127,7 +127,7 @@ Metric: number of such queries returned per second.<br/>
 | MongoDB       | 2,457.27 |    1,588.46     |     2,270.19     |     1x     |
 | ElasticSearch |  519.67  |     617.50      |      629.71      |   0.28x    |
 
-### Random Reads: Find up to 10,000 Docs with Substring
+### Random Reads: Find up to 10,000 Docs containing a Word
 
 
 Input: 1 randomly selected word.<br/>
@@ -140,7 +140,7 @@ Metric: number of such queries returned per second.<br/>
 | MongoDB       |  0.13   |      2.41       |       0.20       |     1x     |
 | ElasticSearch |  0.69   |      0.48       |       0.33       |   0.54x    |
 
-### Random Reads: Find up to 20 Docs with Substring
+### Random Reads: Find up to 20 Docs containing a Word
 
 
 Input: 1 randomly selected word.<br/>

@@ -57,11 +57,11 @@ class P3Bench(object):
 
         # Queries returning collections.
         self.bench_task(
-            name='Random Reads: Find up to 10,000 Docs with Substring',
+            name='Random Reads: Find up to 10,000 Docs containing a Word',
             func=lambda: self.find_with_substring(max_matches=10000)
         )
         self.bench_task(
-            name='Random Reads: Find up to 20 Docs with Substring',
+            name='Random Reads: Find up to 20 Docs containing a Word',
             func=lambda: self.find_with_substring(max_matches=20)
         )
         self.bench_task(

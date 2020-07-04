@@ -128,6 +128,8 @@ class P4Print():
         However, the constant multiplier in our case is much lower, so the new algorithm ends-up beating the classical solutions from Intel, Google and other companies at least in some cases. 
         On our test bench the timings are:
 
+        *   `std::regex` on 1 Intel Core: varies between 1 MB/s and 300 MB/s.
+        *   PCRE2 on 1 Intel Core: .
         *   Intel Hyperscan on 1 Intel Core: 4 GB/s consistent performance.
         *   Unum.RegEx on 1 Intel Core: up to 3 GB/s.
         *   Unum.RegEx on 1 Intel Core (after text preprocessing): up to 15 GB/s.
@@ -149,13 +151,13 @@ class P4Print():
              Output: text content.<br/>
              Metric: number of such queries returned per second.<br/>
              '''),
-            ('Random Reads: Find up to 10,000 Docs with Substring',
+            ('Random Reads: Find up to 10,000 Docs containing a Word',
              '''
              Input: 1 randomly selected word.<br/>
              Output: up to 10,000 documents IDs containing it.<br/>
              Metric: number of such queries returned per second.<br/>
              '''),
-            ('Random Reads: Find up to 20 Docs with Substring',
+            ('Random Reads: Find up to 20 Docs containing a Word',
              '''
              Input: 1 randomly selected word.<br/>
              Output: up to 20 documents IDs containing it.<br/>

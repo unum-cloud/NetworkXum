@@ -378,7 +378,7 @@
     {
         "database": "ElasticSearch",
         "dataset": "Covid19",
-        "benchmark_name": "Random Reads: Find up to 10,000 Docs with Substring",
+        "benchmark_name": "Random Reads: Find up to 10,000 Docs containing a Word",
         "time_elapsed": 30.610080003738403,
         "count_iterations": 1,
         "count_operations": 21,
@@ -414,7 +414,7 @@
     {
         "database": "ElasticSearch",
         "dataset": "Covid19",
-        "benchmark_name": "Random Reads: Find up to 20 Docs with Substring",
+        "benchmark_name": "Random Reads: Find up to 20 Docs containing a Word",
         "time_elapsed": 30.003087997436523,
         "count_iterations": 1,
         "count_operations": 7022,
@@ -522,7 +522,7 @@
     {
         "database": "MongoDB",
         "dataset": "Covid19",
-        "benchmark_name": "Random Reads: Find up to 10,000 Docs with Substring",
+        "benchmark_name": "Random Reads: Find up to 10,000 Docs containing a Word",
         "time_elapsed": 31.02541494369507,
         "count_iterations": 1,
         "count_operations": 4,
@@ -558,7 +558,7 @@
     {
         "database": "MongoDB",
         "dataset": "Covid19",
-        "benchmark_name": "Random Reads: Find up to 20 Docs with Substring",
+        "benchmark_name": "Random Reads: Find up to 20 Docs containing a Word",
         "time_elapsed": 32.25120210647583,
         "count_iterations": 1,
         "count_operations": 137,
@@ -810,7 +810,7 @@
     {
         "database": "ElasticSearch",
         "dataset": "PoliticalTweets",
-        "benchmark_name": "Random Reads: Find up to 10,000 Docs with Substring",
+        "benchmark_name": "Random Reads: Find up to 10,000 Docs containing a Word",
         "time_elapsed": 31.425326108932495,
         "count_iterations": 1,
         "count_operations": 15,
@@ -846,7 +846,7 @@
     {
         "database": "ElasticSearch",
         "dataset": "PoliticalTweets",
-        "benchmark_name": "Random Reads: Find up to 20 Docs with Substring",
+        "benchmark_name": "Random Reads: Find up to 20 Docs containing a Word",
         "time_elapsed": 30.002040147781372,
         "count_iterations": 1,
         "count_operations": 5093,
@@ -954,7 +954,7 @@
     {
         "database": "MongoDB",
         "dataset": "PoliticalTweets",
-        "benchmark_name": "Random Reads: Find up to 10,000 Docs with Substring",
+        "benchmark_name": "Random Reads: Find up to 10,000 Docs containing a Word",
         "time_elapsed": 33.6720187664032,
         "count_iterations": 1,
         "count_operations": 81,
@@ -990,7 +990,7 @@
     {
         "database": "MongoDB",
         "dataset": "PoliticalTweets",
-        "benchmark_name": "Random Reads: Find up to 20 Docs with Substring",
+        "benchmark_name": "Random Reads: Find up to 20 Docs containing a Word",
         "time_elapsed": 30.156317949295044,
         "count_iterations": 1,
         "count_operations": 3419,
@@ -1098,7 +1098,7 @@
     {
         "database": "ElasticSearch",
         "dataset": "EnglishWikipedia",
-        "benchmark_name": "Random Reads: Find up to 10,000 Docs with Substring",
+        "benchmark_name": "Random Reads: Find up to 10,000 Docs containing a Word",
         "time_elapsed": 30.731918811798096,
         "count_iterations": 1,
         "count_operations": 10,
@@ -1134,7 +1134,7 @@
     {
         "database": "ElasticSearch",
         "dataset": "EnglishWikipedia",
-        "benchmark_name": "Random Reads: Find up to 20 Docs with Substring",
+        "benchmark_name": "Random Reads: Find up to 20 Docs containing a Word",
         "time_elapsed": 30.010725021362305,
         "count_iterations": 1,
         "count_operations": 2166,
@@ -1386,7 +1386,7 @@
     {
         "database": "MongoDB",
         "dataset": "EnglishWikipedia",
-        "benchmark_name": "Random Reads: Find up to 10,000 Docs with Substring",
+        "benchmark_name": "Random Reads: Find up to 10,000 Docs containing a Word",
         "time_elapsed": 60.79990768432617,
         "count_iterations": 1,
         "count_operations": 12,
@@ -1422,7 +1422,7 @@
     {
         "database": "MongoDB",
         "dataset": "EnglishWikipedia",
-        "benchmark_name": "Random Reads: Find up to 20 Docs with Substring",
+        "benchmark_name": "Random Reads: Find up to 20 Docs containing a Word",
         "time_elapsed": 63.37255382537842,
         "count_iterations": 1,
         "count_operations": 52,
