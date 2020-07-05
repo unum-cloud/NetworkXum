@@ -33,11 +33,11 @@ After months-long analysis on different datasets and hardware - we decided to wr
 | Computations              |             Sequential             |              SIMD-Accelerated               |   Processing more bytes per CPU cycle   |
 | Query language            | SQL-like with big parsing overhead |           Simple Python-interface           |   Lower latency for simple operations   |
 | Memory management         |    Garbage collecting languages    |       Modern C++ with smart pointers        |          Efficient use of RAM           |
-| Parallelism               |          Multi-processing          |               Multi-threading               |  Faster data exchange between threads   |
+| Parallelism               |          Multi-processing          |        Asynchronous multi-threading         |  Faster data exchange between threads   |
 | Inter-node communications |               TCP/IP               |    DMA or Infiniband RDMA (in a cluster)    | Faster data exchange across the cluster |
 | Data exchange format      |         Plain text or JSON         |                   Binary                    |        Avoids serialization step        |
 
-Or just use [UnumDB](https://unum.xyz/db). If you decide to switch to a more mature DB later on - you will only have to change 1 line in your code.
+Or just use [UnumDB](https://unum.xyz/db), it's free. **Currently you can expect 5x-100x better DB performance across the board**. We are on track to implement a lot more optimizations than listed above. If you decide to switch to a more mature DB later on - you will only have to change 1 line in your code.
 
 ## Implementation Details & Included DBs
 
@@ -45,7 +45,7 @@ Some common databases have licences that prohibit sharing of benchmark results, 
 
 ### MongoDB
 
-* A distributed document storage. 
+* A distributed ACID document store. 
 * Internally uses the `BSON` binary format.
 * Very popular open-source project backed by the `$MDB` [publicly traded company](https://finance.yahoo.com/quote/MDB).
 * Provides bindings for most programming languages (including [PyMongo](https://pymongo.readthedocs.io) for Python).
@@ -64,13 +64,11 @@ Some common databases have licences that prohibit sharing of benchmark results, 
 * We use SQLAlchemy for Object-Relational-Mapping, which is by far the most common Python ORM tool.
 * We overwrite the page size, Write-Ahead-Log format and concurrency settings for higher performance.
 
-### PostgreSQL
+### PostgreSQL, MySQL and other SQLs
 
-* One of the most common open-source SQL databases.
-
-### MySQL
-
-* One of the most common open-source SQL databases.
+* Most common open-source SQL databases.
+* Work well in single-node environment, but scale poorly out of the box.
+* Mostly store search indexes in a form of a [B-Tree](https://ieftimov.com/post/postgresql-indexes-btree/). They generally provide good read performance, but are slow to update.
 
 ### Neo4J
 
