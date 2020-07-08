@@ -26,16 +26,18 @@ The intention of this project was to find the best storage layer for [Unum](http
 
 After months-long analysis on different datasets and hardware - we decided to write a new high-performance database from scratch ([UnumDB](https://unum.xyz/db)). Below are some of the bottlenecks we have identified in most modern DBs. If you decide to write your own, those are the points to consider. 
 
-|                           |          Common Solutions          |            What we use in UnumDB            |               **Result**                |
-| :------------------------ | :--------------------------------: | :-----------------------------------------: | :-------------------------------------: |
-| Data layout               |        Row-wise or columnar        |          Optimal for each datatype          |            Less random jumps            |
-| Compression               |  Generic, but slow (Snappy, zlib)  | Newly invented algorithms for each datatype |         Writes/reads less data          |
-| Computations              |             Sequential             |              SIMD-Accelerated               |   Processing more bytes per CPU cycle   |
-| Query language            | SQL-like with big parsing overhead |           Simple Python-interface           |   Lower latency for simple operations   |
-| Memory management         |    Garbage collecting languages    |       Modern C++ with smart pointers        |          Efficient use of RAM           |
-| Parallelism               |          Multi-processing          |        Asynchronous multi-threading         |  Faster data exchange between threads   |
-| Inter-node communications |               TCP/IP               |    DMA or Infiniband RDMA (in a cluster)    | Faster data exchange across the cluster |
-| Data exchange format      |         Plain text or JSON         |                   Binary                    |        Avoids serialization step        |
+|                           |            Common Solutions             |            What we use in UnumDB            |                **Result**                | Device |
+| :------------------------ | :-------------------------------------: | :-----------------------------------------: | :--------------------------------------: | ------ |
+| Data layout               |          Row-wise or columnar           |          Optimal for each datatype          |         Less random jumps on SSD         | 💾      |
+| Compression               |    Generic, but slow (Snappy, zlib)     | Newly invented algorithms for each datatype |   Writes/reads less bytes to/from SSD    | 💾      |
+| Integrated Analytics      |     Integrating 3rd party libraries     |           Co-designed algorithms            | Optimal use of search indexes & metadata | 🧠      |
+| Computations              |               Sequential                |              SIMD-Accelerated               |   Processing more bytes per CPU cycle    | 🧠      |
+| Query language            |   SQL-like with big parsing overhead    |           Simple Python-interface           |   Lower latency for simple operations    | 🧠      |
+| Memory management         |      Garbage collecting languages       |       Modern C++ with smart pointers        |     Reusing RAM & avoiding GC stalls     | 🐏      |
+| In-Memory copies          | 1+ per read/write + DB cache + OS cache |      1 per write + DB cache + OS cache      |     Fitting more data-points in RAM      | 🐏      |
+| Parallelism               |            Multi-processing             |        Asynchronous multi-threading         |     Faster sharing between CPU cores     | 🧠      |
+| Inter-node communications |                 TCP/IP                  |    DMA or Infiniband RDMA (in a cluster)    |      Faster sharing between servers      | 📡      |
+| Data exchange format      |           Plain text or JSON            |                   Binary                    |     No serialization overhead on CPU     | 🧠      |
 
 Or just use [UnumDB](https://unum.xyz/db), it's free. **Currently you can expect 5x-100x better DB performance across the board**. We are on track to implement a lot more optimizations than listed above. If you decide to switch to a more mature DB later on - you will only have to change 1 line in your code.
 
