@@ -10,15 +10,14 @@
 At [Unum](https://unum.xyz) we develop a neuro-symbolic AI, which means combining discrete structural representations of data and semi-continuous neural representations.
 The common misconception is that CPU/GPU power is the bottleneck for designing AGI, but we would argue that it's the storage layer (unless you want to train on the same data over and over again).
 
-* CPU ⇌ RAM bandwidth (DDR4): ~100 GB/s.
-* GPU ⇌ VRAM bandwidth (HBM2): ~1,000 GB/s.
-* CPU ⇌ GPU bandwidth (PCI-E Gen3 x16): ~15 GB/s.
-* GPU ⇌ GPU bandwidth (NVLink): ~300 GB/s.
-* CPU ⇌ SSD bandwidth (NVMe): ~2 GB/s.
+* CPU ⇌ RAM bandwidth ([DDR4](https://en.wikipedia.org/wiki/DDR4_SDRAM)): ~100 GB/s.
+* GPU ⇌ VRAM bandwidth ([HBM2](https://en.wikipedia.org/wiki/High_Bandwidth_Memory)): ~1,000 GB/s.
+* GPU ⇌ GPU bandwidth ([NVLink](https://en.wikipedia.org/wiki/NVLink)): ~300 GB/s.
+* CPU ⇌ GPU bandwidth ([PCI-E Gen3 x16](https://en.wikipedia.org/wiki/PCI_Express)): ~15 GB/s (60 GB/s by 2022).
+* CPU ⇌ SSD bandwidth ([NVMe over PCI-E Gen3 x4](https://en.wikipedia.org/wiki/NVM_Express)): ~2 GB/s (6 GB/s by 2022).
 
 As we can see, the theoretical throughput between storage (SSD) and CPU is by far the biggest bottleneck.
-2 GB/s doesn't sound very scary, but the problem is that **most databases can hardly saturate 10% of that capacity (or 200 MB/s)!**
-When it comes to random (opposed to sequential) read operations the performance drops further to <1% of channel capacity.
+2 GB/s isn't scary, but **most databases can hardly saturate 10% of that capacity (or 200 MB/s)** due to [read-amplification](http://smalldatum.blogspot.com/2015/11/read-write-space-amplification-pick-2_23.html) or random jumps.
 That's why it's crucial for us to store the data in the most capable database!
 
 
@@ -81,6 +80,8 @@ I suspect a bug in the implementation of the text index, as some batch import op
 | ElasticSearch | 2,5 GB  |     2,9 GB      |     33,5 GB      |
 | UnumDB.Text   |    1    |        1        |        1         |
 
+MongoDB is one of the best products on the DB market, but I suspect they have a bug in their text indexing capabilities. Some of the batch insertions were hanging for ~10 mins and only 15% of the largest dataset were imported after ~7 hours!
+
 ## Read Queries
 
 
@@ -92,23 +93,24 @@ It means having at least 2 bottlenecks:
 1. If you are scanning all the data in the DB you are limited by the sequential read performance of the SSD (accounting for the read amplification dependant on the data locality).
 2. The speed of your RegEx engine.
 
-The (1.) point is pretty clear, but the (2.) is much more complex. Most DBs use the [PCRE/PCRE2](http://www.pcre.org) C library which was first released back in 1997 with a major upgrade in 2015.
-Implementing full RegEx support is complex, especially if you want to beat C code in performance, so most programming languages and libraries just wrap PCRE.
-That said, the performance is still laughable. It varies a lot between different different queries, but [can be orders of magniture slower](https://rust-leipzig.github.io/regex/2017/03/28/comparison-of-regex-engines/) than [Intel Hyperscan](https://software.intel.com/content/www/us/en/develop/articles/introduction-to-hyperscan.html) State-of-theArt library.
-Most (if not all) of those libraries use the classical DFA-based algorithm with `~O(n)` worst case time complexity for search (assuming the automata is already constructed).
-As always, we are not limiting ourselves to using existing algorithms, we design our own. In `Unum.ReGex` we have developed an algorithm with worst-case-complexity harder than the DFA approach, but the average complexity is also `~O(n)`.
-However, the constant multiplier in our case is much lower, so the new algorithm ends-up beating the classical solutions from Intel, Google and other companies at least in some cases. 
+The (1.) point is pretty clear, but the (2.) is much more complex. Most DBs use the [PCRE/PCRE2](http://www.pcre.org) C library which was first released back in 1997 with a major upgrade in 2015.<br/>
+Implementing full RegEx support is complex, especially if you want to beat C code in performance, so most programming languages and libraries just wrap PCRE.<br/>
+That said, the performance is still laughable. It varies a lot between different different queries, but [can be orders of magniture slower](https://rust-leipzig.github.io/regex/2017/03/28/comparison-of-regex-engines/) than [Intel Hyperscan](https://software.intel.com/content/www/us/en/develop/articles/introduction-to-hyperscan.html) State-of-theArt library.<br/>
+Most (if not all) of those libraries use the classical **DFA-based algorithm with `~O(n)` worst case time complexity for search** (assuming the automata is already constructed).<br/>
+As always, we are not limiting ourselves to using existing algorithms, we design our own. In `Unum.ReGex` we have developed an algorithm with worst-case-complexity harder than the DFA approach, but the average complexity is also `~O(n)`.<br/>
+However, **the constant multiplier in our case is much lower, so the new algorithm ends-up beating the classical solutions from Intel, Google** and other companies at least in some cases. <br/>
 On our test bench the timings are:
 
 *   Intel Hyperscan on 1 Intel Core: 4 GB/s consistent performance.
 *   Unum.RegEx on 1 Intel Core: up to 3 GB/s.
-*   Unum.RegEx on 1 Intel Core (after text preprocessing): up to 15 GB/s.
+*   Unum.RegEx on 1 Intel Core (after text preprocessing): **up to 15 GB/s**.
 *   Unum.RegEx on Titan V GPU: ? GB/s.
 *   Unum.RegEx on Titan V GPU (after text preprocessing): ? GB/s.
 
 The best part is that it can use statistics and cleverly organizind search indexes to vastly reduce the number of documents to be scanned.
-To our knowledge, no modern piece of software has such level of mutually-benefitial communication between the storage layer and the application layer.
-The results below speak for themselves, but before we go further I would like to note, that comparing randomly generated RegEx queries makes little sense, as such results wouldn't translate into real-world benefits for potential users.
+To our knowledge, no modern piece of software has such level of **mutually-benefitial communication between the storage layer and the application layer**.
+<br/><br/>
+The results below speak for themselves, but before we go further I would like to note, that comparing randomly generated RegEx queries makes little sense, as such results wouldn't translate into real-world benefits for potential users. 
 There are not too many universally used RegEx patterns, so the DBs can use the cache to fetch previously computed results.
 Such benchmarks are not representative as well, so I took the most common RegEx patterns (dates, numbers, IP addresses, E-mail addresses, XML tags...) and concatentated them with randomly sampled words from each of the datasets.
 That way we are still getting results similar to real-world queries, but avoid cache hits.
