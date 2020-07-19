@@ -37,17 +37,19 @@ That's why it's crucial for us to store the data in the most capable database!
 
 
 * [Covid19](https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge) Scientific Papers.
-    * Documents: 45,941.
-    * Sections: 1,604,649.
-    * Size: 1,7 GB.
+  * Articles: 45,941.
+  * Sections: 1,604,649.
+  * Size: 1,7 GB.
 * [PoliticalTweets](https://www.kaggle.com/iamyoginth/facthub) Posts.
-    * Documents: 12,488,144.
-    * Sections: 12,488,144.
-    * Size: 2,3 GB.
+  * Tweets: 12,488,143.
+  * Size: 2,3 GB.
+* [OldNewspapers](https://www.kaggle.com/alvations/old-newspapers) Articles in different languages.
+  * Articles: 16,806,041.
+  * Size: 2,3 GB.
 * [EnglishWikipedia](https://www.kaggle.com/jkkphys/english-wikipedia-articles-20170820-sqlite) Dump from 2017.
-    * Documents: 4,902,648.
-    * Sections: 23,046,187.
-    * Size: 18,2 GB.
+  * Articles: 4,902,648.
+  * Sections: 23,046,187.
+  * Size: 18,2 GB.
 
 
 ## Sequential Writes: Import CSV (docs/sec)
