@@ -41,13 +41,13 @@ class P3TasksSampler(object):
     def sample_from_distribution(self, count_nodes):
         count_needed = self.number_of_needed_samples()
         while len(self._buffer_edges) < count_needed:
-            v1 = random.randrange(1, count_nodes)
-            v2 = random.randrange(1, count_nodes)
-            if v1 == v2:
+            first = random.randrange(1, count_nodes)
+            second = random.randrange(1, count_nodes)
+            if first == second:
                 continue
             self._buffer_edges.append({
-                'v1': v1,
-                'v2': v2,
+                'first': first,
+                'second': second,
             })
         self._split_samples_into_tasks()
         return len(self._buffer_edges)
@@ -70,7 +70,7 @@ class P3TasksSampler(object):
         cnt = min(len(self._buffer_edges), cnt)
         es = random.sample(self._buffer_edges, cnt)
         # Save only unique values, but don't forget to shuffle.
-        vs = {(e['v1'] if bool(random.getrandbits(1)) else e['v2'])
+        vs = {(e.first if bool(random.getrandbits(1)) else e.second)
               for e in es}
         vs = list(vs)
         random.shuffle(vs)

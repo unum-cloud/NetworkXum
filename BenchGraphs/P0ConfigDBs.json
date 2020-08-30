@@ -1,11 +1,11 @@
 [
     {
-        "module_name": "PyUnumDB.GraphDB",
+        "module_name": "pynum",
         "class_name": "GraphDB",
         "name": "UnumDB.Graph",
         "url_variable_name": "URI_UNUMDB_GRAPH",
-        "url_default": "~/DBs/unumdb.Graph/${DATASET_NAME}",
-        "enabled": false
+        "url_default": "/Users/av/DBs/UnumDB/Graphs/${DATASET_NAME}",
+        "enabled": true
     },
     {
         "module_name": "PyWrappedGraph.SQLite",
@@ -29,7 +29,7 @@
         "name": "MySQL",
         "url_variable_name": "URI_MYSQL",
         "url_default": "mysql://av:temptemp@0.0.0.0:3306/${DATASET_NAME}",
-        "enabled": true
+        "enabled": false
     },
     {
         "module_name": "PyWrappedGraph.PostgreSQL",

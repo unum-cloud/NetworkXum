@@ -11,7 +11,7 @@ class NetworkX(object):
 
     def add_edge(self, u: int, v: int, **attrs) -> bool:
         """https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.upsert_edge.html#networkx.Graph.add_edge"""
-        return self.upsert_edge(Edge(v1=u, v2=v, **attrs))
+        return self.upsert_edge(Edge(first=u, second=v, **attrs))
 
     def add_edges_from(self, es, **attrs) -> int:
         """https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.add_edges_from.html#networkx.Graph.add_edges_from"""
@@ -26,7 +26,7 @@ class NetworkX(object):
         """https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.remove_edge.html#networkx.Graph.remove_edge"""
         self.db.remove_edge(Edge(u, v))
 
-    def remove_edges_from(self, es: List[object]) -> int:
+    def remove_edges_from(self, es: List[Edge]) -> int:
         """https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.remove_edges_from.html#networkx.Graph.remove_edges_from"""
         for e in es:
             self.remove_edge(e)
@@ -60,15 +60,15 @@ class NetworkX(object):
     # --------------------------------
 
     @abstractmethod
-    def edge_directed(self, v1: int, v2: int) -> Optional[object]:
+    def edge_directed(self, first: int, second: int) -> Optional[Edge]:
         """
             Given 2 vertexes that are stored in DB as 
-            outgoing from `v1` into `v2`.
+            outgoing from `first` into `second`.
         """
         pass
 
     @abstractmethod
-    def edge_undirected(self, v1: int, v2: int) -> Optional[object]:
+    def edge_undirected(self, first: int, second: int) -> Optional[Edge]:
         """
             Given 2 vertexes search for an edge 
             that goes in any direction.
@@ -76,15 +76,15 @@ class NetworkX(object):
         pass
 
     @abstractmethod
-    def edges_from(self, v: int) -> List[object]:
+    def edges_from(self, v: int) -> List[Edge]:
         pass
 
     @abstractmethod
-    def edges_to(self, v: int) -> List[object]:
+    def edges_to(self, v: int) -> List[Edge]:
         pass
 
     @abstractmethod
-    def edges_related(self, v: int) -> List[object]:
+    def edges_related(self, v: int) -> List[Edge]:
         """
             Finds all edges that contain `v` as part of it.
         """
@@ -202,8 +202,8 @@ class NetworkX(object):
         """
         vs_unique = set()
         for e in self.edges_related(v):
-            vs_unique.add(e['v1'])
-            vs_unique.add(e['v2'])
+            vs_unique.add(e.first)
+            vs_unique.add(e.second)
         vs_unique.discard(v)
         return vs_unique
 
@@ -228,5 +228,5 @@ class NetworkX(object):
             return related_to_related.difference(related).difference({v})
 
     @abstractmethod
-    def shortest_path(self, v1, v2) -> List[int]:
+    def shortest_path(self, first, second) -> List[int]:
         pass

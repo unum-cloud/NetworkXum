@@ -40,15 +40,17 @@ class BaseAPI(object):
             self.edge_id_generator = lambda e: self.biggest_edge_id() + 1
 
     @abstractmethod
-    def validate_edge(self, e: object) -> Optional[object]:
-        if ('v1' not in e) or ('v2' not in e):
+    def validate_edge(self, e: Edge) -> Optional[Edge]:
+        if isinstance(e, dict):
+            e = Edge(**e)
+        if (e.first < 0) or (e.second < 0):
             return None
-        if '_id' not in e:
-            e['_id'] = self.edge_id_generator(e)
+        if e._id < 0:
+            e._id = self.edge_id_generator(e)
         return e
 
     @abstractmethod
-    def upsert_edge(self, e: object) -> bool:
+    def upsert_edge(self, e: Edge) -> bool:
         """
             Updates an `Edge` with given ID. If it's missing - creates a new one.
             If ID property isn't set - it will be computed as hash of member nodes, 
@@ -57,30 +59,30 @@ class BaseAPI(object):
         pass
 
     @abstractmethod
-    def remove_edge(self, e: object) -> bool:
+    def remove_edge(self, e: Edge) -> bool:
         """
             Can delete edges with known ID and without.
             In the second case we only delete 1 edge, that has 
-            matching `v1` and `v2` nodes without 
+            matching `first` and `second` nodes without 
             searching for reverse edge.
         """
         return False
 
     @abstractmethod
-    def upsert_edges(self, es: Sequence[object]) -> int:
+    def upsert_edges(self, es: Sequence[Edge]) -> int:
         es = map_compact(self.validate_edge, es)
         successes = map(self.upsert_edge, es)
         return int(sum(successes))
 
     @abstractmethod
-    def remove_edges(self, es: Sequence[object]) -> int:
+    def remove_edges(self, es: Sequence[Edge]) -> int:
         successes = map(self.remove_edge, es)
         return int(sum(successes))
 
     @abstractmethod
     def upsert_adjacency_list(self, filepath: str) -> int:
         """
-            Imports data from adjacency list CSV file. Row shape: `(v1, v2, weight)`.
+            Imports data from adjacency list CSV file. Row shape: `(first, second, weight)`.
             Generates the edge IDs by hashing the members.
             So it guarantess edge uniqness, but is much slower than `insert_adjacency_list`.
         """
@@ -89,7 +91,7 @@ class BaseAPI(object):
     @abstractmethod
     def insert_adjacency_list(self, filepath: str) -> int:
         """
-            Imports data from adjacency list CSV file. Row shape: `(v1, v2, weight)`.
+            Imports data from adjacency list CSV file. Row shape: `(first, second, weight)`.
             Uses the `biggest_edge_id` to generate incremental IDs for new edges.
             Doesn't guarantee edge uniqness (for 2 given nodes) as `upsert_adjacency_list` does.
         """
@@ -140,35 +142,35 @@ class BaseAPI(object):
     # --------------------------------
 
     @abstractmethod
-    def iterate_nodes(self) -> Generator[object, None, None]:
+    def iterate_nodes(self) -> Generator[Edge, None, None]:
         # TODO
         pass
 
     @abstractmethod
-    def iterate_edges(self) -> Generator[object, None, None]:
+    def iterate_edges(self) -> Generator[Edge, None, None]:
         # TODO
         pass
 
     @abstractmethod
-    def edge_directed(self, v1: int, v2: int) -> Optional[object]:
-        """Only finds edges directed from `v1` to `v2`."""
+    def edge_directed(self, first: int, second: int) -> Optional[Edge]:
+        """Only finds edges directed from `first` to `second`."""
         pass
 
     @abstractmethod
-    def edge_undirected(self, v1: int, v2: int) -> Optional[object]:
+    def edge_undirected(self, first: int, second: int) -> Optional[Edge]:
         """Checks for edges in both directions."""
         pass
 
     @abstractmethod
-    def edges_from(self, v: int) -> List[object]:
+    def edges_from(self, v: int) -> List[Edge]:
         pass
 
     @abstractmethod
-    def edges_to(self, v: int) -> List[object]:
+    def edges_to(self, v: int) -> List[Edge]:
         pass
 
     @abstractmethod
-    def edges_related(self, v: int) -> List[object]:
+    def edges_related(self, v: int) -> List[Edge]:
         """Finds all edges that contain `v` as part of it."""
         pass
 
@@ -200,8 +202,8 @@ class BaseAPI(object):
         """Returns IDs of nodes that have a shared edge with `v`."""
         vs_unique = set()
         for e in self.edges_related(v):
-            vs_unique.add(e['v1'])
-            vs_unique.add(e['v2'])
+            vs_unique.add(e.first)
+            vs_unique.add(e.second)
         vs_unique.discard(v)
         return vs_unique
 

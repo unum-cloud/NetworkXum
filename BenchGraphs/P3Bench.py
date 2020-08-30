@@ -154,7 +154,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for e in self.tasks.edges_to_query[:half]:
-            match = self.g.edge_directed(e['v1'], e['v2'])
+            match = self.g.edge_directed(e.first, e.second)
             cnt += 1
             cnt_found += 0 if (match is None) else 1
             dt = time() - t0
@@ -162,7 +162,7 @@ class P3Bench(object):
                 break
         t0 = time()
         for e in self.tasks.edges_to_query[half:]:
-            match = self.g.edge_directed(e['v2'], e['v1'])
+            match = self.g.edge_directed(e.second, e.first)
             cnt += 1
             cnt_found += 0 if (match is None) else 1
             dt = time() - t0
@@ -176,7 +176,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for e in self.tasks.edges_to_query:
-            match = self.g.edge_directed(e['v1'], e['v2'])
+            match = self.g.edge_directed(e.first, e.second)
             cnt += 1
             cnt_found += 0 if (match is None) else 1
             dt = time() - t0
