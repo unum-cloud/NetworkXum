@@ -29,14 +29,14 @@ def map_compact(func, os: Sequence[object]) -> Sequence[object]:
     return os_new
 
 
-def remove_duplicate_edges(es: Sequence[object]) -> Sequence[object]:
+def remove_duplicate_edges(es: Sequence[Edge]) -> Sequence[Edge]:
     ids = set()
 
     def false_if_exists(e: object) -> bool:
-        if '_id' in e:
-            return False
-        ids.add(e['_id'])
-        return True
+        if e._id < 0:
+            ids.add(e._id)
+            return True
+        return False
     return filterfalse(false_if_exists, es)
 
 
@@ -51,7 +51,7 @@ def chunks(iterable, size) -> Generator[list, None, None]:
         yield current
 
 
-def yield_edges_from_csv(filepath: str, edge_type: type = Edge, directed=True) -> Generator[object, None, None]:
+def yield_edges_from_csv(filepath: str, edge_type: type = Edge, is_directed=True) -> Generator[Edge, None, None]:
     with open(filepath, 'r') as f:
         reader = csv.reader(f, delimiter=',')
         # Skip the header line.
@@ -60,11 +60,11 @@ def yield_edges_from_csv(filepath: str, edge_type: type = Edge, directed=True) -
             if len(columns) < 2:
                 continue
             # Check if the data isn't corrupt.
-            v1 = int(columns[0])
-            v2 = int(columns[1])
+            first = int(columns[0])
+            second = int(columns[1])
             has_weight = (len(columns) > 2 and len(columns[2]) > 0)
             w = float(columns[2]) if has_weight else 1.0
-            yield edge_type(v1=v1, v2=v2, weight=w, _id=idx, directed=directed)
+            yield edge_type(first=first, second=second, weight=w, _id=idx, is_directed=is_directed)
 
 
 def yield_texts_from_sectioned_csv(filepath: str) -> Generator[TextFile, None, None]:
@@ -100,7 +100,7 @@ def export_edges_into_graph(filepath: str, g) -> int:
     starting_id = g.biggest_edge_id()
     for es in chunks(yield_edges_from_csv(filepath, e_type), chunk_len):
         for i, e in enumerate(es):
-            es[i]['_id'] += starting_id
+            es[i]._id += starting_id
         count_edges_added += g.upsert_edges(es)
     return count_edges_added
 

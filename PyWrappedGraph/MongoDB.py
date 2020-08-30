@@ -12,7 +12,7 @@ from PyWrappedHelpers.Algorithms import *
 
 class MongoDB(BaseAPI):
     """
-        MongoDB until v2.6 had 1'000 element limit for the batch size.
+        MongoDB until second.6 had 1'000 element limit for the batch size.
         It was later pushed to 100'000, but there isn't much improvement 
         beyond this point and not every document is small enough to fit 
         in RAM with such batch sizes.
@@ -21,7 +21,7 @@ class MongoDB(BaseAPI):
     """
     __max_batch_size__ = 10000
     __is_concurrent__ = True
-    __edge_type__ = dict
+    __edge_type__ = Edge
 
     def __init__(self, url='mongodb://localhost:27017/graph', **kwargs):
         BaseAPI.__init__(self, **kwargs)
@@ -32,49 +32,50 @@ class MongoDB(BaseAPI):
         self.create_index()
 
     def create_index(self, background=False):
-        self.edges.create_index('v1', background=background, sparse=True)
-        self.edges.create_index('v2', background=background, sparse=True)
-        self.edges.create_index('directed', background=background, sparse=True)
+        self.edges.create_index('first', background=background, sparse=True)
+        self.edges.create_index('second', background=background, sparse=True)
+        self.edges.create_index(
+            'is_directed', background=background, sparse=True)
 
     # Relatives
 
-    def edge_directed(self, v1: int, v2: int) -> Optional[object]:
+    def edge_directed(self, first: int, second: int) -> Optional[Edge]:
         result = self.edges.find_one(filter={
-            'v1': v1,
-            'v2': v2,
-            'directed': True,
+            'first': first,
+            'second': second,
+            'is_directed': True,
         })
-        return result
+        return self.validate_edge(result)
 
-    def edge_undirected(self, v1: int, v2: int) -> Optional[object]:
+    def edge_undirected(self, first: int, second: int) -> Optional[Edge]:
         result = self.edges.find_one(filter={
             '$or': [{
-                'v1': v1,
-                'v2': v2,
+                'first': first,
+                'second': second,
             }, {
-                'v1': v2,
-                'v2': v1,
+                'first': second,
+                'second': first,
             }],
         })
-        return result
+        return self.validate_edge(result)
 
-    def edges_from(self, v: int) -> List[object]:
-        result = self.edges.find(filter={'v1': v, 'directed': True})
-        return list(result)
+    def edges_from(self, v: int) -> List[Edge]:
+        result = self.edges.find(filter={'first': v, 'is_directed': True})
+        return list(map_compact(self.validate_edge, result))
 
-    def edges_to(self, v: int) -> List[object]:
-        result = self.edges.find(filter={'v2': v, 'directed': True})
-        return list(result)
+    def edges_to(self, v: int) -> List[Edge]:
+        result = self.edges.find(filter={'second': v, 'is_directed': True})
+        return list(map_compact(self.validate_edge, result))
 
-    def edges_related(self, v: int) -> List[object]:
+    def edges_related(self, v: int) -> List[Edge]:
         result = self.edges.find(filter={
             '$or': [{
-                'v1': v,
+                'first': v,
             }, {
-                'v2': v,
+                'second': v,
             }],
         })
-        return list(result)
+        return list(map_compact(self.validate_edge, result))
 
     # Wider range of neighbors
 
@@ -82,25 +83,25 @@ class MongoDB(BaseAPI):
         vs = list(vs)
         result = self.edges.find(filter={
             '$or': [{
-                'v1': {'$in': vs},
+                'first': {'$in': vs},
             }, {
-                'v2': {'$in': vs},
+                'second': {'$in': vs},
             }],
         }, projection={
-            'v1': 1,
-            'v2': 1,
+            'first': 1,
+            'second': 1,
         })
         vs_unique = set()
-        for e in result:
-            vs_unique.add(e['v1'])
-            vs_unique.add(e['v2'])
+        for e in map_compact(self.validate_edge, result):
+            vs_unique.add(e.first)
+            vs_unique.add(e.second)
         return vs_unique.difference(set(vs))
 
     # Metadata
 
     def count_nodes(self) -> int:
-        froms = set(self.edges.distinct('v1'))
-        tos = set(self.edges.distinct('v2'))
+        froms = set(self.edges.distinct('first'))
+        tos = set(self.edges.distinct('second'))
         attributed = set(self.nodes.distinct('_id'))
         return len(froms.union(tos).union(attributed))
 
@@ -112,8 +113,8 @@ class MongoDB(BaseAPI):
             {
                 '$match': {
                     '$or': [
-                        {'v1': v},
-                        {'v2': v}
+                        {'first': v},
+                        {'second': v}
                     ],
                 }
             },
@@ -134,8 +135,8 @@ class MongoDB(BaseAPI):
         result = self.edges.aggregate(pipeline=[
             {
                 '$match': {
-                    'v2': v,
-                    'directed': True
+                    'second': v,
+                    'is_directed': True
                 }
             },
             {
@@ -155,8 +156,8 @@ class MongoDB(BaseAPI):
         result = self.edges.aggregate(pipeline=[
             {
                 '$match': {
-                    'v1': v,
-                    'directed': True
+                    'first': v,
+                    'is_directed': True
                 }
             },
             {
@@ -184,45 +185,40 @@ class MongoDB(BaseAPI):
 
     # Modifications
 
-    def validate_edge(self, e: object) -> object:
-        if not isinstance(e, dict):
-            e = e.__dict__
-        return super().validate_edge(e)
-
-    def upsert_edge(self, e: object) -> bool:
+    def upsert_edge(self, e: Edge) -> bool:
         e = self.validate_edge(e)
         if e is None:
             return False
-        if '_id' in e:
+        if e._id < 0:
             result = self.edges.update_one(
-                filter={'_id': e['_id'], },
-                update={'$set': e, },
+                filter={
+                    'first': e.first,
+                    'second': e.second,
+                },
+                update={'$set': e.__dict__, },
                 upsert=True,
             )
         else:
             result = self.edges.update_one(
-                filter={
-                    'v1': e['v1'],
-                    'v2': e['v2'],
-                },
-                update={'$set': e, },
+                filter={'_id': e._id, },
+                update={'$set': e.__dict__, },
                 upsert=True,
             )
         return result.modified_count >= 1
 
-    def remove_edge(self, e: object) -> bool:
+    def remove_edge(self, e: Edge) -> bool:
         result = self.edges.delete_one(filter={
-            'v1': e['v1'],
-            'v2': e['v2'],
-            'directed': e['directed'],
+            'first': e.first,
+            'second': e.second,
+            'is_directed': e.is_directed,
         })
         return result.deleted_count >= 1
 
     def remove_node(self, v: int) -> int:
         result = self.edges.delete_many(filter={
             '$or': [
-                {'v1': v},
-                {'v2': v},
+                {'first': v},
+                {'second': v},
             ]
         })
         return result.deleted_count >= 1
@@ -230,7 +226,7 @@ class MongoDB(BaseAPI):
     def remove_all(self):
         self.edges.drop()
 
-    def upsert_edges(self, es: List[object]) -> int:
+    def upsert_edges(self, es: List[Edge]) -> int:
         """Supports up to 1000 operations"""
         es = map_compact(self.validate_edge, es)
         es = remove_duplicate_edges(es)
@@ -240,17 +236,17 @@ class MongoDB(BaseAPI):
 
         def make_upsert(e):
             filters = {}
-            if '_id' in e:
-                filters['_id'] = e['_id']
+            if e._id < 0:
+                filters['first'] = e.first
+                filters['second'] = e.second
+                filters['is_directed'] = e.is_directed
             else:
-                filters['v1'] = e['v1']
-                filters['v2'] = e['v2']
-                filters['directed'] = e['directed']
+                filters['_id'] = e._id
 
             return UpdateOne(
                 filter=filters,
                 update={
-                    '$set': e
+                    '$set': e.__dict__
                 },
                 upsert=True,
             )
@@ -263,7 +259,7 @@ class MongoDB(BaseAPI):
             print(bwe.details['writeErrors'])
             return 0
 
-    def insert_edges(self, es: List[object]) -> int:
+    def insert_edges(self, es: List[Edge]) -> int:
         try:
             es = map_compact(self.validate_edge, es)
             es = remove_duplicate_edges(es)

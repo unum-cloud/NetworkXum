@@ -30,9 +30,9 @@ class NodeSQL(DeclarativeSQL):
 class EdgeSQL(DeclarativeSQL, Edge):
     __tablename__ = 'table_edges'
     _id = Column(BigInteger, primary_key=True)
-    v1 = Column(BigInteger)
-    v2 = Column(BigInteger)
-    directed = Column(Boolean)
+    first = Column(BigInteger)
+    second = Column(BigInteger)
+    is_directed = Column(Boolean)
     weight = Column(Float)
     attributes_json = Column(Text)
 
@@ -44,14 +44,14 @@ class EdgeSQL(DeclarativeSQL, Edge):
 class EdgeNew(DeclarativeSQL, Edge):
     __tablename__ = 'new_edges'
     _id = Column(BigInteger, primary_key=True)
-    v1 = Column(BigInteger)
-    v2 = Column(BigInteger)
-    directed = Column(Boolean)
+    first = Column(BigInteger)
+    second = Column(BigInteger)
+    is_directed = Column(Boolean)
     weight = Column(Float)
     attributes_json = Column(Text)
-    index_v1 = Index('index_v1', EdgeSQL.v1, unique=False)
-    index_v2 = Index('index_v2', EdgeSQL.v2, unique=False)
-    index_directed = Index('index_directed', EdgeSQL.directed, unique=False)
+    index_v1 = Index('index_v1', EdgeSQL.first, unique=False)
+    index_v2 = Index('index_v2', EdgeSQL.second, unique=False)
+    index_directed = Index('index_directed', EdgeSQL.is_directed, unique=False)
 
     # TODO: Consider using different Integer types in different SQL DBs.
     # https://stackoverflow.com/a/60840921/2766161
@@ -126,27 +126,27 @@ class BaseSQL(BaseAPI):
 
     # Relatives
 
-    def edge_directed(self, v1: int, v2: int) -> Optional[EdgeSQL]:
+    def edge_directed(self, first: int, second: int) -> Optional[EdgeSQL]:
         result = None
         with self.get_session() as s:
             result = s.query(EdgeSQL).filter(and_(
-                EdgeSQL.v1 == v1,
-                EdgeSQL.v2 == v2,
-                EdgeSQL.directed == True,
+                EdgeSQL.first == first,
+                EdgeSQL.second == second,
+                EdgeSQL.is_directed == True,
             )).limit(1).first()
         return result
 
-    def edge_undirected(self, v1: int, v2: int) -> Optional[EdgeSQL]:
+    def edge_undirected(self, first: int, second: int) -> Optional[EdgeSQL]:
         result = None
         with self.get_session() as s:
             result = s.query(EdgeSQL).filter(or_(
                 and_(
-                    EdgeSQL.v1 == v1,
-                    EdgeSQL.v2 == v2,
+                    EdgeSQL.first == first,
+                    EdgeSQL.second == second,
                 ),
                 and_(
-                    EdgeSQL.v1 == v2,
-                    EdgeSQL.v2 == v1,
+                    EdgeSQL.first == second,
+                    EdgeSQL.second == first,
                 )
             )).limit(1).first()
         return result
@@ -154,29 +154,31 @@ class BaseSQL(BaseAPI):
     def edges_from(self, v: int) -> List[EdgeSQL]:
         result = list()
         with self.get_session() as s:
-            result = s.query(EdgeSQL).filter_by(v1=v, directed=True).all()
+            result = s.query(EdgeSQL).filter_by(
+                first=v, is_directed=True).all()
         return result
 
     def edges_to(self, v: int) -> List[EdgeSQL]:
         result = list()
         with self.get_session() as s:
-            result = s.query(EdgeSQL).filter_by(v2=v, directed=True).all()
+            result = s.query(EdgeSQL).filter_by(
+                second=v, is_directed=True).all()
         return result
 
     def edges_related(self, v: int) -> List[EdgeSQL]:
         result = list()
         with self.get_session() as s:
             result = s.query(EdgeSQL).filter(or_(
-                EdgeSQL.v1 == v,
-                EdgeSQL.v2 == v,
+                EdgeSQL.first == v,
+                EdgeSQL.second == v,
             )).all()
         return result
 
     def all_vertexes(self) -> Set[int]:
         result = set()
         with self.get_session() as s:
-            all_froms = s.query(EdgeSQL.v1).distinct().all()
-            all_tos = s.query(EdgeSQL.v2).distinct().all()
+            all_froms = s.query(EdgeSQL.first).distinct().all()
+            all_tos = s.query(EdgeSQL.second).distinct().all()
             result = set(all_froms).union(all_tos)
         return result
 
@@ -186,14 +188,14 @@ class BaseSQL(BaseAPI):
         result = set()
         with self.get_session() as s:
             edges = s.query(EdgeSQL).filter(or_(
-                EdgeSQL.v1.in_(vs),
-                EdgeSQL.v2.in_(vs),
+                EdgeSQL.first.in_(vs),
+                EdgeSQL.second.in_(vs),
             )).all()
             for e in edges:
-                if (e.v1 not in vs):
-                    result.add(e.v1)
-                elif (e.v2 not in vs):
-                    result.add(e.v2)
+                if (e.first not in vs):
+                    result.add(e.first)
+                elif (e.second not in vs):
+                    result.add(e.second)
         return result
 
     # Metadata
@@ -214,8 +216,8 @@ class BaseSQL(BaseAPI):
                 func.count(EdgeSQL.weight).label("count"),
                 func.sum(EdgeSQL.weight).label("sum"),
             ).filter(or_(
-                EdgeSQL.v1 == v,
-                EdgeSQL.v2 == v,
+                EdgeSQL.first == v,
+                EdgeSQL.second == v,
             )).first()
         return result
 
@@ -225,7 +227,7 @@ class BaseSQL(BaseAPI):
             result = s.query(
                 func.count(EdgeSQL.weight).label("count"),
                 func.sum(EdgeSQL.weight).label("sum"),
-            ).filter_by(v2=v, directed=True).first()
+            ).filter_by(second=v, is_directed=True).first()
         return result
 
     def count_following(self, v: int) -> (int, float):
@@ -234,7 +236,7 @@ class BaseSQL(BaseAPI):
             result = s.query(
                 func.count(EdgeSQL.weight).label("count"),
                 func.sum(EdgeSQL.weight).label("sum"),
-            ).filter_by(v1=v, directed=True).first()
+            ).filter_by(first=v, is_directed=True).first()
         return result
 
     def biggest_edge_id(self) -> int:
@@ -263,15 +265,15 @@ class BaseSQL(BaseAPI):
     def remove_edge(self, e: EdgeSQL) -> bool:
         result = False
         with self.get_session() as s:
-            if '_id' in e:
+            if e._id < 0:
                 s.query(EdgeSQL).filter_by(
-                    _id=e['_id']
+                    first=e.first,
+                    second=e.second,
+                    is_directed=e.is_directed,
                 ).delete()
             else:
                 s.query(EdgeSQL).filter_by(
-                    v1=e['v1'],
-                    v2=e['v2'],
-                    directed=e['directed'],
+                    _id=e._id
                 ).delete()
             result = True
         return result
@@ -288,8 +290,8 @@ class BaseSQL(BaseAPI):
         result = 0
         with self.get_session() as s:
             result = s.query(EdgeSQL).filter(or_(
-                EdgeSQL.v1 == v,
-                EdgeSQL.v2 == v,
+                EdgeSQL.first == v,
+                EdgeSQL.second == v,
             )).delete()
         return result
 
@@ -306,14 +308,13 @@ class BaseSQL(BaseAPI):
             current_id = self.biggest_edge_id() + 1
             # Build the new table.
             chunk_len = type(self).__max_batch_size__
-            for es in chunks(yield_edges_from_csv(path, edge_type=dict), chunk_len):
+            for es in chunks(yield_edges_from_csv(path, edge_type=Edge), chunk_len):
                 for i, e in enumerate(es):
-                    e['_id'] = current_id
-                    es[i] = e
+                    es[i]._id = current_id
                     current_id += 1
                 s.bulk_insert_mappings(
                     EdgeNew,
-                    es,
+                    [e.__dict__ for e in es],
                     return_defaults=False,
                     render_nulls=True,
                 )
@@ -370,7 +371,7 @@ class BaseSQL(BaseAPI):
             # migration = text(f'''
             # DELETE {EdgeNew.__tablename__};
             # OUTPUT DELETED.*
-            # INTO {EdgeSQL.__tablename__} (_id, v1, v2, weight, attributes_json)
+            # INTO {EdgeSQL.__tablename__} (_id, first, second, weight, attributes_json)
             # ''')
             # But this syntax isn't globally supported.
             s.execute(migration)

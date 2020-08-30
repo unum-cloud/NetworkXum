@@ -1,6 +1,6 @@
 [
     {
-        "module_name": "PyUnumDB.TextDB",
+        "module_name": "pynum.TextDB",
         "class_name": "TextDB",
         "name": "UnumDB.Text",
         "url_variable_name": "URI_UNUMDB_TEXT",

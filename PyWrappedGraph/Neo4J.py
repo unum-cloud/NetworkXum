@@ -153,50 +153,50 @@ class Neo4J(BaseAPI):
 
     # Relatives
 
-    def edge_directed(self, v1: int, v2: int) -> Optional[object]:
+    def edge_directed(self, first: int, second: int) -> Optional[Edge]:
         pattern = '''
-        MATCH (v1:VERTEX {_id: %d})-[e:EDGE]->(v2:VERTEX {_id: %d})
-        RETURN v1._id, v2._id, e.weight
+        MATCH (first:VERTEX {_id: %d})-[e:EDGE]->(second:VERTEX {_id: %d})
+        RETURN first._id, second._id, e.weight
         '''
-        task = pattern % (v1, v2)
+        task = pattern % (first, second)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
         return self._records_to_edges(self.session.run(task))
 
-    def edge_undirected(self, v1: int, v2: int) -> Optional[object]:
+    def edge_undirected(self, first: int, second: int) -> Optional[Edge]:
         pattern = '''
-        MATCH (v1:VERTEX {_id: %d})-[e:EDGE]-(v2:VERTEX {_id: %d})
-        RETURN v1._id, v2._id, e.weight
+        MATCH (first:VERTEX {_id: %d})-[e:EDGE]-(second:VERTEX {_id: %d})
+        RETURN first._id, second._id, e.weight
         '''
-        task = pattern % (v1, v2)
+        task = pattern % (first, second)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
         return self._records_to_edges(self.session.run(task))
 
-    def edges_from(self, v: int) -> List[object]:
+    def edges_from(self, v: int) -> List[Edge]:
         pattern = '''
-        MATCH (v1:VERTEX {_id: %d})-[e:EDGE]->(v2:VERTEX)
-        RETURN v1._id, v2._id, e.weight
-        '''
-        task = pattern % (v)
-        task = task.replace('VERTEX', self._v)
-        task = task.replace('EDGE', self._e)
-        return self._records_to_edges(self.session.run(task))
-
-    def edges_to(self, v: int) -> List[object]:
-        pattern = '''
-        MATCH (v1:VERTEX)-[e:EDGE]->(v2:VERTEX {_id: %d})
-        RETURN v1._id, v2._id, e.weight
+        MATCH (first:VERTEX {_id: %d})-[e:EDGE]->(second:VERTEX)
+        RETURN first._id, second._id, e.weight
         '''
         task = pattern % (v)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
         return self._records_to_edges(self.session.run(task))
 
-    def edges_related(self, v: int) -> List[object]:
+    def edges_to(self, v: int) -> List[Edge]:
         pattern = '''
-        MATCH (v1:VERTEX {_id: %d})-[e:EDGE]-(v2:VERTEX)
-        RETURN v1._id, v2._id, e.weight
+        MATCH (first:VERTEX)-[e:EDGE]->(second:VERTEX {_id: %d})
+        RETURN first._id, second._id, e.weight
+        '''
+        task = pattern % (v)
+        task = task.replace('VERTEX', self._v)
+        task = task.replace('EDGE', self._e)
+        return self._records_to_edges(self.session.run(task))
+
+    def edges_related(self, v: int) -> List[Edge]:
+        pattern = '''
+        MATCH (first:VERTEX {_id: %d})-[e:EDGE]-(second:VERTEX)
+        RETURN first._id, second._id, e.weight
         '''
         task = pattern % (v)
         task = task.replace('VERTEX', self._v)
@@ -207,9 +207,9 @@ class Neo4J(BaseAPI):
 
     def edges_related_to_group(self, vs: Sequence[int]) -> List[Edge]:
         pattern = '''
-        MATCH (v1:VERTEX)-[e:EDGE]-(v2:VERTEX)
-        WHERE (v1._id IN [%s]) AND NOT (v2._id IN [%s])
-        RETURN v1._id, v2._id, e.weight
+        MATCH (first:VERTEX)-[e:EDGE]-(second:VERTEX)
+        WHERE (first._id IN [%s]) AND NOT (second._id IN [%s])
+        RETURN first._id, second._id, e.weight
         '''
         group_members = ','.join([str(v) for v in vs])
         task = pattern % (group_members, group_members)
@@ -219,9 +219,9 @@ class Neo4J(BaseAPI):
 
     def nodes_related_to_group(self, vs: Sequence[int]) -> Set[int]:
         pattern = '''
-        MATCH (v1:VERTEX)-[:EDGE]-(v2:VERTEX)
-        WHERE (v1._id IN [%s]) AND NOT (v2._id IN [%s])
-        RETURN v2._id as _id
+        MATCH (first:VERTEX)-[:EDGE]-(second:VERTEX)
+        WHERE (first._id IN [%s]) AND NOT (second._id IN [%s])
+        RETURN second._id as _id
         '''
         group_members = ','.join([str(v) for v in vs])
         task = pattern % (group_members, group_members)
@@ -260,10 +260,10 @@ class Neo4J(BaseAPI):
         task = task.replace('EDGE', self._e)
         return {int(r['_id']) for r in self.session.run(task).records()}
 
-    def shortest_path(self, v1, v2) -> (List[int], float):
+    def shortest_path(self, first, second) -> (List[int], float):
         pattern = '''
-        MATCH (v1:VERTEX {_id: %d}), (v2:VERTEX {_id: %d})
-        CALL algo.shortestPath.stream(v1, v2, "weight")
+        MATCH (first:VERTEX {_id: %d}), (second:VERTEX {_id: %d})
+        CALL algo.shortestPath.stream(first, second, "weight")
         YIELD nodeId, weight
         MATCH (v_on_path:Loc) WHERE id(v_on_path) = nodeId
         RETURN v_on_path._id AS _id, weight
@@ -357,12 +357,12 @@ class Neo4J(BaseAPI):
             using `insert_edge()`
         """
         pattern = '''
-        MERGE (v1:VERTEX {_id: %d})
-        MERGE (v2:VERTEX {_id: %d})
-        MERGE (v1)-[:EDGE {_id: %d, weight: %d}]%s(v2)
+        MERGE (first:VERTEX {_id: %d})
+        MERGE (second:VERTEX {_id: %d})
+        MERGE (first)-[:EDGE {_id: %d, weight: %d}]%s(second)
         '''
-        d = '->' if e['directed'] else '-'
-        task = pattern % (e['v1'], e['v2'], e['_id'], e['weight'], d)
+        d = '->' if e.is_directed else '-'
+        task = pattern % (e.first, e.second, e._id, e.weight, d)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
         self.session.run(task)
@@ -370,12 +370,12 @@ class Neo4J(BaseAPI):
 
     def insert_edge(self, e: Edge) -> bool:
         pattern = '''
-        MERGE (v1:VERTEX {_id: %d})
-        MERGE (v2:VERTEX {_id: %d})
-        CREATE (v1)-[:EDGE {_id: %d, weight: %d}]%s(v2)
+        MERGE (first:VERTEX {_id: %d})
+        MERGE (second:VERTEX {_id: %d})
+        CREATE (first)-[:EDGE {_id: %d, weight: %d}]%s(second)
         '''
-        d = '->' if e['directed'] else '-'
-        task = pattern % (e['v1'], e['v2'], e['_id'], e['weight'], d)
+        d = '->' if e.is_directed else '-'
+        task = pattern % (e.first, e.second, e._id, e.weight, d)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
         self.session.run(task)
@@ -384,8 +384,8 @@ class Neo4J(BaseAPI):
     def insert_edges(self, es: List[Edge]) -> int:
         vs = set()
         for e in es:
-            vs.add(e['v1'])
-            vs.add(e['v2'])
+            vs.add(e.first)
+            vs.add(e.second)
         task = str()
         # First upsert all the nodes.
         for v in vs:
@@ -396,8 +396,9 @@ class Neo4J(BaseAPI):
         # Then add the edges connecting matched nodes.
         for e in es:
             pattern = 'CREATE (v%d)-[:EDGE {_id: %d, weight: %d}]%s(v%d)'
-            d = '->' if e['directed'] else '-'
-            part = (pattern % (e['v1'], e['_id'], e['weight'], d, e['v2']))
+            d = '->' if e.is_directed else '-'
+            part = (pattern %
+                    (e.first, e._id, e.weight, d, e.second))
             task += part
             task += '\n'
         task = task.replace('VERTEX', self._v)
@@ -415,28 +416,28 @@ class Neo4J(BaseAPI):
         task = task.replace('EDGE', self._e)
         return self.session.run(task)
 
-    def remove_edge(self, e: object) -> bool:
+    def remove_edge(self, e: Edge) -> bool:
         task = str()
-        if '_id' in e:
+        if e._id < 0:
+            pattern = '''
+            MATCH (first:VERTEX {_id: %d})
+            MATCH (second:VERTEX {_id: %d})
+            MATCH (first)-[e:EDGE]%s(second)
+            DELETE e
+            '''
+            d = '->' if e.is_directed else '-'
+            task = pattern % (e.first, e.second, d)
+        else:
             # We provide excessive information on node IDs
             # to use property indexes.
             pattern = '''
-            MATCH (v1:VERTEX {_id: %d})
-            MATCH (v2:VERTEX {_id: %d})
-            MATCH (v1)-[e:EDGE {_id: %d}]%s(v2)
+            MATCH (first:VERTEX {_id: %d})
+            MATCH (second:VERTEX {_id: %d})
+            MATCH (first)-[e:EDGE {_id: %d}]%s(second)
             DELETE e
             '''
-            d = '->' if e['directed'] else '-'
-            task = pattern % (e['v1'], e['v2'], e['_id'], d)
-        else:
-            pattern = '''
-            MATCH (v1:VERTEX {_id: %d})
-            MATCH (v2:VERTEX {_id: %d})
-            MATCH (v1)-[e:EDGE]%s(v2)
-            DELETE e
-            '''
-            d = '->' if e['directed'] else '-'
-            task = pattern % (e['v1'], e['v2'], d)
+            d = '->' if e.is_directed else '-'
+            task = pattern % (e.first, e.second, e._id, d)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
         self.session.run(task)
@@ -460,7 +461,7 @@ class Neo4J(BaseAPI):
             count_edges_added += self.insert_edges(es)
         return count_edges_added
 
-    def insert_adjacency_list_at_once(self, filepath: str, directed=True) -> int:
+    def insert_adjacency_list_at_once(self, filepath: str, is_directed=True) -> int:
         """
             This function may be tricky to use!
 
@@ -486,15 +487,15 @@ class Neo4J(BaseAPI):
             pattern_full = '''
             LOAD CSV WITH HEADERS FROM '%s' AS row
             WITH
-                toInteger(row.v1) AS id_from,
-                toInteger(row.v2) AS id_to,
+                toInteger(row.first) AS id_from,
+                toInteger(row.second) AS id_to,
                 toFloat(row.weight) AS w,
                 toInteger(linenumber()) AS idx
-            MERGE (v1:VERTEX {_id: id_from})
-            MERGE (v2:VERTEX {_id: id_to})
-            CREATE (v1)-[:EDGE {_id: idx + %d, weight: w}]%s(v2)
+            MERGE (first:VERTEX {_id: id_from})
+            MERGE (second:VERTEX {_id: id_to})
+            CREATE (first)-[:EDGE {_id: idx + %d, weight: w}]%s(second)
             '''
-            d = '->' if directed else '-'
+            d = '->' if is_directed else '-'
             task = pattern_full % (
                 'file:///' + filename, current_id, d
             )
@@ -507,7 +508,7 @@ class Neo4J(BaseAPI):
             os.unlink(file_link)
         return self.count_edges() - cnt
 
-    def insert_adjacency_list_in_parts(self, filepath: str, directed=True) -> int:
+    def insert_adjacency_list_in_parts(self, filepath: str, is_directed=True) -> int:
         """
             This function may be tricky to use!
 
@@ -534,25 +535,25 @@ class Neo4J(BaseAPI):
             USING PERIODIC COMMIT %d
             LOAD CSV WITH HEADERS FROM '%s' AS row
             WITH
-                toInteger(row.v1) AS id_from,
-                toInteger(row.v2) AS id_to
-            MERGE (v1:VERTEX {_id: id_from})
-            MERGE (v2:VERTEX {_id: id_to});
+                toInteger(row.first) AS id_from,
+                toInteger(row.second) AS id_to
+            MERGE (first:VERTEX {_id: id_from})
+            MERGE (second:VERTEX {_id: id_to});
             '''
             pattern_edges = '''
             USING PERIODIC COMMIT %d
             LOAD CSV WITH HEADERS FROM '%s' AS row
             WITH
-                toInteger(row.v1) AS id_from,
-                toInteger(row.v2) AS id_to,
+                toInteger(row.first) AS id_from,
+                toInteger(row.second) AS id_to,
                 toFloat(row.weight) AS w,
                 toInteger(linenumber()) AS idx
-            MATCH (v1:VERTEX {_id: id_from})
-            MATCH (v2:VERTEX {_id: id_to})
-            CREATE (v1)-[e:EDGE {_id: idx + %d, weight: w}]%s(v2)
+            MATCH (first:VERTEX {_id: id_from})
+            MATCH (second:VERTEX {_id: id_to})
+            CREATE (first)-[e:EDGE {_id: idx + %d, weight: w}]%s(second)
             RETURN count(e)
             '''
-            d = '->' if directed else '-'
+            d = '->' if is_directed else '-'
             tasks = [
                 pattern_nodes % (
                     Neo4J.__max_batch_size__, 'file:///' + filename
@@ -577,7 +578,7 @@ class Neo4J(BaseAPI):
     def _records_to_edges(self, records) -> List[Edge]:
         if isinstance(records, BoltStatementResult):
             records = list(records.records())
-        return [Edge(r['v1._id'], r['v2._id'], r['e.weight']) for r in records]
+        return [Edge(r['first._id'], r['second._id'], r['e.weight']) for r in records]
 
     def _first_record(self, records, key):
         if isinstance(records, BoltStatementResult):
