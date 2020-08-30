@@ -50,7 +50,7 @@ class NetworkX(object):
     @abstractmethod
     def new_edge_key(self, u: int, v: int) -> int:
         """https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.MultiDiGraph.new_edge_key.html#networkx.MultiDiGraph.new_edge_key"""
-        return Edge.combine_ids(u, v)
+        return Edge.identify_by_members(u, v)
 
     # endregion
 

@@ -4,7 +4,7 @@ from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 import concurrent.futures
 from pathlib import Path
 
-from PyWrappedHelpers.TextFile import TextFile
+from PyWrappedHelpers.Text import Text
 from PyWrappedHelpers.Algorithms import *
 from PyWrappedHelpers.Config import allow_big_csv_fields
 
@@ -41,20 +41,20 @@ class BaseAPI(object):
     # --------------------------------
 
     @abstractmethod
-    def upsert_doc(self, doc: object) -> bool:
+    def upsert_doc(self, doc: Text) -> bool:
         pass
 
     @abstractmethod
-    def remove_doc(self, doc: object) -> bool:
+    def remove_doc(self, doc: Text) -> bool:
         return False
 
     @abstractmethod
-    def upsert_docs(self, docs: Sequence[object]) -> int:
+    def upsert_docs(self, docs: Sequence[Text]) -> int:
         successes = map(self.upsert_doc, docs)
         return int(sum(successes))
 
     @abstractmethod
-    def remove_docs(self, docs: Sequence[object]) -> int:
+    def remove_docs(self, docs: Sequence[Text]) -> int:
         successes = map(self.remove_doc, docs)
         return int(sum(successes))
 
@@ -63,7 +63,7 @@ class BaseAPI(object):
         cnt_success = 0
         paths = [pth for pth in Path(directory).iterdir()]
         for paths_chunk in chunks(paths, type(self).__max_batch_size__):
-            files_chunk = map(TextFile, paths_chunk)
+            files_chunk = map(Text, paths_chunk)
             cnt_success += self.upsert_docs(files_chunk)
         return cnt_success
 
@@ -90,11 +90,11 @@ class BaseAPI(object):
         pass
 
     @abstractmethod
-    def find_with_substring(self, field: str, query: str) -> Sequence[object]:
+    def find_with_substring(self, field: str, query: str) -> Sequence[Text]:
         pass
 
     @abstractmethod
-    def find_with_regex(self, field: str, query: str) -> Sequence[object]:
+    def find_with_regex(self, field: str, query: str) -> Sequence[Text]:
         pass
 
     # endregion
