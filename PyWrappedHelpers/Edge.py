@@ -14,17 +14,8 @@ class Edge:
         d = '->' if self.is_directed else '-'
         return f'<Edge({self.first}{d}{self.second}, _id={self._id}, weight={self.weight})>'
 
-    # def __contains__(self, key) -> bool:
-    #     return key in ['_id', 'first', 'second', 'is_directed', 'label', 'weight']
-
-    # def __getitem__(self, key):
-    #     return getattr(self, key)
-
-    # def __setitem__(self, key, val):
-    #     return setattr(self, key, val)
-
     @staticmethod
-    def combine_ids(first: int, second: int) -> int:
+    def identify_by_members(first: int, second: int) -> int:
         # Source: https://stackoverflow.com/a/919661
         _id = (first + second) * (first + second + 1) // 2 + second
         # Some databases may have smaller default integer sizes,
@@ -34,7 +25,7 @@ class Edge:
         return _id
 
 
-assert (Edge.combine_ids(10, 20) != Edge.combine_ids(20, 10)), \
+assert (Edge.identify_by_members(10, 20) != Edge.identify_by_members(20, 10)), \
     'The node IDs transformation must be order-dependant.'
 
 

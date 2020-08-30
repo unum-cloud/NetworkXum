@@ -5,6 +5,7 @@ import importlib
 from pystats2md.micro_bench import MicroBench
 from pystats2md.helpers import metric2str, bytes2str
 
+from PyWrappedHelpers.Edge import Edge
 from PyWrappedHelpers.Algorithms import export_edges_into_graph
 from P0Config import P0Config
 
@@ -68,7 +69,7 @@ class P2Import(object):
     def benchmark_parsing_speed(self, dataset: dict):
 
         class PseudoGraph(object):
-            __edge_type__ = dict
+            __edge_type__ = Edge
             __max_batch_size__ = 1000000
 
             def __init__(self):

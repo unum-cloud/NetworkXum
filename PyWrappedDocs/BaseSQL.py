@@ -117,11 +117,11 @@ class BaseSQL(BaseAPI):
     # --------------------------------
 
     @abstractmethod
-    def find_with_substring(self, field: str, query: str) -> Sequence[object]:
+    def find_with_substring(self, field: str, query: str) -> Sequence[Text]:
         pass
 
     @abstractmethod
-    def find_with_regex(self, field: str, query: str) -> Sequence[object]:
+    def find_with_regex(self, field: str, query: str) -> Sequence[Text]:
         pass
 
     def find_with_id(self, identifier: str) -> object:

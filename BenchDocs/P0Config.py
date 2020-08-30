@@ -23,7 +23,7 @@ class P0Config(object):
             P0Config()
         return P0Config.__shared
 
-    def __init__(self, device_name='UnknownDevice'):
+    def __init__(self, device_name='MacbookPro'):
         if P0Config.__shared is not None:
             raise Exception("This class is a singleton!")
 

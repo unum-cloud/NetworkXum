@@ -5,7 +5,7 @@ from elasticsearch.helpers import streaming_bulk
 
 from PyWrappedDocs.BaseAPI import BaseAPI
 from PyWrappedHelpers.Algorithms import *
-from PyWrappedHelpers.TextFile import TextFile
+from PyWrappedHelpers.Text import Text
 from PyWrappedHelpers.Config import allow_big_csv_fields
 
 
@@ -64,10 +64,10 @@ class ElasticSearch(BaseAPI):
             return 0
         return self.elastic.count(index=self.db_name).pop('count', 0)
 
-    def validate_doc(self, doc: object) -> dict:
+    def validate_doc(self, doc: Text) -> dict:
         if isinstance(doc, (str, int)):
             return {'_id': doc}
-        if isinstance(doc, TextFile):
+        if isinstance(doc, Text):
             return doc.to_dict()
         if isinstance(doc, dict):
             return copy.deepcopy(doc)
@@ -227,9 +227,9 @@ if __name__ == '__main__':
     db = ElasticSearch(url='http://localhost:9200/text-test')
     db.remove_all()
     assert db.count_docs() == 0
-    assert db.upsert_doc(TextFile(sample_file).to_dict())
+    assert db.upsert_doc(Text.from_file(sample_file))
     assert db.count_docs() == 1
     assert db.find_with_substring('nanoparticles')
     assert db.find_with_regex('nanoparticles')
-    assert db.remove_doc(TextFile(sample_file).to_dict())
+    assert db.remove_doc(Text.from_file(sample_file))
     assert db.count_docs() == 0

@@ -9,7 +9,7 @@ import random
 from random import SystemRandom
 
 from PyWrappedHelpers.Edge import Edge
-from PyWrappedHelpers.TextFile import TextFile
+from PyWrappedHelpers.Text import Text
 
 
 def map_compact(func, os: Sequence[object]) -> Sequence[object]:
@@ -67,7 +67,7 @@ def yield_edges_from_csv(filepath: str, edge_type: type = Edge, is_directed=True
             yield edge_type(first=first, second=second, weight=w, _id=idx, is_directed=is_directed)
 
 
-def yield_texts_from_sectioned_csv(filepath: str) -> Generator[TextFile, None, None]:
+def yield_texts_from_sectioned_csv(filepath: str) -> Generator[Text, None, None]:
     last_text = str()
     last_path = str()
 
@@ -83,14 +83,14 @@ def yield_texts_from_sectioned_csv(filepath: str) -> Generator[TextFile, None, N
 
             if new_article_id != last_path:
                 if len(last_text) > 0:
-                    yield TextFile(last_path, last_text)
+                    yield Text(idx, last_text)
                 last_path = new_article_id
                 last_text = new_text
             else:
                 last_text += new_text
 
-    if len(last_text) > 0:
-        yield TextFile(last_path, last_text)
+        if len(last_text) > 0:
+            yield Text(idx, last_text)
 
 
 def export_edges_into_graph(filepath: str, g) -> int:

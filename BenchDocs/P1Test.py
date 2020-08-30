@@ -1,5 +1,5 @@
 from PyWrappedDocs.BaseAPI import BaseAPI
-from PyWrappedHelpers.TextFile import TextFile
+from PyWrappedHelpers.Text import Text
 from PyWrappedHelpers.Algorithms import *
 
 from P0Config import P0Config
@@ -15,9 +15,9 @@ class P1Test(object):
     def __init__(self):
         self.conf = P0Config.shared()
         self.docs = [
-            TextFile('1', 'the big brown fox').to_dict(),
-            TextFile('2', 'as.the.day;passes').to_dict(),
-            TextFile('3', 'along the:way').to_dict(),
+            Text(1, 'the big brown fox'),
+            Text(2, 'as.the.day;passes'),
+            Text(3, 'along the:way'),
         ]
 
     def run(self):

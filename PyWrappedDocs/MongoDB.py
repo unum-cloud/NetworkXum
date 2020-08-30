@@ -6,7 +6,7 @@ from pymongo import UpdateOne, DeleteOne
 
 from PyWrappedDocs.BaseAPI import BaseAPI
 from PyWrappedHelpers.Algorithms import *
-from PyWrappedHelpers.TextFile import TextFile
+from PyWrappedHelpers.Text import Text
 from PyWrappedHelpers.Config import allow_big_csv_fields
 
 
@@ -103,16 +103,16 @@ class MongoDB(BaseAPI):
             dicts = dicts.limit(max_matches)
         return [d['_id'] for d in dicts]
 
-    def validate_doc(self, doc: object) -> dict:
+    def validate_doc(self, doc: Text) -> dict:
         if isinstance(doc, (str, int)):
             return {'_id': doc}
-        if isinstance(doc, TextFile):
+        if isinstance(doc, Text):
             return doc.to_dict()
         if isinstance(doc, dict):
             return doc
         return doc.__dict__
 
-    def upsert_doc(self, doc: object) -> bool:
+    def upsert_doc(self, doc: Text) -> bool:
         doc = self.validate_doc(doc)
         result = self.docs_collection.update_one(
             filter={'_id': doc['_id'], },
@@ -121,12 +121,12 @@ class MongoDB(BaseAPI):
         )
         return (result.modified_count >= 1) or (result.upserted_id is not None)
 
-    def remove_doc(self, doc: object) -> bool:
+    def remove_doc(self, doc: Text) -> bool:
         doc = self.validate_doc(doc)
         result = self.docs_collection.delete_one(filter={'_id': doc['_id'], })
         return result.deleted_count >= 1
 
-    def upsert_docs(self, docs: List[object]) -> int:
+    def upsert_docs(self, docs: Sequence[Text]) -> int:
         """
             Supports up to 1000 updates per batch.
             https://api.mongodb.com/python/current/examples/bulk.html#ordered-bulk-write-operations
@@ -149,13 +149,13 @@ class MongoDB(BaseAPI):
             print(bwe.details['writeErrors'])
             return 0
 
-    def insert_docs(self, docs: List[object]) -> int:
+    def insert_docs(self, docs: Sequence[Text]) -> int:
         docs = map(self.validate_doc, docs)
         result = self.docs_collection.insert_many(
             documents=docs, ordered=False)
         return len(result.inserted_ids)
 
-    def remove_docs(self, docs: List[object]) -> int:
+    def remove_docs(self, docs: Sequence[Text]) -> int:
         def make_upsert(doc):
             return DeleteOne(
                 filter={'_id': doc['_id'], },
@@ -199,9 +199,9 @@ if __name__ == '__main__':
     db = MongoDB(url='mongodb://localhost:27017/SingleTextTest')
     db.remove_all()
     assert db.count_docs() == 0
-    assert db.upsert_doc(TextFile(sample_file).to_dict())
+    assert db.upsert_doc(Text.from_file(sample_file))
     assert db.count_docs() == 1
     assert db.find_with_substring('Atripla-trimethyl')
     assert db.find_with_regex('Atripla-trimeth[a-z]{2}')
-    # assert db.remove_doc(TextFile(sample_file).to_dict())
+    # assert db.remove_doc(Text.from_file(sample_file))
     # assert db.count_docs() == 0
