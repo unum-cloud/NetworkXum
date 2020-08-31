@@ -13,7 +13,7 @@
         "name": "SQLite",
         "url_variable_name": "URI_SQLITE",
         "url_default": "sqlite:////Users/av/DBs/sqlite/${DATASET_NAME}.db3",
-        "enabled": true
+        "enabled": false
     },
     {
         "module_name": "PyWrappedGraph.SQLite",
@@ -21,7 +21,7 @@
         "name": "SQLite (In-Memory)",
         "url_variable_name": "URI_SQLITE_RAM",
         "url_default": "sqlite:///:memory:",
-        "enabled": true
+        "enabled": false
     },
     {
         "module_name": "PyWrappedGraph.MySQL",
@@ -37,7 +37,7 @@
         "name": "PostgreSQL",
         "url_variable_name": "URI_POSTGRESQL",
         "url_default": "postgres://av:temptemp@0.0.0.0:5432/${DATASET_NAME}",
-        "enabled": true
+        "enabled": false
     },
     {
         "module_name": "PyWrappedGraph.MongoDB",
@@ -45,7 +45,7 @@
         "name": "MongoDB",
         "url_variable_name": "URI_MONGODB",
         "url_default": "mongodb://0.0.0.0:27017/${DATASET_NAME}",
-        "enabled": true
+        "enabled": false
     },
     {
         "module_name": "PyWrappedGraph.Neo4J",
