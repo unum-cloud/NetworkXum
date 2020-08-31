@@ -24,7 +24,7 @@ class P2Import(object):
             # Define a baseline, so we know how much time it took
             # to read the data vs actually importing it into DB
             # and building indexes.
-            self.benchmark_parsing_speed(dataset)
+            # self.benchmark_parsing_speed(dataset)
 
             for db in self.conf.databases:
                 g = self.conf.make_db(database=db, dataset=dataset)
