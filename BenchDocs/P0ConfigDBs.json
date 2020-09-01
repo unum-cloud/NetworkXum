@@ -1,11 +1,11 @@
 [
     {
-        "module_name": "pynum.TextDB",
+        "module_name": "pynum",
         "class_name": "TextDB",
-        "name": "UnumDB.Text",
+        "name": "Unum.TextDB",
         "url_variable_name": "URI_UNUMDB_TEXT",
-        "url_default": "~/DBs/unumdb.Text/${DATASET_NAME}",
-        "enabled": false
+        "url_default": "/Users/av/DBs/UnumDB/Texts/${DATASET_NAME}",
+        "enabled": true
     },
     {
         "module_name": "PyWrappedDocs.ElasticSearch",
@@ -13,7 +13,7 @@
         "name": "ElasticSearch",
         "url_variable_name": "URI_ELASTIC_SEARCH",
         "url_default": "http://localhost:9200/${DATASET_NAME}",
-        "enabled": true
+        "enabled": false
     },
     {
         "module_name": "PyWrappedDocs.MongoDB",

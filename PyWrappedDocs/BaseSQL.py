@@ -20,8 +20,8 @@ DeclarativeDocsSQL = declarative_base()
 class TextSQL(DeclarativeDocsSQL):
     __tablename__ = 'table_nodes'
     _id = Column(BigInteger, primary_key=True)
-    plain = Column(Text)
-    plain_index = Index('plain_index', TextSQL.plain, unique=False)
+    content = Column(Text)
+    content_index = Index('content_index', TextSQL.content, unique=False)
 
     def __init__(self, *args, **kwargs):
         DeclarativeDocsSQL.__init__(self)
@@ -92,7 +92,7 @@ class BaseSQL(BaseAPI):
         result = False
         with self.get_session() as s:
             s.query(TextSQL).filter_by(
-                _id=doc['_id']
+                _id=doc._id
             ).delete()
             result = True
         return result

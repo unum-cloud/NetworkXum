@@ -29,7 +29,7 @@ class P4Print():
         out = Report()
         dbs = [
             'MongoDB', 'ElasticSearch',
-            # 'UnumDB.Text',
+            # 'Unum.TextDB',
         ]  # ins.subset().unique('database')
         dataset_names = [
             'Covid19',
@@ -102,7 +102,7 @@ class P4Print():
         out.add(StatsTable(header_row=[
             'Covid19', 'PoliticalTweets', 'EnglishWikipedia',
         ], header_col=[
-            'MongoDB', 'ElasticSearch', 'UnumDB.Text',
+            'MongoDB', 'ElasticSearch', 'Unum.TextDB',
         ], content=[
             ['1,9 GB', '3,2 GB', 'Expected 60,7 GB'],
             ['2,5 GB', '2,9 GB', '33,5 GB'],

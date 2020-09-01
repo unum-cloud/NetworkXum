@@ -80,7 +80,7 @@ I suspect a bug in the implementation of the text index, as some batch import op
 | :------------ | :-----: | :-------------: | :--------------: |
 | MongoDB       | 1,9 GB  |     3,2 GB      | Expected 60,7 GB |
 | ElasticSearch | 2,5 GB  |     2,9 GB      |     33,5 GB      |
-| UnumDB.Text   |    1    |        1        |        1         |
+| Unum.TextDB   |    1    |        1        |        1         |
 
 MongoDB is one of the best products on the DB market, but I suspect they have a bug in their text indexing capabilities. Some of the batch insertions were hanging for ~10 mins and only 15% of the largest dataset were imported after ~7 hours!
 

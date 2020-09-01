@@ -85,7 +85,7 @@ class P3TasksSampler(object):
         self.doc_ids_to_query = sample_reservoir(all_ids, self.count_changes)
 
         cnt_wanted = self.count_substring_ops
-        all_words = flatten([t.to_dict().pop('plain', '').split()
+        all_words = flatten([t.to_dict().pop('content', '').split()
                              for t in self._buffer_texts])
         self.words_to_search = sample_reservoir(all_words, cnt_wanted)
         self.docs_to_change_by_one = self._buffer_texts
