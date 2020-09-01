@@ -135,7 +135,7 @@ class ElasticSearch(BaseAPI):
     def find_with_substring(
         self,
         query: str,
-        field: str = 'plain',
+        field: str = 'content',
         max_matches: int = None,
     ):
         """
@@ -176,7 +176,7 @@ class ElasticSearch(BaseAPI):
     def find_with_regex(
         self,
         query: str,
-        field: str = 'plain',
+        field: str = 'content',
         max_matches: int = None,
     ):
         """

@@ -24,7 +24,7 @@ class BaseAPI(object):
 
     def __init__(
         self,
-        indexed_fields: Sequence[str] = ['plain'],
+        indexed_fields: Sequence[str] = ['content'],
         **kwargs,
     ):
         object.__init__(self)

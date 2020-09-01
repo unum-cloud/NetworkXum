@@ -2,7 +2,7 @@
     {
         "module_name": "pynum",
         "class_name": "GraphDB",
-        "name": "UnumDB.Graph",
+        "name": "Unum.GraphDB",
         "url_variable_name": "URI_UNUMDB_GRAPH",
         "url_default": "/Users/av/DBs/UnumDB/Graphs/${DATASET_NAME}",
         "enabled": true

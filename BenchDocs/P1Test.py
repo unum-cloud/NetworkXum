@@ -43,17 +43,17 @@ class P1Test(object):
             assert t.upsert_doc(doc)
         self.validate_contents(t)
         for doc in self.docs:
-            assert t.remove_doc(doc['_id'])
+            assert t.remove_doc(doc._id)
         self.validate_empty(t)
 
         print(f'--- Batch Operations')
         t.upsert_docs(self.docs)
         self.validate_contents(t)
-        t.remove_docs(self.docs)
+        t.remove_docs([doc._id for doc in self.docs])
         self.validate_empty(t)
 
         print(f'--- Bulk Insert')
-        t.import_docs_from_csv(self.conf.test_dataset['path'])
+        t.import_docs_from_csv(self.conf.test_dataset['path'], column=3)
         self.validate_contents(t)
         t.remove_all()
         self.validate_empty(t)
@@ -66,15 +66,15 @@ class P1Test(object):
 
     def validate_contents(self, t):
         for d in self.docs:
-            assert t.find_with_id(d['_id'])['plain'] == d['plain'], \
+            assert t.find_with_id(d._id).content == d.content, \
                 f'No document: {d}'
 
         assert t.count_docs() == 3, \
             f'count_docs: {t.count_docs()}'
-        assert set(t.find_with_substring('big')) == {'1'}, \
-            f'find_with_substring: {t.find_with_substring("big")}'
-        assert set(t.find_with_regex('big')) == {'1'}, \
-            f'find_with_regex: {t.find_with_regex("big")}'
+        assert {match._id for match in t.find_with_substring('big', max_matches=100)} == {1}, \
+            f'find_with_substring: {t.find_with_substring("big", max_matches=100)}'
+        assert {match._id for match in t.find_with_regex('big', max_matches=100)} == {1}, \
+            f'find_with_regex: {t.find_with_regex("big", max_matches=100)}'
 
 
 if __name__ == "__main__":

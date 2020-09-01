@@ -5,7 +5,7 @@ services:
     container_name: benchgraphs-client
     image: 'unum/pywrappeddbs:latest'
     volumes:
-      - '~/DBs/UnumDB.Graph/:/var/lib/unumdb'
+      - '~/DBs/Unum.GraphDB/:/var/lib/unumdb'
       - '~/DBs/SQLite/:/var/lib/sqlite'
       - '~/Datasets:~/Datasets'
 
