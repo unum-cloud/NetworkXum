@@ -5,8 +5,7 @@ import importlib
 from pystats2md.micro_bench import MicroBench
 from pystats2md.helpers import metric2str, bytes2str
 
-from PyWrappedHelpers.Edge import Edge
-from PyWrappedHelpers.Algorithms import export_edges_into_graph
+from PyWrappedHelpers import *
 from P0Config import P0Config
 
 
@@ -36,7 +35,7 @@ class P2Import(object):
 
         db_name = database['name']
         dataset_name = dataset['name']
-        if (g.count_edges() != 0):
+        if (g.number_of_edges() != 0):
             print(f'-- Skipping: {dataset_name} -> {db_name}')
             return
 
@@ -47,8 +46,8 @@ class P2Import(object):
         print(f'--- file size:', bytes2str(file_size))
 
         def import_one() -> int:
-            g.insert_adjacency_list(dataset_path)
-            return g.count_edges()
+            g.add_edges_stream(yield_edges_from(dataset_path), upsert=False)
+            return g.number_of_edges()
 
         counter = MicroBench(
             benchmark_name='Sequential Writes: Import CSV',
@@ -68,7 +67,7 @@ class P2Import(object):
 
     def benchmark_parsing_speed(self, dataset: dict):
 
-        class PseudoGraph(object):
+        class PseudoGraph(BaseAPI):
             __edge_type__ = Edge
             __max_batch_size__ = 1000000
 
@@ -78,7 +77,7 @@ class P2Import(object):
             def biggest_edge_id(self) -> int:
                 return self.count
 
-            def upsert_edges(self, es) -> int:
+            def add(self, es) -> int:
                 self.count += len(es)
                 return len(es)
 
@@ -86,7 +85,7 @@ class P2Import(object):
         p = self.conf.normalize_path(dataset['path'])
         counter = MicroBench(
             benchmark_name='Sequential Writes: Import CSV',
-            func=lambda: export_edges_into_graph(p, g),
+            func=lambda: g.add_edges_stream(yield_edges_from_csv(p)),
             database='Parsing in Python',
             dataset=dataset['name'],
             source=self.conf.default_stats_file,

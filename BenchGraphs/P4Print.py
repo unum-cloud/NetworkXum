@@ -7,7 +7,7 @@ from pystats2md.stats_subset import StatsSubset
 from pystats2md.report import Report
 
 from P0Config import P0Config
-from PyWrappedHelpers.Config import unumdb_purpose
+from PyWrappedHelpers import *
 
 
 class P4Print():

@@ -41,7 +41,7 @@ class P3Bench(object):
         if self.g is None:
             return
         is_in_ram = bool(type(self.g).__in_memory__)
-        if (self.g.count_edges() == 0) and (not is_in_ram):
+        if (self.g.number_of_edges() == 0) and (not is_in_ram):
             return
         print('- Benchmarking: {} @ {}'.format(
             self.dataset['name'],
@@ -232,7 +232,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            vs = self.g.nodes_related(v)
+            vs = self.g.neighbors(v)
             cnt += 1
             cnt_found += len(vs)
             dt = time() - t0
@@ -245,7 +245,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.g.count_related(v)
+            self.g.number_of_neighbors(v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -256,7 +256,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.g.count_followers(v)
+            self.g.number_of_predecessors(v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -267,7 +267,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.g.count_following(v)
+            self.g.number_of_successors(v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -279,7 +279,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_analyze:
-            vs = self.g.nodes_related_to_related(v)
+            vs = self.g.neighbors_of_neighbors(v)
             cnt += 1
             cnt_found += len(vs)
             dt = time() - t0
@@ -291,28 +291,28 @@ class P3Bench(object):
     def remove_e(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_change_by_one:
-            self.g.remove_edge(e)
+            self.g.remove(e)
             cnt += 1
         return cnt
 
     def upsert_e(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_change_by_one:
-            self.g.upsert_edge(e)
+            self.g.add(e)
             cnt += 1
         return cnt
 
     def remove_es(self) -> int:
         cnt = 0
         for es in self.tasks.edges_to_change_batched:
-            self.g.remove_edges(es)
+            self.g.remove(es)
             cnt += len(es)
         return cnt
 
     def upsert_es(self) -> int:
         cnt = 0
         for es in self.tasks.edges_to_change_batched:
-            self.g.upsert_edges(es)
+            self.g.add(es)
             cnt += len(es)
         return cnt
 
@@ -324,13 +324,13 @@ class P3Bench(object):
         return cnt
 
     def remove_bulk(self) -> int:
-        c = self.g.count_edges()
-        self.g.remove_all()
-        return c - self.g.count_edges()
+        c = self.g.number_of_edges()
+        self.g.clear()
+        return c - self.g.number_of_edges()
 
     def import_bulk(self) -> int:
-        self.g.insert_adjacency_list(self.dataset_path)
-        return self.g.count_edges()
+        self.g.add_edges_stream(self.dataset_path)
+        return self.g.number_of_edges()
 
 
 if __name__ == "__main__":

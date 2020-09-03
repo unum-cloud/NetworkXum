@@ -9,7 +9,7 @@ from pystats2md.report import Report
 
 from P0Config import P0Config
 from P3TasksSampler import P3TasksSampler
-from PyWrappedHelpers.Config import unumdb_purpose
+from PyWrappedHelpers import *
 
 
 class P4Print():
@@ -22,7 +22,7 @@ class P4Print():
         device_name = self.conf.device_name
         ins = StatsFile(filename=None)
         stats_paths = [f for f in glob.glob(
-            f'BenchDocs/{device_name}/**/*.json', recursive=True)]
+            f'BenchTexts/{device_name}/**/*.json', recursive=True)]
         for stats_path in stats_paths:
             ins.append(StatsFile(filename=stats_path))
 
@@ -247,7 +247,7 @@ class P4Print():
                 col_names=dataset_names
             ).add_gains())
 
-        out.print_to(f'BenchDocs/{device_name}/README.md')
+        out.print_to(f'BenchTexts/{device_name}/README.md')
 
 
 if __name__ == "__main__":

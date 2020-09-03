@@ -5,38 +5,6 @@
         "name": "Unum.GraphDB",
         "url_variable_name": "URI_UNUMDB_GRAPH",
         "url_default": "/Users/av/DBs/UnumDB/Graphs/${DATASET_NAME}",
-        "enabled": true
-    },
-    {
-        "module_name": "PyWrappedGraph.SQLite",
-        "class_name": "SQLite",
-        "name": "SQLite",
-        "url_variable_name": "URI_SQLITE",
-        "url_default": "sqlite:////Users/av/DBs/sqlite/${DATASET_NAME}.db3",
-        "enabled": false
-    },
-    {
-        "module_name": "PyWrappedGraph.SQLite",
-        "class_name": "SQLiteMem",
-        "name": "SQLite (In-Memory)",
-        "url_variable_name": "URI_SQLITE_RAM",
-        "url_default": "sqlite:///:memory:",
-        "enabled": false
-    },
-    {
-        "module_name": "PyWrappedGraph.MySQL",
-        "class_name": "MySQL",
-        "name": "MySQL",
-        "url_variable_name": "URI_MYSQL",
-        "url_default": "mysql://av:temptemp@0.0.0.0:3306/${DATASET_NAME}",
-        "enabled": false
-    },
-    {
-        "module_name": "PyWrappedGraph.PostgreSQL",
-        "class_name": "PostgreSQL",
-        "name": "PostgreSQL",
-        "url_variable_name": "URI_POSTGRESQL",
-        "url_default": "postgres://av:temptemp@0.0.0.0:5432/${DATASET_NAME}",
         "enabled": false
     },
     {
@@ -45,7 +13,39 @@
         "name": "MongoDB",
         "url_variable_name": "URI_MONGODB",
         "url_default": "mongodb://0.0.0.0:27017/${DATASET_NAME}",
-        "enabled": false
+        "enabled": true
+    },
+    {
+        "module_name": "PyWrappedGraph.SQLite",
+        "class_name": "SQLite",
+        "name": "SQLite",
+        "url_variable_name": "URI_SQLITE",
+        "url_default": "sqlite:////Users/av/DBs/sqlite/${DATASET_NAME}.db3",
+        "enabled": true
+    },
+    {
+        "module_name": "PyWrappedGraph.SQLite",
+        "class_name": "SQLiteMem",
+        "name": "SQLite (In-Memory)",
+        "url_variable_name": "URI_SQLITE_RAM",
+        "url_default": "sqlite:///:memory:",
+        "enabled": true
+    },
+    {
+        "module_name": "PyWrappedGraph.MySQL",
+        "class_name": "MySQL",
+        "name": "MySQL",
+        "url_variable_name": "URI_MYSQL",
+        "url_default": "mysql://av:temptemp@0.0.0.0:3306/${DATASET_NAME}",
+        "enabled": true
+    },
+    {
+        "module_name": "PyWrappedGraph.PostgreSQL",
+        "class_name": "PostgreSQL",
+        "name": "PostgreSQL",
+        "url_variable_name": "URI_POSTGRESQL",
+        "url_default": "postgres://av:temptemp@0.0.0.0:5432/${DATASET_NAME}",
+        "enabled": true
     },
     {
         "module_name": "PyWrappedGraph.Neo4J",

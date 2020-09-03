@@ -8,8 +8,7 @@ from urllib.parse import urlparse
 import random
 from random import SystemRandom
 
-from PyWrappedHelpers.Edge import Edge
-from PyWrappedHelpers.Text import Text
+from PyWrappedHelpers import *
 
 
 def map_compact(func, os: Sequence[object]) -> Sequence[object]:
@@ -34,7 +33,7 @@ def remove_duplicate_edges(es: Sequence[Edge]) -> Sequence[Edge]:
 
     def false_if_exists(e: object) -> bool:
         if e._id < 0:
-            ids.add(e._id)
+            ids.insert(e._id)
             return True
         return False
     return filterfalse(false_if_exists, es)
@@ -91,33 +90,6 @@ def yield_texts_from_sectioned_csv(filepath: str) -> Generator[Text, None, None]
 
         if len(last_text) > 0:
             yield Text(idx, last_text)
-
-
-def export_edges_into_graph(filepath: str, g) -> int:
-    e_type = type(g).__edge_type__
-    chunk_len = type(g).__max_batch_size__
-    count_edges_added = 0
-    starting_id = g.biggest_edge_id()
-    for es in chunks(yield_edges_from_csv(filepath, e_type), chunk_len):
-        for i, e in enumerate(es):
-            es[i]._id += starting_id
-        count_edges_added += g.upsert_edges(es)
-    return count_edges_added
-
-
-def export_edges_into_graph_parallel(filepath: str, g, thread_count=8) -> int:
-    e_type = type(g).__edge_type__
-    batch_per_thread = type(g).__max_batch_size__
-    chunk_len = thread_count * batch_per_thread
-    count_edges_before = g.count_edges()
-    with concurrent.futures.ThreadPoolExecutor(max_workers=thread_count) as executor:
-        for es in chunks(yield_edges_from_csv(filepath, e_type), chunk_len):
-            x_len = int(math.ceil(len(es) / thread_count))
-            es_per_thread = [es[x:x+x_len] for x in range(0, len(es), x_len)]
-            print(f'-- Importing part: {x_len} rows x {thread_count} threads')
-            executor.map(g.upsert_edges, es_per_thread)
-            executor.shutdown(wait=True)
-    return g.count_edges() - count_edges_before
 
 
 def extract_database_name(url: str, default='graph') -> (str, str):

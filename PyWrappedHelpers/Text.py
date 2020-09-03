@@ -19,3 +19,8 @@ class Text:
         else:
             text._id = _id
         return text
+
+
+@dataclass
+class TextMatch(Text):
+    rating: float = 1

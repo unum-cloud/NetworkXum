@@ -1,4 +1,4 @@
-from PyWrappedGraph.BaseSQL import BaseSQL, EdgeNew
+from PyWrappedGraph.BaseSQL import *
 
 
 class MySQL(BaseSQL):
@@ -8,7 +8,7 @@ class MySQL(BaseSQL):
         self.set_pragmas_on_first_launch()
 
     def set_pragmas_on_first_launch(self):
-        if self.count_edges() > 0:
+        if self.number_of_edges() > 0:
             return
         # https://www.percona.com/blog/2014/01/28/10-mysql-performance-tuning-settings-after-installation/
         # https://www.monitis.com/blog/101-tips-to-mysql-tuning-and-optimization/
@@ -21,7 +21,7 @@ class MySQL(BaseSQL):
             'SET GLOBAL innodb_file_per_table=1;'
             # Don't use 0 as node or edge ID, unless prespecified.
             # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_insert_id
-            'SET SESSION insert_id=1;'
+            'SET SESSION insert_id=0;'
             # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_tmp_table_size
             'SET GLOBAL tmp_table_size=16777216;',
             # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_max_heap_table_size
@@ -42,12 +42,12 @@ class MySQL(BaseSQL):
                 s.execute(p)
                 s.commit()
 
-    def insert_adjacency_list_native(self, path: str) -> int:
+    def add_bulk_from_path(self, path: str) -> int:
         """
             This method requires the file to be mounted on the same filesystem.
             Unlike Postgres the connection wrapper doesn't allow channeling data to remote DB.            
         """
-        cnt = self.count_edges()
+        cnt = self.number_of_edges()
         pattern = '''
         LOAD DATA LOCAL INFILE  '%s'
         INTO TABLE %s
@@ -56,9 +56,11 @@ class MySQL(BaseSQL):
         IGNORE 1 ROWS
         (first, second, weight);
         '''
-        task = pattern % (path, EdgeNew.__tablename__)
+        task = pattern % (path, EdgeNewSQL.__tablename__)
         with self.get_session() as s:
             s.execute(task)
             s.commit()
-        self.upsert_table(EdgeNew.__tablename__)
-        return self.count_edges() - cnt
+        self.upsert_table(EdgeNewSQL.__tablename__)
+        self.clear_table(EdgeNewSQL.__tablename__)
+        self.add_missing_nodes()
+        return self.number_of_edges() - cnt

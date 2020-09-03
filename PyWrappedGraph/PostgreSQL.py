@@ -1,4 +1,4 @@
-from PyWrappedGraph.BaseSQL import BaseSQL, EdgeNew, EdgeSQL
+from PyWrappedGraph.BaseSQL import *
 
 
 class PostgreSQL(BaseSQL):
@@ -17,7 +17,7 @@ class PostgreSQL(BaseSQL):
         self.set_pragmas_on_first_launch()
 
     def set_pragmas_on_first_launch(self):
-        if self.count_edges() > 0:
+        if self.number_of_edges() > 0:
             return
         # https://www.percona.com/blog/2018/08/31/tuning-postgresql-database-parameters-to-optimize-performance/
         # https://www.revsys.com/writings/postgresql-performance.html
@@ -36,16 +36,16 @@ class PostgreSQL(BaseSQL):
                 s.commit()
 
     # TODO: Change the IDs of imported entries.
-    # def upsert_adjacency_list(self, path: str) -> int:
-    #     cnt = self.count_edges()
+    # def upsert_bulk_from_path(self, path: str) -> int:
+    #     cnt = self.number_of_edges()
     #     with open(path, 'r') as f:
     #         conn = self.engine.raw_connection()
     #         cursor = conn.cursor()
-    #         cmd = f'COPY {EdgeNew.__tablename__} (first, second, weight) FROM STDIN WITH (FORMAT CSV, HEADER TRUE)'
+    #         cmd = f'COPY {EdgeNewSQL.__tablename__} (first, second, weight) FROM STDIN WITH (FORMAT CSV, HEADER TRUE)'
     #         cursor.copy_expert(cmd, f)
     #         conn.commit()
-    #     self.upsert_table(EdgeNew.__tablename__)
-    #     return self.count_edges() - cnt
+    #     self.upsert_table(EdgeNewSQL.__tablename__)
+    #     return self.number_of_edges() - cnt
 
     def upsert_table(self, source_name: str):
         # https://stackoverflow.com/a/17267423/2766161

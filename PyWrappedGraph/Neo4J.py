@@ -6,9 +6,8 @@ from urllib.parse import urlparse
 from neo4j import GraphDatabase
 from neo4j import BoltStatementResult
 
-from PyWrappedHelpers.Edge import Edge
+from PyWrappedHelpers import *
 from PyWrappedGraph.BaseAPI import BaseAPI
-from PyWrappedHelpers.Algorithms import *
 
 
 class Neo4J(BaseAPI):
@@ -217,7 +216,7 @@ class Neo4J(BaseAPI):
         task = task.replace('EDGE', self._e)
         return self._records_to_edges(self.session.run(task))
 
-    def nodes_related_to_group(self, vs: Sequence[int]) -> Set[int]:
+    def neighbors_of_group(self, vs: Sequence[int]) -> Set[int]:
         pattern = '''
         MATCH (first:VERTEX)-[:EDGE]-(second:VERTEX)
         WHERE (first._id IN [%s]) AND NOT (second._id IN [%s])
@@ -229,7 +228,7 @@ class Neo4J(BaseAPI):
         task = task.replace('EDGE', self._e)
         return {int(r['_id']) for r in self.session.run(task).records()}
 
-    def nodes_related(self, v: int) -> Set[int]:
+    def neighbors(self, v: int) -> Set[int]:
         pattern = '''
         MATCH (:VERTEX {_id: %d})-[:EDGE]-(v_related:VERTEX)
         RETURN v_related._id as _id
@@ -239,7 +238,7 @@ class Neo4J(BaseAPI):
         task = task.replace('EDGE', self._e)
         return {int(r['_id']) for r in self.session.run(task).records()}
 
-    def nodes_related_to_related(self, v: int, include_related=False) -> Set[int]:
+    def neighbors_of_neighbors(self, v: int, include_related=False) -> Set[int]:
         if include_related:
             pattern = '''
             MATCH (v:VERTEX {_id: %d})-[:EDGE]-(:VERTEX)-[:EDGE]-(v_unrelated:VERTEX)
@@ -277,7 +276,7 @@ class Neo4J(BaseAPI):
 
     # Metadata
 
-    def count_nodes(self) -> int:
+    def reduce_nodes(self) -> int:
         task = f'''
         MATCH (v:{self._v})
         WITH count(v) as result
@@ -285,7 +284,7 @@ class Neo4J(BaseAPI):
         '''
         return int(self._first_record(self.session.run(task), 'result'))
 
-    def count_edges(self) -> int:
+    def reduce_edges(self) -> int:
         task = f'''
         MATCH ()-[e:{self._e}]->()
         WITH count(e) as result
@@ -293,7 +292,7 @@ class Neo4J(BaseAPI):
         '''
         return int(self._first_record(self.session.run(task), 'result'))
 
-    def count_related(self, v: int) -> (int, float):
+    def degree_neighbors(self, v: int) -> (int, float):
         pattern = '''
         MATCH (v:VERTEX {_id: %d})-[e:EDGE]-()
         WITH count(e) as c, sum(e.weight) as s
@@ -307,7 +306,7 @@ class Neo4J(BaseAPI):
         s = float(self._first_record(rs, 's'))
         return c, s
 
-    def count_followers(self, v: int) -> (int, float):
+    def degree_predecessors(self, v: int) -> (int, float):
         pattern = '''
         MATCH (:VERTEX)-[e:EDGE]->(v:VERTEX {_id: %d})
         WITH count(e) as c, sum(e.weight) as s
@@ -321,7 +320,7 @@ class Neo4J(BaseAPI):
         s = float(self._first_record(rs, 's'))
         return c, s
 
-    def count_following(self, v: int) -> (int, float):
+    def degree_successors(self, v: int) -> (int, float):
         pattern = '''
         MATCH (v:VERTEX {_id: %d})-[e:EDGE]->(:VERTEX)
         WITH count(e) as c, sum(e.weight) as s
@@ -349,7 +348,7 @@ class Neo4J(BaseAPI):
             return 0
         return int(self._first_record(rs, '_id'))
 
-    def upsert_edge(self, e: Edge) -> bool:
+    def add(self, e: Edge) -> bool:
         """
             CAUTION: True Upserting is too slow, if indexing isn't enabled,
             as we need to perform full scans to match each edge ID!
@@ -384,8 +383,8 @@ class Neo4J(BaseAPI):
     def insert_edges(self, es: List[Edge]) -> int:
         vs = set()
         for e in es:
-            vs.add(e.first)
-            vs.add(e.second)
+            vs.insert(e.first)
+            vs.insert(e.second)
         task = str()
         # First upsert all the nodes.
         for v in vs:
@@ -416,7 +415,7 @@ class Neo4J(BaseAPI):
         task = task.replace('EDGE', self._e)
         return self.session.run(task)
 
-    def remove_edge(self, e: Edge) -> bool:
+    def remove(self, e: Edge) -> bool:
         task = str()
         if e._id < 0:
             pattern = '''
@@ -443,7 +442,7 @@ class Neo4J(BaseAPI):
         self.session.run(task)
         return True
 
-    def remove_all(self):
+    def clear(self):
         self.session.run(f'MATCH (v:{self._v}) DETACH DELETE v')
         idxs = self.get_indexes()
         if f'index{self._v}' in idxs:
@@ -454,14 +453,14 @@ class Neo4J(BaseAPI):
         if f'constraint{self._e}' in cs:
             self.session.run(f'DROP CONSTRAINT constraint{self._e}')
 
-    def insert_adjacency_list(self, filepath: str) -> int:
+    def add_edges_stream(self, stream) -> int:
         chunk_len = Neo4J.__max_batch_size__
         count_edges_added = 0
-        for es in chunks(yield_edges_from_csv(filepath), chunk_len):
+        for es in chunks(stream, chunk_len):
             count_edges_added += self.insert_edges(es)
         return count_edges_added
 
-    def insert_adjacency_list_at_once(self, filepath: str, is_directed=True) -> int:
+    def add_bulk_from_path(self, filepath: str, is_directed=True) -> int:
         """
             This function may be tricky to use!
 
@@ -472,7 +471,7 @@ class Neo4J(BaseAPI):
             CAUTION 2: This frequently fails with following error:
             `neobolt.exceptions.DatabaseError`: "Java heap space".
         """
-        cnt = self.count_edges()
+        cnt = self.number_of_edges()
         current_id = self.biggest_edge_id() + 1
         _, filename = os.path.split(filepath)
 
@@ -506,7 +505,7 @@ class Neo4J(BaseAPI):
         finally:
             # Don't forget to copy temporary file!
             os.unlink(file_link)
-        return self.count_edges() - cnt
+        return self.number_of_edges() - cnt
 
     def insert_adjacency_list_in_parts(self, filepath: str, is_directed=True) -> int:
         """
@@ -519,7 +518,7 @@ class Neo4J(BaseAPI):
             CAUTION 2: This frequently fails with following error:
             `neobolt.exceptions.DatabaseError`: "Java heap space".
         """
-        cnt = self.count_edges()
+        cnt = self.number_of_edges()
         current_id = self.biggest_edge_id() + 1
         _, filename = os.path.split(filepath)
 
@@ -569,7 +568,7 @@ class Neo4J(BaseAPI):
         finally:
             # Don't forget to copy temporary file!
             os.unlink(file_link)
-        return self.count_edges() - cnt
+        return self.number_of_edges() - cnt
 
     # ---
     # Helper methods.
