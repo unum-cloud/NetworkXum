@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
+import json
 
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
@@ -11,52 +12,68 @@ from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy import text
 from sqlalchemy import Index, Table
 
-from PyWrappedGraph.BaseAPI import BaseAPI
-from PyWrappedHelpers.Edge import Edge
-from PyWrappedHelpers.Algorithms import *
+from PyWrappedGraph.BaseAPI import *
+from PyWrappedHelpers import *
 
 DeclarativeSQL = declarative_base()
 
 
-class NodeSQL(DeclarativeSQL):
-    __tablename__ = 'table_nodes'
+class NodeSQL(DeclarativeSQL, Node):
+    __tablename__ = 'main_nodes'
     _id = Column(BigInteger, primary_key=True)
-    attributes_json = Column(Text)
+    weight = Column(Float)
+    label = Column(Integer)
+    payload_json = Column(sa.Text)
 
     def __init__(self, *args, **kwargs):
         DeclarativeSQL.__init__(self)
+        subdict = kwargs.pop('payload', {})
+        if len(subdict):
+            self.payload_json = json.dumps(subdict)
+        Node.__init__(self, *args, **kwargs)
 
 
 class EdgeSQL(DeclarativeSQL, Edge):
-    __tablename__ = 'table_edges'
+    __tablename__ = 'main_edges'
     _id = Column(BigInteger, primary_key=True)
     first = Column(BigInteger)
     second = Column(BigInteger)
     is_directed = Column(Boolean)
     weight = Column(Float)
-    attributes_json = Column(Text)
+    label = Column(Integer)
+    payload_json = Column(sa.Text)
 
     def __init__(self, *args, **kwargs):
         DeclarativeSQL.__init__(self)
+        subdict = kwargs.pop('payload', {})
+        if len(subdict):
+            self.payload_json = json.dumps(subdict)
         Edge.__init__(self, *args, **kwargs)
 
 
-class EdgeNew(DeclarativeSQL, Edge):
+index_first = Index('index_first', EdgeSQL.first, unique=False)
+index_second = Index('index_second', EdgeSQL.second, unique=False)
+index_label = Index('index_label', EdgeSQL.label, unique=False)
+index_directed = Index('index_directed', EdgeSQL.is_directed, unique=False)
+
+
+class EdgeNewSQL(DeclarativeSQL, Edge):
     __tablename__ = 'new_edges'
     _id = Column(BigInteger, primary_key=True)
     first = Column(BigInteger)
     second = Column(BigInteger)
     is_directed = Column(Boolean)
     weight = Column(Float)
-    attributes_json = Column(Text)
-    index_v1 = Index('index_v1', EdgeSQL.first, unique=False)
-    index_v2 = Index('index_v2', EdgeSQL.second, unique=False)
-    index_directed = Index('index_directed', EdgeSQL.is_directed, unique=False)
+    label = Column(Integer)
+    payload_json = Column(sa.Text)
 
     # TODO: Consider using different Integer types in different SQL DBs.
     # https://stackoverflow.com/a/60840921/2766161
     def __init__(self, *args, **kwargs):
         DeclarativeSQL.__init__(self)
+        subdict = kwargs.pop('payload', {})
+        if len(subdict):
+            self.payload_json = json.dumps(subdict)
         Edge.__init__(self, *args, **kwargs)
 
 
@@ -110,6 +127,229 @@ class BaseSQL(BaseAPI):
         DeclarativeSQL.metadata.create_all(self.engine)
         self.session_maker = sessionmaker(bind=self.engine)
 
+# region Metadata
+
+    def reduce_nodes(self) -> GraphDegree:
+        result = (0, 0)
+        with self.get_session() as s:
+            result = s.query(
+                func.count(NodeSQL.weight).label("count"),
+                func.sum(NodeSQL.weight).label("sum"),
+            ).first()
+
+        return GraphDegree(*result)
+
+    def reduce_edges(self, u=None, v=None, key=None) -> GraphDegree:
+        result = (0, 0)
+        with self.get_session() as s:
+            q = s.query(
+                func.count(EdgeSQL.weight).label("count"),
+                func.sum(EdgeSQL.weight).label("sum"),
+            )
+            q = self.filter_edges_members(q, u, v)
+            q = self.filter_edges_label(q, key)
+            result = q.first()
+
+        return GraphDegree(*result)
+
+    def biggest_edge_id(self) -> int:
+        result = 0
+        with self.get_session() as s:
+            biggest = s.query(
+                func.max(EdgeSQL._id).label("max"),
+            ).first()
+            if biggest[0] is None:
+                result = 0
+            else:
+                result = biggest[0]
+        return result
+
+# region Bulk Reads
+
+    @property
+    def nodes(self) -> Sequence[Node]:
+        with self.get_session() as s:
+            return s.query(NodeSQL).all()
+        return []
+
+    @property
+    def edges(self) -> Sequence[Edge]:
+        with self.get_session() as s:
+            return s.query(EdgeSQL).all()
+        return []
+
+    @property
+    def out_edges(self) -> Sequence[Edge]:
+        with self.get_session() as s:
+            return s.query(EdgeSQL).filter(EdgeSQL.is_directed == True).all()
+        return []
+
+    @property
+    def mentioned_nodes_ids(self) -> Sequence[int]:
+        with self.get_session() as s:
+            all_froms = s.query(EdgeSQL.first).distinct().all()
+            all_tos = s.query(EdgeSQL.second).distinct().all()
+            result = set(all_froms).union(all_tos)
+            return result
+        return []
+
+# region Random Reads
+
+    def has_node(self, n) -> Optional[Node]:
+        n = self.make_node_id(n)
+        with self.get_session() as s:
+            return s.query(NodeSQL).filter(NodeSQL._id == n).first()
+        return None
+
+    def has_edge(self, u, v, key=None) -> Sequence[Edge]:
+        with self.get_session() as s:
+            q = s.query(EdgeSQL)
+            q = self.filter_edges_members(q, u, v)
+            q = self.filter_edges_label(q, key)
+            return q.all()
+        return []
+
+    def neighbors_of_group(self, vs: Sequence[int]) -> Set[int]:
+        result = set()
+        with self.get_session() as s:
+            edges = s.query(EdgeSQL).filter(or_(
+                EdgeSQL.first.in_(vs),
+                EdgeSQL.second.in_(vs),
+            )).all()
+            for e in edges:
+                if (e.first not in vs):
+                    result.add(e.first)
+                elif (e.second not in vs):
+                    result.add(e.second)
+        return result
+
+# region Random Writes
+
+    def add(self, obj, upsert=True) -> int:
+        if isinstance(obj, DeclarativeSQL):
+            with self.get_session() as s:
+                s.merge(obj)
+            return 1
+        if isinstance(obj, Edge) or isinstance(obj, Edge):
+            return self.add([obj], upsert=upsert)
+
+        # We are dealing with a collection of `Node`s or `Edge`s.
+        all_ids = [o._id for o in obj]
+        new_dicts = {o._id: o.__dict__ for o in obj}
+        target_class = EdgeSQL if self.is_list_of_edges(obj) else NodeSQL
+        with self.get_session() as s:
+            # Only merge those entries which already exist in the database
+            for each in s.query(EdgeSQL).filter(EdgeSQL._id.in_(all_ids)).all():
+                s.merge(new_dicts.pop(each._id))
+            # Only add those posts which did not exist in the database
+            s.bulk_insert_mappings(
+                target_class,
+                new_dicts.values(),
+                return_defaults=False,
+                render_nulls=True,
+            )
+        return len(new_dicts)
+
+    def remove(self, obj) -> int:
+        with self.get_session() as s:
+            # Edge
+            if isinstance(obj, Edge):
+                if obj._id < 0:
+                    return s.query(EdgeSQL).filter_by(
+                        first=obj.first,
+                        second=obj.second,
+                        is_directed=obj.is_directed,
+                    ).delete()
+                else:
+                    return s.query(EdgeSQL).filter_by(
+                        _id=obj._id
+                    ).delete()
+            # Node
+            elif isinstance(obj, Node):
+                return s.query(EdgeSQL).filter(or_(
+                    EdgeSQL.first == obj._id,
+                    EdgeSQL.second == obj._id,
+                )).delete() + s.query(NodeSQL).filter_by(
+                    _id=obj._id
+                ).delete()
+
+        return super().remove(obj)
+
+    def remove_node(self, n) -> int:
+        return self.remove(self.make_node(n))
+
+# region Bulk Writes
+
+    def clear_edges(self) -> int:
+        result = 0
+        with self.get_session() as s:
+            result += s.query(EdgeSQL).delete()
+            result += s.query(EdgeNewSQL).delete()
+        return result
+
+    def clear(self) -> int:
+        result = 0
+        with self.get_session() as s:
+            result += s.query(NodeSQL).delete()
+            result += s.query(EdgeSQL).delete()
+            result += s.query(EdgeNewSQL).delete()
+        return result
+
+    def add_edges_stream(self, stream, upsert=True) -> int:
+        if upsert:
+            return super().add_edges_stream(stream, upsert=True)
+
+        with self.get_session() as s:
+            # Build the new table.
+            chunk_len = type(self).__max_batch_size__
+            for objs in chunks(stream, chunk_len):
+                s.bulk_insert_mappings(
+                    EdgeNewSQL,
+                    [o.__dict__ for o in objs],
+                    return_defaults=False,
+                    render_nulls=True,
+                )
+
+        # Import the new data.
+        cnt = self.number_of_edges()
+        self.insert_table(EdgeNewSQL.__tablename__)
+        self.clear_table(EdgeNewSQL.__tablename__)
+        self.add_missing_nodes()
+        result = self.number_of_edges() - cnt
+        return result
+
+# region Helpers
+
+    def insert_table(self, source_name: str):
+        with self.get_session() as s:
+            migration = text(f'''
+                INSERT INTO {EdgeSQL.__tablename__}
+                SELECT * FROM {source_name};
+            ''')
+            s.execute(migration)
+
+    @abstractmethod
+    def upsert_table(self, source_name: str):
+        with self.get_session() as s:
+            # Performing an `INSERT` and then a `DELETE` might lead to integrity issues,
+            # so perhaps a way to get around it, and to perform everything neatly in
+            # a single statement, is to take advantage of the `[deleted]` temporary table.
+            # migration = text(f'''
+            # DELETE {EdgeNewSQL.__tablename__};
+            # OUTPUT DELETED.*
+            # INTO {EdgeSQL.__tablename__} (_id, first, second, weight, payload_json)
+            # ''')
+            # But this syntax isn't globally supported.
+            migration = text(f'''
+                REPLACE INTO {EdgeSQL.__tablename__}
+                SELECT * FROM {source_name};
+            ''')
+            s.execute(migration)
+
+    def clear_table(self, table_name: str):
+        with self.get_session() as s:
+            s.execute(text(f'DELETE FROM {table_name};'))
+
     @contextmanager
     def get_session(self):
         session = self.session_maker()
@@ -124,281 +364,50 @@ class BaseSQL(BaseAPI):
         finally:
             session.close()
 
-    # Relatives
+    def filter_edges_containing(self, q, n):
+        return q.filter(or_(
+            EdgeSQL.first == n,
+            EdgeSQL.second == n,
+        ))
 
-    def edge_directed(self, first: int, second: int) -> Optional[EdgeSQL]:
-        result = None
-        with self.get_session() as s:
-            result = s.query(EdgeSQL).filter(and_(
-                EdgeSQL.first == first,
-                EdgeSQL.second == second,
-                EdgeSQL.is_directed == True,
-            )).limit(1).first()
-        return result
-
-    def edge_undirected(self, first: int, second: int) -> Optional[EdgeSQL]:
-        result = None
-        with self.get_session() as s:
-            result = s.query(EdgeSQL).filter(or_(
-                and_(
-                    EdgeSQL.first == first,
-                    EdgeSQL.second == second,
-                ),
-                and_(
-                    EdgeSQL.first == second,
-                    EdgeSQL.second == first,
-                )
-            )).limit(1).first()
-        return result
-
-    def edges_from(self, v: int) -> List[EdgeSQL]:
-        result = list()
-        with self.get_session() as s:
-            result = s.query(EdgeSQL).filter_by(
-                first=v, is_directed=True).all()
-        return result
-
-    def edges_to(self, v: int) -> List[EdgeSQL]:
-        result = list()
-        with self.get_session() as s:
-            result = s.query(EdgeSQL).filter_by(
-                second=v, is_directed=True).all()
-        return result
-
-    def edges_related(self, v: int) -> List[EdgeSQL]:
-        result = list()
-        with self.get_session() as s:
-            result = s.query(EdgeSQL).filter(or_(
-                EdgeSQL.first == v,
-                EdgeSQL.second == v,
-            )).all()
-        return result
-
-    def all_vertexes(self) -> Set[int]:
-        result = set()
-        with self.get_session() as s:
-            all_froms = s.query(EdgeSQL.first).distinct().all()
-            all_tos = s.query(EdgeSQL.second).distinct().all()
-            result = set(all_froms).union(all_tos)
-        return result
-
-    # Wider range of neighbors
-
-    def nodes_related_to_group(self, vs: Sequence[int]) -> Set[int]:
-        result = set()
-        with self.get_session() as s:
-            edges = s.query(EdgeSQL).filter(or_(
-                EdgeSQL.first.in_(vs),
-                EdgeSQL.second.in_(vs),
-            )).all()
-            for e in edges:
-                if (e.first not in vs):
-                    result.add(e.first)
-                elif (e.second not in vs):
-                    result.add(e.second)
-        return result
-
-    # Metadata
-
-    def count_nodes(self) -> int:
-        return len(self.all_vertexes())
-
-    def count_edges(self) -> int:
-        result = 0
-        with self.get_session() as s:
-            result = s.query(EdgeSQL).count()
-        return result
-
-    def count_related(self, v: int) -> (int, float):
-        result = (0, 0)
-        with self.get_session() as s:
-            result = s.query(
-                func.count(EdgeSQL.weight).label("count"),
-                func.sum(EdgeSQL.weight).label("sum"),
-            ).filter(or_(
-                EdgeSQL.first == v,
-                EdgeSQL.second == v,
-            )).first()
-        return result
-
-    def count_followers(self, v: int) -> (int, float):
-        result = (0, 0)
-        with self.get_session() as s:
-            result = s.query(
-                func.count(EdgeSQL.weight).label("count"),
-                func.sum(EdgeSQL.weight).label("sum"),
-            ).filter_by(second=v, is_directed=True).first()
-        return result
-
-    def count_following(self, v: int) -> (int, float):
-        result = (0, 0)
-        with self.get_session() as s:
-            result = s.query(
-                func.count(EdgeSQL.weight).label("count"),
-                func.sum(EdgeSQL.weight).label("sum"),
-            ).filter_by(first=v, is_directed=True).first()
-        return result
-
-    def biggest_edge_id(self) -> int:
-        result = 0
-        with self.get_session() as s:
-            biggest = s.query(
-                func.max(EdgeSQL._id).label("max"),
-            ).first()
-            if biggest[0] is None:
-                result = 0
+    def filter_edges_members(self, q, u, v):
+        u = self.make_node_id(u)
+        v = self.make_node_id(v)
+        if u < 0 and v < 0:
+            return q
+        elif u < 0 or v < 0:
+            if not self.is_directed:
+                return self.filter_edges_containing(q, max(u, v))
+            elif u < 0:
+                return q.filter(EdgeSQL.second == v)
+            elif v < 0:
+                return q.filter(EdgeSQL.first == u)
+        else:
+            if self.is_directed:
+                if u == v:
+                    return self.filter_edges_containing(q, u)
+                else:
+                    return q.filter(and_(
+                        EdgeSQL.first == u,
+                        EdgeSQL.second == v,
+                    ))
             else:
-                result = biggest[0]
-        return result
+                if u == v:
+                    return self.filter_edges_containing(q, u)
+                else:
+                    return q.filter(or_(
+                        and_(
+                            EdgeSQL.first == v,
+                            EdgeSQL.second == u,
+                        ),
+                        and_(
+                            EdgeSQL.first == u,
+                            EdgeSQL.second == v,
+                        )
+                    ))
 
-    # Modifications
-
-    def upsert_edge(self, e: EdgeSQL) -> bool:
-        result = False
-        with self.get_session() as s:
-            e = self.validate_edge(e)
-            if e is not None:
-                s.merge(e)
-                result = True
-        return result
-
-    def remove_edge(self, e: EdgeSQL) -> bool:
-        result = False
-        with self.get_session() as s:
-            if e._id < 0:
-                s.query(EdgeSQL).filter_by(
-                    first=e.first,
-                    second=e.second,
-                    is_directed=e.is_directed,
-                ).delete()
-            else:
-                s.query(EdgeSQL).filter_by(
-                    _id=e._id
-                ).delete()
-            result = True
-        return result
-
-    def upsert_edges(self, es: List[Edge]) -> int:
-        result = 0
-        with self.get_session() as s:
-            es = map_compact(self.validate_edge, es)
-            es = list(map(s.merge, es))
-            result = len(es)
-        return result
-
-    def remove_node(self, v: int) -> int:
-        result = 0
-        with self.get_session() as s:
-            result = s.query(EdgeSQL).filter(or_(
-                EdgeSQL.first == v,
-                EdgeSQL.second == v,
-            )).delete()
-        return result
-
-    def remove_all(self) -> int:
-        result = 0
-        with self.get_session() as s:
-            result += s.query(EdgeSQL).delete()
-            result += s.query(EdgeNew).delete()
-        return result
-
-    def insert_adjacency_list(self, path: str) -> int:
-        result = 0
-        with self.get_session() as s:
-            current_id = self.biggest_edge_id() + 1
-            # Build the new table.
-            chunk_len = type(self).__max_batch_size__
-            for es in chunks(yield_edges_from_csv(path, edge_type=Edge), chunk_len):
-                for i, e in enumerate(es):
-                    es[i]._id = current_id
-                    current_id += 1
-                s.bulk_insert_mappings(
-                    EdgeNew,
-                    [e.__dict__ for e in es],
-                    return_defaults=False,
-                    render_nulls=True,
-                )
-        # Import the new data.
-        cnt = self.count_edges()
-        self.insert_table(EdgeNew.__tablename__)
-        self.flush_temporary_table()
-        result = self.count_edges() - cnt
-        return result
-
-    def insert_table(self, source_name: str):
-        with self.get_session() as s:
-            migration = text(f'''
-                INSERT INTO {EdgeSQL.__tablename__}
-                SELECT * FROM {source_name};
-            ''')
-            s.execute(migration)
-
-    def upsert_adjacency_list(self, path: str) -> int:
-        result = 0
-        """
-            Direct injections (even in batches) have huge performance impact.
-            We are not only conflicting with other operations in same DB, 
-            but also constantly rewriting indexes after every new batch insert.
-            Instead we create a an additional unindexed table, fill it and
-            then merge into the main one.
-        """
-        count_merged = 0
-        with self.get_session() as s:
-            # Build the new table.
-            chunk_len = type(self).__max_batch_size__
-            for es in chunks(yield_edges_from_csv(path), chunk_len):
-                es = map_compact(
-                    lambda e: self.validate_edge_and_convert(e, EdgeNew), es)
-                es = list(map(s.merge, es))
-                count_merged += len(es)
-        # Import the new data.
-        cnt = self.count_edges()
-        self.upsert_table(EdgeNew.__tablename__)
-        self.flush_temporary_table()
-        result = self.count_edges() - cnt
-        return result
-
-    @abstractmethod
-    def upsert_table(self, source_name: str):
-        with self.get_session() as s:
-            migration = text(f'''
-                REPLACE INTO {EdgeSQL.__tablename__}
-                SELECT * FROM {source_name};
-            ''')
-            # Performing an `INSERT` and then a `DELETE` might lead to integrity issues,
-            # so perhaps a way to get around it, and to perform everything neatly in
-            # a single statement, is to take advantage of the `[deleted]` temporary table.
-            # migration = text(f'''
-            # DELETE {EdgeNew.__tablename__};
-            # OUTPUT DELETED.*
-            # INTO {EdgeSQL.__tablename__} (_id, first, second, weight, attributes_json)
-            # ''')
-            # But this syntax isn't globally supported.
-            s.execute(migration)
-
-    def insert_bulk_deduplicated(self, es: List[EdgeNew]):
-        # Some low quality datasets contain duplicates and
-        # if we have ID collisions, the operation will fail.
-        # https://docs.sqlalchemy.org/en/13/orm/session_api.html#sqlalchemy.orm.session.Session.bulk_save_objects
-        with self.get_session() as s:
-            s.bulk_insert_mappings(
-                EdgeNew,
-                es,
-                return_defaults=False,
-                render_nulls=True,
-            )
-
-    def flush_temporary_table(self):
-        with self.get_session() as s:
-            s.execute(text(f'DELETE FROM {EdgeNew.__tablename__};'))
-
-    def validate_edge(self, e) -> DeclarativeSQL:
-        return self.validate_edge_and_convert(e, EdgeSQL)
-
-    def validate_edge_and_convert(self, e, e_type) -> DeclarativeSQL:
-        if (not isinstance(e, DeclarativeSQL)) and (e_type is not None):
-            if isinstance(e, dict):
-                e = e_type(**e)
-            else:
-                e = e_type(**e.__dict__)
-        return super().validate_edge(e)
+    def filter_edges_label(self, q, key):
+        key = self.make_label(key)
+        if key < 0:
+            return q
+        return q.filter(EdgeSQL.label == key)

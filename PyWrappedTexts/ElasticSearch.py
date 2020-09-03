@@ -3,10 +3,8 @@ import copy
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
 
-from PyWrappedDocs.BaseAPI import BaseAPI
-from PyWrappedHelpers.Algorithms import *
-from PyWrappedHelpers.Text import Text
-from PyWrappedHelpers.Config import allow_big_csv_fields
+from PyWrappedTexts.BaseAPI import BaseAPI
+from PyWrappedHelpers import *
 
 
 class ElasticSearch(BaseAPI):
@@ -53,18 +51,18 @@ class ElasticSearch(BaseAPI):
     def commit_all(self):
         return self.elastic.indices.refresh(self.db_name)
 
-    def remove_all(self):
+    def clear(self):
         # https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-exists.html
         if self.index_exists():
             self.elastic.indices.delete(self.db_name)
         self.create_index()
 
-    def count_docs(self) -> int:
+    def count_texts(self) -> int:
         if not self.index_exists():
             return 0
         return self.elastic.count(index=self.db_name).pop('count', 0)
 
-    def validate_doc(self, doc: Text) -> dict:
+    def validate_text(self, doc: Text) -> dict:
         if isinstance(doc, (str, int)):
             return {'_id': doc}
         if isinstance(doc, Text):
@@ -73,9 +71,9 @@ class ElasticSearch(BaseAPI):
             return copy.deepcopy(doc)
         return copy.deepcopy(doc.__dict__)
 
-    def upsert_doc(self, doc, sync=True) -> bool:
+    def upsert_text(self, doc, sync=True) -> bool:
         # https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
-        doc = self.validate_doc(doc)
+        doc = self.validate_text(doc)
         doc_id = doc.pop('_id', None)
         if doc_id is None:
             return False
@@ -87,8 +85,8 @@ class ElasticSearch(BaseAPI):
             return True
         return False
 
-    def remove_doc(self, doc, sync=True) -> bool:
-        doc = self.validate_doc(doc)
+    def remove_text(self, doc, sync=True) -> bool:
+        doc = self.validate_text(doc)
         doc_id = doc.pop('_id', None)
         if doc_id is None:
             return False
@@ -100,15 +98,15 @@ class ElasticSearch(BaseAPI):
             return True
         return False
 
-    def upsert_docs(self, docs) -> int:
-        docs = map(self.validate_doc, docs)
-        statuses = [self.upsert_doc(doc, sync=False) for doc in docs]
+    def upsert_texts(self, docs) -> int:
+        docs = map(self.validate_text, docs)
+        statuses = [self.upsert_text(doc, sync=False) for doc in docs]
         self.commit_all()
         return sum(statuses)
 
-    def remove_docs(self, docs) -> int:
-        docs = map(self.validate_doc, docs)
-        statuses = [self.remove_doc(doc, sync=False) for doc in docs]
+    def remove_texts(self, docs) -> int:
+        docs = map(self.validate_text, docs)
+        statuses = [self.remove_text(doc, sync=False) for doc in docs]
         self.commit_all()
         return sum(statuses)
 
@@ -204,13 +202,13 @@ class ElasticSearch(BaseAPI):
         hits_arr = docs.get('hits', {}).get('hits', [])
         return [h['_id'] for h in hits_arr]
 
-    def import_docs_from_csv(self, filepath: str) -> int:
+    def import_texts_from_csv(self, filepath: str) -> int:
         allow_big_csv_fields()
         # https://elasticsearch-py.readthedocs.io/en/master/helpers.html
 
         def produce_validated():
             for doc in yield_texts_from_sectioned_csv(filepath):
-                yield self.validate_doc(doc)
+                yield self.validate_text(doc)
 
         cnt_success = 0
         for ok, action in streaming_bulk(
@@ -225,11 +223,11 @@ class ElasticSearch(BaseAPI):
 if __name__ == '__main__':
     sample_file = 'Datasets/text-test/nanoformulations.txt'
     db = ElasticSearch(url='http://localhost:9200/text-test')
-    db.remove_all()
-    assert db.count_docs() == 0
-    assert db.upsert_doc(Text.from_file(sample_file))
-    assert db.count_docs() == 1
+    db.clear()
+    assert db.count_texts() == 0
+    assert db.upsert_text(Text.from_file(sample_file))
+    assert db.count_texts() == 1
     assert db.find_with_substring('nanoparticles')
     assert db.find_with_regex('nanoparticles')
-    assert db.remove_doc(Text.from_file(sample_file))
-    assert db.count_docs() == 0
+    assert db.remove_text(Text.from_file(sample_file))
+    assert db.count_texts() == 0

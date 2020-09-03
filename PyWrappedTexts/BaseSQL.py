@@ -11,8 +11,8 @@ from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy import text
 from sqlalchemy import Index, Table
 
-from PyWrappedDocs.BaseAPI import BaseAPI
-from PyWrappedHelpers.Algorithms import *
+from PyWrappedTexts.BaseAPI import BaseAPI
+from PyWrappedHelpers import *
 
 DeclarativeDocsSQL = declarative_base()
 
@@ -43,7 +43,7 @@ class BaseSQL(BaseAPI):
     __in_memory__ = False
 
     # --------------------------------
-    # region: Initialization and Metadata.
+    # region Initialization and Metadata.
     # --------------------------------
 
     def __init__(self, url='sqlite:///:memory:', **kwargs):
@@ -69,7 +69,7 @@ class BaseSQL(BaseAPI):
         finally:
             session.close()
 
-    def count_docs(self) -> int:
+    def count_texts(self) -> int:
         result = 0
         with self.get_session() as s:
             result = s.query(TextSQL).count()
@@ -78,17 +78,17 @@ class BaseSQL(BaseAPI):
     # endregion
 
     # --------------------------------
-    # region: Adding and removing documents.
+    # region Adding and removing documents.
     # --------------------------------
 
-    def upsert_doc(self, doc: TextSQL) -> bool:
+    def upsert_text(self, doc: TextSQL) -> bool:
         result = False
         with self.get_session() as s:
             s.merge(doc)
             result = True
         return result
 
-    def remove_doc(self, doc: TextSQL) -> bool:
+    def remove_text(self, doc: TextSQL) -> bool:
         result = False
         with self.get_session() as s:
             s.query(TextSQL).filter_by(
@@ -97,14 +97,14 @@ class BaseSQL(BaseAPI):
             result = True
         return result
 
-    def upsert_docs(self, docs: List[Edge]) -> int:
+    def upsert_texts(self, docs: List[Edge]) -> int:
         result = 0
         with self.get_session() as s:
             docs = list(map(s.merge, docs))
             result = len(docs)
         return result
 
-    def remove_all(self) -> int:
+    def clear(self) -> int:
         result = 0
         with self.get_session() as s:
             result += s.query(TextSQL).delete()
@@ -113,7 +113,7 @@ class BaseSQL(BaseAPI):
     # endregion
 
     # --------------------------------
-    # region: Search Queries.
+    # region Search Queries.
     # --------------------------------
 
     @abstractmethod

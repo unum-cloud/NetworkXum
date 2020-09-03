@@ -8,7 +8,7 @@ from PyWrappedGraph.BaseAPI import BaseAPI
 
 from P0Config import P0Config
 from P3TasksSampler import P3TasksSampler
-from PyWrappedHelpers.Config import allow_big_csv_fields
+from PyWrappedHelpers import *
 
 
 class P3Bench(object):
@@ -42,7 +42,7 @@ class P3Bench(object):
     def bench_buffered_graph(self):
         if self.tdb is None:
             return
-        if self.tdb.count_docs() == 0:
+        if self.tdb.count_texts() == 0:
             return
         print('- Benchmarking: {} @ {}'.format(
             self.dataset['name'],
@@ -81,19 +81,19 @@ class P3Bench(object):
         # Reversable write operations.
         self.bench_task(
             name='Random Writes: Remove Doc',
-            func=self.remove_doc
+            func=self.remove_text
         )
         self.bench_task(
             name='Random Writes: Upsert Doc',
-            func=self.upsert_doc
+            func=self.upsert_text
         )
         self.bench_task(
             name='Random Writes: Remove Docs Batch',
-            func=self.remove_docs
+            func=self.remove_texts
         )
         self.bench_task(
             name='Random Writes: Upsert Docs Batch',
-            func=self.upsert_docs
+            func=self.upsert_texts
         )
 
     def bench_task(self, name, func):
@@ -186,31 +186,31 @@ class P3Bench(object):
         print(f'---- {cnt} ops: {cnt_found} matches found')
         return cnt
 
-    def remove_doc(self) -> int:
+    def remove_text(self) -> int:
         cnt = 0
         for doc in self.tasks.docs_to_change_by_one:
-            self.tdb.remove_doc(doc)
+            self.tdb.remove_text(doc)
             cnt += 1
         return cnt
 
-    def upsert_doc(self) -> int:
+    def upsert_text(self) -> int:
         cnt = 0
         for doc in self.tasks.docs_to_change_by_one:
-            self.tdb.upsert_doc(doc)
+            self.tdb.upsert_text(doc)
             cnt += 1
         return cnt
 
-    def remove_docs(self) -> int:
+    def remove_texts(self) -> int:
         cnt = 0
         for docs in self.tasks.docs_to_change_batched:
-            self.tdb.remove_docs(docs)
+            self.tdb.remove_texts(docs)
             cnt += len(docs)
         return cnt
 
-    def upsert_docs(self) -> int:
+    def upsert_texts(self) -> int:
         cnt = 0
         for docs in self.tasks.docs_to_change_batched:
-            self.tdb.upsert_docs(docs)
+            self.tdb.upsert_texts(docs)
             cnt += len(docs)
         return cnt
 

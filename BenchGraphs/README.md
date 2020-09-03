@@ -18,7 +18,7 @@ The application is split into multiple stages, each with it's own file, so you c
 
 ## Setup
 
-Testing and benchmarking was done on 16" 2019 MacBook Pro. The simplest approach is to test using Docker Compose to start sandboxed DB instances, but [it comes with sacrifices on other platforms.](https://github.com/docker/for-mac/issues/1592). In case you are running this on the mac - call `run_mac.sh`, otherwise - `run_docker.sh`.
+Testing and benchmarking was done on 16" 2019 MacBook Pro. The simplest approach is to test using Docker Compose to start sandboxed DB instances, but [it comes with sacrifices on other platforms.](https://github.com/docker/for-mac/issues/1592). In case you are running this on the mac - call `run_mac.sh`, otherwise - `run_textker.sh`.
 
 Docker engine can't talk to Apple File System directly, and the `osxfs` [intermediate layer is a lot slower than native storage](https://docs.docker.com/docker-for-mac/osxfs/#performance-issues-solutions-and-roadmap). With a classical block-based file system, the access latency is typically under 10μs (microseconds). With `osxfs`, latency is presently around 130μs for most operations (or 13× slower). Throughput for bulk operations doesn't exceed 250 MB/s, while the drive is capable of 3 GB/s (or 12× slower). Even in operations with huge batch sizes the performance was at least 4 times lower than native storage.
 

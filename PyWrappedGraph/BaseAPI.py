@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
+from typing import Sequence, Optional, Dict, Generator, Set, Tuple, Sequence
 import concurrent.futures
+import collections
 
-from PyWrappedHelpers.Edge import Edge
-from PyWrappedHelpers.Algorithms import *
+from PyWrappedHelpers import *
 
 
 class BaseAPI(object):
@@ -13,215 +13,351 @@ class BaseAPI(object):
         By default, it allows multi-edges (multiple edges connecting same nodes).
         Easiest way to preserve edge uniqness is to generate edge IDs
         by hashing IDs of nodes that it's connecting.
+
+        Partially compatiable with `MultiDiGraph` from NetworkX package.
+        Explicitly supported edge attributes are: `_id: int` `weight: float`, `label: int`, `is_directed: bool`.
+        Explicitly supported node attributes are: `_id: int` `weight: float`, `label: int`.
+        Non-integer node names will be hashed.
+        The hashable `key` will be transformed into the `label` property of nodes and edges.
+        Docs: https://networkx.github.io/documentation/stable/reference/classes/multidigraph.html
     """
     __max_batch_size__ = 100
     __is_concurrent__ = True
     __edge_type__ = Edge
+    __node_type__ = Node
     __in_memory__ = False
-
-    # --------------------------------
-    # region: Adding and removing nodes and edges.
-    # https://networkx.github.io/documentation/stable/reference/classes/graph.html#adding-and-removing-nodes-and-edges
-    # --------------------------------
 
     def __init__(
         self,
         is_directed=True,
         is_weighted=True,
-        edge_id_generator=None,
+        upsert_nodes_with_every_edge=True,
         **kwargs,
     ):
         object.__init__(self)
-        self.count_undirected_in_source_queries = True
         self.is_directed = is_directed
         self.is_weighted = is_weighted
-        self.edge_id_generator = edge_id_generator
-        if self.edge_id_generator is None:
-            self.edge_id_generator = lambda e: self.biggest_edge_id() + 1
+
+# region Metadata
 
     @abstractmethod
-    def validate_edge(self, e: Edge) -> Optional[Edge]:
-        if isinstance(e, dict):
-            e = Edge(**e)
-        if (e.first < 0) or (e.second < 0):
-            return None
-        if e._id < 0:
-            e._id = self.edge_id_generator(e)
-        return e
+    def reduce_nodes(self) -> GraphDegree:
+        return GraphDegree(0, 0)
 
     @abstractmethod
-    def upsert_edge(self, e: Edge) -> bool:
+    def reduce_edges(self, u=None, v=None, key=None) -> GraphDegree:
         """
-            Updates an `Edge` with given ID. If it's missing - creates a new one.
-            If ID property isn't set - it will be computed as hash of member nodes, 
-            so only one such edge can exist in DB.
+            We count all the edges that have `u` or `v`. Both can be set to `None`.
+            If both are set to the same integer value, we will search for edges containing that edge in any role.
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.MultiDiGraph.number_of_edges.html#networkx.MultiDiGraph.number_of_edges
         """
-        pass
-
-    @abstractmethod
-    def remove_edge(self, e: Edge) -> bool:
-        """
-            Can delete edges with known ID and without.
-            In the second case we only delete 1 edge, that has 
-            matching `first` and `second` nodes without 
-            searching for reverse edge.
-        """
-        return False
-
-    @abstractmethod
-    def upsert_edges(self, es: Sequence[Edge]) -> int:
-        es = map_compact(self.validate_edge, es)
-        successes = map(self.upsert_edge, es)
-        return int(sum(successes))
-
-    @abstractmethod
-    def remove_edges(self, es: Sequence[Edge]) -> int:
-        successes = map(self.remove_edge, es)
-        return int(sum(successes))
-
-    @abstractmethod
-    def upsert_adjacency_list(self, filepath: str) -> int:
-        """
-            Imports data from adjacency list CSV file. Row shape: `(first, second, weight)`.
-            Generates the edge IDs by hashing the members.
-            So it guarantess edge uniqness, but is much slower than `insert_adjacency_list`.
-        """
-        return export_edges_into_graph(filepath, self)
-
-    @abstractmethod
-    def insert_adjacency_list(self, filepath: str) -> int:
-        """
-            Imports data from adjacency list CSV file. Row shape: `(first, second, weight)`.
-            Uses the `biggest_edge_id` to generate incremental IDs for new edges.
-            Doesn't guarantee edge uniqness (for 2 given nodes) as `upsert_adjacency_list` does.
-        """
-        return export_edges_into_graph(filepath, self)
-
-    @abstractmethod
-    def remove_all(self):
-        """Remove all nodes and edges from the graph."""
-        pass
-
-    @abstractmethod
-    def remove_node(self, n: int) -> int:
-        """Removes all the edges containing that node."""
-        return self.remove_edges(self.edges_related(n))
-
-    # endregion
-
-    # --------------------------------
-    # region: Simple lookups.
-    # https://networkx.github.io/documentation/stable/reference/classes/graph.html#reporting-nodes-edges-and-neighbors
-    # --------------------------------
-
-    @abstractmethod
-    def count_nodes(self) -> int:
-        pass
-
-    @abstractmethod
-    def count_edges(self) -> int:
-        pass
+        return GraphDegree(0, 0)
 
     @abstractmethod
     def biggest_edge_id(self) -> int:
         return 0
 
+    def number_of_nodes(self) -> int:
+        cnt_registered = self.reduce_nodes().count
+        if cnt_registered > 0:
+            return cnt_registered
+        return len(self.mentioned_nodes_ids)
+
+    def number_of_edges(self, u=None, v=None, key=None) -> int:
+        return self.reduce_edges(u, v, key).count
+
+    def __len__(self) -> int:
+        """
+            Uses `self.number_of_nodes()`.
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.__len__.html
+        """
+        return self.number_of_nodes().count
+
+    def order(self) -> int:
+        """
+            Uses `self.number_of_nodes()`.
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.number_of_nodes.html
+        """
+        return self.number_of_nodes().count
+
+
+# region Bulk Reads
+
+    @property
     @abstractmethod
-    def contains_node(self, v: int) -> bool:
-        # TODO
-        pass
+    def nodes(self) -> Sequence[Node]:
+        """
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.MultiDiGraph.nodes.html
+        """
+        return []
 
+    @property
     @abstractmethod
-    def node_attributes(self, v: int) -> dict:
-        # TODO
-        pass
+    def edges(self) -> Sequence[Edge]:
+        """
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.MultiDiGraph.edges.html
+        """
+        return []
 
-    # --------------------------------
-    # region: Bulk reads.
-    # https://networkx.github.io/documentation/stable/reference/classes/graph.html#reporting-nodes-edges-and-neighbors
-    # --------------------------------
-
+    @property
     @abstractmethod
-    def iterate_nodes(self) -> Generator[Edge, None, None]:
-        # TODO
-        pass
+    def out_edges(self) -> Sequence[Edge]:
+        """
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.MultiDiGraph.out_edges.html
+        """
+        return [e for e in self.edges if e.is_directed]
 
+    @property
     @abstractmethod
-    def iterate_edges(self) -> Generator[Edge, None, None]:
-        # TODO
-        pass
+    def in_edges(self) -> Sequence[Edge]:
+        """
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.MultiDiGraph.in_edges.html
+        """
+        return [e.inverted() for e in self.out_edges]
 
+    @property
     @abstractmethod
-    def edge_directed(self, first: int, second: int) -> Optional[Edge]:
-        """Only finds edges directed from `first` to `second`."""
-        pass
+    def mentioned_nodes_ids(self) -> Sequence[int]:
+        return self.unique_members_of_edges(self.edges)
 
-    @abstractmethod
-    def edge_undirected(self, first: int, second: int) -> Optional[Edge]:
-        """Checks for edges in both directions."""
-        pass
-
-    @abstractmethod
-    def edges_from(self, v: int) -> List[Edge]:
-        pass
-
-    @abstractmethod
-    def edges_to(self, v: int) -> List[Edge]:
-        pass
-
-    @abstractmethod
-    def edges_related(self, v: int) -> List[Edge]:
-        """Finds all edges that contain `v` as part of it."""
-        pass
-
-    @abstractmethod
-    def count_following(self, v: int) -> (int, float):
-        """Returns the number of edges outgoing from `v` and total `weight`."""
-        pass
-
-    @abstractmethod
-    def count_followers(self, v: int) -> (int, float):
-        """Returns the number of edges incoming into `v` and total `weight`."""
-        pass
-
-    @abstractmethod
-    def count_related(self, v: int) -> (int, float):
-        """Returns the number of edges containing `v` and total `weight`."""
-        pass
-
-    # endregion
-
-    # --------------------------------
-    # region: Wider range of neighbors & analytics.
-    # Most of them aren't implemented in DBs and will
-    # be called through NetworkX wrapper.
-    # --------------------------------
+# region Random Reads
 
     @abstractmethod
-    def nodes_related(self, v: int) -> Set[int]:
-        """Returns IDs of nodes that have a shared edge with `v`."""
-        vs_unique = set()
-        for e in self.edges_related(v):
-            vs_unique.add(e.first)
-            vs_unique.add(e.second)
-        vs_unique.discard(v)
-        return vs_unique
+    def has_node(self, n) -> Optional[Node]:
+        """
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.MultiDiGraph.has_node.html
+        """
+        return None
 
     @abstractmethod
-    def nodes_related_to_group(self, vs: List[int]) -> Set[int]:
+    def has_edge(self, u, v, key=None) -> Sequence[Edge]:
+        """
+            The NetworkX API promises a `bool` return value, but we do differently.
+            We export all the edges that have given `u` and `v`. Any one of them can be set to `None`.
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.MultiDiGraph.has_edge.html
+        """
+        return None
+
+    @abstractmethod
+    def neighbors(self, n) -> Sequence[int]:
+        """
+            Returns IDs of nodes that have a shared edge with `v`.
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.MultiDiGraph.neighbors.html
+        """
+        result = self.unique_members_of_edges(self.has_edge(n, n))
+        result.discard(n)
+        return result
+
+    @abstractmethod
+    def successors(self, n) -> Sequence[int]:
+        """
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.MultiDiGraph.successors.html
+        """
+        result = self.unique_members_of_edges(self.has_edge(n, None))
+        result.discard(n)
+        return result
+
+    @abstractmethod
+    def predecessors(self, n) -> Sequence[int]:
+        """
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.MultiDiGraph.predecessors.html
+        """
+        result = self.unique_members_of_edges(self.has_edge(None, n))
+        result.discard(n)
+        return result
+
+    def __iter__(self) -> Sequence[Node]:
+        return nodes
+
+    def __contains__(self, n) -> bool:
+        return has_node(n) is not None
+
+    def get_edge_data(self, u, v, key=None, default=None) -> dict:
+        """
+            This method isn't actively used and is designed for compatiability.
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.MultiDiGraph.get_edge_data.html
+        """
+        e = self.has_edge(u, v, key)
+        if e is None:
+            return default
+        return dict(
+            weight=e.weight,
+            label=e.label,
+            is_directed=e.is_directed,
+            **e.payload,
+        )
+
+    @abstractmethod
+    def neighbors_of_group(self, vs: Sequence[int]) -> Set[int]:
         """Returns IDs of nodes that have one or more edges with members of `vs`."""
         results = set()
         for v in vs:
-            results = results.union(self.nodes_related(v))
+            results = results.union(self.neighbors(v))
         return results.difference(set(vs))
 
     @abstractmethod
-    def nodes_related_to_related(self, v: int, include_related=False) -> Set[int]:
-        related = self.nodes_related(v)
-        related_to_related = self.nodes_related_to_group(related.union({v}))
+    def neighbors_of_neighbors(self, v: int, include_related=False) -> Set[int]:
+        related = self.neighbors(v)
+        related_to_related = self.neighbors_of_group(related.union({v}))
         if include_related:
             return related_to_related.union(related).difference({v})
         else:
             return related_to_related.difference(related).difference({v})
 
-    # endregion
+
+# region Random Writes
+
+    @abstractmethod
+    def add(self, obj, upsert=True) -> int:
+        """
+            Adds either an `Edge`, `Sequence[Edge]`, `Node` or `Sequence[Node]`.
+            Other arguments aren't allowed.
+        """
+        if self.is_list_of_edges(obj) or self.is_list_of_nodes(obj):
+            return sum([self.add(o, upsert=upsert) for o in obj])
+        else:
+            return 0
+
+    @abstractmethod
+    def remove(self, obj) -> int:
+        """
+            Removes either an `Edge`, `Sequence[Edge]`, `Node` or `Sequence[Node]`.
+            Other arguments aren't allowed.
+            Can delete edges without a known ID, but it will work slower.
+        """
+        if self.is_list_of_edges(obj) or self.is_list_of_nodes(obj):
+            return sum(map(self.remove, obj))
+        else:
+            return 0
+
+    def remove_node(self, n) -> int:
+        """
+            Removes all the edges containing that node.
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.remove.html
+        """
+        return self.remove(self.edges_related(n))
+
+    def add_node(self, _id, **attrs) -> bool:
+        """
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.add_node.html
+        """
+        return self.add(self.make_node(_id, **attrs))
+
+    def add_edge(self, first, second, **attrs) -> bool:
+        """
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.add_edge.html
+        """
+        return self.add(self.make_edge(first, second, **attrs))
+
+    def add_missing_nodes(self) -> int:
+        """
+            Goes through all `Edge`s in DB and makes sure every node is present.
+            Expects, that all `Node` IDs will fit into RAM.
+        """
+        ids = self.mentioned_nodes_ids
+        registered_ids = {n._id for n in self.nodes}
+        ids = ids.difference(registered_ids)
+        nodes = [self.make_node(_id) for _id in ids]
+        return self.add(nodes, upsert=False)
+
+# region Bulk
+
+    @abstractmethod
+    def add_edges_stream(self, stream, upsert=True) -> int:
+        """
+            Imports data from adjacency list CSV file. Row shape: `(first, second, weight)`.
+            Uses the `biggest_edge_id` to generate incremental IDs for new edges.
+            Doesn't guarantee edge uniqness (for 2 given nodes) as `upsert_bulk` does.
+        """
+        count_edges_added = 0
+        chunk_len = type(self).__max_batch_size__
+        for es in chunks(stream, chunk_len):
+            count_edges_added += self.add(es, upsert=upsert)
+        self.add_missing_nodes()
+        return count_edges_added
+
+    @abstractmethod
+    def clear(self):
+        """
+            Remove all nodes and edges from the graph.
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.clear.html
+        """
+        pass
+
+    @abstractmethod
+    def clear_edges(self):
+        """
+            Remove all edges from the graph, but keep the nodes.
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.clear_edges.html
+        """
+        pass
+
+
+# region Helpers
+
+    def make_node_id(self, node_for_adding) -> int:
+        if isinstance(node_for_adding, int):
+            return node_for_adding
+        elif isinstance(node_for_adding, Node):
+            return node_for_adding._id
+        elif node_for_adding is None:
+            return -1
+        else:
+            return hash(node_for_adding)
+
+    def make_label(self, key) -> int:
+        if key is None:
+            return -1
+        elif isinstance(key, int):
+            return key
+        else:
+            return hash(key)
+
+    def make_node(self, node_for_adding, **attrs) -> Optional[Node]:
+        """
+            Parses NetworkX API arguments into a `Node` object.
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.add_node.html
+        """
+        n = Node(
+            _id=self.make_node_id(node_for_adding),
+            weight=attrs.pop('weight', 1),
+            label=attrs.pop('label', 0),
+        )
+        n.payload = attrs
+        if not isinstance(node_for_adding, int):
+            n.payload['_id'] = node_for_adding
+        return n
+
+    def make_edge(self, first, second, key, **attrs) -> Optional[Edge]:
+        """
+            Parses NetworkX API arguments into an `Edge` object.
+            https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.Graph.add_edge.html
+        """
+        first = self.make_node_id(first)
+        second = self.make_node_id(second)
+        label = self.make_label(key if key else attrs.pop('label', -1))
+        e = Edge(
+            _id=attrs.pop('_id', -1),
+            first=first,
+            second=second,
+            weight=attrs.pop('weight', 1),
+            label=label,
+            is_directed=attrs.pop('is_directed', self.is_directed),
+        )
+        if e._id < 0:
+            e._id = Edge.identify_by_members(first, second)
+        e.payload = dict(key=key, **attrs)
+        return e
+
+    def unique_members_of_edges(self, es: Sequence[Edge]) -> Set[int]:
+        result = set()
+        for e in es:
+            result.add(e.first)
+            result.add(e.second)
+        return result
+
+    def is_list_of_edges(self, es: Sequence[Edge]) -> bool:
+        return isinstance(es, collections.Sequence) and all([isinstance(e, Edge) for e in es])
+
+    def is_list_of_nodes(self, ns: Sequence[Node]) -> bool:
+        return isinstance(ns, collections.Sequence) and all([isinstance(n, Node) for n in ns])

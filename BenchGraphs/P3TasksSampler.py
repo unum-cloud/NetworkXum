@@ -1,7 +1,7 @@
 import random
 from typing import List
 
-from PyWrappedHelpers.Algorithms import *
+from PyWrappedHelpers import *
 from pynum import sample_edges
 
 from P0Config import P0Config
@@ -44,11 +44,11 @@ class P3TasksSampler(object):
         self._split_samples_into_tasks()
         return len(self._buffer_edges)
 
-    def sample_from_distribution(self, count_nodes):
+    def sample_from_distribution(self, number_of_nodes):
         count_needed = self.number_of_needed_samples()
         while len(self._buffer_edges) < count_needed:
-            first = random.randrange(1, count_nodes)
-            second = random.randrange(1, count_nodes)
+            first = random.randrange(1, number_of_nodes)
+            second = random.randrange(1, number_of_nodes)
             if first == second:
                 continue
             self._buffer_edges.append({

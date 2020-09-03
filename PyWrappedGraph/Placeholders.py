@@ -1,4 +1,4 @@
-from PyWrappedHelpers.Algorithms import *
+from PyWrappedHelpers import *
 from PyWrappedGraph.BaseAPI import BaseAPI
 from PyWrappedGraph.BaseSQL import BaseSQL
 

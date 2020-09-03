@@ -5,7 +5,7 @@ import importlib
 from pystats2md.micro_bench import MicroBench
 from pystats2md.helpers import metric2str, bytes2str
 
-from PyWrappedHelpers.Algorithms import export_edges_into_graph
+from PyWrappedHelpers import *
 from P0Config import P0Config
 
 
@@ -30,7 +30,7 @@ class P2Import(object):
 
         db_name = database['name']
         dataset_name = dataset['name']
-        if (tdb.count_docs() != 0):
+        if (tdb.count_texts() != 0):
             print(f'-- Skipping: {dataset_name} -> {db_name}')
             return
 
@@ -41,8 +41,8 @@ class P2Import(object):
         print(f'--- file size:', bytes2str(file_size))
 
         def import_one() -> int:
-            tdb.import_docs_from_csv(dataset_path)
-            return tdb.count_docs()
+            tdb.import_texts_from_csv(dataset_path)
+            return tdb.count_texts()
 
         counter = MicroBench(
             benchmark_name='Sequential Writes: Import CSV',

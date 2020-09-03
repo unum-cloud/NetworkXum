@@ -1,6 +1,5 @@
-from PyWrappedDocs.BaseAPI import BaseAPI
-from PyWrappedHelpers.Text import Text
-from PyWrappedHelpers.Algorithms import *
+from PyWrappedTexts.BaseAPI import BaseAPI
+from PyWrappedHelpers import *
 
 from P0Config import P0Config
 
@@ -35,42 +34,42 @@ class P1Test(object):
         print(f'-- Starting testing of: {class_name(t)}')
 
         print(f'--- Cleaning')
-        t.remove_all()
+        t.clear()
         self.validate_empty(t)
 
         print(f'--- Single Operations')
         for doc in self.docs:
-            assert t.upsert_doc(doc)
+            assert t.upsert_text(doc)
         self.validate_contents(t)
         for doc in self.docs:
-            assert t.remove_doc(doc._id)
+            assert t.remove_text(doc._id)
         self.validate_empty(t)
 
         print(f'--- Batch Operations')
-        t.upsert_docs(self.docs)
+        t.upsert_texts(self.docs)
         self.validate_contents(t)
-        t.remove_docs([doc._id for doc in self.docs])
+        t.remove_texts([doc._id for doc in self.docs])
         self.validate_empty(t)
 
         print(f'--- Bulk Insert')
-        t.import_docs_from_csv(self.conf.test_dataset['path'], column=3)
+        t.import_texts_from_csv(self.conf.test_dataset['path'], column=3)
         self.validate_contents(t)
-        t.remove_all()
+        t.clear()
         self.validate_empty(t)
 
         print(f'--- Passed All!')
 
     def validate_empty(self, t):
-        assert t.count_docs() == 0, \
-            f'count_docs() must be =0: {t.count_docs()}'
+        assert t.count_texts() == 0, \
+            f'count_texts() must be =0: {t.count_texts()}'
 
     def validate_contents(self, t):
         for d in self.docs:
             assert t.find_with_id(d._id).content == d.content, \
                 f'No document: {d}'
 
-        assert t.count_docs() == 3, \
-            f'count_docs: {t.count_docs()}'
+        assert t.count_texts() == 3, \
+            f'count_texts: {t.count_texts()}'
         assert {match._id for match in t.find_with_substring('big', max_matches=100)} == {1}, \
             f'find_with_substring: {t.find_with_substring("big", max_matches=100)}'
         assert {match._id for match in t.find_with_regex('big', max_matches=100)} == {1}, \

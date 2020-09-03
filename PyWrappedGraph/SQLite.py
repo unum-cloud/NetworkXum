@@ -1,4 +1,4 @@
-from PyWrappedGraph.BaseSQL import BaseSQL, EdgeSQL
+from PyWrappedGraph.BaseSQL import *
 
 
 class SQLiteMem(BaseSQL):
@@ -32,7 +32,7 @@ class SQLite(BaseSQL):
         self.set_pragmas_on_first_launch()
 
     def set_pragmas_on_first_launch(self):
-        if self.count_edges() > 0:
+        if self.number_of_edges() > 0:
             return
         # https://sqlite.org/pragma.html#modify
         # https://stackoverflow.com/a/58547438/2766161

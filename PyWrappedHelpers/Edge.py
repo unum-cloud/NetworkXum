@@ -1,18 +1,42 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
-@dataclass
+@dataclass(order=True)
 class Edge:
     _id: int = -1
     first: int = -1
     second: int = -1
     weight: float = 1
-    label: int = 0
+    label: int = -1
     is_directed: bool = True
+    payload: dict = field(default_factory=dict)
 
     def __repr__(self) -> str:
         d = '->' if self.is_directed else '-'
         return f'<Edge({self.first}{d}{self.second}, _id={self._id}, weight={self.weight})>'
+
+    def __bool__(self):
+        return self._id >= 0
+
+    def __getitem__(self, key: int):
+        # We want `Edge` to behave as `(int, int)` tuple for NetworkX compatiability.
+        if isinstance(key, int):
+            if key == 0:
+                return self.first
+            elif key == 1:
+                return self.second
+        return None
+
+    def inverted(self):
+        return Edge(
+            _id=self._id,
+            first=self.second,
+            second=self.first,
+            weight=self.weight,
+            label=self.label,
+            is_directed=self.is_directed,
+            payload=self.payload,
+        )
 
     @staticmethod
     def identify_by_members(first: int, second: int) -> int:
@@ -27,11 +51,3 @@ class Edge:
 
 assert (Edge.identify_by_members(10, 20) != Edge.identify_by_members(20, 10)), \
     'The node IDs transformation must be order-dependant.'
-
-
-@dataclass
-class Node:
-    _id: int = -1
-    weight: float = 1
-    label: int = 0
-    payload: str = ''

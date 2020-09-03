@@ -1,4 +1,4 @@
-from PyWrappedHelpers.Algorithms import *
+from PyWrappedHelpers import *
 from P0Config import P0Config
 
 

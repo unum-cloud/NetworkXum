@@ -4,7 +4,7 @@ import json
 import importlib
 
 from pystats2md.stats_file import StatsFile
-from PyWrappedHelpers.SingletonMeta import SingletonMeta
+from PyWrappedHelpers import *
 
 
 class P0Config(object):
@@ -33,9 +33,9 @@ class P0Config(object):
         self.count_changes = int(os.getenv('COUNT_CHANGES', '1000'))
 
         self.default_stats_file = StatsFile(
-            f'BenchDocs/{device_name}/PyWrappedDBs.json')
-        self.databases = self.load_json('BenchDocs/P0ConfigDBs.json')
-        self.datasets = self.load_json('BenchDocs/P0ConfigDatasets.json')
+            f'BenchTexts/{device_name}/PyWrappedDBs.json')
+        self.databases = self.load_json('BenchTexts/P0ConfigDBs.json')
+        self.datasets = self.load_json('BenchTexts/P0ConfigDatasets.json')
         self.test_dataset = {
             "name": "TextTest",
             "path": "Datasets/TextTest/all.csv",

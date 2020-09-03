@@ -37,4 +37,4 @@ brew install elasticsearch &&
 
 ~/miniconda3/bin/python setup.py install
 ~/miniconda3/bin/python BenchGraphs/main.py
-~/miniconda3/bin/python BenchDocs/main.py
+~/miniconda3/bin/python BenchTexts/main.py

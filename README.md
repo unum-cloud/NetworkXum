@@ -19,8 +19,8 @@ The intention of this project was to find the best storage layer for [Unum](http
 
 * [PyWrappedGraph](PyWrappedGraph) - Python wrappers for Graph (Network) datastructures backed by persistent DBs.
 * [BenchGraphs](BenchGraphs) - benchmarking tools and performance results for [PyWrappedGraph](PyWrappedGraph).
-* [PyWrappedDocs](PyWrappedDocs) - Python wrappers for search-able containers of strings backed by persistent DBs.
-* [BenchDocs](BenchDocs) - benchmarking tools and performance results for [PyWrappedDocs](PyWrappedDocs).
+* [PyWrappedTexts](PyWrappedTexts) - Python wrappers for search-able containers of strings backed by persistent DBs.
+* [BenchTexts](BenchTexts) - benchmarking tools and performance results for [PyWrappedTexts](PyWrappedTexts).
 
 ## Implementation Details & Included DBs
 
