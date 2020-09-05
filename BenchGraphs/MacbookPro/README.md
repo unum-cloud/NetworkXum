@@ -70,9 +70,10 @@ But before comparing DBs, let's see what our SSD is capable of by simply parsing
 This will be our baseline for estimating the time required to build the indexes in each DB.
 
 
-|                   | PatentCitations | MouseGenes | HumanBrain |
-| :---------------- | :-------------: | :--------: | :--------: |
-| Parsing in Python |   432,217.12    | 403,278.42 | 330,070.54 |
+|                   | PatentCitations |  MouseGenes  |  HumanBrain  |
+| :---------------- | :-------------: | :----------: | :----------: |
+| Parsing in Python |   276,762.85    |  269,444.25  |  242,972.78  |
+| Sampling in Unum  |  4,025,752.40   | 3,932,870.14 | 3,449,392.42 |
 
 Most DBs provide some form functionality for faster bulk imports, but not all of them where used in benchmarks for various reasons.
 
@@ -83,11 +84,11 @@ Most DBs provide some form functionality for faster bulk imports, but not all of
 
 |              | PatentCitations |  MouseGenes  | HumanBrain | Mean Gains  |
 | :----------- | :-------------: | :----------: | :--------: | :---------: |
-| PostgreSQL   |    5,902.69     |   6,812.14   |  7,469.46  |     1x      |
-| MySQL        |    11,889.85    |  16,095.21   | 12,144.30  |    1.99x    |
-| SQLite       |    50,057.93    |  42,350.66   | 34,728.02  |    6.30x    |
-| MongoDB      |    32,917.56    |  39,077.58   | 15,125.21  |    4.32x    |
-| Unum.GraphDB |   253,298.95    | 1,056,780.56 | 819,382.93 | **105.50x** |
+| PostgreSQL   |    5,902.69     |   6,812.14   |  6,700.64  |     1x      |
+| MySQL        |    11,889.85    |  16,095.21   | 10,807.24  |    2.00x    |
+| SQLite       |    32,854.49    |  42,350.66   | 25,289.73  |    5.18x    |
+| MongoDB      |    32,917.56    |  39,077.58   | 29,843.12  |    5.25x    |
+| Unum.GraphDB |   253,298.95    | 1,056,780.56 | 819,382.93 | **109.68x** |
 
 The benchmarks were repeated dozens of times. 
 These numbers translate into following import duration for each dataset.
@@ -95,10 +96,10 @@ These numbers translate into following import duration for each dataset.
 
 |              | PatentCitations  |    MouseGenes    |    HumanBrain    |
 | :----------- | :--------------: | :--------------: | :--------------: |
-| PostgreSQL   | 46 mins, 39 secs | 35 mins, 29 secs | 3 hours, 14 mins |
-| MySQL        | 23 mins, 9 secs  | 15 mins, 1 secs  | 1 hours, 59 mins |
-| SQLite       | 5 mins, 30 secs  | 5 mins, 43 secs  | 41 mins, 53 secs |
-| MongoDB      | 8 mins, 22 secs  | 6 mins, 11 secs  | 1 hours, 36 mins |
+| PostgreSQL   | 46 mins, 39 secs | 35 mins, 29 secs | 3 hours, 37 mins |
+| MySQL        | 23 mins, 9 secs  | 15 mins, 1 secs  | 2 hours, 14 mins |
+| SQLite       | 8 mins, 23 secs  | 5 mins, 43 secs  | 57 mins, 31 secs |
+| MongoDB      | 8 mins, 22 secs  | 6 mins, 11 secs  | 48 mins, 44 secs |
 | Unum.GraphDB |  1 mins, 5 secs  | 0 mins, 14 secs  | 1 mins, 47 secs  |
 
 Those benchmarks only tell half of the story. 
@@ -126,23 +127,7 @@ the networking bandwidth and latency between server and client applications
 can't be a bottleneck.
 
 
-### Random Reads: Find Any Relation
-
-
-Input: 2 vertex identifiers.<br/>
-Output: edge that connects them.<br/>
-Metric: number of such edges returned per second.<br/>
-
-
-|              | PatentCitations | MouseGenes | HumanBrain | Mean Gains  |
-| :----------- | :-------------: | :--------: | :--------: | :---------: |
-| PostgreSQL   |     795.55      |   358.33   |   533.47   |     1x      |
-| MySQL        |     659.80      |   778.07   |   503.36   |    1.15x    |
-| SQLite       |     295.62      |   389.14   |   51.15    |    0.44x    |
-| MongoDB      |     990.73      |   980.28   |   136.46   |    1.25x    |
-| Unum.GraphDB |    47,609.53    | 74,190.89  | 50,403.22  | **102.06x** |
-
-### Random Reads: Find Directed Edge
+### Random Reads: Find Specific Edge
 
 
 Input: 2 vertex identifiers (order is important).<br/>
@@ -150,13 +135,13 @@ Output: edge that connects them in given direction.<br/>
 Metric: number of such edges returned per second.<br/>
 
 
-|              | PatentCitations | MouseGenes | HumanBrain | Mean Gains |
-| :----------- | :-------------: | :--------: | :--------: | :--------: |
-| PostgreSQL   |     686.19      |   381.83   |   459.56   |     1x     |
-| MySQL        |     672.81      |   616.83   |   547.84   |   1.20x    |
-| SQLite       |     282.41      |   375.69   |   47.57    |   0.46x    |
-| MongoDB      |    1,002.83     |   734.23   |   145.53   |   1.23x    |
-| Unum.GraphDB |    21,447.65    | 68,585.20  | 37,048.96  | **83.19x** |
+|              | PatentCitations | MouseGenes | HumanBrain | Mean Gains  |
+| :----------- | :-------------: | :--------: | :--------: | :---------: |
+| PostgreSQL   |     530.98      |   210.12   |   333.01   |     1x      |
+| MySQL        |     588.10      |   463.66   |   460.77   |    1.41x    |
+| SQLite       |     501.45      |   336.20   |   20.13    |    0.80x    |
+| MongoDB      |     615.85      |   101.44   |   57.60    |    0.72x    |
+| Unum.GraphDB |    21,447.65    | 68,585.20  | 37,048.96  | **118.31x** |
 
 ### Random Reads: Find Connected Edges
 
@@ -168,11 +153,11 @@ Metric: number of such edges returned per second.<br/>
 
 |              | PatentCitations | MouseGenes | HumanBrain | Mean Gains  |
 | :----------- | :-------------: | :--------: | :--------: | :---------: |
-| PostgreSQL   |     328.63      |    8.08    |   24.17    |     1x      |
-| MySQL        |     540.34      |   35.92    |   90.80    |    1.85x    |
-| SQLite       |     312.83      |   17.94    |   28.93    |    1.00x    |
-| MongoDB      |     779.87      |   128.89   |   58.69    |    2.68x    |
-| Unum.GraphDB |    33,426.60    |  8,809.77  | 16,543.26  | **162.88x** |
+| PostgreSQL   |     280.66      |    7.54    |   20.55    |     1x      |
+| MySQL        |     411.96      |   33.03    |   81.64    |    1.71x    |
+| SQLite       |     237.11      |   12.40    |   24.55    |    0.89x    |
+| MongoDB      |     642.83      |   48.73    |   50.03    |    2.40x    |
+| Unum.GraphDB |    33,426.60    |  8,809.77  | 16,543.26  | **190.37x** |
 
 ### Random Reads: Find Ingoing Edges
 
@@ -184,11 +169,11 @@ Metric: number of such edges returned per second.<br/>
 
 |              | PatentCitations | MouseGenes | HumanBrain | Mean Gains  |
 | :----------- | :-------------: | :--------: | :--------: | :---------: |
-| PostgreSQL   |     365.96      |   74.56    |   24.36    |     1x      |
-| MySQL        |     760.76      |   80.79    |   132.62   |    2.10x    |
-| SQLite       |     281.01      |   84.61    |   30.81    |    0.85x    |
-| MongoDB      |    1,225.93     |   373.95   |   67.70    |    3.59x    |
-| Unum.GraphDB |    33,748.78    | 11,677.90  | 20,017.27  | **140.77x** |
+| PostgreSQL   |     303.76      |   61.20    |   17.72    |     1x      |
+| MySQL        |     522.43      |   71.84    |   128.35   |    1.89x    |
+| SQLite       |     249.51      |   73.30    |   27.43    |    0.92x    |
+| MongoDB      |     987.99      |   170.63   |   61.51    |    3.19x    |
+| Unum.GraphDB |    33,748.78    | 11,677.90  | 20,017.27  | **171.02x** |
 
 ### Random Reads: Find Friends
 
@@ -200,11 +185,11 @@ Metric: number of neighbor identiefiers returned per second.<br/>
 
 |              | PatentCitations | MouseGenes | HumanBrain | Mean Gains  |
 | :----------- | :-------------: | :--------: | :--------: | :---------: |
-| PostgreSQL   |     314.14      |   10.39    |   24.50    |     1x      |
-| MySQL        |     505.74      |   34.54    |   83.49    |    1.79x    |
-| SQLite       |     301.06      |   39.58    |   28.94    |    1.06x    |
-| MongoDB      |     986.09      |   137.81   |   59.64    |    3.39x    |
-| Unum.GraphDB |    45,616.00    | 10,306.82  | 21,258.48  | **221.12x** |
+| PostgreSQL   |     312.71      |   11.33    |   21.65    |     1x      |
+| MySQL        |     427.02      |   32.53    |   77.54    |    1.55x    |
+| SQLite       |     238.24      |   23.14    |   24.69    |    0.83x    |
+| MongoDB      |     790.29      |   51.57    |   50.88    |    2.58x    |
+| Unum.GraphDB |    45,616.00    | 10,306.82  | 21,258.48  | **223.26x** |
 
 ### Random Reads: Count Friends
 
@@ -216,11 +201,11 @@ Metric: number queries per second.<br/>
 
 |              | PatentCitations | MouseGenes | HumanBrain | Mean Gains  |
 | :----------- | :-------------: | :--------: | :--------: | :---------: |
-| PostgreSQL   |     330.16      |   73.70    |   30.44    |     1x      |
-| MySQL        |     616.57      |    7.83    |   51.40    |    1.56x    |
-| SQLite       |     324.47      |   195.61   |   39.07    |    1.29x    |
-| MongoDB      |     912.83      |   218.61   |   67.06    |    2.76x    |
-| Unum.GraphDB |    37,335.19    |  8,770.08  | 17,737.67  | **147.00x** |
+| PostgreSQL   |     333.80      |   69.38    |   27.22    |     1x      |
+| MySQL        |     453.03      |    7.94    |   45.58    |    1.18x    |
+| SQLite       |     276.89      |   166.34   |   32.69    |    1.11x    |
+| MongoDB      |     972.77      |   107.47   |   66.58    |    2.66x    |
+| Unum.GraphDB |    37,335.19    |  8,770.08  | 17,737.67  | **148.34x** |
 
 ### Random Reads: Count Followers
 
@@ -232,11 +217,11 @@ Metric: number queries per second.<br/>
 
 |              | PatentCitations | MouseGenes | HumanBrain | Mean Gains |
 | :----------- | :-------------: | :--------: | :--------: | :--------: |
-| PostgreSQL   |     362.16      |   578.65   |   33.78    |     1x     |
-| MySQL        |     821.91      |   132.29   |   214.55   |   1.20x    |
-| SQLite       |     360.58      |   646.95   |   40.73    |   1.08x    |
-| MongoDB      |    1,241.53     |   601.68   |   77.26    |   1.97x    |
-| Unum.GraphDB |    41,296.42    | 11,964.82  | 21,197.98  | **76.40x** |
+| PostgreSQL   |     384.53      |   523.76   |   28.28    |     1x     |
+| MySQL        |     600.77      |   134.06   |   211.05   |   1.01x    |
+| SQLite       |     295.23      |   364.06   |   34.20    |   0.74x    |
+| MongoDB      |    1,451.90     |   547.85   |   81.04    |   2.22x    |
+| Unum.GraphDB |    41,296.42    | 11,964.82  | 21,197.98  | **79.50x** |
 
 ## Write Operations
 
@@ -258,11 +243,11 @@ Metric: number inserted edges per second.<br/>
 
 |              | PatentCitations | MouseGenes | HumanBrain | Mean Gains |
 | :----------- | :-------------: | :--------: | :--------: | :--------: |
-| PostgreSQL   |     421.67      |   491.60   |   454.61   |     1x     |
-| MySQL        |     396.75      |   407.14   |   309.22   |   0.81x    |
-| SQLite       |     347.70      |   364.13   |   278.15   |   0.72x    |
-| MongoDB      |    1,524.28     |  2,064.84  |   845.99   |   3.24x    |
-| Unum.GraphDB |    6,746.84     |  6,025.57  |  5,589.32  | **13.42x** |
+| PostgreSQL   |     398.77      |   447.46   |   394.25   |     1x     |
+| MySQL        |     295.08      |   382.02   |   262.42   |   0.76x    |
+| SQLite       |     443.18      |   390.89   |   333.93   |   0.94x    |
+| MongoDB      |    2,014.47     |  2,310.43  |  1,474.33  |   4.67x    |
+| Unum.GraphDB |    6,746.84     |  6,025.57  |  5,589.32  | **14.80x** |
 
 ### Random Writes: Upsert Edges Batch
 
@@ -274,11 +259,11 @@ Metric: number inserted edges per second.<br/>
 
 |              | PatentCitations | MouseGenes | HumanBrain | Mean Gains |
 | :----------- | :-------------: | :--------: | :--------: | :--------: |
-| PostgreSQL   |     567.80      |   819.02   |   746.89   |     1x     |
-| MySQL        |     812.79      |   795.84   |   786.82   |   1.12x    |
-| SQLite       |    1,073.77     |  1,115.09  |  1,004.13  |   1.50x    |
-| MongoDB      |    4,192.98     |  5,427.22  |  1,639.07  |   5.28x    |
-| Unum.GraphDB |    28,673.75    | 20,244.71  | 18,075.73  | **31.40x** |
+| PostgreSQL   |    1,922.62     |  2,088.48  |  2,503.27  |     1x     |
+| MySQL        |    2,269.23     |  2,213.56  |  2,261.52  |   1.04x    |
+| SQLite       |    3,758.68     |  3,317.96  |  3,626.23  |   1.64x    |
+| MongoDB      |    5,211.36     |  4,634.20  |  3,440.20  |   2.04x    |
+| Unum.GraphDB |    28,673.75    | 20,244.71  | 18,075.73  | **10.28x** |
 
 ### Random Writes: Remove Edge
 
@@ -290,11 +275,11 @@ Metric: number removed edges per second.<br/>
 
 |              | PatentCitations | MouseGenes | HumanBrain | Mean Gains |
 | :----------- | :-------------: | :--------: | :--------: | :--------: |
-| PostgreSQL   |     862.59      |   996.31   |   855.55   |     1x     |
-| MySQL        |     822.14      |   732.72   |   745.51   |   0.85x    |
-| SQLite       |     422.41      |   444.84   |   382.08   |   0.46x    |
-| MongoDB      |     525.93      |   297.69   |   71.89    |   0.33x    |
-| Unum.GraphDB |    5,832.34     |  5,885.34  |  5,500.31  | **6.34x**  |
+| PostgreSQL   |     845.35      |   964.71   |   679.98   |     1x     |
+| MySQL        |     582.90      |   709.48   |   714.84   |   0.81x    |
+| SQLite       |     358.19      |   401.46   |   303.40   |   0.43x    |
+| MongoDB      |     688.57      |   863.73   |   481.64   |   0.82x    |
+| Unum.GraphDB |    5,832.34     |  5,885.34  |  5,500.31  | **6.91x**  |
 
 ### Random Writes: Remove Edges Batch
 
@@ -306,9 +291,9 @@ Metric: number removed edges per second.<br/>
 
 |              | PatentCitations | MouseGenes | HumanBrain | Mean Gains |
 | :----------- | :-------------: | :--------: | :--------: | :--------: |
-| PostgreSQL   |    1,243.77     |  1,312.31  |  1,282.17  |     1x     |
-| MySQL        |     689.72      |   641.08   |   649.54   |   0.52x    |
-| SQLite       |     605.12      |   615.77   |   595.16   |   0.47x    |
-| MongoDB      |     916.13      |   436.58   |   82.23    |   0.37x    |
-| Unum.GraphDB |    28,980.20    | 20,700.46  | 19,079.61  | **17.91x** |
+| PostgreSQL   |    1,188.46     |  1,343.77  |  1,126.29  |     1x     |
+| MySQL        |     577.58      |   608.91   |   560.44   |   0.48x    |
+| SQLite       |     581.98      |   594.95   |   605.30   |   0.49x    |
+| MongoDB      |    8,792.92     |  8,393.00  |  5,165.72  |   6.11x    |
+| Unum.GraphDB |    28,980.20    | 20,700.46  | 19,079.61  | **18.79x** |
 
