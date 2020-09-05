@@ -52,7 +52,7 @@ class P1Test(object):
         self.validate_empty(t)
 
         print(f'--- Bulk Insert')
-        t.import_texts_from_csv(self.conf.test_dataset['path'], column=3)
+        t.add_stream(self.conf.test_dataset['path'], column=3)
         self.validate_contents(t)
         t.clear()
         self.validate_empty(t)
@@ -65,15 +65,15 @@ class P1Test(object):
 
     def validate_contents(self, t):
         for d in self.docs:
-            assert t.find_with_id(d._id).content == d.content, \
+            assert t.get(d._id).content == d.content, \
                 f'No document: {d}'
 
         assert t.count_texts() == 3, \
             f'count_texts: {t.count_texts()}'
-        assert {match._id for match in t.find_with_substring('big', max_matches=100)} == {1}, \
-            f'find_with_substring: {t.find_with_substring("big", max_matches=100)}'
-        assert {match._id for match in t.find_with_regex('big', max_matches=100)} == {1}, \
-            f'find_with_regex: {t.find_with_regex("big", max_matches=100)}'
+        assert {match._id for match in t.find_substring('big', max_matches=100)} == {1}, \
+            f'find_substring: {t.find_substring("big", max_matches=100)}'
+        assert {match._id for match in t.find_regex('big', max_matches=100)} == {1}, \
+            f'find_regex: {t.find_regex("big", max_matches=100)}'
 
 
 if __name__ == "__main__":

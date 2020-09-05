@@ -5,7 +5,7 @@ from setuptools import setup
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 setup(
     name='PyWrappedDBs',

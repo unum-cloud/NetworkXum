@@ -4,7 +4,9 @@ import importlib
 
 from pystats2md.micro_bench import MicroBench
 from pystats2md.helpers import metric2str, bytes2str
+import pynum
 
+from PyWrappedGraph.BaseAPI import BaseAPI
 from PyWrappedHelpers import *
 from P0Config import P0Config
 
@@ -23,7 +25,8 @@ class P2Import(object):
             # Define a baseline, so we know how much time it took
             # to read the data vs actually importing it into DB
             # and building indexes.
-            # self.benchmark_parsing_speed(dataset)
+            self.benchmark_parsing_speed_python(dataset)
+            self.benchmark_parsing_speed_pynum(dataset)
 
             for db in self.conf.databases:
                 g = self.conf.make_db(database=db, dataset=dataset)
@@ -46,7 +49,8 @@ class P2Import(object):
         print(f'--- file size:', bytes2str(file_size))
 
         def import_one() -> int:
-            g.add_edges_stream(yield_edges_from(dataset_path), upsert=False)
+            g.add_edges_stream(yield_edges_from_csv(
+                dataset_path), upsert=False)
             return g.number_of_edges()
 
         counter = MicroBench(
@@ -65,7 +69,7 @@ class P2Import(object):
         print(f'--- finished at:', datetime.now().strftime('%H:%M:%S'))
         self.conf.default_stats_file.dump_to_file()
 
-    def benchmark_parsing_speed(self, dataset: dict):
+    def benchmark_parsing_speed_python(self, dataset: dict):
 
         class PseudoGraph(BaseAPI):
             __edge_type__ = Edge
@@ -77,7 +81,7 @@ class P2Import(object):
             def biggest_edge_id(self) -> int:
                 return self.count
 
-            def add(self, es) -> int:
+            def add(self, es, upsert=True) -> int:
                 self.count += len(es)
                 return len(es)
 
@@ -87,6 +91,21 @@ class P2Import(object):
             benchmark_name='Sequential Writes: Import CSV',
             func=lambda: g.add_edges_stream(yield_edges_from_csv(p)),
             database='Parsing in Python',
+            dataset=dataset['name'],
+            source=self.conf.default_stats_file,
+            device_name=self.conf.device_name,
+            limit_iterations=1,
+            limit_seconds=None,
+            limit_operations=None,
+        )
+        counter.run_if_missing()
+
+    def benchmark_parsing_speed_pynum(self, dataset: dict):
+        p = self.conf.normalize_path(dataset['path'])
+        counter = MicroBench(
+            benchmark_name='Sequential Writes: Import CSV',
+            func=lambda: pynum.sample_edges(p, 8),
+            database='Sampling in Unum',
             dataset=dataset['name'],
             source=self.conf.default_stats_file,
             device_name=self.conf.device_name,

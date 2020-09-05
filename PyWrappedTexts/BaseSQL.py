@@ -18,7 +18,7 @@ DeclarativeDocsSQL = declarative_base()
 
 
 class TextSQL(DeclarativeDocsSQL):
-    __tablename__ = 'table_nodes'
+    __tablename__ = 'table_texts'
     _id = Column(BigInteger, primary_key=True)
     content = Column(Text)
     content_index = Index('content_index', TextSQL.content, unique=False)
@@ -117,14 +117,14 @@ class BaseSQL(BaseAPI):
     # --------------------------------
 
     @abstractmethod
-    def find_with_substring(self, field: str, query: str) -> Sequence[Text]:
+    def find_substring(self, field: str, query: str) -> Sequence[Text]:
         pass
 
     @abstractmethod
-    def find_with_regex(self, field: str, query: str) -> Sequence[Text]:
+    def find_regex(self, field: str, query: str) -> Sequence[Text]:
         pass
 
-    def find_with_id(self, identifier: str) -> object:
+    def get(self, identifier: str) -> object:
         pass
 
     # endregion

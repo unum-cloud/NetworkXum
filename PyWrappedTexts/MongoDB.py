@@ -26,24 +26,28 @@ class MongoDB(BaseAPI):
         BaseAPI.__init__(self, **kwargs)
         _, db_name = extract_database_name(url)
         self.db = MongoClient(url)
-        self.docs_collection = self.db[db_name]['docs']
+        self.texts_collection = self.db[db_name]['docs']
         self.create_indexes()
 
     def count_texts(self) -> int:
-        return self.docs_collection.count_documents(filter={})
+        return self.texts_collection.count_documents(filter={})
 
 # region Random Reads
 
-    def find_with_id(self, query: int) -> Optional[Text]:
-        return self.docs_collection.find_one(filter={
+    def get(self, query: int) -> Optional[Text]:
+        result = self.texts_collection.find_one(filter={
             '_id': query
         })
+        if result:
+            return Text(**result)
+        return None
 
-    def find_with_substring(
+    def find_substring(
         self,
         query: str,
-        field: str = 'content',
-        max_matches: int = None,
+        case_sensitive: bool = True,
+        max_matches: Optional[int] = None,
+        include_text=True,
     ) -> Sequence[TextMatch]:
         """
             CAUTION: Seems like MongoDB doesn't support text search limited 
@@ -52,134 +56,102 @@ class MongoDB(BaseAPI):
         # https://docs.mongodb.com/manual/reference/operator/query/text/
         # https://docs.mongodb.com/manual/core/index-text/
         # https://docs.mongodb.com/manual/reference/text-search-languages/#text-search-languages
-        dicts = self.docs_collection.find(filter={
+        proj = ['_id', 'content'] if include_text else ['_id']
+        dicts = self.texts_collection.find(filter={
             '$text': {
                 '$search': f'\"{query}\"',
-                '$caseSensitive': True,
+                '$caseSensitive': case_sensitive,
                 '$diacriticSensitive': False,
             },
-        }, projection=['_id'])
-        if max_matches is not None:
+        }, projection=proj)
+        if max_matches:
             dicts = dicts.limit(max_matches)
-        return [d['_id'] for d in dicts]
+        return map(self.parse_match, dicts)
 
-    def find_with_regex(
+    def find_regex(
         self,
         query: str,
-        field: str = 'content',
-        max_matches: int = None,
+        case_sensitive: bool = True,
+        max_matches: Optional[int] = None,
+        include_text=True,
     ) -> Sequence[TextMatch]:
 
         # https://docs.mongodb.com/manual/reference/operator/query/regex/
-        dicts = self.docs_collection.find(filter={
-            field: {
+        proj = ['_id', 'content'] if include_text else ['_id']
+        opts = 'm' if case_sensitive else 'mi'
+        dicts = self.texts_collection.find(filter={
+            'content': {
                 '$regex': query,
-                '$options': 'm',
+                '$options': opts,
             },
-        }, projection=['_id'])
-        if max_matches is not None:
+        }, projection=proj)
+        if max_matches:
             dicts = dicts.limit(max_matches)
-        return [d['_id'] for d in dicts]
+        return map(self.parse_match, dicts)
 
 # region Random Writes
 
-    def upsert_text(self, doc: Text) -> bool:
-        doc = self.validate_text(doc)
-        result = self.docs_collection.update_one(
-            filter={'_id': doc['_id'], },
-            update={'$set': doc, },
-            upsert=True,
-        )
-        return (result.modified_count >= 1) or (result.upserted_id is not None)
-
-    def remove_text(self, doc: Text) -> bool:
-        doc = self.validate_text(doc)
-        result = self.docs_collection.delete_one(filter={'_id': doc['_id'], })
-        return result.deleted_count >= 1
-
-    def upsert_texts(self, docs: Sequence[Text]) -> int:
+    def add(self, obj: Text, upsert=True) -> int:
         """
             Supports up to 1000 updates per batch.
             https://api.mongodb.com/python/current/examples/bulk.html#ordered-bulk-write-operations
         """
-        def make_upsert(doc):
-            return UpdateOne(
-                filter={'_id': doc['_id'], },
-                update={'$set': doc, },
-                upsert=True,
-            )
+        target = self.texts_collection
+        if isinstance(obj, Text):
+            if upsert:
+                result = target.update_one(
+                    filter={'_id': obj._id, },
+                    update={'$set': obj.__dict__, },
+                    upsert=True,
+                )
+                return (result.modified_count >= 1) or (result.upserted_id is not None)
+            else:
+                return target.insert_one(obj.__dict__).acknowledged
+        elif is_list_of(obj, Text):
+            if upsert:
+                def make_upsert(o):
+                    return UpdateOne(
+                        filter={'_id': o._id, },
+                        update={'$set': o.__dict__, },
+                        upsert=True,
+                    )
+                ops = list(map(make_upsert, obj))
+                try:
+                    result = target.bulk_write(
+                        requests=ops, ordered=False)
+                    cnt_old = result.bulk_api_result['nUpserted']
+                    cnt_new = result.bulk_api_result['nInserted']
+                    return cnt_new + cnt_old
+                except pymongo.errors.BulkWriteError as bwe:
+                    print(bwe)
+                    print(bwe.details['writeErrors'])
+                    return 0
+            else:
+                obj = [o.__dict__ for o in obj]
+                result = target.insert_many(obj, ordered=False)
+                return len(result.inserted_ids)
 
-        docs = map(self.validate_text, docs)
-        ops = list(map(make_upsert, docs))
-        try:
-            result = self.docs_collection.bulk_write(
-                requests=ops, ordered=False)
-            return result.bulk_api_result['nUpserted'] + result.bulk_api_result['nInserted']
-        except pymongo.errors.BulkWriteError as bwe:
-            print(bwe)
-            print(bwe.details['writeErrors'])
-            return 0
+        return super().add(obj, upsert=upsert)
 
-    def insert_texts(self, docs: Sequence[Text]) -> int:
-        docs = map(self.validate_text, docs)
-        result = self.docs_collection.insert_many(
-            documents=docs, ordered=False)
-        return len(result.inserted_ids)
+# region Bulk Reads
 
-    def remove_texts(self, docs: Sequence[Text]) -> int:
-        def make_upsert(doc):
-            return DeleteOne(
-                filter={'_id': doc['_id'], },
-            )
+    @property
+    def texts(self) -> Sequence[Text]:
+        return [Text(**as_dict) for as_dict in self.texts_collection.find()]
 
-        docs = map(self.validate_text, docs)
-        ops = list(map(make_upsert, docs))
-        try:
-            result = self.docs_collection.bulk_write(
-                requests=ops, ordered=False)
-            return result.bulk_api_result['nUpserted'] + result.bulk_api_result['nInserted']
-        except pymongo.errors.BulkWriteError as bwe:
-            print(bwe)
-            print(bwe.details['writeErrors'])
-            return 0
-
-# region Bulk
+# region Bulk Writes
 
     def clear(self):
-        self.docs_collection.drop()
+        self.texts_collection.drop()
         self.create_indexes()
 
-    def import_texts_from_csv(self, filepath: str) -> int:
+    def add_stream(self, stream, upsert=False) -> int:
         # Current version of MongoDB driver is incapable of chunking the iterable input,
         # so it loads everything into RAM forcing the OS to allocate GBs of swap pages.
         # https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_many
-        # def produce_validated():
-        #     for doc in yield_texts_from_sectioned_csv(filepath):
-        #         yield self.validate_text(doc)
-        # result = self.docs_collection.insert_many(
-        #     documents=produce_validated(),
-        #     ordered=False,
-        # )
-        # return len(result.inserted_ids)
-        allow_big_csv_fields()
-        cnt_success = 0
-        for files_chunk in chunks(yield_texts_from_sectioned_csv(filepath), type(self).__max_batch_size__):
-            try:
-                cnt_success += self.insert_texts(files_chunk)
-            except:
-                pass
-        return cnt_success
+        return super().add_stream(stream, upsert=upsert)
 
 # region Helpers
-
-    def validate_text(self, doc: Text) -> dict:
-        if isinstance(doc, (str, int)):
-            return {'_id': doc}
-        if isinstance(doc, Text):
-            return doc.to_dict()
-        if isinstance(doc, dict):
-            return doc
-        return doc.__dict__
 
     def create_indexes(self):
         for field in self.indexed_fields:
@@ -189,17 +161,20 @@ class MongoDB(BaseAPI):
         # self.create_index_for_all_strings()
 
     def create_index(self, field: str, background=False):
-        self.docs_collection.create_index(
+        self.texts_collection.create_index(
             [(field, pymongo.TEXT)],
             background=background,
         )
 
     def create_index_for_all_strings(self, background=False):
         # https://docs.mongodb.com/manual/core/index-text/#wildcard-text-indexes
-        self.docs_collection.create_index(
+        self.texts_collection.create_index(
             {'$**': 'text'},
             background=background,
         )
+
+    def parse_match(self, dict_) -> TextMatch:
+        return TextMatch(_id=dict_['_id'], content=dict_.get('content', ''), rating=1)
 
 
 # region Testing
@@ -211,7 +186,7 @@ if __name__ == '__main__':
     assert db.count_texts() == 0
     assert db.upsert_text(Text.from_file(sample_file))
     assert db.count_texts() == 1
-    assert db.find_with_substring('Atripla-trimethyl')
-    assert db.find_with_regex('Atripla-trimeth[a-z]{2}')
+    assert db.find_substring('Atripla-trimethyl')
+    assert db.find_regex('Atripla-trimeth[a-z]{2}')
     # assert db.remove_text(Text.from_file(sample_file))
     # assert db.count_texts() == 0

@@ -83,9 +83,14 @@ class MongoDB(BaseAPI):
 
     @property
     def mentioned_nodes_ids(self) -> Sequence[int]:
-        rf = self.edges_collection.find().distinct('first')
-        rs = self.edges_collection.find().distinct('second')
-        return {*rf, *rs}
+        ids = set()
+        # Calling `.distinct('first')` on the query object fails,
+        # as the result BSON will be beyond 16 MB.
+        for doc in self.edges_collection.find({}, {'_id': 0, 'first': 1}):
+            ids.add(doc['first'])
+        for doc in self.edges_collection.find({}, {'_id': 0, 'second': 1}):
+            ids.add(doc['second'])
+        return ids
 
 # region Random Reads
 
@@ -127,8 +132,8 @@ class MongoDB(BaseAPI):
     def add(self, obj, upsert=True) -> int:
         is_edge = isinstance(obj, Edge)
         is_node = isinstance(obj, Node)
-        is_edges = self.is_list_of_edges(obj)
-        is_nodes = self.is_list_of_nodes(obj)
+        is_edges = is_list_of(obj, Edge)
+        is_nodes = is_list_of(obj, Node)
         target = self.edges_collection if (
             is_edge or is_edges) else self.nodes_collection
 
@@ -168,15 +173,15 @@ class MongoDB(BaseAPI):
                 result = target.insert_many(obj, ordered=False)
                 return len(result.inserted_ids)
 
-        return super().insert(obj, upsert=upsert)
+        return super().add(obj, upsert=upsert)
 
     def remove(self, obj) -> int:
         is_edge = isinstance(obj, Edge)
         is_node = isinstance(obj, Node)
-        is_edges = self.is_list_of_edges(obj)
-        is_nodes = self.is_list_of_nodes(obj)
+        is_edges = is_list_of(obj, Edge)
+        is_nodes = is_list_of(obj, Node)
         if not (is_edge or is_node or is_edges or is_nodes):
-            return super().insert(obj, upsert=upsert)
+            return super().remove(obj)
 
         target = self.edges_collection if (
             is_edge or is_edges) else self.nodes_collection
@@ -246,14 +251,14 @@ class MongoDB(BaseAPI):
         if u < 0 and v < 0:
             return None
         elif u < 0 or v < 0:
-            if not self.is_directed:
+            if not self.directed:
                 return self.pipe_match_edge_containing(max(u, v))
             elif u < 0:
                 return {'$match': {'second': v}}
             elif v < 0:
                 return {'$match': {'first': u}}
         else:
-            if self.is_directed:
+            if self.directed:
                 if u == v:
                     return self.pipe_match_edge_containing(u)
                 else:
@@ -276,8 +281,3 @@ class MongoDB(BaseAPI):
         if key < 0:
             return None
         return {'$match': {'label': key}}
-
-    # def pipe_match(self, u, v, key) -> dict:
-    #     match_members = self.pipe_match_edge_members(u, v)
-    #     match_label = self.pipe_match_label(key)
-    #     if match_members and match_label:

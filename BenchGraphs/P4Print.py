@@ -84,7 +84,7 @@ class P4Print():
             row_name_property='database',
             col_name_property='dataset',
             cell_content_property='operations_per_second',
-            row_names=['Parsing in Python'],
+            row_names=['Parsing in Python', 'Sampling in Unum'],
             col_names=dataset_names,
         ))
 
@@ -209,6 +209,8 @@ class P4Print():
                 col_names=dataset_names
             ).add_gains())
 
+        # Add a chart showing the number of total read bytes during random read operations.
+
         # Write Operations.
         out.add('## Write Operations')
         out.add('''
@@ -261,6 +263,8 @@ class P4Print():
                 row_names=dbs,
                 col_names=dataset_names
             ).add_gains())
+
+        # Add a chart showing the number of total read and written bytes during write operations.
 
         out.print_to(f'BenchGraphs/{device_name}/README.md')
 

@@ -29,7 +29,7 @@
         "name": "SQLite (In-Memory)",
         "url_variable_name": "URI_SQLITE_RAM",
         "url_default": "sqlite:///:memory:",
-        "enabled": true
+        "enabled": false
     },
     {
         "module_name": "PyWrappedGraph.MySQL",
