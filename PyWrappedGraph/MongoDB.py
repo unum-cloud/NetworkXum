@@ -132,8 +132,8 @@ class MongoDB(BaseAPI):
     def add(self, obj, upsert=True) -> int:
         is_edge = isinstance(obj, Edge)
         is_node = isinstance(obj, Node)
-        is_edges = is_list_of(obj, Edge)
-        is_nodes = is_list_of(obj, Node)
+        is_edges = is_sequence_of(obj, Edge)
+        is_nodes = is_sequence_of(obj, Node)
         target = self.edges_collection if (
             is_edge or is_edges) else self.nodes_collection
 
@@ -178,8 +178,8 @@ class MongoDB(BaseAPI):
     def remove(self, obj) -> int:
         is_edge = isinstance(obj, Edge)
         is_node = isinstance(obj, Node)
-        is_edges = is_list_of(obj, Edge)
-        is_nodes = is_list_of(obj, Node)
+        is_edges = is_sequence_of(obj, Edge)
+        is_nodes = is_sequence_of(obj, Node)
         if not (is_edge or is_node or is_edges or is_nodes):
             return super().remove(obj)
 

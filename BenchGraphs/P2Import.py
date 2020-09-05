@@ -22,6 +22,8 @@ class P2Import(object):
 
     def run(self):
         for dataset in self.conf.datasets:
+            if not dataset['enabled']:
+                continue
             # Define a baseline, so we know how much time it took
             # to read the data vs actually importing it into DB
             # and building indexes.
@@ -86,10 +88,10 @@ class P2Import(object):
                 return len(es)
 
         dataset_name = dataset['name']
+        p = self.conf.normalize_path(dataset['path'])
         print(f'-- Bulk importing: {dataset_name} -> PseudoGraph')
 
         g = PseudoGraph()
-        p = self.conf.normalize_path(dataset['path'])
         counter = MicroBench(
             benchmark_name='Sequential Writes: Import CSV',
             func=lambda: g.add_edges_stream(yield_edges_from_csv(p)),
@@ -104,12 +106,18 @@ class P2Import(object):
         counter.run_if_missing()
 
     def benchmark_parsing_speed_pynum(self, dataset: dict):
+
         dataset_name = dataset['name']
-        print(f'-- Bulk importing: {dataset_name} -> PseudoGraph')
         p = self.conf.normalize_path(dataset['path'])
+        print(f'-- Bulk importing: {dataset_name} -> Pynum')
+
+        def sample():
+            pynum.sample_edges(p, 8)
+            return dataset['edges']
+
         counter = MicroBench(
             benchmark_name='Sequential Writes: Import CSV',
-            func=lambda: pynum.sample_edges(p, 8),
+            func=lambda: sample(),
             database='Sampling in Unum',
             dataset=dataset['name'],
             source=self.conf.default_stats_file,

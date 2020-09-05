@@ -49,7 +49,7 @@ class ElasticSearch(BaseAPI):
             if sync and success:
                 self.commit_all()
             return success
-        elif is_list_of(one_or_many_texts, Text):
+        elif is_sequence_of(one_or_many_texts, Text):
             statuses = [self.add(t, sync=False) for t in one_or_many_texts]
             cnt = int(sum(statuses))
             if sync and cnt:
@@ -67,7 +67,7 @@ class ElasticSearch(BaseAPI):
             if sync and success:
                 self.commit_all()
             return success
-        elif is_list_of(one_or_many_texts, Text):
+        elif is_sequence_of(one_or_many_texts, Text):
             statuses = [self.remove(t, sync=False) for t in one_or_many_texts]
             cnt = int(sum(statuses))
             if sync and cnt:

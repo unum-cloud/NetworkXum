@@ -24,7 +24,7 @@ class P3Bench(object):
         self.max_seconds_per_query = max_seconds_per_query
         self.tasks = P3TasksSampler()
 
-    def run(self, repeat_existing=True):
+    def run(self, repeat_existing=False):
         self.repeat_existing = repeat_existing
         for dataset in self.conf.datasets:
             dataset_path = self.conf.normalize_path(dataset['path'])
@@ -55,26 +55,20 @@ class P3Bench(object):
             )
 
         # Streaming edges.
-        self.bench_task(
-            name='Sequential Reads: Streaming Edges',
-            func=self.stream_es
-        )
-        self.bench_task(
-            name='Sequential Reads: Streaming Nodes',
-            func=self.stream_ns
-        )
-
-        # Queries returning single object.
-        self.bench_task(
-            name='Random Reads: Find Directed Edge',
-            func=self.find_e_directed
-        )
-        self.bench_task(
-            name='Random Reads: Find Any Relation',
-            func=self.find_e_undirected
-        )
+        # self.bench_task(
+        #     name='Sequential Reads: Streaming Edges',
+        #     func=self.stream_es
+        # )
+        # self.bench_task(
+        #     name='Sequential Reads: Streaming Nodes',
+        #     func=self.stream_ns
+        # )
 
         # Queries returning collections.
+        self.bench_task(
+            name='Random Reads: Find Directed Edge',
+            func=self.find_e
+        )
         self.bench_task(
             name='Random Reads: Find Ingoing Edges',
             func=self.find_es_to
@@ -159,54 +153,22 @@ class P3Bench(object):
 
     def stream_es(self) -> int:
         cnt = 0
-        t0 = time()
         for e in self.gdb.edges:
             cnt += 1
-            dt = time() - t0
-            if dt > self.max_seconds_per_query:
-                break
         return cnt
 
     def stream_ns(self) -> int:
         cnt = 0
-        t0 = time()
         for n in self.gdb.nodes:
             cnt += 1
-            dt = time() - t0
-            if dt > self.max_seconds_per_query:
-                break
         return cnt
 
-    def find_e_directed(self) -> int:
-        # Try both existing and potentially missing edges
-        half = int(len(self.tasks.edges_to_query) / 2)
-        cnt = 0
-        cnt_found = 0
-        t0 = time()
-        for e in self.tasks.edges_to_query[:half]:
-            match = self.gdb.edge_directed(e.first, e.second)
-            cnt += 1
-            cnt_found += 0 if (match is None) else 1
-            dt = time() - t0
-            if dt > self.max_seconds_per_query:
-                break
-        t0 = time()
-        for e in self.tasks.edges_to_query[half:]:
-            match = self.gdb.edge_directed(e.second, e.first)
-            cnt += 1
-            cnt_found += 0 if (match is None) else 1
-            dt = time() - t0
-            if dt > self.max_seconds_per_query:
-                break
-        print(f'---- {cnt} ops: {cnt_found} directed matches')
-        return cnt
-
-    def find_e_undirected(self) -> int:
+    def find_e(self) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
         for e in self.tasks.edges_to_query:
-            match = self.gdb.edge_directed(e.first, e.second)
+            match = self.gdb.has_edge(e.first, e.second)
             cnt += 1
             cnt_found += 0 if (match is None) else 1
             dt = time() - t0
@@ -220,7 +182,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            es = self.gdb.edges_related(v)
+            es = self.gdb.has_edge(v, v)
             cnt += 1
             cnt_found += len(es)
             dt = time() - t0
@@ -234,7 +196,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            es = self.gdb.edges_from(v)
+            es = self.gdb.has_edge(v, None)
             cnt += 1
             cnt_found += len(es)
             dt = time() - t0
@@ -248,7 +210,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            es = self.gdb.edges_to(v)
+            es = self.gdb.has_edge(None, v)
             cnt += 1
             cnt_found += len(es)
             dt = time() - t0
@@ -275,7 +237,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.gdb.number_of_neighbors(v)
+            self.gdb.number_of_edges(v, v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -286,7 +248,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.gdb.number_of_predecessors(v)
+            self.gdb.number_of_edges(None, v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -297,7 +259,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.gdb.number_of_successors(v)
+            self.gdb.number_of_edges(v, None)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
