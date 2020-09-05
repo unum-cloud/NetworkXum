@@ -222,7 +222,7 @@ class BaseAPI(object):
             Adds either an `Edge`, `Sequence[Edge]`, `Node` or `Sequence[Node]`.
             Other arguments aren't allowed.
         """
-        if is_list_of(obj, Edge) or is_list_of(obj, Node):
+        if is_sequence_of(obj, Edge) or is_sequence_of(obj, Node):
             return sum([self.add(o, upsert=upsert) for o in obj])
         else:
             return 0
@@ -234,7 +234,7 @@ class BaseAPI(object):
             Other arguments aren't allowed.
             Can delete edges without a known ID, but it will work slower.
         """
-        if is_list_of(obj, Edge) or is_list_of(obj, Node):
+        if is_sequence_of(obj, Edge) or is_sequence_of(obj, Node):
             return sum(map(self.remove, obj))
         else:
             return 0
@@ -364,9 +364,3 @@ class BaseAPI(object):
             result.add(e.first)
             result.add(e.second)
         return result
-
-    def is_list_of(self, Edge, es: Sequence[Edge]) -> bool:
-        return isinstance(es, collections.Sequence) and all([isinstance(e, Edge) for e in es])
-
-    def is_list_of(self, Node, ns: Sequence[Node]) -> bool:
-        return isinstance(ns, collections.Sequence) and all([isinstance(n, Node) for n in ns])

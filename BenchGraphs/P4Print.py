@@ -266,6 +266,32 @@ class P4Print():
 
         # Add a chart showing the number of total read and written bytes during write operations.
 
+        out.add('### Sequential Reads')
+
+        out.add('#### Sequential Reads: Streaming Edges')
+        out.add(ins.filtered(
+            device_name=device_name,
+            benchmark_name='Streaming Edges',
+        ).table(
+            row_name_property='database',
+            col_name_property='dataset',
+            cell_content_property='operations_per_second',
+            row_names=dbs,
+            col_names=dataset_names,
+        ).add_gains())
+
+        out.add('#### Sequential Reads: Streaming Nodes')
+        out.add(ins.filtered(
+            device_name=device_name,
+            benchmark_name='Streaming Nodes',
+        ).table(
+            row_name_property='database',
+            col_name_property='dataset',
+            cell_content_property='operations_per_second',
+            row_names=dbs,
+            col_names=dataset_names,
+        ).add_gains())
+
         out.print_to(f'BenchGraphs/{device_name}/README.md')
 
 

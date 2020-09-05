@@ -37,10 +37,10 @@ class P3TasksSampler(object):
     def sample_file(self, filename: str) -> int:
         self.clear()
         # C++ version is much faster.
-        # self._buffer_edges = sample_reservoir(
-        #     yield_edges_from_csv(filename), self.number_of_needed_samples())
-        self._buffer_edges = sample_edges(
-            filename, self.number_of_needed_samples())
+        # self._buffer_edges = pynum.sample_edges(
+        #     filename, self.number_of_needed_samples())
+        self._buffer_edges = sample_reservoir(
+            yield_edges_from_csv(filename), self.number_of_needed_samples())
         self._split_samples_into_tasks()
         return len(self._buffer_edges)
 

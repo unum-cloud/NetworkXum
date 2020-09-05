@@ -107,7 +107,7 @@ class MongoDB(BaseAPI):
                 return (result.modified_count >= 1) or (result.upserted_id is not None)
             else:
                 return target.insert_one(obj.__dict__).acknowledged
-        elif is_list_of(obj, Text):
+        elif is_sequence_of(obj, Text):
             if upsert:
                 def make_upsert(o):
                     return UpdateOne(

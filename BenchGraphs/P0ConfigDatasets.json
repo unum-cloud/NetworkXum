@@ -42,7 +42,7 @@
         "edges": 87273967,
         "degree": 186,
         "size_mb": 3840,
-        "enabled": false
+        "enabled": true
     },
     {
         "name": "Wikipedia",

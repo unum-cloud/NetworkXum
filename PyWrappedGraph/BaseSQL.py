@@ -230,18 +230,23 @@ class BaseSQL(BaseAPI):
             with self.get_session() as s:
                 s.merge(obj)
             return 1
-        if isinstance(obj, Edge) or isinstance(obj, Edge):
-            return self.add([obj], upsert=upsert)
+
+        if not isinstance(obj, collections.Sequence):
+            obj = [obj]
 
         # We are dealing with a collection of `Node`s or `Edge`s.
         all_ids = [o._id for o in obj]
         new_dicts = {o._id: o.__dict__ for o in obj}
-        target_class = EdgeSQL if is_list_of(obj, Edge) else NodeSQL
+        target_class = EdgeSQL if is_sequence_of(obj, Edge) else NodeSQL
         with self.get_session() as s:
             # Only merge those entries which already exist in the database
             if upsert:
                 for each in s.query(target_class).filter(target_class._id.in_(all_ids)).all():
-                    s.merge(new_dicts.pop(each._id))
+                    new_dict = new_dicts.pop(each._id)
+                    for k, v in new_dict.items():
+                        if k is not '_id':
+                            setattr(each, k, v)
+                    s.merge(each)
             # Only add those posts which did not exist in the database
             s.bulk_insert_mappings(
                 target_class,

@@ -152,21 +152,17 @@ class Neo4J(BaseAPI):
 
     # Relatives
 
-    def edge_directed(self, first: int, second: int) -> Optional[Edge]:
-        pattern = '''
-        MATCH (first:VERTEX {_id: %d})-[e:EDGE]->(second:VERTEX {_id: %d})
-        RETURN first._id, second._id, e.weight
-        '''
-        task = pattern % (first, second)
-        task = task.replace('VERTEX', self._v)
-        task = task.replace('EDGE', self._e)
-        return self._records_to_edges(self.session.run(task))
-
-    def edge_undirected(self, first: int, second: int) -> Optional[Edge]:
-        pattern = '''
-        MATCH (first:VERTEX {_id: %d})-[e:EDGE]-(second:VERTEX {_id: %d})
-        RETURN first._id, second._id, e.weight
-        '''
+    def has_edge(self, first: int, second: int) -> Optional[Edge]:
+        if self.directed:
+            pattern = '''
+            MATCH (first:VERTEX {_id: %d})-[e:EDGE]->(second:VERTEX {_id: %d})
+            RETURN first._id, second._id, e.weight
+            '''
+        else:
+            pattern = '''
+            MATCH (first:VERTEX {_id: %d})-[e:EDGE]-(second:VERTEX {_id: %d})
+            RETURN first._id, second._id, e.weight
+            '''
         task = pattern % (first, second)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
