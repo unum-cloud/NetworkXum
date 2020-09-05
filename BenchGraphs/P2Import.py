@@ -85,6 +85,9 @@ class P2Import(object):
                 self.count += len(es)
                 return len(es)
 
+        dataset_name = dataset['name']
+        print(f'-- Bulk importing: {dataset_name} -> PseudoGraph')
+
         g = PseudoGraph()
         p = self.conf.normalize_path(dataset['path'])
         counter = MicroBench(
@@ -101,6 +104,8 @@ class P2Import(object):
         counter.run_if_missing()
 
     def benchmark_parsing_speed_pynum(self, dataset: dict):
+        dataset_name = dataset['name']
+        print(f'-- Bulk importing: {dataset_name} -> PseudoGraph')
         p = self.conf.normalize_path(dataset['path'])
         counter = MicroBench(
             benchmark_name='Sequential Writes: Import CSV',

@@ -184,9 +184,9 @@ if __name__ == '__main__':
     db = MongoDB(url='mongodb://localhost:27017/SingleTextTest')
     db.clear()
     assert db.count_texts() == 0
-    assert db.upsert_text(Text.from_file(sample_file))
+    assert db.add(Text.from_file(sample_file))
     assert db.count_texts() == 1
     assert db.find_substring('Atripla-trimethyl')
     assert db.find_regex('Atripla-trimeth[a-z]{2}')
-    # assert db.remove_text(Text.from_file(sample_file))
+    # assert db.remove(Text.from_file(sample_file))
     # assert db.count_texts() == 0

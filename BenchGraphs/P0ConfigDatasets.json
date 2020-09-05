@@ -6,7 +6,7 @@
         "edges": 52310,
         "degree": 8,
         "size_mb": 1,
-        "enabled": true
+        "enabled": false
     },
     {
         "name": "MovieRatings",
@@ -15,7 +15,7 @@
         "edges": 2811716,
         "degree": 90,
         "size_mb": 33,
-        "enabled": true
+        "enabled": false
     },
     {
         "name": "PatentCitations",
@@ -42,7 +42,7 @@
         "edges": 87273967,
         "degree": 186,
         "size_mb": 3840,
-        "enabled": true
+        "enabled": false
     },
     {
         "name": "Wikipedia",

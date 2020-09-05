@@ -13,7 +13,7 @@ class P1Test(object):
 
     def __init__(self):
         self.conf = P0Config.shared()
-        self.docs = [
+        self.texts = [
             Text(1, 'the big brown fox'),
             Text(2, 'as.the.day;passes'),
             Text(3, 'along the:way'),
@@ -21,59 +21,59 @@ class P1Test(object):
 
     def run(self):
         for db in self.conf.databases:
-            t = self.conf.make_db(
+            tdb = self.conf.make_db(
                 database=db,
                 dataset=self.conf.test_dataset,
             )
-            self.run_one(t)
+            self.run_one(tdb)
 
-    def run_one(self, t):
-        if t is None:
+    def run_one(self, tdb):
+        if tdb is None:
             return
 
-        print(f'-- Starting testing of: {class_name(t)}')
+        print(f'-- Starting testing of: {class_name(tdb)}')
 
         print(f'--- Cleaning')
-        t.clear()
-        self.validate_empty(t)
+        tdb.clear()
+        self.validate_empty(tdb)
 
         print(f'--- Single Operations')
-        for doc in self.docs:
-            assert t.upsert_text(doc)
-        self.validate_contents(t)
-        for doc in self.docs:
-            assert t.remove_text(doc._id)
-        self.validate_empty(t)
+        for text in self.texts:
+            assert tdb.add(text)
+        self.validate_contents(tdb)
+        for text in self.texts:
+            assert tdb.remove(text._id)
+        self.validate_empty(tdb)
 
         print(f'--- Batch Operations')
-        t.upsert_texts(self.docs)
-        self.validate_contents(t)
-        t.remove_texts([doc._id for doc in self.docs])
-        self.validate_empty(t)
+        tdb.add(self.texts)
+        self.validate_contents(tdb)
+        tdb.remove([text._id for text in self.texts])
+        self.validate_empty(tdb)
 
         print(f'--- Bulk Insert')
-        t.add_stream(self.conf.test_dataset['path'], column=3)
-        self.validate_contents(t)
-        t.clear()
-        self.validate_empty(t)
+        tdb.add_stream(self.conf.test_dataset['path'], column=3)
+        self.validate_contents(tdb)
+        tdb.clear()
+        self.validate_empty(tdb)
 
         print(f'--- Passed All!')
 
-    def validate_empty(self, t):
-        assert t.count_texts() == 0, \
-            f'count_texts() must be =0: {t.count_texts()}'
+    def validate_empty(self, tdb):
+        assert tdb.count_texts() == 0, \
+            f'count_texts() must be =0: {tdb.count_texts()}'
 
-    def validate_contents(self, t):
-        for d in self.docs:
-            assert t.get(d._id).content == d.content, \
-                f'No document: {d}'
+    def validate_contents(self, tdb):
+        for d in self.texts:
+            assert tdb.get(d._id).content == d.content, \
+                f'No textument: {d}'
 
-        assert t.count_texts() == 3, \
-            f'count_texts: {t.count_texts()}'
-        assert {match._id for match in t.find_substring('big', max_matches=100)} == {1}, \
-            f'find_substring: {t.find_substring("big", max_matches=100)}'
-        assert {match._id for match in t.find_regex('big', max_matches=100)} == {1}, \
-            f'find_regex: {t.find_regex("big", max_matches=100)}'
+        assert tdb.count_texts() == 3, \
+            f'count_texts: {tdb.count_texts()}'
+        assert {match._id for match in tdb.find_substring('big', max_matches=100)} == {1}, \
+            f'find_substring: {tdb.find_substring("big", max_matches=100)}'
+        assert {match._id for match in tdb.find_regex('big', max_matches=100)} == {1}, \
+            f'find_regex: {tdb.find_regex("big", max_matches=100)}'
 
 
 if __name__ == "__main__":

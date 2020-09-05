@@ -189,28 +189,28 @@ class P3Bench(object):
     def remove_text(self) -> int:
         cnt = 0
         for doc in self.tasks.docs_to_change_by_one:
-            self.tdb.remove_text(doc)
+            self.tdb.remove(doc)
             cnt += 1
         return cnt
 
     def upsert_text(self) -> int:
         cnt = 0
         for doc in self.tasks.docs_to_change_by_one:
-            self.tdb.upsert_text(doc)
+            self.tdb.add(doc)
             cnt += 1
         return cnt
 
     def remove_texts(self) -> int:
         cnt = 0
         for docs in self.tasks.docs_to_change_batched:
-            self.tdb.remove_texts(docs)
+            self.tdb.remove(docs)
             cnt += len(docs)
         return cnt
 
     def upsert_texts(self) -> int:
         cnt = 0
         for docs in self.tasks.docs_to_change_batched:
-            self.tdb.upsert_texts(docs)
+            self.tdb.add(docs)
             cnt += len(docs)
         return cnt
 
