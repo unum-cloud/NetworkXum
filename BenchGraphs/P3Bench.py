@@ -27,6 +27,8 @@ class P3Bench(object):
     def run(self, repeat_existing=False):
         self.repeat_existing = repeat_existing
         for dataset in self.conf.datasets:
+            if not dataset['enabled']:
+                continue
             dataset_path = self.conf.normalize_path(dataset['path'])
             self.tasks.sample_file(dataset_path)
 
@@ -66,7 +68,7 @@ class P3Bench(object):
 
         # Queries returning collections.
         self.bench_task(
-            name='Random Reads: Find Directed Edge',
+            name='Random Reads: Find Specific Edge',
             func=self.find_e
         )
         self.bench_task(
