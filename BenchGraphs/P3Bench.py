@@ -31,17 +31,17 @@ class P3Bench(object):
             self.tasks.sample_file(dataset_path)
 
             for db in self.conf.databases:
-                self.g = self.conf.make_db(database=db, dataset=dataset)
+                self.gdb = self.conf.make_db(database=db, dataset=dataset)
                 self.database = db
                 self.dataset = dataset
                 self.bench_buffered_graph()
                 self.conf.default_stats_file.dump_to_file()
 
     def bench_buffered_graph(self, remove_all_afterwards=False):
-        if self.g is None:
+        if self.gdb is None:
             return
-        is_in_ram = bool(type(self.g).__in_memory__)
-        if (self.g.number_of_edges() == 0) and (not is_in_ram):
+        is_in_ram = bool(type(self.gdb).__in_memory__)
+        if (self.gdb.number_of_edges() == 0) and (not is_in_ram):
             return
         print('- Benchmarking: {} @ {}'.format(
             self.dataset['name'],
@@ -53,6 +53,16 @@ class P3Bench(object):
                 name='Sequential Writes: Import CSV',
                 func=self.import_bulk
             )
+
+        # Streaming edges.
+        self.bench_task(
+            name='Sequential Reads: Streaming Edges',
+            func=self.stream_es
+        )
+        self.bench_task(
+            name='Sequential Reads: Streaming Nodes',
+            func=self.stream_ns
+        )
 
         # Queries returning single object.
         self.bench_task(
@@ -147,6 +157,26 @@ class P3Bench(object):
     # Operations
     # ---
 
+    def stream_es(self) -> int:
+        cnt = 0
+        t0 = time()
+        for e in self.gdb.edges:
+            cnt += 1
+            dt = time() - t0
+            if dt > self.max_seconds_per_query:
+                break
+        return cnt
+
+    def stream_ns(self) -> int:
+        cnt = 0
+        t0 = time()
+        for n in self.gdb.nodes:
+            cnt += 1
+            dt = time() - t0
+            if dt > self.max_seconds_per_query:
+                break
+        return cnt
+
     def find_e_directed(self) -> int:
         # Try both existing and potentially missing edges
         half = int(len(self.tasks.edges_to_query) / 2)
@@ -154,7 +184,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for e in self.tasks.edges_to_query[:half]:
-            match = self.g.edge_directed(e.first, e.second)
+            match = self.gdb.edge_directed(e.first, e.second)
             cnt += 1
             cnt_found += 0 if (match is None) else 1
             dt = time() - t0
@@ -162,7 +192,7 @@ class P3Bench(object):
                 break
         t0 = time()
         for e in self.tasks.edges_to_query[half:]:
-            match = self.g.edge_directed(e.second, e.first)
+            match = self.gdb.edge_directed(e.second, e.first)
             cnt += 1
             cnt_found += 0 if (match is None) else 1
             dt = time() - t0
@@ -176,7 +206,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for e in self.tasks.edges_to_query:
-            match = self.g.edge_directed(e.first, e.second)
+            match = self.gdb.edge_directed(e.first, e.second)
             cnt += 1
             cnt_found += 0 if (match is None) else 1
             dt = time() - t0
@@ -190,7 +220,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            es = self.g.edges_related(v)
+            es = self.gdb.edges_related(v)
             cnt += 1
             cnt_found += len(es)
             dt = time() - t0
@@ -204,7 +234,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            es = self.g.edges_from(v)
+            es = self.gdb.edges_from(v)
             cnt += 1
             cnt_found += len(es)
             dt = time() - t0
@@ -218,7 +248,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            es = self.g.edges_to(v)
+            es = self.gdb.edges_to(v)
             cnt += 1
             cnt_found += len(es)
             dt = time() - t0
@@ -232,7 +262,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            vs = self.g.neighbors(v)
+            vs = self.gdb.neighbors(v)
             cnt += 1
             cnt_found += len(vs)
             dt = time() - t0
@@ -245,7 +275,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.g.number_of_neighbors(v)
+            self.gdb.number_of_neighbors(v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -256,7 +286,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.g.number_of_predecessors(v)
+            self.gdb.number_of_predecessors(v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -267,7 +297,7 @@ class P3Bench(object):
         cnt = 0
         t0 = time()
         for v in self.tasks.nodes_to_query:
-            self.g.number_of_successors(v)
+            self.gdb.number_of_successors(v)
             cnt += 1
             dt = time() - t0
             if dt > self.max_seconds_per_query:
@@ -279,7 +309,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for v in self.tasks.nodes_to_analyze:
-            vs = self.g.neighbors_of_neighbors(v)
+            vs = self.gdb.neighbors_of_neighbors(v)
             cnt += 1
             cnt_found += len(vs)
             dt = time() - t0
@@ -291,46 +321,46 @@ class P3Bench(object):
     def remove_e(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_change_by_one:
-            self.g.remove(e)
+            self.gdb.remove(e)
             cnt += 1
         return cnt
 
     def upsert_e(self) -> int:
         cnt = 0
         for e in self.tasks.edges_to_change_by_one:
-            self.g.add(e)
+            self.gdb.add(e)
             cnt += 1
         return cnt
 
     def remove_es(self) -> int:
         cnt = 0
         for es in self.tasks.edges_to_change_batched:
-            self.g.remove(es)
+            self.gdb.remove(es)
             cnt += len(es)
         return cnt
 
     def upsert_es(self) -> int:
         cnt = 0
         for es in self.tasks.edges_to_change_batched:
-            self.g.add(es)
+            self.gdb.add(es)
             cnt += len(es)
         return cnt
 
     def remove_v(self) -> int:
         cnt = 0
         for v in self.tasks.nodes_to_change_by_one:
-            self.g.remove_node(v)
+            self.gdb.remove_node(v)
             cnt += 1
         return cnt
 
     def remove_bulk(self) -> int:
-        c = self.g.number_of_edges()
-        self.g.clear()
-        return c - self.g.number_of_edges()
+        c = self.gdb.number_of_edges()
+        self.gdb.clear()
+        return c - self.gdb.number_of_edges()
 
     def import_bulk(self) -> int:
-        self.g.add_edges_stream(self.dataset_path)
-        return self.g.number_of_edges()
+        self.gdb.add_edges_stream(self.dataset_path)
+        return self.gdb.number_of_edges()
 
 
 if __name__ == "__main__":

@@ -28,84 +28,84 @@ class P1Test(object):
 
     def run(self):
         for db in self.conf.databases:
-            g = self.conf.make_db(
+            gdb = self.conf.make_db(
                 database=db, dataset=self.conf.test_dataset)
-            if g is None:
+            if gdb is None:
                 continue
-            self.run_one(g)
+            self.run_one(gdb)
 
-    def run_one(self, g):
-        print(f'-- Starting testing of: {class_name(g)}')
+    def run_one(self, gdb):
+        print(f'-- Starting testing of: {class_name(gdb)}')
 
         print(f'--- Cleaning')
-        g.clear()
-        self.validate_empty_edges(g)
-        self.validate_empty_nodes(g)
+        gdb.clear()
+        self.validate_empty_edges(gdb)
+        self.validate_empty_nodes(gdb)
 
         print(f'--- Single Operations')
         for e in self.edges:
-            g.add(e)
-        self.validate_contents(g)
+            gdb.add(e)
+        self.validate_contents(gdb)
         for e in self.edges:
-            g.remove(e)
-        self.validate_empty_edges(g)
+            gdb.remove(e)
+        self.validate_empty_edges(gdb)
 
         print(f'--- Batch Operations')
-        g.add(self.edges)
-        self.validate_contents(g)
-        g.remove(self.edges)
-        self.validate_empty_edges(g)
+        gdb.add(self.edges)
+        self.validate_contents(gdb)
+        gdb.remove(self.edges)
+        self.validate_empty_edges(gdb)
 
-        g.clear()
+        gdb.clear()
         print(f'--- Bulk Insert')
-        g.add_edges_stream(yield_edges_from_csv(
+        gdb.add_edges_stream(yield_edges_from_csv(
             self.conf.test_dataset['path']), upsert=False)
-        self.validate_contents(g)
-        g.clear()
-        self.validate_empty_edges(g)
-        self.validate_empty_nodes(g)
+        self.validate_contents(gdb)
+        gdb.clear()
+        self.validate_empty_edges(gdb)
+        self.validate_empty_nodes(gdb)
 
         print(f'--- Bulk Upsert')
-        g.add_edges_stream(yield_edges_from_csv(
+        gdb.add_edges_stream(yield_edges_from_csv(
             self.conf.test_dataset['path']), upsert=True)
-        self.validate_contents(g)
-        g.clear()
-        self.validate_empty_edges(g)
-        self.validate_empty_nodes(g)
+        self.validate_contents(gdb)
+        gdb.clear()
+        self.validate_empty_edges(gdb)
+        self.validate_empty_nodes(gdb)
 
         print(f'--- Passed All!')
 
-    def validate_empty_edges(self, g):
-        assert g.number_of_edges() == 0, \
-            f'number_of_edges must be =0: {g.number_of_edges()}'
+    def validate_empty_edges(self, gdb):
+        assert gdb.number_of_edges() == 0, \
+            f'number_of_edges must be =0: {gdb.number_of_edges()}'
 
-    def validate_empty_nodes(self, g):
-        assert g.number_of_nodes() == 0, \
-            f'number_of_nodes must be =0: {g.number_of_nodes()}'
+    def validate_empty_nodes(self, gdb):
+        assert gdb.number_of_nodes() == 0, \
+            f'number_of_nodes must be =0: {gdb.number_of_nodes()}'
 
-    def validate_contents(self, g):
+    def validate_contents(self, gdb):
         for e in self.edges:
-            assert g.has_edge(e.first, e.second), \
+            assert gdb.has_edge(e.first, e.second), \
                 f'No directed edge: {e}'
 
-        assert g.number_of_edges() == 10, \
-            f'number_of_edges: {g.number_of_edges()}'
-        assert g.number_of_nodes() == 8, \
-            f'number_of_nodes: {g.number_of_nodes()}'
-        assert g.reduce_edges(None, 1) == GraphDegree(3, 10.0), \
-            f'reduce_edges: {g.reduce_edges(None, 1)}'
-        assert g.reduce_edges(1, None) == GraphDegree(1, 4.0), \
-            f'reduce_edges: {g.reduce_edges(1, None)}'
-        assert g.reduce_edges(1, 1) == GraphDegree(4, 14.0), \
-            f'reduce_edges: {g.reduce_edges(1, 1)}'
-        assert set(g.neighbors(1)) == {2, 4, 6, 7}, \
-            f'neighbors: {g.neighbors(1)}'
-        assert set(g.neighbors_of_neighbors(8)) == {1}, \
-            f'neighbors_of_neighbors: {g.neighbors_of_neighbors(8)}'
-        assert g.reduce_edges(None, 5) == GraphDegree(1, 3.0), \
-            f'reduce_edges: {g.reduce_edges(None, 5)}'
-        assert g.reduce_edges(5, None) == GraphDegree(1, 2.0), \
-            f'reduce_edges: {g.reduce_edges(5, None)}'
+        assert gdb.number_of_edges() == 10, \
+            f'number_of_edges: {gdb.number_of_edges()}'
+        assert gdb.number_of_nodes() == 8, \
+            f'number_of_nodes: {gdb.number_of_nodes()}'
+        assert gdb.reduce_edges(None, 1) == GraphDegree(3, 10.0), \
+            f'reduce_edges: {gdb.reduce_edges(None, 1)}'
+        assert gdb.reduce_edges(1, None) == GraphDegree(1, 4.0), \
+            f'reduce_edges: {gdb.reduce_edges(1, None)}'
+        assert gdb.reduce_edges(1, 1) == GraphDegree(4, 14.0), \
+            f'reduce_edges: {gdb.reduce_edges(1, 1)}'
+        assert set(gdb.neighbors(1)) == {2, 4, 6, 7}, \
+            f'neighbors: {gdb.neighbors(1)}'
+        assert set(gdb.neighbors_of_neighbors(8)) == {1}, \
+            f'neighbors_of_neighbors: {gdb.neighbors_of_neighbors(8)}'
+        assert gdb.reduce_edges(None, 5) == GraphDegree(1, 3.0), \
+            f'reduce_edges: {gdb.reduce_edges(None, 5)}'
+        assert gdb.reduce_edges(5, None) == GraphDegree(1, 2.0), \
+            f'reduce_edges: {gdb.reduce_edges(5, None)}'
 
 
 if __name__ == "__main__":
