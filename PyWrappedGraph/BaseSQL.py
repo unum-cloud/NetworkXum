@@ -236,11 +236,12 @@ class BaseSQL(BaseAPI):
         # We are dealing with a collection of `Node`s or `Edge`s.
         all_ids = [o._id for o in obj]
         new_dicts = {o._id: o.__dict__ for o in obj}
-        target_class = EdgeSQL if self.is_list_of_edges(obj) else NodeSQL
+        target_class = EdgeSQL if is_list_of(obj, Edge) else NodeSQL
         with self.get_session() as s:
             # Only merge those entries which already exist in the database
-            for each in s.query(EdgeSQL).filter(EdgeSQL._id.in_(all_ids)).all():
-                s.merge(new_dicts.pop(each._id))
+            if upsert:
+                for each in s.query(target_class).filter(target_class._id.in_(all_ids)).all():
+                    s.merge(new_dicts.pop(each._id))
             # Only add those posts which did not exist in the database
             s.bulk_insert_mappings(
                 target_class,
@@ -248,7 +249,9 @@ class BaseSQL(BaseAPI):
                 return_defaults=False,
                 render_nulls=True,
             )
-        return len(new_dicts)
+            return len(new_dicts)
+
+        return super().add(obj)
 
     def remove(self, obj) -> int:
         with self.get_session() as s:
@@ -376,14 +379,14 @@ class BaseSQL(BaseAPI):
         if u < 0 and v < 0:
             return q
         elif u < 0 or v < 0:
-            if not self.is_directed:
+            if not self.directed:
                 return self.filter_edges_containing(q, max(u, v))
             elif u < 0:
                 return q.filter(EdgeSQL.second == v)
             elif v < 0:
                 return q.filter(EdgeSQL.first == u)
         else:
-            if self.is_directed:
+            if self.directed:
                 if u == v:
                     return self.filter_edges_containing(q, u)
                 else:

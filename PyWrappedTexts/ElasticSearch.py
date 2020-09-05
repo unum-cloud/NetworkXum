@@ -20,6 +20,8 @@ class ElasticSearch(BaseAPI):
     __max_batch_size__ = 100000
     __in_memory__ = False
 
+# region Metadata
+
     def __init__(self, url='http://localhost:9200/text', **kwargs):
         BaseAPI.__init__(self, **kwargs)
         url, db_name = extract_database_name(url, default='text')
@@ -27,119 +29,74 @@ class ElasticSearch(BaseAPI):
         self.db_name = db_name
         self.create_index()
 
-    def create_index(self):
-        if self.index_exists():
-            return
-        properties = dict()
-        for field in self.indexed_fields:
-            properties[field] = {'type': 'text'}
-        # https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-create-index.html
-        # https://sarahleejane.github.io/learning/python/2015/10/14/creating-an-elastic-search-index-with-python.html
-        self.elastic.indices.create(self.db_name, body={
-            'settings': {
-                'number_of_shards': 1,
-            },
-            'mappings': {
-                'properties': properties,
-            }
-        })
-
-    def index_exists(self):
-        # https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-exists.html
-        return self.elastic.indices.exists(self.db_name)
-
-    def commit_all(self):
-        return self.elastic.indices.refresh(self.db_name)
-
-    def clear(self):
-        # https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-exists.html
-        if self.index_exists():
-            self.elastic.indices.delete(self.db_name)
-        self.create_index()
-
     def count_texts(self) -> int:
         if not self.index_exists():
             return 0
         return self.elastic.count(index=self.db_name).pop('count', 0)
 
-    def validate_text(self, doc: Text) -> dict:
-        if isinstance(doc, (str, int)):
-            return {'_id': doc}
-        if isinstance(doc, Text):
-            return doc.to_dict()
-        if isinstance(doc, dict):
-            return copy.deepcopy(doc)
-        return copy.deepcopy(doc.__dict__)
+# region Random Writes
 
-    def upsert_text(self, doc, sync=True) -> bool:
-        # https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
-        doc = self.validate_text(doc)
-        doc_id = doc.pop('_id', None)
-        if doc_id is None:
-            return False
-        result = self.elastic.index(index=self.db_name, id=doc_id, body=doc)
-        result = result.pop('result', None)
-        if (result == 'created') or (result == 'updated'):
-            if sync:
+    def add(self, one_or_many_texts, upsert=True, sync=True) -> int:
+        """
+            https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
+        """
+        if isinstance(one_or_many_texts, Text):
+            result = self.elastic.index(index=self.db_name, id=one_or_many_texts._id, body={
+                'content': one_or_many_texts.content,
+            })
+            result = result.pop('result', None)
+            success = (result == 'created') or (result == 'updated')
+            if sync and success:
                 self.commit_all()
-            return True
-        return False
-
-    def remove_text(self, doc, sync=True) -> bool:
-        doc = self.validate_text(doc)
-        doc_id = doc.pop('_id', None)
-        if doc_id is None:
-            return False
-        result = self.elastic.delete(index=self.db_name, id=doc_id)
-        result = result.pop('result', None)
-        if (result == 'deleted'):
-            if sync:
+            return success
+        elif is_list_of(one_or_many_texts, Text):
+            statuses = [self.add(t, sync=False) for t in one_or_many_texts]
+            cnt = int(sum(statuses))
+            if sync and cnt:
                 self.commit_all()
-            return True
-        return False
+            return cnt
 
-    def upsert_texts(self, docs) -> int:
-        docs = map(self.validate_text, docs)
-        statuses = [self.upsert_text(doc, sync=False) for doc in docs]
-        self.commit_all()
-        return sum(statuses)
+        return super().add(one_or_many_texts, upsert=upsert)
 
-    def remove_texts(self, docs) -> int:
-        docs = map(self.validate_text, docs)
-        statuses = [self.remove_text(doc, sync=False) for doc in docs]
-        self.commit_all()
-        return sum(statuses)
+    def remove(self, one_or_many_texts, sync=True) -> int:
+        if isinstance(one_or_many_texts, Text):
+            result = self.elastic.delete(
+                index=self.db_name, id=one_or_many_texts._id)
+            result = result.pop('result', None)
+            success = (result == 'deleted')
+            if sync and success:
+                self.commit_all()
+            return success
+        elif is_list_of(one_or_many_texts, Text):
+            statuses = [self.remove(t, sync=False) for t in one_or_many_texts]
+            cnt = int(sum(statuses))
+            if sync and cnt:
+                self.commit_all()
+            return cnt
 
-    def hit_to_dict(self, hit: dict) -> dict:
-        content = hit['_source']
-        content['_id'] = hit['_id']
-        if '_score' in hit:
-            content['_score'] = hit['_score']
-        return content
+        return super().remove(one_or_many_texts)
 
-    def find_with_id(self, identifier: str):
+# region Random Reads
+
+    def get(self, identifier: int) -> Optional[Text]:
         """ 
-            Returns the document together with it's system ID, that may be different from original once.
+            Returns the document together with it's system ID, that may be different from original one.
             It's done to reduce the DB size and accelerate the search.
             https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html
         """
-        doc = self.elastic.get(index=self.db_name, id=identifier)
-        if doc is None:
-            return None
-        if not doc.get('found', False):
-            return None
-        return self.hit_to_dict(doc)
+        result = self.elastic.get(index=self.db_name, id=identifier)
+        if result and result.get('found', False):
+            return self.parse_match(result)
+        return None
 
-    def find_with_substring(
+    def find_substring(
         self,
         query: str,
-        field: str = 'content',
-        max_matches: int = None,
-    ):
+        case_sensitive: bool = True,
+        max_matches: Optional[int] = None,
+        include_text=True,
+    ) -> Sequence[TextMatch]:
         """
-            Returns only document IDs without the content or match range.
-            It's done to minimize the communication time and reduce the load on TCP/IP stack.
-            We are benchmarking the DBs and not networking implementatinos, after all.
             https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-term-query.html
             https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-match-query.html
         """
@@ -164,23 +121,22 @@ class ElasticSearch(BaseAPI):
         #     },
         #     'stored_fields': [],
         # }
-        if max_matches is not None:
+        if max_matches:
             query_dict['from'] = 0
             query_dict['size'] = max_matches
-        docs = self.elastic.search(index=self.db_name, body=query_dict)
-        hits_arr = docs.get('hits', {}).get('hits', [])
-        return [h['_id'] for h in hits_arr]
+        #
+        result = self.elastic.search(index=self.db_name, body=query_dict)
+        dicts = result.get('hits', {}).get('hits', [])
+        return map(self.parse_match, dicts)
 
-    def find_with_regex(
+    def find_regex(
         self,
         query: str,
-        field: str = 'content',
-        max_matches: int = None,
+        case_sensitive: bool = True,
+        max_matches: Optional[int] = None,
+        include_text=True,
     ):
         """
-            Returns only document IDs without the content or match range.
-            It's done to minimize the communication time and reduce the load on TCP/IP stack.
-            We are benchmarking the DBs and not networking implementatinos, after all.
             https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-regexp-query.html
             https://lucene.apache.org/core/4_9_0/core/org/apache/lucene/util/automaton/RegExp.html
         """
@@ -195,30 +151,102 @@ class ElasticSearch(BaseAPI):
             },
             'stored_fields': [],
         }
-        if max_matches is not None:
+        if max_matches:
             query_dict['from'] = 0
             query_dict['size'] = max_matches
-        docs = self.elastic.search(index=self.db_name, body=query_dict)
-        hits_arr = docs.get('hits', {}).get('hits', [])
-        return [h['_id'] for h in hits_arr]
+        #
+        result = self.elastic.search(index=self.db_name, body=query_dict)
+        dicts = result.get('hits', {}).get('hits', [])
+        return map(self.parse_match, dicts)
 
-    def import_texts_from_csv(self, filepath: str) -> int:
-        allow_big_csv_fields()
-        # https://elasticsearch-py.readthedocs.io/en/master/helpers.html
+# region Bulk Reads
 
-        def produce_validated():
-            for doc in yield_texts_from_sectioned_csv(filepath):
-                yield self.validate_text(doc)
+    @property
+    def texts(self, page_size=100) -> Generator[Text, None, None]:
+        offset = 0
+        while True:
+            result = self.elastic.search(index=self.db_name, body={
+                "size": page_size,
+                "from": offset
+            })
+            dicts = result.get('hits', {}).get('hits', [])
+            if not dicts:
+                break
+            yield from map(self.parse_match, dicts)
+            offset += page_size
 
+# region Bulk Writes
+
+    def add_stream(self, stream, upsert=False) -> int:
+        """
+            https://elasticsearch-py.readthedocs.io/en/master/helpers.html
+        """
         cnt_success = 0
-        for ok, action in streaming_bulk(
-            client=self.elastic,
-            index=self.db_name,
-            actions=produce_validated(),
-        ):
-            cnt_success += ok
+        if upsert:
+            for t in stream:
+                self.add(t, upsert=True, sync=False)
+                cnt_success += 1
+            self.commit_all()
+        else:
+            def produce_validated():
+                for text in stream:
+                    yield text.__dict__
+            for ok, action in streaming_bulk(
+                client=self.elastic,
+                index=self.db_name,
+                actions=produce_validated(),
+            ):
+                cnt_success += ok
+        #
         return cnt_success
 
+    def clear(self):
+        """
+            https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-exists.html
+        """
+        if self.index_exists():
+            self.elastic.indices.delete(self.db_name)
+        self.create_index()
+
+# region Helpers
+
+    def create_index(self):
+        """
+            https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-create-index.html
+            https://sarahleejane.github.io/learning/python/2015/10/14/creating-an-elastic-search-index-with-python.html
+        """
+        if self.index_exists():
+            return
+        properties = dict()
+        for field in self.indexed_fields:
+            properties[field] = {'type': 'text'}
+        self.elastic.indices.create(self.db_name, body={
+            'settings': {
+                'number_of_shards': 1,
+            },
+            'mappings': {
+                'properties': properties,
+            }
+        })
+
+    def index_exists(self):
+        """
+            https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-exists.html
+        """
+        return self.elastic.indices.exists(self.db_name)
+
+    def commit_all(self):
+        return self.elastic.indices.refresh(self.db_name)
+
+    def parse_match(self, hit: dict) -> TextMatch:
+        return TextMatch(
+            _id=hit.pop('_id', 0),
+            content=hit.pop('_source', ''),
+            rating=hit.pop('_score', 1),
+        )
+
+
+# region Testing
 
 if __name__ == '__main__':
     sample_file = 'Datasets/text-test/nanoformulations.txt'
@@ -227,7 +255,7 @@ if __name__ == '__main__':
     assert db.count_texts() == 0
     assert db.upsert_text(Text.from_file(sample_file))
     assert db.count_texts() == 1
-    assert db.find_with_substring('nanoparticles')
-    assert db.find_with_regex('nanoparticles')
+    assert db.find_substring('nanoparticles')
+    assert db.find_regex('nanoparticles')
     assert db.remove_text(Text.from_file(sample_file))
     assert db.count_texts() == 0

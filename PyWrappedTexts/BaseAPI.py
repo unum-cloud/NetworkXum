@@ -2,7 +2,7 @@ import os
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
 import concurrent.futures
-from pathlib import Path
+import collections
 
 from PyWrappedHelpers import *
 
@@ -16,93 +16,85 @@ class BaseAPI(object):
     __is_concurrent__ = True
     __in_memory__ = False
 
-    # --------------------------------
-    # region Initialization and Metadata.
-    # --------------------------------
+# region Metadata
 
-    def __init__(
-        self,
-        indexed_fields: Sequence[str] = ['content'],
-        **kwargs,
-    ):
+    def __init__(self, **kwargs):
         object.__init__(self)
-        self.indexed_fields = indexed_fields
+        self.indexed_fields = ['content']
 
     @abstractmethod
     def count_texts(self) -> int:
-        pass
+        return 0
 
-    # endregion
 
-    # --------------------------------
-    # region Adding and removing documents.
-    # --------------------------------
+# region Random Writes
 
     @abstractmethod
-    def upsert_text(self, doc: Text) -> bool:
-        pass
-
-    @abstractmethod
-    def remove_text(self, doc: int) -> bool:
+    def add(self, one_or_many_texts, upsert=True) -> int:
+        if isinstance(one_or_many_texts, collections.Sequence):
+            return int(sum(map(self.add, one_or_many_texts)))
+        elif isinstance(one_or_many_texts, Text):
+            return self.add([one_or_many_texts])
+        elif isinstance(one_or_many_texts, dict):
+            return self.add(Text(**one_or_many_texts))
         return False
 
     @abstractmethod
-    def upsert_texts(self, docs: Sequence[Text]) -> int:
-        successes = map(self.upsert_text, docs)
-        return int(sum(successes))
+    def remove(self, one_or_many_texts) -> int:
+        if isinstance(one_or_many_texts, collections.Sequence):
+            return int(sum(map(self.remove, one_or_many_texts)))
+        elif isinstance(one_or_many_texts, Text):
+            return self.remove(one_or_many_texts._id)
+        elif isinstance(one_or_many_texts, dict):
+            return self.remove(one_or_many_texts.pop('_id', None))
+        return False
+
+
+# region Bulk Writes
 
     @abstractmethod
-    def remove_texts(self, docs: Sequence[int]) -> int:
-        successes = map(self.remove_text, docs)
-        return int(sum(successes))
-
-    @abstractmethod
-    def import_texts_from_directory(self, directory: str) -> int:
+    def add_stream(self, stream, upsert=False) -> int:
         cnt_success = 0
-        paths = [pth for pth in Path(directory).iterdir()]
-        for paths_chunk in chunks(paths, type(self).__max_batch_size__):
-            files_chunk = map(Text, paths_chunk)
-            cnt_success += self.upsert_texts(files_chunk)
-        return cnt_success
-
-    @abstractmethod
-    def import_texts_from_csv(self, filepath: str) -> int:
-        allow_big_csv_fields()
-        cnt_success = 0
-        for files_chunk in chunks(yield_texts_from_sectioned_csv(filepath), type(self).__max_batch_size__):
-            cnt_success += self.upsert_texts(files_chunk)
+        for texts_batch in chunks(stream, type(self).__max_batch_size__):
+            try:
+                cnt_success += self.add(texts_batch, upsert=upsert)
+            except:
+                pass
         return cnt_success
 
     @abstractmethod
     def clear(self):
         pass
 
-    # endregion
-
-    # --------------------------------
-    # region Search Queries.
-    # --------------------------------
+# region Random Reads
 
     @abstractmethod
-    def find_with_id(self, id: int) -> object:
-        pass
+    def get(self, id: int) -> Optional[Text]:
+        return None
 
     @abstractmethod
-    def find_with_substring(
+    def find_substring(
         self,
         query: str,
-        field: str = 'content',
-        max_matches: int = None
+        case_sensitive: bool = True,
+        max_matches: Optional[int] = None,
+        include_text=True,
     ) -> Sequence[Text]:
-        pass
+        return []
 
     @abstractmethod
-    def find_with_regex(
+    def find_regex(
         self,
         query: str,
-        field: str = 'content',
-        max_matches: int = None
+        case_sensitive: bool = True,
+        max_matches: Optional[int] = None,
+        include_text=True,
     ) -> Sequence[Text]:
-        pass
+        return []
 
-    # endregion
+# region Bulk Reads
+
+    @property
+    @abstractmethod
+    def texts(self) -> Sequence[Text]:
+        return []

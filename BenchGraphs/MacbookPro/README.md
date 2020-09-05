@@ -36,7 +36,7 @@ Links: [The Most Popular Open Source Databases 2020](https://www.percona.com/blo
 
 
 * CPU:
-    * Model: `?`.
+    * Model: `Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz`.
     * Cores: 8 (16 threads @ 2.3 Ghz).
 * RAM Space: 16.0 GB.
 * Disk Space: 931.5 GB.
@@ -81,13 +81,13 @@ Most DBs provide some form functionality for faster bulk imports, but not all of
 * MongoDB provides a command line tool, but it wasn't used to limit the number of binary dependencies and simplify configuration.
 
 
-|              | PatentCitations |  MouseGenes  | HumanBrain | Mean Gains |
-| :----------- | :-------------: | :----------: | :--------: | :--------: |
-| PostgreSQL   |    7,522.24     |   7,306.20   |  7,469.46  |     1x     |
-| MySQL        |    14,698.93    |  18,549.58   | 12,144.30  |   2.04x    |
-| SQLite       |    50,057.93    |  43,819.69   | 34,728.02  |   5.77x    |
-| MongoDB      |    15,135.22    |  14,759.00   | 15,125.21  |   2.02x    |
-| Unum.GraphDB |   253,298.95    | 1,056,780.56 | 819,382.93 | **95.50x** |
+|              | PatentCitations |  MouseGenes  | HumanBrain | Mean Gains  |
+| :----------- | :-------------: | :----------: | :--------: | :---------: |
+| PostgreSQL   |    5,902.69     |   6,812.14   |  7,469.46  |     1x      |
+| MySQL        |    11,889.85    |  16,095.21   | 12,144.30  |    1.99x    |
+| SQLite       |    50,057.93    |  42,350.66   | 34,728.02  |    6.30x    |
+| MongoDB      |    32,917.56    |  39,077.58   | 15,125.21  |    4.32x    |
+| Unum.GraphDB |   253,298.95    | 1,056,780.56 | 819,382.93 | **105.50x** |
 
 The benchmarks were repeated dozens of times. 
 These numbers translate into following import duration for each dataset.
@@ -95,10 +95,10 @@ These numbers translate into following import duration for each dataset.
 
 |              | PatentCitations  |    MouseGenes    |    HumanBrain    |
 | :----------- | :--------------: | :--------------: | :--------------: |
-| PostgreSQL   | 36 mins, 36 secs | 33 mins, 5 secs  | 3 hours, 14 mins |
-| MySQL        | 18 mins, 44 secs | 13 mins, 2 secs  | 1 hours, 59 mins |
-| SQLite       | 5 mins, 30 secs  | 5 mins, 31 secs  | 41 mins, 53 secs |
-| MongoDB      | 18 mins, 11 secs | 16 mins, 23 secs | 1 hours, 36 mins |
+| PostgreSQL   | 46 mins, 39 secs | 35 mins, 29 secs | 3 hours, 14 mins |
+| MySQL        | 23 mins, 9 secs  | 15 mins, 1 secs  | 1 hours, 59 mins |
+| SQLite       | 5 mins, 30 secs  | 5 mins, 43 secs  | 41 mins, 53 secs |
+| MongoDB      | 8 mins, 22 secs  | 6 mins, 11 secs  | 1 hours, 36 mins |
 | Unum.GraphDB |  1 mins, 5 secs  | 0 mins, 14 secs  | 1 mins, 47 secs  |
 
 Those benchmarks only tell half of the story. 

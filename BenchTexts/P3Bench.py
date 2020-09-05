@@ -52,17 +52,17 @@ class P3Bench(object):
         # Queries returning single object.
         self.bench_task(
             name='Random Reads: Lookup Doc by ID',
-            func=self.find_with_id
+            func=self.get
         )
 
         # Queries returning collections.
         self.bench_task(
             name='Random Reads: Find up to 10,000 Docs containing a Word',
-            func=lambda: self.find_with_substring(max_matches=10000)
+            func=lambda: self.find_substring(max_matches=10000)
         )
         self.bench_task(
             name='Random Reads: Find up to 20 Docs containing a Word',
-            func=lambda: self.find_with_substring(max_matches=20)
+            func=lambda: self.find_substring(max_matches=20)
         )
         self.bench_task(
             name='Random Reads: Find up to 20 Docs with Bigram',
@@ -74,7 +74,7 @@ class P3Bench(object):
         #     regexs = regex_template['Tasks']
         #     self.bench_task(
         #         name=name,
-        #         func=lambda: self.find_with_regex(
+        #         func=lambda: self.find_regex(
         #             regexs=regexs, max_matches=20)
         #     )
 
@@ -127,12 +127,12 @@ class P3Bench(object):
     # Operations
     # ---
 
-    def find_with_id(self) -> int:
+    def get(self) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
         for doc_id in self.tasks.doc_ids_to_query:
-            match = self.tdb.find_with_id(doc_id)
+            match = self.tdb.get(doc_id)
             cnt += 1
             cnt_found += 0 if (match is None) else 1
             dt = time() - t0
@@ -141,12 +141,12 @@ class P3Bench(object):
         print(f'---- {cnt} ops: {cnt_found} ID matches')
         return cnt
 
-    def find_with_substring(self, max_matches: int = None) -> int:
+    def find_substring(self, max_matches: int = None) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
         for word in self.tasks.words_to_search:
-            doc_ids = self.tdb.find_with_substring(
+            doc_ids = self.tdb.find_substring(
                 query=word, max_matches=max_matches)
             cnt += 1
             cnt_found += len(doc_ids)
@@ -161,7 +161,7 @@ class P3Bench(object):
         cnt_found = 0
         t0 = time()
         for word in self.tasks.phrases_to_search:
-            doc_ids = self.tdb.find_with_substring(
+            doc_ids = self.tdb.find_substring(
                 query=word, max_matches=max_matches)
             cnt += 1
             cnt_found += len(doc_ids)
@@ -171,12 +171,12 @@ class P3Bench(object):
         print(f'---- {cnt} ops: {cnt_found} matches found')
         return cnt
 
-    def find_with_regex(self, regexs, max_matches: int = None) -> int:
+    def find_regex(self, regexs, max_matches: int = None) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
         for regex in regexs:
-            doc_ids = self.tdb.find_with_regex(
+            doc_ids = self.tdb.find_regex(
                 query=regex, max_matches=max_matches)
             cnt += 1
             cnt_found += len(doc_ids)

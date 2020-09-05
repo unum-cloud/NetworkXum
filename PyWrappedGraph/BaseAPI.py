@@ -15,7 +15,7 @@ class BaseAPI(object):
         by hashing IDs of nodes that it's connecting.
 
         Partially compatiable with `MultiDiGraph` from NetworkX package.
-        Explicitly supported edge attributes are: `_id: int` `weight: float`, `label: int`, `is_directed: bool`.
+        Explicitly supported edge attributes are: `_id: int` `weight: float`, `label: int`, `directed: bool`.
         Explicitly supported node attributes are: `_id: int` `weight: float`, `label: int`.
         Non-integer node names will be hashed.
         The hashable `key` will be transformed into the `label` property of nodes and edges.
@@ -29,14 +29,15 @@ class BaseAPI(object):
 
     def __init__(
         self,
-        is_directed=True,
-        is_weighted=True,
-        upsert_nodes_with_every_edge=True,
+        directed=True,
+        weighted=True,
+        multigraph=True,
         **kwargs,
     ):
         object.__init__(self)
-        self.is_directed = is_directed
-        self.is_weighted = is_weighted
+        self.directed = directed
+        self.weighted = weighted
+        self.multigraph = multigraph
 
 # region Metadata
 
@@ -80,6 +81,11 @@ class BaseAPI(object):
         """
         return self.number_of_nodes().count
 
+    def is_directed(self):
+        return self.directed
+
+    def is_multigraph(self):
+        return self.multigraph
 
 # region Bulk Reads
 
@@ -105,7 +111,7 @@ class BaseAPI(object):
         """
             https://networkx.github.io/documentation/stable/reference/classes/generated/networkx.MultiDiGraph.out_edges.html
         """
-        return [e for e in self.edges if e.is_directed]
+        return [e for e in self.edges if e.directed]
 
     @property
     @abstractmethod
@@ -118,6 +124,9 @@ class BaseAPI(object):
     @property
     @abstractmethod
     def mentioned_nodes_ids(self) -> Sequence[int]:
+        """
+            CAUTION: This operation can be very expensive!
+        """
         return self.unique_members_of_edges(self.edges)
 
 # region Random Reads
@@ -183,7 +192,7 @@ class BaseAPI(object):
         return dict(
             weight=e.weight,
             label=e.label,
-            is_directed=e.is_directed,
+            directed=e.directed,
             **e.payload,
         )
 
@@ -213,7 +222,7 @@ class BaseAPI(object):
             Adds either an `Edge`, `Sequence[Edge]`, `Node` or `Sequence[Node]`.
             Other arguments aren't allowed.
         """
-        if self.is_list_of_edges(obj) or self.is_list_of_nodes(obj):
+        if is_list_of(obj, Edge) or is_list_of(obj, Node):
             return sum([self.add(o, upsert=upsert) for o in obj])
         else:
             return 0
@@ -225,7 +234,7 @@ class BaseAPI(object):
             Other arguments aren't allowed.
             Can delete edges without a known ID, but it will work slower.
         """
-        if self.is_list_of_edges(obj) or self.is_list_of_nodes(obj):
+        if is_list_of(obj, Edge) or is_list_of(obj, Node):
             return sum(map(self.remove, obj))
         else:
             return 0
@@ -342,7 +351,7 @@ class BaseAPI(object):
             second=second,
             weight=attrs.pop('weight', 1),
             label=label,
-            is_directed=attrs.pop('is_directed', self.is_directed),
+            directed=attrs.pop('directed', self.directed),
         )
         if e._id < 0:
             e._id = Edge.identify_by_members(first, second)
@@ -356,8 +365,8 @@ class BaseAPI(object):
             result.add(e.second)
         return result
 
-    def is_list_of_edges(self, es: Sequence[Edge]) -> bool:
+    def is_list_of(self, Edge, es: Sequence[Edge]) -> bool:
         return isinstance(es, collections.Sequence) and all([isinstance(e, Edge) for e in es])
 
-    def is_list_of_nodes(self, ns: Sequence[Node]) -> bool:
+    def is_list_of(self, Node, ns: Sequence[Node]) -> bool:
         return isinstance(ns, collections.Sequence) and all([isinstance(n, Node) for n in ns])

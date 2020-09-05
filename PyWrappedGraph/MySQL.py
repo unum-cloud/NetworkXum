@@ -21,7 +21,8 @@ class MySQL(BaseSQL):
             'SET GLOBAL innodb_file_per_table=1;'
             # Don't use 0 as node or edge ID, unless prespecified.
             # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_insert_id
-            'SET SESSION insert_id=0;'
+            # 'SET SESSION insert_id=1;'
+            'SET SESSION sql_mode=NO_AUTO_VALUE_ON_ZERO',
             # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_tmp_table_size
             'SET GLOBAL tmp_table_size=16777216;',
             # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_max_heap_table_size

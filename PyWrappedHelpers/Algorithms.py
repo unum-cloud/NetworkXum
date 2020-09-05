@@ -7,8 +7,14 @@ import math
 from urllib.parse import urlparse
 import random
 from random import SystemRandom
+from pathlib import Path
+import collections
 
 from PyWrappedHelpers import *
+
+
+def is_sequence_of(objs, expected_class) -> bool:
+    return isinstance(objs, collections.Sequence) and all([isinstance(obj, expected_class) for obj in objs])
 
 
 def map_compact(func, os: Sequence[object]) -> Sequence[object]:
@@ -69,6 +75,7 @@ def yield_edges_from_csv(filepath: str, edge_type: type = Edge, is_directed=True
 def yield_texts_from_sectioned_csv(filepath: str) -> Generator[Text, None, None]:
     last_text = str()
     last_path = str()
+    allow_big_csv_fields()
 
     with open(filepath, 'r') as f:
         reader = csv.reader(f, delimiter=',')
@@ -90,6 +97,13 @@ def yield_texts_from_sectioned_csv(filepath: str) -> Generator[Text, None, None]
 
         if len(last_text) > 0:
             yield Text(idx, last_text)
+
+
+def yield_texts_from_directory(directory: str) -> Generator[Text, None, None]:
+    idx = 0
+    for path in Path(directory).iterdir():
+        yield Text.from_file(path=path, _id=idx)
+        idx += 1
 
 
 def extract_database_name(url: str, default='graph') -> (str, str):
