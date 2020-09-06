@@ -75,7 +75,7 @@ class P3TasksSampler(object):
     def sample_file(self, filename: str) -> int:
         self.clear()
         self._buffer_texts = sample_reservoir(
-            yield_texts_from_sectioned_csv(filename), self.number_of_needed_samples())
+            yield_texts_from_csv(filename), self.number_of_needed_samples())
         self._split_samples_into_tasks()
         return len(self._buffer_texts)
 

@@ -52,7 +52,8 @@ class P1Test(object):
         self.validate_empty(tdb)
 
         print(f'--- Bulk Insert')
-        tdb.add_stream(self.conf.test_dataset['path'], column=3)
+        tdb.add_stream(yield_texts_from_csv(
+            self.conf.test_dataset['path'], text_column=3))
         self.validate_contents(tdb)
         tdb.clear()
         self.validate_empty(tdb)

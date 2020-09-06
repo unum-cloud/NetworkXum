@@ -130,7 +130,7 @@ class P4Print():
         Most DBs don't have high-performance bulk I/O options. 
         It means, that when you import the data there is no way to inform the DB about various properties of the imported dataset. 
         Which in turn results in huge write-amplification. 
-        Combine this with inefficient and slow built-in compression and you prepare to give all your money to AWS!
+        Combine this with inefficient and slow built-in compression and prepare to give all your money to AWS!
         ''')
 
         out.add(

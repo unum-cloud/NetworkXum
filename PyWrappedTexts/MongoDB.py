@@ -26,7 +26,7 @@ class MongoDB(BaseAPI):
         BaseAPI.__init__(self, **kwargs)
         _, db_name = extract_database_name(url)
         self.db = MongoClient(url)
-        self.texts_collection = self.db[db_name]['docs']
+        self.texts_collection = self.db[db_name]['texts']
         self.create_indexes()
 
     def count_texts(self) -> int:
@@ -132,6 +132,16 @@ class MongoDB(BaseAPI):
                 return len(result.inserted_ids)
 
         return super().add(obj, upsert=upsert)
+
+    def remove(self, obj) -> int:
+        target = self.texts_collection
+        if isinstance(obj, int):
+            return target.delete_one(filter={'_id': obj}).deleted_count >= 1
+        elif is_sequence_of(obj, int):
+            return target.delete_many(filter={'_id': {'$in': obj}}).deleted_count
+
+        return super().remove(obj)
+
 
 # region Bulk Reads
 

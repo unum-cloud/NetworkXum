@@ -15,7 +15,7 @@
         "docs": 12488144,
         "sections": 12488144,
         "size_mb": 2300,
-        "enabled": true
+        "enabled": false
     },
     {
         "name": "EnglishWikipedia",
@@ -24,6 +24,6 @@
         "docs": 4902648,
         "sections": 23046187,
         "size_mb": 18200,
-        "enabled": true
+        "enabled": false
     }
 ]
