@@ -1,5 +1,6 @@
 import platform
 import glob
+import re
 
 import psutil
 from pystats2md.stats_file import StatsFile
@@ -81,12 +82,12 @@ class P4Print():
             device_name=device_name,
             benchmark_name='Sequential Writes: Import CSV',
         ).table(
+            cell_content_property='operations_per_second',
             row_name_property='database',
             col_name_property='dataset',
-            cell_content_property='operations_per_second',
             row_names=['Parsing in Python', 'Sampling in Unum'],
             col_names=dataset_names,
-        ))
+        ).add_gains())
 
         out.add('''
         Most DBs provide some form functionality for faster bulk imports, but not all of them where used in benchmarks for various reasons.
@@ -100,9 +101,9 @@ class P4Print():
             device_name=device_name,
             benchmark_name='Sequential Writes: Import CSV',
         ).table(
+            cell_content_property='operations_per_second',
             row_name_property='database',
             col_name_property='dataset',
-            cell_content_property='operations_per_second',
             row_names=dbs,
             col_names=dataset_names,
         ).add_gains())
@@ -116,22 +117,46 @@ class P4Print():
             device_name=device_name,
             benchmark_name='Sequential Writes: Import CSV',
         ).table(
+            cell_content_property='time_elapsed',
             row_name_property='database',
             col_name_property='dataset',
-            cell_content_property='time_elapsed',
             row_names=dbs,
             col_names=dataset_names,
         ).printable_seconds())
 
         out.add('''
         Those benchmarks only tell half of the story. 
-        We should not only consider performance, but also the used disk space and the affect on the hardware lifetime, as SSDs don't last too long.
-        Unum has not only the highest performance, but also the most compact representation. For the `HumanBrain` graph results are:
+        SSDs have a relatively short lifespan, especially new high-capacity technologies like TLC and QLC. 
+        Most DBs don't have high-performance bulk I/O options. 
+        It means, that when you import the data there is no way to inform the DB about various properties of the imported dataset. 
+        Which in turn results in huge write-amplification. 
+        Combine this with inefficient and slow built-in compression and you prepare to give all your money to AWS!
+        ''')
 
-        * MongoDB: 1,1 GB for data + 2,5 GB for indexes = 3,6 GB. Wrote ~25 GB to disk.
-        * MySQL: 8.5 GB for data + 6.4 GB for indexes = 14.9 GB. Wrote ~300 GB to disk.
-        * PostgreSQL: 6 GB for data + 9 GB for indexes = 15 GB. Wrote ~25 GB to disk. Furthermore, after flushing the changes, it didn't reclaim 8 GB of space from the temporary table.
-        * Unum: 1.5 GB total volume. Extra 3.8 GB of space were (optionally) used requested to slighly accelerate the import time. All of that space was reclaimed. A total of 5.3 was written to disk.
+        out.add(
+            StatsSubset(ins).filtered(
+                device_name=device_name,
+                benchmark_name='Sequential Writes: Import CSV',
+            ).table(
+                cell_content_property='write_bytes',
+                row_name_property='database',
+                col_name_property='dataset',
+                col_names=dataset_names,
+                row_names=dbs,
+            ).plot(
+                title='Import Overhead - Total Bytes Written',
+                print_height=True,
+                print_rows_names=True,
+                print_cols_names=True,
+            )
+        )
+
+        out.add('''
+        Once the data is imported, it's on-disk representation has different layouts in each DB. 
+        Some are more compact than others. For comparison, let's take the `HumanBrain` 4 GB graph. 
+        According to graph above, a total of 5.3 GB was writen during the import. 
+        However, thanks to our compression, the resulting DB size is only 0.8 GB. 
+        Same graph uses ~3.5 GB in MongoDB, ~15 GB in MySQL, ~15 GB in PostgreSQL and ~15 GB in SQLite.
         ''')
 
         # Read Queries.
@@ -196,14 +221,30 @@ class P4Print():
                 device_name=device_name,
                 benchmark_name=read_op,
             ).table(
+                cell_content_property='operations_per_second',
                 row_name_property='database',
                 col_name_property='dataset',
-                cell_content_property='operations_per_second',
                 row_names=dbs,
                 col_names=dataset_names
             ).add_gains())
 
         # Add a chart showing the number of total read bytes during random read operations.
+        out.add(
+            StatsSubset(ins).filtered(
+                device_name=device_name,
+                benchmark_name=re.compile('Random Reads: Find.*'),
+            ).table(
+                cell_content_property='read_bytes',
+                row_name_property='database',
+                col_name_property='benchmark_name',
+                row_names=dbs,
+            ).plot(
+                title='Read Amplification - Read Bytes Per Benchmark',
+                print_height=True,
+                print_rows_names=True,
+                print_cols_names=True,
+            )
+        )
 
         # Write Operations.
         out.add('## Write Operations')
@@ -251,14 +292,30 @@ class P4Print():
                 device_name=device_name,
                 benchmark_name=write_op,
             ).table(
+                cell_content_property='operations_per_second',
                 row_name_property='database',
                 col_name_property='dataset',
-                cell_content_property='operations_per_second',
+                col_names=dataset_names,
                 row_names=dbs,
-                col_names=dataset_names
             ).add_gains())
 
         # Add a chart showing the number of total read and written bytes during write operations.
+        out.add(
+            StatsSubset(ins).filtered(
+                device_name=device_name,
+                benchmark_name=re.compile('Random Writes.*'),
+            ).table(
+                cell_content_property='write_bytes',
+                row_name_property='database',
+                col_name_property='benchmark_name',
+                row_names=dbs,
+            ).plot(
+                title='Write Amplification - Written Bytes Per Benchmark',
+                print_height=True,
+                print_rows_names=True,
+                print_cols_names=True,
+            )
+        )
 
         # out.add('### Sequential Reads')
 
@@ -267,9 +324,9 @@ class P4Print():
         #     device_name=device_name,
         #     benchmark_name='Streaming Edges',
         # ).table(
+        #     cell_content_property='operations_per_second',
         #     row_name_property='database',
         #     col_name_property='dataset',
-        #     cell_content_property='operations_per_second',
         #     row_names=dbs,
         #     col_names=dataset_names,
         # ).add_gains())
@@ -279,9 +336,9 @@ class P4Print():
         #     device_name=device_name,
         #     benchmark_name='Streaming Nodes',
         # ).table(
+        #     cell_content_property='operations_per_second',
         #     row_name_property='database',
         #     col_name_property='dataset',
-        #     cell_content_property='operations_per_second',
         #     row_names=dbs,
         #     col_names=dataset_names,
         # ).add_gains())

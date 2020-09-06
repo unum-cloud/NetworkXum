@@ -1,7 +1,7 @@
 [
     {
-        "database": "Parsing in Python",
         "dataset": "PatentCitations",
+        "database": "Parsing in Python",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 59.68628668785095,
         "count_iterations": 1,
@@ -36,8 +36,8 @@
         "write_requests_per_second": 29.60479028023819
     },
     {
-        "database": "Parsing in Python",
         "dataset": "MouseGenes",
+        "database": "Parsing in Python",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 53.83746790885925,
         "count_iterations": 1,
@@ -72,8 +72,8 @@
         "write_requests_per_second": 15.918282067997776
     },
     {
-        "database": "Parsing in Python",
         "dataset": "HumanBrain",
+        "database": "Parsing in Python",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 359.1923599243164,
         "count_iterations": 1,
@@ -108,8 +108,8 @@
         "write_requests_per_second": 28.39147247494008
     },
     {
-        "database": "MongoDB",
         "dataset": "PatentCitations",
+        "database": "MongoDB",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 501.8277533054352,
         "count_iterations": 1,
@@ -144,8 +144,8 @@
         "write_requests_per_second": 231.7428624343492
     },
     {
-        "database": "PostgreSQL",
         "dataset": "PatentCitations",
+        "database": "PostgreSQL",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 2798.5478250980377,
         "count_iterations": 1,
@@ -180,8 +180,8 @@
         "write_requests_per_second": 471.3062210947902
     },
     {
-        "database": "MySQL",
         "dataset": "PatentCitations",
+        "database": "MySQL",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 1389.3313291072845,
         "count_iterations": 1,
@@ -216,8 +216,8 @@
         "write_requests_per_second": 11058.568016221267
     },
     {
-        "database": "SQLite",
         "dataset": "MouseGenes",
+        "database": "SQLite",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 342.52584505081177,
         "count_iterations": 1,
@@ -252,8 +252,8 @@
         "write_requests_per_second": 167.9464508480122
     },
     {
-        "database": "MongoDB",
         "dataset": "MouseGenes",
+        "database": "MongoDB",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 371.2153079509735,
         "count_iterations": 1,
@@ -288,8 +288,8 @@
         "write_requests_per_second": 228.3607334727579
     },
     {
-        "database": "PostgreSQL",
         "dataset": "MouseGenes",
+        "database": "PostgreSQL",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 2129.4635326862335,
         "count_iterations": 1,
@@ -324,8 +324,8 @@
         "write_requests_per_second": 1285.7867523779928
     },
     {
-        "database": "MySQL",
         "dataset": "MouseGenes",
+        "database": "MySQL",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 901.2738580703735,
         "count_iterations": 1,
@@ -360,8 +360,8 @@
         "write_requests_per_second": 9430.34009462677
     },
     {
-        "database": "SQLite",
         "dataset": "HumanBrain",
+        "database": "SQLite",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 3450.965090036392,
         "count_iterations": 1,
@@ -396,8 +396,8 @@
         "write_requests_per_second": 929.8390207610478
     },
     {
-        "database": "MongoDB",
         "dataset": "HumanBrain",
+        "database": "MongoDB",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 2924.4247212409973,
         "count_iterations": 1,
@@ -432,8 +432,8 @@
         "write_requests_per_second": 239.8868382231091
     },
     {
-        "database": "PostgreSQL",
         "dataset": "HumanBrain",
+        "database": "PostgreSQL",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 13024.72899889946,
         "count_iterations": 1,
@@ -468,8 +468,8 @@
         "write_requests_per_second": 1441.7691916343692
     },
     {
-        "database": "MySQL",
         "dataset": "HumanBrain",
+        "database": "MySQL",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 8075.50866985321,
         "count_iterations": 1,
@@ -504,8 +504,8 @@
         "write_requests_per_second": 9604.382481755149
     },
     {
-        "database": "Parsing in Python",
         "dataset": "CommunitiesFB",
+        "database": "Parsing in Python",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 0.03272891044616699,
         "count_iterations": 1,
@@ -540,8 +540,8 @@
         "write_requests_per_second": 2597.0922600619197
     },
     {
-        "database": "SQLite (In-Memory)",
         "dataset": "CommunitiesFB",
+        "database": "SQLite (In-Memory)",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 0.3459761142730713,
         "count_iterations": 1,
@@ -576,8 +576,8 @@
         "write_requests_per_second": 0.0
     },
     {
-        "database": "Parsing in Python",
         "dataset": "MovieRatings",
+        "database": "Parsing in Python",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 10.067133903503418,
         "count_iterations": 1,
@@ -612,8 +612,8 @@
         "write_requests_per_second": 449.08511631365775
     },
     {
-        "database": "MongoDB",
         "dataset": "CommunitiesFB",
+        "database": "MongoDB",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 0.37868499755859375,
         "count_iterations": 1,
@@ -648,8 +648,8 @@
         "write_requests_per_second": 512.2991437493704
     },
     {
-        "database": "SQLite",
         "dataset": "CommunitiesFB",
+        "database": "SQLite",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 0.4207620620727539,
         "count_iterations": 1,
@@ -684,8 +684,8 @@
         "write_requests_per_second": 102.19552539545468
     },
     {
-        "database": "MySQL",
         "dataset": "CommunitiesFB",
+        "database": "MySQL",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 0.8555810451507568,
         "count_iterations": 1,
@@ -720,8 +720,8 @@
         "write_requests_per_second": 4676.354183717344
     },
     {
-        "database": "PostgreSQL",
         "dataset": "CommunitiesFB",
+        "database": "PostgreSQL",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 2.1302032470703125,
         "count_iterations": 1,
@@ -756,8 +756,8 @@
         "write_requests_per_second": 175.57010135740123
     },
     {
-        "database": "MongoDB",
         "dataset": "MovieRatings",
+        "database": "MongoDB",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 72.49415612220764,
         "count_iterations": 1,
@@ -792,8 +792,8 @@
         "write_requests_per_second": 205.78210435130597
     },
     {
-        "database": "SQLite",
         "dataset": "MovieRatings",
+        "database": "SQLite",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 67.41530895233154,
         "count_iterations": 1,
@@ -828,8 +828,8 @@
         "write_requests_per_second": 156.70031279497158
     },
     {
-        "database": "SQLite (In-Memory)",
         "dataset": "MovieRatings",
+        "database": "SQLite (In-Memory)",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 54.68755912780762,
         "count_iterations": 1,
@@ -864,8 +864,8 @@
         "write_requests_per_second": 117.86958684580105
     },
     {
-        "database": "MySQL",
         "dataset": "MovieRatings",
+        "database": "MySQL",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 153.2326159477234,
         "count_iterations": 1,
@@ -900,8 +900,8 @@
         "write_requests_per_second": 8313.61516685591
     },
     {
-        "database": "PostgreSQL",
         "dataset": "MovieRatings",
+        "database": "PostgreSQL",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 451.24164509773254,
         "count_iterations": 1,
@@ -936,8 +936,8 @@
         "write_requests_per_second": 912.0789370202305
     },
     {
-        "database": "Parsing in Python",
         "dataset": "Wikipedia",
+        "database": "Parsing in Python",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 2462.293276309967,
         "count_iterations": 1,
@@ -972,8 +972,8 @@
         "write_requests_per_second": 80.95583167035637
     },
     {
-        "database": "Sampling in Unum",
         "dataset": "CommunitiesFB",
+        "database": "Sampling in Unum",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 0.003698110580444336,
         "count_iterations": 1,
@@ -1008,8 +1008,8 @@
         "write_requests_per_second": 5678.575462574947
     },
     {
-        "database": "Sampling in Unum",
         "dataset": "MovieRatings",
+        "database": "Sampling in Unum",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 0.729860782623291,
         "count_iterations": 1,
@@ -1044,8 +1044,8 @@
         "write_requests_per_second": 0.0
     },
     {
-        "database": "Sampling in Unum",
         "dataset": "PatentCitations",
+        "database": "Sampling in Unum",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 3.7354650497436523,
         "count_iterations": 1,
@@ -1080,8 +1080,8 @@
         "write_requests_per_second": 2.141634279391532
     },
     {
-        "database": "SQLite",
         "dataset": "PatentCitations",
+        "database": "SQLite",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 502.79122591018677,
         "count_iterations": 1,
@@ -1116,8 +1116,8 @@
         "write_requests_per_second": 328.8462317549168
     },
     {
-        "database": "MongoDB",
         "dataset": "PatentCitations",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Find Ingoing Edges",
         "time_elapsed": 20.129786729812622,
         "count_iterations": 1,
@@ -1152,8 +1152,8 @@
         "write_requests_per_second": 2.6825917594062187
     },
     {
-        "database": "MongoDB",
         "dataset": "PatentCitations",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Find Connected Edges",
         "time_elapsed": 30.938236236572266,
         "count_iterations": 1,
@@ -1188,8 +1188,8 @@
         "write_requests_per_second": 13.155242493070208
     },
     {
-        "database": "MongoDB",
         "dataset": "PatentCitations",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Find Friends",
         "time_elapsed": 25.165497064590454,
         "count_iterations": 1,
@@ -1224,8 +1224,8 @@
         "write_requests_per_second": 26.901912497988548
     },
     {
-        "database": "MongoDB",
         "dataset": "PatentCitations",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Count Friends",
         "time_elapsed": 20.444740056991577,
         "count_iterations": 1,
@@ -1260,8 +1260,8 @@
         "write_requests_per_second": 44.11892728817254
     },
     {
-        "database": "MongoDB",
         "dataset": "PatentCitations",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Count Followers",
         "time_elapsed": 13.697942018508911,
         "count_iterations": 1,
@@ -1296,8 +1296,8 @@
         "write_requests_per_second": 17.520880120218614
     },
     {
-        "database": "SQLite",
         "dataset": "PatentCitations",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Find Specific Edge",
         "time_elapsed": 39.88422775268555,
         "count_iterations": 1,
@@ -1332,8 +1332,8 @@
         "write_requests_per_second": 36.70623909476156
     },
     {
-        "database": "SQLite",
         "dataset": "PatentCitations",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Find Ingoing Edges",
         "time_elapsed": 60.002131938934326,
         "count_iterations": 1,
@@ -1368,8 +1368,8 @@
         "write_requests_per_second": 25.115774245050353
     },
     {
-        "database": "SQLite",
         "dataset": "PatentCitations",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Find Connected Edges",
         "time_elapsed": 60.00244903564453,
         "count_iterations": 1,
@@ -1404,8 +1404,8 @@
         "write_requests_per_second": 21.232466682204567
     },
     {
-        "database": "SQLite",
         "dataset": "PatentCitations",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Find Friends",
         "time_elapsed": 60.00158619880676,
         "count_iterations": 1,
@@ -1440,8 +1440,8 @@
         "write_requests_per_second": 29.999206921562955
     },
     {
-        "database": "SQLite",
         "dataset": "PatentCitations",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Count Friends",
         "time_elapsed": 60.0031681060791,
         "count_iterations": 1,
@@ -1476,8 +1476,8 @@
         "write_requests_per_second": 16.91577348391988
     },
     {
-        "database": "SQLite",
         "dataset": "PatentCitations",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Count Followers",
         "time_elapsed": 60.00068497657776,
         "count_iterations": 1,
@@ -1512,8 +1512,8 @@
         "write_requests_per_second": 16.7331423031575
     },
     {
-        "database": "MySQL",
         "dataset": "PatentCitations",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Find Specific Edge",
         "time_elapsed": 17.004008769989014,
         "count_iterations": 1,
@@ -1548,8 +1548,8 @@
         "write_requests_per_second": 74.45303146599224
     },
     {
-        "database": "MySQL",
         "dataset": "PatentCitations",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Find Ingoing Edges",
         "time_elapsed": 19.085716009140015,
         "count_iterations": 1,
@@ -1584,8 +1584,8 @@
         "write_requests_per_second": 106.10028982042077
     },
     {
-        "database": "MySQL",
         "dataset": "PatentCitations",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Find Connected Edges",
         "time_elapsed": 24.203619956970215,
         "count_iterations": 1,
@@ -1620,8 +1620,8 @@
         "write_requests_per_second": 70.85716942544003
     },
     {
-        "database": "MySQL",
         "dataset": "PatentCitations",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Find Friends",
         "time_elapsed": 23.350069046020508,
         "count_iterations": 1,
@@ -1656,8 +1656,8 @@
         "write_requests_per_second": 28.265441044273146
     },
     {
-        "database": "MySQL",
         "dataset": "PatentCitations",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Count Friends",
         "time_elapsed": 22.009735822677612,
         "count_iterations": 1,
@@ -1692,8 +1692,8 @@
         "write_requests_per_second": 24.580031507810446
     },
     {
-        "database": "MySQL",
         "dataset": "PatentCitations",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Count Followers",
         "time_elapsed": 16.597070693969727,
         "count_iterations": 1,
@@ -1728,8 +1728,8 @@
         "write_requests_per_second": 13.496357527800777
     },
     {
-        "database": "MySQL",
         "dataset": "PatentCitations",
+        "database": "MySQL",
         "benchmark_name": "Random Writes: Remove Edge",
         "time_elapsed": 17.15548300743103,
         "count_iterations": 1,
@@ -1764,8 +1764,8 @@
         "write_requests_per_second": 7949.586726350192
     },
     {
-        "database": "MySQL",
         "dataset": "PatentCitations",
+        "database": "MySQL",
         "benchmark_name": "Random Writes: Upsert Edge",
         "time_elapsed": 33.88966488838196,
         "count_iterations": 1,
@@ -1800,8 +1800,8 @@
         "write_requests_per_second": 4834.807323697408
     },
     {
-        "database": "MySQL",
         "dataset": "PatentCitations",
+        "database": "MySQL",
         "benchmark_name": "Random Writes: Remove Edges Batch",
         "time_elapsed": 17.31362795829773,
         "count_iterations": 1,
@@ -1836,8 +1836,8 @@
         "write_requests_per_second": 10900.488358336861
     },
     {
-        "database": "MySQL",
         "dataset": "PatentCitations",
+        "database": "MySQL",
         "benchmark_name": "Random Writes: Upsert Edges Batch",
         "time_elapsed": 4.406773090362549,
         "count_iterations": 1,
@@ -1872,8 +1872,8 @@
         "write_requests_per_second": 14056.997882526248
     },
     {
-        "database": "PostgreSQL",
         "dataset": "PatentCitations",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Find Specific Edge",
         "time_elapsed": 18.833189010620117,
         "count_iterations": 1,
@@ -1908,8 +1908,8 @@
         "write_requests_per_second": 131.47003402364692
     },
     {
-        "database": "PostgreSQL",
         "dataset": "PatentCitations",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Find Ingoing Edges",
         "time_elapsed": 32.82566785812378,
         "count_iterations": 1,
@@ -1944,8 +1944,8 @@
         "write_requests_per_second": 19.466473698626018
     },
     {
-        "database": "PostgreSQL",
         "dataset": "PatentCitations",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Find Connected Edges",
         "time_elapsed": 35.52678179740906,
         "count_iterations": 1,
@@ -1980,8 +1980,8 @@
         "write_requests_per_second": 13.370194990041046
     },
     {
-        "database": "PostgreSQL",
         "dataset": "PatentCitations",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Find Friends",
         "time_elapsed": 31.885578870773315,
         "count_iterations": 1,
@@ -2016,8 +2016,8 @@
         "write_requests_per_second": 13.736617477610727
     },
     {
-        "database": "PostgreSQL",
         "dataset": "PatentCitations",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Count Friends",
         "time_elapsed": 29.87130069732666,
         "count_iterations": 1,
@@ -2052,8 +2052,8 @@
         "write_requests_per_second": 28.924083646525773
     },
     {
-        "database": "PostgreSQL",
         "dataset": "PatentCitations",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Count Followers",
         "time_elapsed": 25.930495262145996,
         "count_iterations": 1,
@@ -2088,8 +2088,8 @@
         "write_requests_per_second": 74.00552826314141
     },
     {
-        "database": "PostgreSQL",
         "dataset": "PatentCitations",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Writes: Remove Edge",
         "time_elapsed": 11.829405307769775,
         "count_iterations": 1,
@@ -2124,8 +2124,8 @@
         "write_requests_per_second": 874.8537843405013
     },
     {
-        "database": "PostgreSQL",
         "dataset": "PatentCitations",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Writes: Upsert Edge",
         "time_elapsed": 25.07697319984436,
         "count_iterations": 1,
@@ -2160,8 +2160,8 @@
         "write_requests_per_second": 1580.1348784886818
     },
     {
-        "database": "PostgreSQL",
         "dataset": "PatentCitations",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Writes: Remove Edges Batch",
         "time_elapsed": 8.4142427444458,
         "count_iterations": 1,
@@ -2196,8 +2196,8 @@
         "write_requests_per_second": 1475.5932740585288
     },
     {
-        "database": "PostgreSQL",
         "dataset": "PatentCitations",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Writes: Upsert Edges Batch",
         "time_elapsed": 5.201230764389038,
         "count_iterations": 1,
@@ -2232,8 +2232,8 @@
         "write_requests_per_second": 3393.4275942615777
     },
     {
-        "database": "MongoDB",
         "dataset": "MouseGenes",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Find Specific Edge",
         "time_elapsed": 60.00320315361023,
         "count_iterations": 1,
@@ -2268,8 +2268,8 @@
         "write_requests_per_second": 47.880777175262175
     },
     {
-        "database": "MongoDB",
         "dataset": "MouseGenes",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Find Ingoing Edges",
         "time_elapsed": 45.12699794769287,
         "count_iterations": 1,
@@ -2304,8 +2304,8 @@
         "write_requests_per_second": 23.84381964089882
     },
     {
-        "database": "MongoDB",
         "dataset": "MouseGenes",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Find Connected Edges",
         "time_elapsed": 60.025423765182495,
         "count_iterations": 1,
@@ -2340,8 +2340,8 @@
         "write_requests_per_second": 82.04856694167525
     },
     {
-        "database": "MongoDB",
         "dataset": "MouseGenes",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Find Friends",
         "time_elapsed": 60.0104660987854,
         "count_iterations": 1,
@@ -2376,8 +2376,8 @@
         "write_requests_per_second": 74.55366190016233
     },
     {
-        "database": "MongoDB",
         "dataset": "MouseGenes",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Count Friends",
         "time_elapsed": 60.03496980667114,
         "count_iterations": 1,
@@ -2412,8 +2412,8 @@
         "write_requests_per_second": 64.39580152117286
     },
     {
-        "database": "MongoDB",
         "dataset": "MouseGenes",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Count Followers",
         "time_elapsed": 14.054862022399902,
         "count_iterations": 1,
@@ -2448,8 +2448,8 @@
         "write_requests_per_second": 246.24930465230037
     },
     {
-        "database": "MongoDB",
         "dataset": "MouseGenes",
+        "database": "MongoDB",
         "benchmark_name": "Random Writes: Remove Edge",
         "time_elapsed": 11.577712297439575,
         "count_iterations": 1,
@@ -2484,8 +2484,8 @@
         "write_requests_per_second": 403.79307067717355
     },
     {
-        "database": "MongoDB",
         "dataset": "MouseGenes",
+        "database": "MongoDB",
         "benchmark_name": "Random Writes: Upsert Edge",
         "time_elapsed": 4.32820725440979,
         "count_iterations": 1,
@@ -2520,8 +2520,8 @@
         "write_requests_per_second": 279.7925165820499
     },
     {
-        "database": "MongoDB",
         "dataset": "MouseGenes",
+        "database": "MongoDB",
         "benchmark_name": "Random Writes: Remove Edges Batch",
         "time_elapsed": 1.1914689540863037,
         "count_iterations": 1,
@@ -2556,8 +2556,8 @@
         "write_requests_per_second": 499.38355335182433
     },
     {
-        "database": "MongoDB",
         "dataset": "MouseGenes",
+        "database": "MongoDB",
         "benchmark_name": "Random Writes: Upsert Edges Batch",
         "time_elapsed": 2.157870054244995,
         "count_iterations": 1,
@@ -2592,8 +2592,8 @@
         "write_requests_per_second": 371.66278776717496
     },
     {
-        "database": "SQLite",
         "dataset": "MouseGenes",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Find Specific Edge",
         "time_elapsed": 29.74419403076172,
         "count_iterations": 1,
@@ -2628,8 +2628,8 @@
         "write_requests_per_second": 20.54182404028491
     },
     {
-        "database": "SQLite",
         "dataset": "MouseGenes",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Find Ingoing Edges",
         "time_elapsed": 60.017443895339966,
         "count_iterations": 1,
@@ -2664,8 +2664,8 @@
         "write_requests_per_second": 20.827278185651885
     },
     {
-        "database": "SQLite",
         "dataset": "MouseGenes",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Find Connected Edges",
         "time_elapsed": 60.00237011909485,
         "count_iterations": 1,
@@ -2700,8 +2700,8 @@
         "write_requests_per_second": 17.14932256771864
     },
     {
-        "database": "SQLite",
         "dataset": "MouseGenes",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Find Friends",
         "time_elapsed": 60.03394293785095,
         "count_iterations": 1,
@@ -2736,8 +2736,8 @@
         "write_requests_per_second": 18.57282639513256
     },
     {
-        "database": "SQLite",
         "dataset": "MouseGenes",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Count Friends",
         "time_elapsed": 46.289791107177734,
         "count_iterations": 1,
@@ -2772,8 +2772,8 @@
         "write_requests_per_second": 18.14654980954859
     },
     {
-        "database": "SQLite",
         "dataset": "MouseGenes",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Count Followers",
         "time_elapsed": 21.15040898323059,
         "count_iterations": 1,
@@ -2808,8 +2808,8 @@
         "write_requests_per_second": 26.382468558523783
     },
     {
-        "database": "SQLite",
         "dataset": "MouseGenes",
+        "database": "SQLite",
         "benchmark_name": "Random Writes: Remove Edge",
         "time_elapsed": 24.909061908721924,
         "count_iterations": 1,
@@ -2844,8 +2844,8 @@
         "write_requests_per_second": 2519.0832248093916
     },
     {
-        "database": "SQLite",
         "dataset": "MouseGenes",
+        "database": "SQLite",
         "benchmark_name": "Random Writes: Upsert Edge",
         "time_elapsed": 25.582440853118896,
         "count_iterations": 1,
@@ -2880,8 +2880,8 @@
         "write_requests_per_second": 3635.6186860356165
     },
     {
-        "database": "SQLite",
         "dataset": "MouseGenes",
+        "database": "SQLite",
         "benchmark_name": "Random Writes: Remove Edges Batch",
         "time_elapsed": 16.808056116104126,
         "count_iterations": 1,
@@ -2916,8 +2916,8 @@
         "write_requests_per_second": 5407.406982233861
     },
     {
-        "database": "SQLite",
         "dataset": "MouseGenes",
+        "database": "SQLite",
         "benchmark_name": "Random Writes: Upsert Edges Batch",
         "time_elapsed": 3.0139000415802,
         "count_iterations": 1,
@@ -2952,8 +2952,8 @@
         "write_requests_per_second": 10238.229395232878
     },
     {
-        "database": "MySQL",
         "dataset": "MouseGenes",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Find Specific Edge",
         "time_elapsed": 21.56766390800476,
         "count_iterations": 1,
@@ -2988,8 +2988,8 @@
         "write_requests_per_second": 322.38076546711295
     },
     {
-        "database": "MySQL",
         "dataset": "MouseGenes",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Find Ingoing Edges",
         "time_elapsed": 60.007028341293335,
         "count_iterations": 1,
@@ -3024,8 +3024,8 @@
         "write_requests_per_second": 33.44608215866106
     },
     {
-        "database": "MySQL",
         "dataset": "MouseGenes",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Find Connected Edges",
         "time_elapsed": 60.03520107269287,
         "count_iterations": 1,
@@ -3060,8 +3060,8 @@
         "write_requests_per_second": 10.243990009383577
     },
     {
-        "database": "MySQL",
         "dataset": "MouseGenes",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Find Friends",
         "time_elapsed": 60.00772714614868,
         "count_iterations": 1,
@@ -3096,8 +3096,8 @@
         "write_requests_per_second": 10.298673677389287
     },
     {
-        "database": "MySQL",
         "dataset": "MouseGenes",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Count Friends",
         "time_elapsed": 60.10411477088928,
         "count_iterations": 1,
@@ -3132,8 +3132,8 @@
         "write_requests_per_second": 10.448535884670651
     },
     {
-        "database": "MySQL",
         "dataset": "MouseGenes",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Count Followers",
         "time_elapsed": 57.43730926513672,
         "count_iterations": 1,
@@ -3168,8 +3168,8 @@
         "write_requests_per_second": 10.411351221896007
     },
     {
-        "database": "MySQL",
         "dataset": "MouseGenes",
+        "database": "MySQL",
         "benchmark_name": "Random Writes: Remove Edge",
         "time_elapsed": 14.09481692314148,
         "count_iterations": 1,
@@ -3204,8 +3204,8 @@
         "write_requests_per_second": 9017.9958131496
     },
     {
-        "database": "MySQL",
         "dataset": "MouseGenes",
+        "database": "MySQL",
         "benchmark_name": "Random Writes: Upsert Edge",
         "time_elapsed": 26.1766037940979,
         "count_iterations": 1,
@@ -3240,8 +3240,8 @@
         "write_requests_per_second": 6389.789955781551
     },
     {
-        "database": "MySQL",
         "dataset": "MouseGenes",
+        "database": "MySQL",
         "benchmark_name": "Random Writes: Remove Edges Batch",
         "time_elapsed": 16.42271399497986,
         "count_iterations": 1,
@@ -3276,8 +3276,8 @@
         "write_requests_per_second": 11603.015193362606
     },
     {
-        "database": "MySQL",
         "dataset": "MouseGenes",
+        "database": "MySQL",
         "benchmark_name": "Random Writes: Upsert Edges Batch",
         "time_elapsed": 4.517615079879761,
         "count_iterations": 1,
@@ -3312,8 +3312,8 @@
         "write_requests_per_second": 13499.379411851785
     },
     {
-        "database": "PostgreSQL",
         "dataset": "MouseGenes",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Find Specific Edge",
         "time_elapsed": 47.591089963912964,
         "count_iterations": 1,
@@ -3348,8 +3348,8 @@
         "write_requests_per_second": 77.76665764130152
     },
     {
-        "database": "PostgreSQL",
         "dataset": "MouseGenes",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Find Ingoing Edges",
         "time_elapsed": 60.013901233673096,
         "count_iterations": 1,
@@ -3384,8 +3384,8 @@
         "write_requests_per_second": 52.787769747960866
     },
     {
-        "database": "PostgreSQL",
         "dataset": "MouseGenes",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Find Connected Edges",
         "time_elapsed": 60.05498695373535,
         "count_iterations": 1,
@@ -3420,8 +3420,8 @@
         "write_requests_per_second": 32.83657361409757
     },
     {
-        "database": "PostgreSQL",
         "dataset": "MouseGenes",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Find Friends",
         "time_elapsed": 60.00684595108032,
         "count_iterations": 1,
@@ -3456,8 +3456,8 @@
         "write_requests_per_second": 24.797170663045172
     },
     {
-        "database": "PostgreSQL",
         "dataset": "MouseGenes",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Count Friends",
         "time_elapsed": 60.0061092376709,
         "count_iterations": 1,
@@ -3492,8 +3492,8 @@
         "write_requests_per_second": 18.464786570504973
     },
     {
-        "database": "PostgreSQL",
         "dataset": "MouseGenes",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Count Followers",
         "time_elapsed": 14.7014000415802,
         "count_iterations": 1,
@@ -3528,8 +3528,8 @@
         "write_requests_per_second": 30.813391834707783
     },
     {
-        "database": "PostgreSQL",
         "dataset": "MouseGenes",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Writes: Remove Edge",
         "time_elapsed": 10.365861892700195,
         "count_iterations": 1,
@@ -3564,8 +3564,8 @@
         "write_requests_per_second": 1081.0485530288074
     },
     {
-        "database": "PostgreSQL",
         "dataset": "MouseGenes",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Writes: Upsert Edge",
         "time_elapsed": 22.348591327667236,
         "count_iterations": 1,
@@ -3600,8 +3600,8 @@
         "write_requests_per_second": 1354.6267662302823
     },
     {
-        "database": "PostgreSQL",
         "dataset": "MouseGenes",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Writes: Remove Edges Batch",
         "time_elapsed": 7.441729784011841,
         "count_iterations": 1,
@@ -3636,8 +3636,8 @@
         "write_requests_per_second": 2410.192323636171
     },
     {
-        "database": "PostgreSQL",
         "dataset": "MouseGenes",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Writes: Upsert Edges Batch",
         "time_elapsed": 4.788177013397217,
         "count_iterations": 1,
@@ -3672,8 +3672,8 @@
         "write_requests_per_second": 1912.4188546870573
     },
     {
-        "database": "MongoDB",
         "dataset": "HumanBrain",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Find Specific Edge",
         "time_elapsed": 60.02103805541992,
         "count_iterations": 1,
@@ -3708,8 +3708,8 @@
         "write_requests_per_second": 10.329711382657663
     },
     {
-        "database": "MongoDB",
         "dataset": "HumanBrain",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Find Ingoing Edges",
         "time_elapsed": 60.03459405899048,
         "count_iterations": 1,
@@ -3744,8 +3744,8 @@
         "write_requests_per_second": 16.9402328097811
     },
     {
-        "database": "MongoDB",
         "dataset": "HumanBrain",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Find Connected Edges",
         "time_elapsed": 60.0864782333374,
         "count_iterations": 1,
@@ -3780,8 +3780,8 @@
         "write_requests_per_second": 18.589873010401565
     },
     {
-        "database": "MongoDB",
         "dataset": "HumanBrain",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Find Friends",
         "time_elapsed": 60.043928146362305,
         "count_iterations": 1,
@@ -3816,8 +3816,8 @@
         "write_requests_per_second": 16.85432701093709
     },
     {
-        "database": "MongoDB",
         "dataset": "HumanBrain",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Count Friends",
         "time_elapsed": 60.00316095352173,
         "count_iterations": 1,
@@ -3852,8 +3852,8 @@
         "write_requests_per_second": 46.0475740959749
     },
     {
-        "database": "MongoDB",
         "dataset": "HumanBrain",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Count Followers",
         "time_elapsed": 60.00715088844299,
         "count_iterations": 1,
@@ -3888,8 +3888,8 @@
         "write_requests_per_second": 71.64146166499567
     },
     {
-        "database": "MongoDB",
         "dataset": "HumanBrain",
+        "database": "MongoDB",
         "benchmark_name": "Random Writes: Remove Edge",
         "time_elapsed": 20.76254892349243,
         "count_iterations": 1,
@@ -3924,8 +3924,8 @@
         "write_requests_per_second": 443.87613649749284
     },
     {
-        "database": "MongoDB",
         "dataset": "HumanBrain",
+        "database": "MongoDB",
         "benchmark_name": "Random Writes: Upsert Edge",
         "time_elapsed": 6.782750844955444,
         "count_iterations": 1,
@@ -3960,8 +3960,8 @@
         "write_requests_per_second": 224.2453002871568
     },
     {
-        "database": "MongoDB",
         "dataset": "HumanBrain",
+        "database": "MongoDB",
         "benchmark_name": "Random Writes: Remove Edges Batch",
         "time_elapsed": 1.9358398914337158,
         "count_iterations": 1,
@@ -3996,8 +3996,8 @@
         "write_requests_per_second": 261.90182475499415
     },
     {
-        "database": "MongoDB",
         "dataset": "HumanBrain",
+        "database": "MongoDB",
         "benchmark_name": "Random Writes: Upsert Edges Batch",
         "time_elapsed": 2.906803846359253,
         "count_iterations": 1,
@@ -4032,8 +4032,8 @@
         "write_requests_per_second": 260.42348916943126
     },
     {
-        "database": "SQLite",
         "dataset": "HumanBrain",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Find Specific Edge",
         "time_elapsed": 60.30744004249573,
         "count_iterations": 1,
@@ -4068,8 +4068,8 @@
         "write_requests_per_second": 16.415884993665706
     },
     {
-        "database": "SQLite",
         "dataset": "HumanBrain",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Find Ingoing Edges",
         "time_elapsed": 60.00170707702637,
         "count_iterations": 1,
@@ -4104,8 +4104,8 @@
         "write_requests_per_second": 16.349534834744862
     },
     {
-        "database": "SQLite",
         "dataset": "HumanBrain",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Find Connected Edges",
         "time_elapsed": 60.005932092666626,
         "count_iterations": 1,
@@ -4140,8 +4140,8 @@
         "write_requests_per_second": 14.215261229218466
     },
     {
-        "database": "SQLite",
         "dataset": "HumanBrain",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Find Friends",
         "time_elapsed": 60.01316213607788,
         "count_iterations": 1,
@@ -4176,8 +4176,8 @@
         "write_requests_per_second": 15.64656762912856
     },
     {
-        "database": "SQLite",
         "dataset": "HumanBrain",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Count Friends",
         "time_elapsed": 60.073866844177246,
         "count_iterations": 1,
@@ -4212,8 +4212,8 @@
         "write_requests_per_second": 14.748509569030297
     },
     {
-        "database": "SQLite",
         "dataset": "HumanBrain",
+        "database": "SQLite",
         "benchmark_name": "Random Reads: Count Followers",
         "time_elapsed": 60.05954027175903,
         "count_iterations": 1,
@@ -4248,8 +4248,8 @@
         "write_requests_per_second": 40.426549870573766
     },
     {
-        "database": "SQLite",
         "dataset": "HumanBrain",
+        "database": "SQLite",
         "benchmark_name": "Random Writes: Remove Edge",
         "time_elapsed": 32.959452867507935,
         "count_iterations": 1,
@@ -4284,8 +4284,8 @@
         "write_requests_per_second": 2070.665440787101
     },
     {
-        "database": "SQLite",
         "dataset": "HumanBrain",
+        "database": "SQLite",
         "benchmark_name": "Random Writes: Upsert Edge",
         "time_elapsed": 29.94628620147705,
         "count_iterations": 1,
@@ -4320,8 +4320,8 @@
         "write_requests_per_second": 3185.369943979733
     },
     {
-        "database": "SQLite",
         "dataset": "HumanBrain",
+        "database": "SQLite",
         "benchmark_name": "Random Writes: Remove Edges Batch",
         "time_elapsed": 16.52064609527588,
         "count_iterations": 1,
@@ -4356,8 +4356,8 @@
         "write_requests_per_second": 5473.756866316427
     },
     {
-        "database": "SQLite",
         "dataset": "HumanBrain",
+        "database": "SQLite",
         "benchmark_name": "Random Writes: Upsert Edges Batch",
         "time_elapsed": 2.757688045501709,
         "count_iterations": 1,
@@ -4392,8 +4392,8 @@
         "write_requests_per_second": 10885.56773089924
     },
     {
-        "database": "MySQL",
         "dataset": "HumanBrain",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Find Specific Edge",
         "time_elapsed": 21.702831745147705,
         "count_iterations": 1,
@@ -4428,8 +4428,8 @@
         "write_requests_per_second": 14.422081121740263
     },
     {
-        "database": "MySQL",
         "dataset": "HumanBrain",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Find Ingoing Edges",
         "time_elapsed": 60.00159478187561,
         "count_iterations": 1,
@@ -4464,8 +4464,8 @@
         "write_requests_per_second": 14.3996172625229
     },
     {
-        "database": "MySQL",
         "dataset": "HumanBrain",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Find Connected Edges",
         "time_elapsed": 60.005767822265625,
         "count_iterations": 1,
@@ -4500,8 +4500,8 @@
         "write_requests_per_second": 11.548889800937715
     },
     {
-        "database": "MySQL",
         "dataset": "HumanBrain",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Find Friends",
         "time_elapsed": 60.009514808654785,
         "count_iterations": 1,
@@ -4536,8 +4536,8 @@
         "write_requests_per_second": 18.897003310489197
     },
     {
-        "database": "MySQL",
         "dataset": "HumanBrain",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Count Friends",
         "time_elapsed": 60.002485036849976,
         "count_iterations": 1,
@@ -4572,8 +4572,8 @@
         "write_requests_per_second": 15.416028176698344
     },
     {
-        "database": "MySQL",
         "dataset": "HumanBrain",
+        "database": "MySQL",
         "benchmark_name": "Random Reads: Count Followers",
         "time_elapsed": 46.62800097465515,
         "count_iterations": 1,
@@ -4608,8 +4608,8 @@
         "write_requests_per_second": 14.197477613501658
     },
     {
-        "database": "MySQL",
         "dataset": "HumanBrain",
+        "database": "MySQL",
         "benchmark_name": "Random Writes: Remove Edge",
         "time_elapsed": 13.98912787437439,
         "count_iterations": 1,
@@ -4644,8 +4644,8 @@
         "write_requests_per_second": 9875.669251195426
     },
     {
-        "database": "MySQL",
         "dataset": "HumanBrain",
+        "database": "MySQL",
         "benchmark_name": "Random Writes: Upsert Edge",
         "time_elapsed": 38.10666608810425,
         "count_iterations": 1,
@@ -4680,8 +4680,8 @@
         "write_requests_per_second": 5074.676424143205
     },
     {
-        "database": "MySQL",
         "dataset": "HumanBrain",
+        "database": "MySQL",
         "benchmark_name": "Random Writes: Remove Edges Batch",
         "time_elapsed": 17.843208074569702,
         "count_iterations": 1,
@@ -4716,8 +4716,8 @@
         "write_requests_per_second": 12023.11821413726
     },
     {
-        "database": "MySQL",
         "dataset": "HumanBrain",
+        "database": "MySQL",
         "benchmark_name": "Random Writes: Upsert Edges Batch",
         "time_elapsed": 4.421798944473267,
         "count_iterations": 1,
@@ -4752,8 +4752,8 @@
         "write_requests_per_second": 13355.650209698728
     },
     {
-        "database": "PostgreSQL",
         "dataset": "HumanBrain",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Find Specific Edge",
         "time_elapsed": 30.028931140899658,
         "count_iterations": 1,
@@ -4788,8 +4788,8 @@
         "write_requests_per_second": 18.58207997420192
     },
     {
-        "database": "PostgreSQL",
         "dataset": "HumanBrain",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Find Ingoing Edges",
         "time_elapsed": 60.101929903030396,
         "count_iterations": 1,
@@ -4824,8 +4824,8 @@
         "write_requests_per_second": 12.14603260124585
     },
     {
-        "database": "PostgreSQL",
         "dataset": "HumanBrain",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Find Connected Edges",
         "time_elapsed": 60.04023194313049,
         "count_iterations": 1,
@@ -4860,8 +4860,8 @@
         "write_requests_per_second": 21.985258172391653
     },
     {
-        "database": "PostgreSQL",
         "dataset": "HumanBrain",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Find Friends",
         "time_elapsed": 60.038249015808105,
         "count_iterations": 1,
@@ -4896,8 +4896,8 @@
         "write_requests_per_second": 45.854102095401444
     },
     {
-        "database": "PostgreSQL",
         "dataset": "HumanBrain",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Count Friends",
         "time_elapsed": 60.18382501602173,
         "count_iterations": 1,
@@ -4932,8 +4932,8 @@
         "write_requests_per_second": 21.816493046935154
     },
     {
-        "database": "PostgreSQL",
         "dataset": "HumanBrain",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Reads: Count Followers",
         "time_elapsed": 60.002673864364624,
         "count_iterations": 1,
@@ -4968,8 +4968,8 @@
         "write_requests_per_second": 61.597254954916956
     },
     {
-        "database": "PostgreSQL",
         "dataset": "HumanBrain",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Writes: Remove Edge",
         "time_elapsed": 14.70626711845398,
         "count_iterations": 1,
@@ -5004,8 +5004,8 @@
         "write_requests_per_second": 705.5495399631225
     },
     {
-        "database": "PostgreSQL",
         "dataset": "HumanBrain",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Writes: Upsert Edge",
         "time_elapsed": 25.36452007293701,
         "count_iterations": 1,
@@ -5040,8 +5040,8 @@
         "write_requests_per_second": 1691.5360462813574
     },
     {
-        "database": "PostgreSQL",
         "dataset": "HumanBrain",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Writes: Remove Edges Batch",
         "time_elapsed": 8.878719806671143,
         "count_iterations": 1,
@@ -5076,8 +5076,8 @@
         "write_requests_per_second": 1193.978437300702
     },
     {
-        "database": "PostgreSQL",
         "dataset": "HumanBrain",
+        "database": "PostgreSQL",
         "benchmark_name": "Random Writes: Upsert Edges Batch",
         "time_elapsed": 3.994781255722046,
         "count_iterations": 1,
@@ -5112,8 +5112,8 @@
         "write_requests_per_second": 1703.9731500316288
     },
     {
-        "database": "MongoDB",
         "dataset": "PatentCitations",
+        "database": "MongoDB",
         "benchmark_name": "Random Reads: Find Specific Edge",
         "time_elapsed": 32.47554898262024,
         "count_iterations": 1,
@@ -5148,8 +5148,8 @@
         "write_requests_per_second": 18.41385346003014
     },
     {
-        "database": "MongoDB",
         "dataset": "PatentCitations",
+        "database": "MongoDB",
         "benchmark_name": "Random Writes: Remove Edge",
         "time_elapsed": 14.522772073745728,
         "count_iterations": 1,
@@ -5184,8 +5184,8 @@
         "write_requests_per_second": 239.41710180012547
     },
     {
-        "database": "MongoDB",
         "dataset": "PatentCitations",
+        "database": "MongoDB",
         "benchmark_name": "Random Writes: Upsert Edge",
         "time_elapsed": 4.964082956314087,
         "count_iterations": 1,
@@ -5220,8 +5220,8 @@
         "write_requests_per_second": 229.6496674274897
     },
     {
-        "database": "MongoDB",
         "dataset": "PatentCitations",
+        "database": "MongoDB",
         "benchmark_name": "Random Writes: Remove Edges Batch",
         "time_elapsed": 1.1372780799865723,
         "count_iterations": 1,
@@ -5256,8 +5256,8 @@
         "write_requests_per_second": 239.1675393965313
     },
     {
-        "database": "MongoDB",
         "dataset": "PatentCitations",
+        "database": "MongoDB",
         "benchmark_name": "Random Writes: Upsert Edges Batch",
         "time_elapsed": 1.9188838005065918,
         "count_iterations": 1,
@@ -5292,8 +5292,8 @@
         "write_requests_per_second": 241.80724225067846
     },
     {
-        "database": "SQLite",
         "dataset": "PatentCitations",
+        "database": "SQLite",
         "benchmark_name": "Random Writes: Remove Edge",
         "time_elapsed": 27.917782068252563,
         "count_iterations": 1,
@@ -5328,8 +5328,8 @@
         "write_requests_per_second": 2222.7410418310533
     },
     {
-        "database": "SQLite",
         "dataset": "PatentCitations",
+        "database": "SQLite",
         "benchmark_name": "Random Writes: Upsert Edge",
         "time_elapsed": 22.563986778259277,
         "count_iterations": 1,
@@ -5364,8 +5364,8 @@
         "write_requests_per_second": 4016.0456080089416
     },
     {
-        "database": "SQLite",
         "dataset": "PatentCitations",
+        "database": "SQLite",
         "benchmark_name": "Random Writes: Remove Edges Batch",
         "time_elapsed": 17.18258309364319,
         "count_iterations": 1,
@@ -5400,8 +5400,8 @@
         "write_requests_per_second": 5189.208136754876
     },
     {
-        "database": "SQLite",
         "dataset": "PatentCitations",
+        "database": "SQLite",
         "benchmark_name": "Random Writes: Upsert Edges Batch",
         "time_elapsed": 2.6605100631713867,
         "count_iterations": 1,
