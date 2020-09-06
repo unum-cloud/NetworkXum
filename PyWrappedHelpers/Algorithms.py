@@ -72,31 +72,31 @@ def yield_edges_from_csv(filepath: str, edge_type: type = Edge, is_directed=True
             yield edge_type(first=first, second=second, weight=w, _id=idx, is_directed=is_directed)
 
 
-def yield_texts_from_sectioned_csv(filepath: str) -> Generator[Text, None, None]:
+def yield_texts_from_csv(filepath: str, text_column: int, id_column: int = None) -> Generator[Text, None, None]:
     last_text = str()
-    last_path = str()
+    last_id = 0
     allow_big_csv_fields()
 
     with open(filepath, 'r') as f:
-        reader = csv.reader(f, delimiter=',')
+        reader = csv.reader(f)
         # Skip the header line.
         next(reader)
         for idx, columns in enumerate(reader):
             if len(columns) < 4:
                 continue
-            new_article_id = str(columns[0])
-            new_text = str(columns[3])
+            new_id = str(columns[id_column]) if id_column else (last_id + 1)
+            new_text = str(columns[text_column])
 
-            if new_article_id != last_path:
+            if new_id != last_id:
                 if len(last_text) > 0:
-                    yield Text(idx, last_text)
-                last_path = new_article_id
+                    yield Text(last_id, last_text)
+                last_id = new_id
                 last_text = new_text
             else:
                 last_text += new_text
 
         if len(last_text) > 0:
-            yield Text(idx, last_text)
+            yield Text(last_id, last_text)
 
 
 def yield_texts_from_directory(directory: str) -> Generator[Text, None, None]:

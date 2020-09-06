@@ -107,7 +107,7 @@ SSDs have a relatively short lifespan, especially new high-capacity technologies
 Most DBs don't have high-performance bulk I/O options. 
 It means, that when you import the data there is no way to inform the DB about various properties of the imported dataset. 
 Which in turn results in huge write-amplification. 
-Combine this with inefficient and slow built-in compression and you prepare to give all your money to AWS!
+Combine this with inefficient and slow built-in compression and prepare to give all your money to AWS!
 
 
 ![Import Overhead - Total Bytes Written](Import_Overhead_-_Total_Bytes_Written.svg)

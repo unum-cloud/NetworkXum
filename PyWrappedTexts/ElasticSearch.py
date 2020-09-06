@@ -59,15 +59,15 @@ class ElasticSearch(BaseAPI):
         return super().add(one_or_many_texts, upsert=upsert)
 
     def remove(self, one_or_many_texts, sync=True) -> int:
-        if isinstance(one_or_many_texts, Text):
+        if isinstance(one_or_many_texts, int):
             result = self.elastic.delete(
-                index=self.db_name, id=one_or_many_texts._id)
+                index=self.db_name, id=one_or_many_texts)
             result = result.pop('result', None)
             success = (result == 'deleted')
             if sync and success:
                 self.commit_all()
             return success
-        elif is_sequence_of(one_or_many_texts, Text):
+        elif is_sequence_of(one_or_many_texts, int):
             statuses = [self.remove(t, sync=False) for t in one_or_many_texts]
             cnt = int(sum(statuses))
             if sync and cnt:
@@ -103,7 +103,7 @@ class ElasticSearch(BaseAPI):
         query_dict = {
             'query': {
                 'match': {
-                    field: {
+                    'content': {
                         'query': query,
                         'operator': 'and',
                         'zero_terms_query': 'all',
@@ -116,7 +116,7 @@ class ElasticSearch(BaseAPI):
         # query_dict = {
         #     'query': {
         #         'match_phrase': {
-        #             field: query,
+        #             'content': query,
         #         },
         #     },
         #     'stored_fields': [],
@@ -143,7 +143,7 @@ class ElasticSearch(BaseAPI):
         query_dict = {
             'query': {
                 'regexp': {
-                    field: {
+                    'content': {
                         'value': query,
                         'flags': 'INTERVAL',
                     },
@@ -186,11 +186,10 @@ class ElasticSearch(BaseAPI):
             for t in stream:
                 self.add(t, upsert=True, sync=False)
                 cnt_success += 1
-            self.commit_all()
         else:
             def produce_validated():
-                for text in stream:
-                    yield text.__dict__
+                for t in stream:
+                    yield t.__dict__
             for ok, action in streaming_bulk(
                 client=self.elastic,
                 index=self.db_name,
@@ -198,6 +197,7 @@ class ElasticSearch(BaseAPI):
             ):
                 cnt_success += ok
         #
+        self.commit_all()
         return cnt_success
 
     def clear(self):
@@ -240,9 +240,9 @@ class ElasticSearch(BaseAPI):
 
     def parse_match(self, hit: dict) -> TextMatch:
         return TextMatch(
-            _id=hit.pop('_id', 0),
-            content=hit.pop('_source', ''),
-            rating=hit.pop('_score', 1),
+            _id=int(hit.pop('_id', 0)),
+            content=hit.pop('_source', {}).pop('content', ''),
+            rating=float(hit.pop('_score', 1)),
         )
 
 
