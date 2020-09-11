@@ -1,16 +1,11 @@
 from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence, Generator
 from itertools import groupby, count, filterfalse, chain
 import csv
-import time
-import concurrent
-import math
 from urllib.parse import urlparse
 import random
 from random import SystemRandom
 from pathlib import Path
 import collections
-
-from PyWrappedHelpers import *
 
 
 def is_sequence_of(objs, expected_class) -> bool:
@@ -54,56 +49,6 @@ def chunks(iterable, size) -> Generator[list, None, None]:
         current.append(v)
     if len(current) > 0:
         yield current
-
-
-def yield_edges_from_csv(filepath: str, edge_type: type = Edge, is_directed=True) -> Generator[Edge, None, None]:
-    with open(filepath, 'r') as f:
-        reader = csv.reader(f, delimiter=',')
-        # Skip the header line.
-        next(reader)
-        for idx, columns in enumerate(reader):
-            if len(columns) < 2:
-                continue
-            # Check if the data isn't corrupt.
-            first = int(columns[0])
-            second = int(columns[1])
-            has_weight = (len(columns) > 2 and len(columns[2]) > 0)
-            w = float(columns[2]) if has_weight else 1.0
-            yield edge_type(first=first, second=second, weight=w, _id=idx, is_directed=is_directed)
-
-
-def yield_texts_from_csv(filepath: str, text_column: int, id_column: int = None) -> Generator[Text, None, None]:
-    last_text = str()
-    last_id = 0
-    allow_big_csv_fields()
-
-    with open(filepath, 'r') as f:
-        reader = csv.reader(f)
-        # Skip the header line.
-        next(reader)
-        for idx, columns in enumerate(reader):
-            if len(columns) < 4:
-                continue
-            new_id = str(columns[id_column]) if id_column else (last_id + 1)
-            new_text = str(columns[text_column])
-
-            if new_id != last_id:
-                if len(last_text) > 0:
-                    yield Text(last_id, last_text)
-                last_id = new_id
-                last_text = new_text
-            else:
-                last_text += new_text
-
-        if len(last_text) > 0:
-            yield Text(last_id, last_text)
-
-
-def yield_texts_from_directory(directory: str) -> Generator[Text, None, None]:
-    idx = 0
-    for path in Path(directory).iterdir():
-        yield Text.from_file(path=path, _id=idx)
-        idx += 1
 
 
 def extract_database_name(url: str, default='graph') -> (str, str):

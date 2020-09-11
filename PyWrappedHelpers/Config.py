@@ -19,21 +19,3 @@ unumdb_purpose = '''
     2 GB/s isn't scary, but **most databases can hardly saturate 10% of that capacity (or 200 MB/s)** due to [read-amplification](http://smalldatum.blogspot.com/2015/11/read-write-space-amplification-pick-2_23.html) or random jumps.
     That's why it's crucial for us to store the data in the most capable database!
 '''
-
-
-def allow_big_csv_fields():
-    """
-        When dealing with big docs in ElasticSearch - 
-        an error may occur when bulk-loading:
-        >>> _csv.Error: field larger than field limit (131072)        
-    """
-    max_field_len = sys.maxsize
-    while True:
-        # decrease the max_field_len value by factor 10
-        # as long as the OverflowError occurs.
-        # https://stackoverflow.com/a/15063941/2766161
-        try:
-            csv.field_size_limit(max_field_len)
-            break
-        except OverflowError:
-            max_field_len = int(max_field_len/10)
