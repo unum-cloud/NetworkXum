@@ -51,9 +51,7 @@ class P2Import(object):
         print(f'--- file size:', bytes2str(file_size))
 
         def import_one() -> int:
-            g.add_edges_stream(yield_edges_from_csv(
-                dataset_path), upsert=False)
-            return g.number_of_edges()
+            return import_graph(g, dataset_path)
 
         counter = MicroBench(
             benchmark_name='Sequential Writes: Import CSV',
@@ -94,7 +92,7 @@ class P2Import(object):
         g = PseudoGraph()
         counter = MicroBench(
             benchmark_name='Sequential Writes: Import CSV',
-            func=lambda: g.add_edges_stream(yield_edges_from_csv(p)),
+            func=lambda: import_graph(g, p),
             database='Parsing in Python',
             dataset=dataset['name'],
             source=self.conf.default_stats_file,

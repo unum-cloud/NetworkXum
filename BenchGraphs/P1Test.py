@@ -58,16 +58,7 @@ class P1Test(object):
 
         gdb.clear()
         print(f'--- Bulk Insert')
-        gdb.add_edges_stream(yield_edges_from_csv(
-            self.conf.test_dataset['path']), upsert=False)
-        self.validate_contents(gdb)
-        gdb.clear()
-        self.validate_empty_edges(gdb)
-        self.validate_empty_nodes(gdb)
-
-        print(f'--- Bulk Upsert')
-        gdb.add_edges_stream(yield_edges_from_csv(
-            self.conf.test_dataset['path']), upsert=True)
+        import_graph(gdb, self.conf.test_dataset['path'])
         self.validate_contents(gdb)
         gdb.clear()
         self.validate_empty_edges(gdb)

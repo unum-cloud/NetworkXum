@@ -43,25 +43,25 @@ class MySQL(BaseSQL):
                 s.execute(p)
                 s.commit()
 
-    def add_bulk_from_path(self, path: str) -> int:
-        """
-            This method requires the file to be mounted on the same filesystem.
-            Unlike Postgres the connection wrapper doesn't allow channeling data to remote DB.            
-        """
-        cnt = self.number_of_edges()
-        pattern = '''
-        LOAD DATA LOCAL INFILE  '%s'
-        INTO TABLE %s
-        FIELDS TERMINATED BY ',' 
-        LINES TERMINATED BY '\n'
-        IGNORE 1 ROWS
-        (first, second, weight);
-        '''
-        task = pattern % (path, EdgeNewSQL.__tablename__)
-        with self.get_session() as s:
-            s.execute(task)
-            s.commit()
-        self.upsert_table(EdgeNewSQL.__tablename__)
-        self.clear_table(EdgeNewSQL.__tablename__)
-        self.add_missing_nodes()
-        return self.number_of_edges() - cnt
+    # def add_from_csv(self, path: str) -> int:
+    #     """
+    #         This method requires the file to be mounted on the same filesystem.
+    #         Unlike Postgres the connection wrapper doesn't allow channeling data to remote DB.
+    #     """
+    #     cnt = self.number_of_edges()
+    #     pattern = '''
+    #     LOAD DATA LOCAL INFILE  '%s'
+    #     INTO TABLE %s
+    #     FIELDS TERMINATED BY ','
+    #     LINES TERMINATED BY '\n'
+    #     IGNORE 1 ROWS
+    #     (first, second, weight);
+    #     '''
+    #     task = pattern % (path, EdgeNewSQL.__tablename__)
+    #     with self.get_session() as s:
+    #         s.execute(task)
+    #         s.commit()
+    #     self.upsert_table(EdgeNewSQL.__tablename__)
+    #     self.clear_table(EdgeNewSQL.__tablename__)
+    #     self.add_missing_nodes()
+    #     return self.number_of_edges() - cnt

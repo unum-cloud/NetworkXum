@@ -449,14 +449,14 @@ class Neo4J(BaseAPI):
         if f'constraint{self._e}' in cs:
             self.session.run(f'DROP CONSTRAINT constraint{self._e}')
 
-    def add_edges_stream(self, stream) -> int:
+    def add_stream(self, stream) -> int:
         chunk_len = Neo4J.__max_batch_size__
         count_edges_added = 0
         for es in chunks(stream, chunk_len):
             count_edges_added += self.insert_edges(es)
         return count_edges_added
 
-    def add_bulk_from_path(self, filepath: str, is_directed=True) -> int:
+    def add_from_csv(self, filepath: str, is_directed=True) -> int:
         """
             This function may be tricky to use!
 

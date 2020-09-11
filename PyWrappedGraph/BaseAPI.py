@@ -272,7 +272,7 @@ class BaseAPI(object):
 # region Bulk
 
     @abstractmethod
-    def add_edges_stream(self, stream, upsert=True) -> int:
+    def add_stream(self, stream, upsert=True) -> int:
         """
             Imports data from adjacency list CSV file. Row shape: `(first, second, weight)`.
             Uses the `biggest_edge_id` to generate incremental IDs for new edges.

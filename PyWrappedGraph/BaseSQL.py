@@ -303,9 +303,9 @@ class BaseSQL(BaseAPI):
             result += s.query(EdgeNewSQL).delete()
         return result
 
-    def add_edges_stream(self, stream, upsert=True) -> int:
+    def add_stream(self, stream, upsert=True) -> int:
         if upsert:
-            return super().add_edges_stream(stream, upsert=True)
+            return super().add_stream(stream, upsert=True)
 
         with self.get_session() as s:
             # Build the new table.

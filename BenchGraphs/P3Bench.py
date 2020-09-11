@@ -8,6 +8,7 @@ from PyWrappedGraph.BaseAPI import BaseAPI
 
 from P0Config import P0Config
 from P3TasksSampler import P3TasksSampler
+from PyWrappedHelpers import *
 
 
 class P3Bench(object):
@@ -323,8 +324,7 @@ class P3Bench(object):
         return c - self.gdb.number_of_edges()
 
     def import_bulk(self) -> int:
-        self.gdb.add_edges_stream(self.dataset_path)
-        return self.gdb.number_of_edges()
+        return import_graph(self.gdb, self.dataset_path)
 
 
 if __name__ == "__main__":
