@@ -33,14 +33,14 @@ def yield_edges_from_csv(filepath: str, edge_type: type = Edge, is_directed=True
         reader = csv.reader(f, delimiter=',')
         # Skip the header line.
         next(reader)
-        for idx, columns in enumerate(reader):
-            if len(columns) < 2:
+        for idx, row in enumerate(reader):
+            if len(row) < 2:
                 continue
             # Check if the data isn't corrupt.
-            first = int(columns[0])
-            second = int(columns[1])
-            has_weight = (len(columns) > 2 and len(columns[2]) > 0)
-            w = float(columns[2]) if has_weight else 1.0
+            first = int(row[0])
+            second = int(row[1])
+            has_weight = (len(row) > 2 and len(row[2]) > 0)
+            w = float(row[2]) if has_weight else 1.0
             yield edge_type(_id=idx, first=first, second=second, weight=w, is_directed=is_directed)
 
 
@@ -56,21 +56,17 @@ def import_graph(gdb, filepath: str) -> int:
 
 # region Texts
 
-def yield_texts_from_csv(filepath: str, column: int = 1, id_column: int = 0) -> Generator[Text, None, None]:
+def yield_texts_from_csv(filepath: str, column: str = 'content', id_column: str = None) -> Generator[Text, None, None]:
     last_text = str()
     last_id = 0
-    min_columns = max(column, id_column) + 1
     allow_big_csv_fields()
 
     with open(filepath, 'r') as f:
-        reader = csv.reader(f)
-        # Skip the header line.
-        next(reader)
-        for idx, columns in enumerate(reader):
-            if len(columns) < min_columns:
-                continue
-            new_id = str(columns[id_column]) if id_column else (last_id + 1)
-            new_text = str(columns[column])
+        reader = csv.DictReader(f)
+
+        for row in reader:
+            new_id = str(row[id_column]) if id_column else (last_id + 1)
+            new_text = str(row[column])
 
             if new_id != last_id:
                 if len(last_text) > 0:
