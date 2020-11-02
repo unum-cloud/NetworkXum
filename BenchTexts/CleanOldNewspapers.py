@@ -1,8 +1,9 @@
 import csv
 import sqlite3
 
-file_in = open('/Users/av/Datasets/UnumDB/Texts/OldNewspapers/all.tsv', 'r')
-file_out = open('/Users/av/Datasets/UnumDB/Texts/OldNewspapers/all.csv', 'w')
+file_in = open('/Users/av/Datasets/UnumDB/Articles/OldNewspapers/all.tsv', 'r')
+file_out = open(
+    '/Users/av/Datasets/UnumDB/Articles/OldNewspapers/all.csv', 'w')
 
 reader = csv.reader(file_in, delimiter='\t')
 writer = csv.writer(file_out, delimiter=',',
