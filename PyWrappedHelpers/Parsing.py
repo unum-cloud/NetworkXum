@@ -56,10 +56,10 @@ def import_graph(gdb, filepath: str) -> int:
 
 # region Texts
 
-def yield_texts_from_csv(filepath: str, text_column: int, id_column: int = None) -> Generator[Text, None, None]:
+def yield_texts_from_csv(filepath: str, column: int = 1, id_column: int = 0) -> Generator[Text, None, None]:
     last_text = str()
     last_id = 0
-    min_columns = max(text_column, id_column) + 1
+    min_columns = max(column, id_column) + 1
     allow_big_csv_fields()
 
     with open(filepath, 'r') as f:
@@ -70,7 +70,7 @@ def yield_texts_from_csv(filepath: str, text_column: int, id_column: int = None)
             if len(columns) < min_columns:
                 continue
             new_id = str(columns[id_column]) if id_column else (last_id + 1)
-            new_text = str(columns[text_column])
+            new_text = str(columns[column])
 
             if new_id != last_id:
                 if len(last_text) > 0:

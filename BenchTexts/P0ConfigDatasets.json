@@ -9,8 +9,8 @@
         "enabled": true
     },
     {
-        "name": "PoliticalTweets",
-        "path": "~/Datasets/UnumDB/Texts/PoliticalTweets/all.csv",
+        "name": "PoliticalTweetsIndia",
+        "path": "~/Datasets/UnumDB/Texts/PoliticalTweetsIndia/all.csv",
         "url": "https://www.kaggle.com/iamyoginth/facthub",
         "docs": 12488144,
         "sections": 12488144,
