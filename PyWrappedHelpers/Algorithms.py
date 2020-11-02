@@ -8,6 +8,9 @@ from pathlib import Path
 import collections
 
 
+from PyWrappedHelpers.Edge import Edge
+
+
 def is_sequence_of(objs, expected_class) -> bool:
     return isinstance(objs, collections.Sequence) and all([isinstance(obj, expected_class) for obj in objs])
 
@@ -51,7 +54,7 @@ def chunks(iterable, size) -> Generator[list, None, None]:
         yield current
 
 
-def extract_database_name(url: str, default='graph') -> (str, str):
+def extract_database_name(url: str, default='graph') -> Tuple[str, str]:
     url = urlparse(url)
     address = f'{url.scheme}://{url.netloc}'
 

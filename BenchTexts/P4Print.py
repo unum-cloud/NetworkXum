@@ -33,7 +33,7 @@ class P4Print():
         ]  # ins.subset().unique('database')
         dataset_names = [
             'Covid19',
-            'PoliticalTweets',
+            'PoliticalTweetsIndia',
             'EnglishWikipedia',
         ]  # ins.subset().unique('dataset')
         dataset_for_comparison = 'Covid19'
@@ -53,7 +53,7 @@ class P4Print():
             * Documents: 45,941.
             * Sections: 1,604,649.
             * Size: 1,7 GB.
-        * [PoliticalTweets](https://www.kaggle.com/iamyoginth/facthub) Posts.
+        * [PoliticalTweetsIndia](https://www.kaggle.com/iamyoginth/facthub) Posts.
             * Documents: 12,488,144.
             * Sections: 12,488,144.
             * Size: 2,3 GB.
@@ -100,7 +100,7 @@ class P4Print():
         I suspect a bug in the implementation of the text index, as some batch import operations took over 10 mins for a modest batch size of 10,000 docs.
         ''')
         out.add(StatsTable(header_row=[
-            'Covid19', 'PoliticalTweets', 'EnglishWikipedia',
+            'Covid19', 'PoliticalTweetsIndia', 'EnglishWikipedia',
         ], header_col=[
             'MongoDB', 'ElasticSearch', 'Unum.TextDB',
         ], content=[

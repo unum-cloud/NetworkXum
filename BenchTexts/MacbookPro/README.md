@@ -40,7 +40,7 @@ That's why it's crucial for us to store the data in the most capable database!
   * Articles: 45,941.
   * Sections: 1,604,649.
   * Size: 1,7 GB.
-* [PoliticalTweets](https://www.kaggle.com/iamyoginth/facthub) Posts.
+* [PoliticalTweetsIndia](https://www.kaggle.com/iamyoginth/facthub) Posts.
   * Tweets: 12,488,143.
   * Size: 2,3 GB.
 * [OldNewspapers](https://www.kaggle.com/alvations/old-newspapers) Articles in different languages.
@@ -59,15 +59,15 @@ Every datascience project starts by importing the data.
 Let's see how long it will take to load every dataset into each DB.
 
 
-|               | Covid19 | PoliticalTweets | EnglishWikipedia | Mean Gains |
-| :------------ | :-----: | :-------------: | :--------------: | :--------: |
-| MongoDB       |  42.98  |    3,339.69     |                  |     1x     |
-| ElasticSearch | 210.14  |    6,649.18     |     1,152.83     | **1.58x**  |
+|               | Covid19 | PoliticalTweetsIndia | EnglishWikipedia | Mean Gains |
+| :------------ | :-----: | :------------------: | :--------------: | :--------: |
+| MongoDB       |  42.98  |       3,339.69       |                  |     1x     |
+| ElasticSearch | 210.14  |       6,649.18       |     1,152.83     | **1.58x**  |
 
-|               |     Covid19      | PoliticalTweets  | EnglishWikipedia |
-| :------------ | :--------------: | :--------------: | :--------------: |
-| MongoDB       | 17 mins, 49 secs | 49 mins, 54 secs |                  |
-| ElasticSearch | 3 mins, 39 secs  | 25 mins, 4 secs  | 1 hours, 10 mins |
+|               |     Covid19      | PoliticalTweetsIndia | EnglishWikipedia |
+| :------------ | :--------------: | :------------------: | :--------------: |
+| MongoDB       | 17 mins, 49 secs |   49 mins, 54 secs   |                  |
+| ElasticSearch | 3 mins, 39 secs  |   25 mins, 4 secs    | 1 hours, 10 mins |
 
 Those benchmarks only tell half of the story. 
 We should not only consider performance, but also the used disk space and the affect on the hardware lifetime, as SSDs don't last too long.
@@ -76,11 +76,11 @@ MongoDB generally performs well across different benchmarks, but it failed to im
 I suspect a bug in the implementation of the text index, as some batch import operations took over 10 mins for a modest batch size of 10,000 docs.
 
 
-|               | Covid19 | PoliticalTweets | EnglishWikipedia |
-| :------------ | :-----: | :-------------: | :--------------: |
-| MongoDB       | 1,9 GB  |     3,2 GB      | Expected 60,7 GB |
-| ElasticSearch | 2,5 GB  |     2,9 GB      |     33,5 GB      |
-| Unum.TextDB   |    1    |        1        |        1         |
+|               | Covid19 | PoliticalTweetsIndia | EnglishWikipedia |
+| :------------ | :-----: | :------------------: | :--------------: |
+| MongoDB       | 1,9 GB  |        3,2 GB        | Expected 60,7 GB |
+| ElasticSearch | 2,5 GB  |        2,9 GB        |     33,5 GB      |
+| Unum.TextDB   |    1    |          1           |        1         |
 
 MongoDB is one of the best products on the DB market, but I suspect they have a bug in their text indexing capabilities. Some of the batch insertions were hanging for ~10 mins and only 15% of the largest dataset were imported after ~7 hours!
 
@@ -126,10 +126,10 @@ Output: text content.<br/>
 Metric: number of such queries returned per second.<br/>
 
 
-|               | Covid19  | PoliticalTweets | EnglishWikipedia | Mean Gains |
-| :------------ | :------: | :-------------: | :--------------: | :--------: |
-| MongoDB       | 2,457.27 |    1,588.46     |     2,270.19     |     1x     |
-| ElasticSearch |  519.67  |     617.50      |      629.71      |   0.28x    |
+|               | Covid19  | PoliticalTweetsIndia | EnglishWikipedia | Mean Gains |
+| :------------ | :------: | :------------------: | :--------------: | :--------: |
+| MongoDB       | 2,457.27 |       1,588.46       |     2,270.19     |     1x     |
+| ElasticSearch |  519.67  |        617.50        |      629.71      |   0.28x    |
 
 ### Random Reads: Find up to 10,000 Docs containing a Word
 
@@ -139,10 +139,10 @@ Output: up to 10,000 documents IDs containing it.<br/>
 Metric: number of such queries returned per second.<br/>
 
 
-|               | Covid19 | PoliticalTweets | EnglishWikipedia | Mean Gains |
-| :------------ | :-----: | :-------------: | :--------------: | :--------: |
-| MongoDB       |  0.13   |      2.41       |       0.20       |     1x     |
-| ElasticSearch |  0.69   |      0.48       |       0.33       |   0.54x    |
+|               | Covid19 | PoliticalTweetsIndia | EnglishWikipedia | Mean Gains |
+| :------------ | :-----: | :------------------: | :--------------: | :--------: |
+| MongoDB       |  0.13   |         2.41         |       0.20       |     1x     |
+| ElasticSearch |  0.69   |         0.48         |       0.33       |   0.54x    |
 
 ### Random Reads: Find up to 20 Docs containing a Word
 
@@ -152,10 +152,10 @@ Output: up to 20 documents IDs containing it.<br/>
 Metric: number of such queries returned per second.<br/>
 
 
-|               | Covid19 | PoliticalTweets | EnglishWikipedia | Mean Gains |
-| :------------ | :-----: | :-------------: | :--------------: | :--------: |
-| MongoDB       |  4.25   |     113.38      |       0.82       |     1x     |
-| ElasticSearch | 234.04  |     169.76      |      72.17       | **4.02x**  |
+|               | Covid19 | PoliticalTweetsIndia | EnglishWikipedia | Mean Gains |
+| :------------ | :-----: | :------------------: | :--------------: | :--------: |
+| MongoDB       |  4.25   |        113.38        |       0.82       |     1x     |
+| ElasticSearch | 234.04  |        169.76        |      72.17       | **4.02x**  |
 
 ### Random Reads: Find up to 20 Docs with Bigram
 
@@ -165,10 +165,10 @@ Output: all documents IDs containing it.<br/>
 Metric: number of such queries returned per second.<br/>
 
 
-|               | Covid19 | PoliticalTweets | EnglishWikipedia | Mean Gains  |
-| :------------ | :-----: | :-------------: | :--------------: | :---------: |
-| MongoDB       |  0.09   |      0.49       |       0.02       |     1x      |
-| ElasticSearch | 241.92  |      88.08      |      32.02       | **606.10x** |
+|               | Covid19 | PoliticalTweetsIndia | EnglishWikipedia | Mean Gains  |
+| :------------ | :-----: | :------------------: | :--------------: | :---------: |
+| MongoDB       |  0.09   |         0.49         |       0.02       |     1x      |
+| ElasticSearch | 241.92  |        88.08         |      32.02       | **606.10x** |
 
 ## Write Operations
 
@@ -186,10 +186,10 @@ Output: success/failure indicator.<br/>
 Metric: number inserted docs per second.<br/>
 
 
-|               | Covid19 | PoliticalTweets | EnglishWikipedia | Mean Gains |
-| :------------ | :-----: | :-------------: | :--------------: | :--------: |
-| MongoDB       |  30.00  |     509.45      |      22.22       |     1x     |
-| ElasticSearch |  13.28  |      14.16      |      14.05       |   0.07x    |
+|               | Covid19 | PoliticalTweetsIndia | EnglishWikipedia | Mean Gains |
+| :------------ | :-----: | :------------------: | :--------------: | :--------: |
+| MongoDB       |  30.00  |        509.45        |      22.22       |     1x     |
+| ElasticSearch |  13.28  |        14.16         |      14.05       |   0.07x    |
 
 ### Random Writes: Upsert Docs Batch
 
@@ -199,10 +199,10 @@ Output: 500 success/failure indicators.<br/>
 Metric: number inserted docs per second.<br/>
 
 
-|               | Covid19 | PoliticalTweets | EnglishWikipedia | Mean Gains |
-| :------------ | :-----: | :-------------: | :--------------: | :--------: |
-| MongoDB       |  31.09  |    1,672.29     |      21.40       |     1x     |
-| ElasticSearch |  23.15  |      20.88      |      26.40       |   0.04x    |
+|               | Covid19 | PoliticalTweetsIndia | EnglishWikipedia | Mean Gains |
+| :------------ | :-----: | :------------------: | :--------------: | :--------: |
+| MongoDB       |  31.09  |       1,672.29       |      21.40       |     1x     |
+| ElasticSearch |  23.15  |        20.88         |      26.40       |   0.04x    |
 
 ### Random Writes: Remove Doc
 
@@ -212,10 +212,10 @@ Output: success/failure indicator.<br/>
 Metric: number removed docs per second.<br/>
 
 
-|               | Covid19 | PoliticalTweets | EnglishWikipedia | Mean Gains |
-| :------------ | :-----: | :-------------: | :--------------: | :--------: |
-| MongoDB       |  21.08  |     221.75      |      58.35       |     1x     |
-| ElasticSearch |  13.63  |      12.67      |      11.76       |   0.13x    |
+|               | Covid19 | PoliticalTweetsIndia | EnglishWikipedia | Mean Gains |
+| :------------ | :-----: | :------------------: | :--------------: | :--------: |
+| MongoDB       |  21.08  |        221.75        |      58.35       |     1x     |
+| ElasticSearch |  13.63  |        12.67         |      11.76       |   0.13x    |
 
 ### Random Writes: Remove Docs Batch
 
@@ -225,8 +225,8 @@ Output: 500 success/failure indicators.<br/>
 Metric: number removed docs per second.<br/>
 
 
-|               | Covid19 | PoliticalTweets | EnglishWikipedia | Mean Gains |
-| :------------ | :-----: | :-------------: | :--------------: | :--------: |
-| MongoDB       |  32.48  |    1,772.88     |      21.08       |     1x     |
-| ElasticSearch |  25.97  |      20.58      |      26.07       |   0.04x    |
+|               | Covid19 | PoliticalTweetsIndia | EnglishWikipedia | Mean Gains |
+| :------------ | :-----: | :------------------: | :--------------: | :--------: |
+| MongoDB       |  32.48  |       1,772.88       |      21.08       |     1x     |
+| ElasticSearch |  25.97  |        20.58         |      26.07       |   0.04x    |
 

@@ -41,7 +41,7 @@
     },
     {
         "database": "ElasticSearch",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "date": "2020/41/03-00:07:31",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -81,7 +81,7 @@
     },
     {
         "database": "MongoDB",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "date": "2020/03/03-07:07:44",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -181,7 +181,7 @@
     },
     {
         "database": "ElasticSearch",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "date": "2020/46/03-14:07:54",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -201,7 +201,7 @@
     },
     {
         "database": "ElasticSearch",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "date": "2020/48/03-14:07:04",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -221,7 +221,7 @@
     },
     {
         "database": "ElasticSearch",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "date": "2020/48/03-14:07:53",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -241,7 +241,7 @@
     },
     {
         "database": "ElasticSearch",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "date": "2020/49/03-14:07:41",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -261,7 +261,7 @@
     },
     {
         "database": "MongoDB",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "date": "2020/52/03-14:07:52",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -281,7 +281,7 @@
     },
     {
         "database": "MongoDB",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "date": "2020/52/03-14:07:54",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -301,7 +301,7 @@
     },
     {
         "database": "MongoDB",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "date": "2020/52/03-14:07:54",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -321,7 +321,7 @@
     },
     {
         "database": "MongoDB",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "date": "2020/52/03-14:07:55",
         "num_cpus": 16,
         "mhz_per_cpu": 2300,
@@ -773,7 +773,7 @@
     },
     {
         "database": "ElasticSearch",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Lookup Doc by ID",
         "time_elapsed": 1.6194219589233398,
         "count_iterations": 1,
@@ -809,7 +809,7 @@
     },
     {
         "database": "ElasticSearch",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 10,000 Docs containing a Word",
         "time_elapsed": 31.425326108932495,
         "count_iterations": 1,
@@ -845,7 +845,7 @@
     },
     {
         "database": "ElasticSearch",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 20 Docs containing a Word",
         "time_elapsed": 30.002040147781372,
         "count_iterations": 1,
@@ -881,7 +881,7 @@
     },
     {
         "database": "ElasticSearch",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 20 Docs with Bigram",
         "time_elapsed": 30.005292892456055,
         "count_iterations": 1,
@@ -917,7 +917,7 @@
     },
     {
         "database": "MongoDB",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Lookup Doc by ID",
         "time_elapsed": 0.6295387744903564,
         "count_iterations": 1,
@@ -953,7 +953,7 @@
     },
     {
         "database": "MongoDB",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 10,000 Docs containing a Word",
         "time_elapsed": 33.6720187664032,
         "count_iterations": 1,
@@ -989,7 +989,7 @@
     },
     {
         "database": "MongoDB",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 20 Docs containing a Word",
         "time_elapsed": 30.156317949295044,
         "count_iterations": 1,
@@ -1025,7 +1025,7 @@
     },
     {
         "database": "MongoDB",
-        "dataset": "PoliticalTweets",
+        "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 20 Docs with Bigram",
         "time_elapsed": 30.65218210220337,
         "count_iterations": 1,

@@ -52,7 +52,7 @@ class P1Test(object):
         self.validate_empty(tdb)
 
         print(f'--- Bulk Insert')
-        import_texts(tdb, self.conf.test_dataset['path'], text_column=3)
+        import_texts(tdb, self.conf.test_dataset['path'], column=3)
         self.validate_contents(tdb)
         tdb.clear()
         self.validate_empty(tdb)
