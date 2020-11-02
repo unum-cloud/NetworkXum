@@ -75,13 +75,13 @@ class P3TasksSampler(object):
     def sample_file(self, filename: str) -> int:
         self.clear()
         self._buffer_texts = sample_reservoir(
-            yield_texts_from_csv(filename, column=3), self.number_of_needed_samples())
+            yield_texts_from_csv(filename), self.number_of_needed_samples())
         self._split_samples_into_tasks()
         return len(self._buffer_texts)
 
     def _split_samples_into_tasks(self):
 
-        all_ids = [t.path for t in self._buffer_texts]
+        all_ids = [t._id for t in self._buffer_texts]
         self.doc_ids_to_query = sample_reservoir(all_ids, self.count_changes)
 
         cnt_wanted = self.count_substring_ops

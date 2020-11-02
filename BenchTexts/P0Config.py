@@ -58,6 +58,9 @@ class P0Config(object):
         class_ = getattr(module, database['class_name'])
         instance = class_(url=url)
 
+        if hasattr(instance, 'index_recompute'):
+            instance.index_recompute()
+
         return instance
 
     def normalize_path(self, path: str) -> str:

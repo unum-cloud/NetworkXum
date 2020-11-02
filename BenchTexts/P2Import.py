@@ -41,7 +41,7 @@ class P2Import(object):
         print(f'--- file size:', bytes2str(file_size))
 
         def import_one() -> int:
-            tdb.add_stream(yield_texts_from_csv(dataset_path))
+            import_texts(tdb, dataset_path)
             return tdb.count_texts()
 
         counter = MicroBench(
