@@ -4,7 +4,7 @@
         "class_name": "TextDB",
         "name": "Unum.TextDB",
         "url_variable_name": "URI_UNUMDB_TEXT",
-        "url_default": "/Users/av/DBs/UnumDB/Texts/${DATASET_NAME}",
+        "url_default": "/Users/av/DBs/UnumDB/Articles/${DATASET_NAME}",
         "enabled": true
     },
     {
