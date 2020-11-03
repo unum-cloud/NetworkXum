@@ -139,7 +139,7 @@ can't be a bottleneck.
 
 Input: 2 vertex identifiers (order is important).<br/>
 Output: edge that connects them in given direction.<br/>
-Metric: number of such edges returned per second.<br/>
+Metric: number of queries per second.<br/>
 
 
 |              | PatentCitations | MouseGenes | HumanBrain |    Gains    |
@@ -155,7 +155,7 @@ Metric: number of such edges returned per second.<br/>
 
 Input: 1 vertex identifier.<br/>
 Output: all edges attached to it.<br/>
-Metric: number of such edges returned per second.<br/>
+Metric: number of queries per second.<br/>
 
 
 |              | PatentCitations | MouseGenes | HumanBrain |    Gains    |
@@ -171,7 +171,7 @@ Metric: number of such edges returned per second.<br/>
 
 Input: 1 vertex identifier.<br/>
 Output: all edges incoming into it.<br/>
-Metric: number of such edges returned per second.<br/>
+Metric: number of queries per second.<br/>
 
 
 |              | PatentCitations | MouseGenes | HumanBrain |    Gains    |
@@ -187,7 +187,7 @@ Metric: number of such edges returned per second.<br/>
 
 Input: 1 vertex identifier.<br/>
 Output: the identifiers of all unique vertexes that share an edge with the input.<br/>
-Metric: number of neighbor identiefiers returned per second.<br/>
+Metric: number of queries per second.<br/>
 
 
 |              | PatentCitations | MouseGenes | HumanBrain |    Gains    |
@@ -203,7 +203,7 @@ Metric: number of neighbor identiefiers returned per second.<br/>
 
 Input: 1 vertex identifier.<br/>
 Output: the total number of attached edges and their accumulated weight.<br/>
-Metric: number queries per second.<br/>
+Metric: number of queries per second.<br/>
 
 
 |              | PatentCitations | MouseGenes | HumanBrain |    Gains    |
@@ -219,7 +219,7 @@ Metric: number queries per second.<br/>
 
 Input: 1 vertex identifier.<br/>
 Output: the total number of incoming edges and their accumulated weight.<br/>
-Metric: number queries per second.<br/>
+Metric: number of queries per second.<br/>
 
 
 |              | PatentCitations | MouseGenes | HumanBrain |    Gains    |
