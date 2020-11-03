@@ -57,16 +57,29 @@ class P3Bench(object):
 
         # Queries returning collections.
         self.bench_task(
-            name='Random Reads: Find up to 10,000 Docs containing a Word',
-            func=lambda: self.find_substring(max_matches=10000)
+            name='Random Reads: Find up to 10,000 Docs containing a Short Word',
+            func=lambda: self.find_substrings(
+                max_matches=10000, queries=self.tasks.short_words_to_search)
         )
         self.bench_task(
-            name='Random Reads: Find up to 20 Docs containing a Word',
-            func=lambda: self.find_substring(max_matches=20)
+            name='Random Reads: Find up to 20 Docs containing a Short Word',
+            func=lambda: self.find_substrings(
+                max_matches=20, queries=self.tasks.short_words_to_search)
         )
         self.bench_task(
-            name='Random Reads: Find up to 20 Docs with Bigram',
-            func=lambda: self.find_with_phrase(max_matches=20)
+            name='Random Reads: Find up to 20 Docs with Short Phrases',
+            func=lambda: self.find_substrings(
+                max_matches=20, queries=self.tasks.short_phrases_to_search)
+        )
+        self.bench_task(
+            name='Random Reads: Find up to 20 Docs containing a Long Word',
+            func=lambda: self.find_substrings(
+                max_matches=20, queries=self.tasks.long_words_to_search)
+        )
+        self.bench_task(
+            name='Random Reads: Find up to 20 Docs with Long Phrases',
+            func=lambda: self.find_substrings(
+                max_matches=20, queries=self.tasks.long_phrases_to_search)
         )
         # for regex_template in self.tasks.regexs_to_search:
         #     name = 'Random Reads: Find up to 20 RegEx Matches ({})'.format(
@@ -141,28 +154,12 @@ class P3Bench(object):
         print(f'---- {cnt} ops: {cnt_found} ID matches')
         return cnt
 
-    def find_substring(self, max_matches: int = None) -> int:
+    def find_substrings(self, max_matches: int, queries: list) -> int:
         cnt = 0
         cnt_found = 0
         t0 = time()
-        for word in self.tasks.words_to_search:
-            doc_ids = self.tdb.find_substring(
-                query=word, max_matches=max_matches)
-            cnt += 1
-            cnt_found += len(doc_ids)
-            dt = time() - t0
-            if dt > self.max_seconds_per_query:
-                break
-        print(f'---- {cnt} ops: {cnt_found} matches found')
-        return cnt
-
-    def find_with_phrase(self, max_matches: int = None) -> int:
-        cnt = 0
-        cnt_found = 0
-        t0 = time()
-        for word in self.tasks.phrases_to_search:
-            doc_ids = self.tdb.find_substring(
-                query=word, max_matches=max_matches)
+        for q in queries:
+            doc_ids = self.tdb.find_substring(query=q, max_matches=max_matches)
             cnt += 1
             cnt_found += len(doc_ids)
             dt = time() - t0

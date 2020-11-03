@@ -133,47 +133,75 @@ Metric: number of queries per second.<br/>
 | ElasticSearch | 760.71 | 615.10 | 0.49x |
 | Unum.TextDB | 1,819.77 | 1,277.94 | **1.09x** |
 
-### Random Reads: Find up to 10,000 Docs containing a Word
+### Random Reads: Find up to 10,000 Docs containing a Short Word
 
 
-Input: 1 randomly selected word.<br/>
+Input: 1 randomly selected word (under 9 letters).<br/>
 Output: up to 10,000 documents IDs containing it.<br/>
 Metric: number of queries per second.<br/>
 
 
 |  | Covid19 | PoliticalTweetsIndia | Gains |
 | :--- | :---: | :---: | :---: |
-| MongoDB | 2.02 | 4.28 | 1x |
-| ElasticSearch | 1.67 | 0.85 | 0.51x |
-| Unum.TextDB | 1.75 | 1.86 | 0.65x |
+| MongoDB | 1.68 | 0.86 | 1x |
+| ElasticSearch | 0.57 | 0.54 | 0.48x |
+| Unum.TextDB | 1.16 | 0.99 | 0.92x |
 
-### Random Reads: Find up to 20 Docs containing a Word
+### Random Reads: Find up to 20 Docs containing a Short Word
 
 
-Input: 1 randomly selected word.<br/>
+Input: 1 randomly selected word (under 9 letters).<br/>
 Output: up to 20 documents IDs containing it.<br/>
 Metric: number of queries per second.<br/>
 
 
 |  | Covid19 | PoliticalTweetsIndia | Gains |
 | :--- | :---: | :---: | :---: |
-| MongoDB | 156.62 | 59.15 | 1x |
-| ElasticSearch | 404.58 | 368.70 | **4.41x** |
-| Unum.TextDB | 151.47 | 31.31 | 0.75x |
+| MongoDB | 201.39 | 85.02 | 1x |
+| ElasticSearch | 396.55 | 276.26 | **2.61x** |
+| Unum.TextDB | 119.09 | 53.76 | 0.61x |
 
-### Random Reads: Find up to 20 Docs with Bigram
+### Random Reads: Find up to 20 Docs with Short Phrases
 
 
-Input: a combination of randomly selected words.<br/>
-Output: all documents IDs containing it.<br/>
+Input: a combination of randomly selected short words (under 9 letters).<br/>
+Output: up to 20 documents IDs containing it.<br/>
 Metric: number of queries per second.<br/>
 
 
 |  | Covid19 | PoliticalTweetsIndia | Gains |
 | :--- | :---: | :---: | :---: |
-| MongoDB | 0.21 | 0.29 | 1x |
-| ElasticSearch | 364.08 | 481.67 | **1,714.98x** |
-| Unum.TextDB | 6.89 | 8.31 | 31.06x |
+| MongoDB | 0.21 | 0.63 | 1x |
+| ElasticSearch | 353.87 | 434.69 | **1,188.87x** |
+| Unum.TextDB | 5.92 | 7.27 | 19.88x |
+
+### Random Reads: Find up to 20 Docs containing a Long Word
+
+
+Input: 1 randomly selected word (over 9 letters).<br/>
+Output: up to 20 documents IDs containing it.<br/>
+Metric: number of queries per second.<br/>
+
+
+|  | Covid19 | PoliticalTweetsIndia | Gains |
+| :--- | :---: | :---: | :---: |
+| MongoDB | 187.99 | 24.65 | 1x |
+| ElasticSearch | 594.84 | 485.05 | **11.42x** |
+| Unum.TextDB | 106.75 | 15.73 | 0.60x |
+
+### Random Reads: Find up to 20 Docs with Long Phrases
+
+
+Input: a combination of randomly selected short words (over 9 letters).<br/>
+Output: up to 20 documents IDs containing it.<br/>
+Metric: number of queries per second.<br/>
+
+
+|  | Covid19 | PoliticalTweetsIndia | Gains |
+| :--- | :---: | :---: | :---: |
+| MongoDB | 0.30 | 0.11 | 1x |
+| ElasticSearch | 540.17 | 678.58 | **3,887.36x** |
+| Unum.TextDB | 7.59 | 10.14 | 57.29x |
 
 ![Read Amplification - Read Bytes Per Benchmark](Read_Amplification_-_Read_Bytes_Per_Benchmark.svg)
 

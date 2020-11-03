@@ -1,3 +1,5 @@
+import random
+
 from PyWrappedHelpers import *
 from P0Config import P0Config
 
@@ -62,8 +64,8 @@ class P3TasksSampler(object):
 
     def clear(self):
         self.doc_ids_to_query = []
-        self.words_to_search = []
-        self.phrases_to_search = []
+        self.short_words_to_search = []
+        self.short_phrases_to_search = []
         self.regexs_to_search = []
         self.docs_to_change_by_one = []
         self.docs_to_change_batched = [[]]
@@ -85,10 +87,14 @@ class P3TasksSampler(object):
         self.doc_ids_to_query = sample_reservoir(all_ids, self.count_changes)
 
         all_words = flatten([t.content.split() for t in self._buffer_texts])
-        all_words = filter(lambda x: (len(x) > 4) and x.isalnum(), all_words)
+        all_words = filter(lambda x: x.isalnum(), all_words)
         all_words = list([x.lower() for x in all_words])
         cnt_wanted = min(self.count_substring_ops, len(all_words))
-        self.words_to_search = sample_reservoir(all_words, cnt_wanted)
+
+        self.short_words_to_search = sample_reservoir(
+            [x for x in all_words if (len(x) > 6 and len(x) < 9)], self.count_substring_ops)
+        self.long_words_to_search = sample_reservoir(
+            [x for x in all_words if (len(x) > 9)], self.count_substring_ops)
         self.docs_to_change_by_one = self._buffer_texts[:self.count_changes]
         self.docs_to_change_batched = list(
             chunks(self._buffer_texts[:self.count_changes], 500))
@@ -102,7 +108,7 @@ class P3TasksSampler(object):
                 w_regex = template.replace(r"${RANDOM}", ws_regex[i])
                 family['Tasks'].append(w_regex)
 
-        w0s = sample_reservoir(all_words, cnt_wanted)
-        w1s = sample_reservoir(all_words, cnt_wanted)
-        self.phrases_to_search = [
-            f'{w0s[i]} {w1s[i]}' for i in range(cnt_wanted)]
+        self.short_phrases_to_search = [
+            f'{random.choice(self.short_words_to_search)} {random.choice(self.short_words_to_search)}' for _ in range(self.count_substring_ops)]
+        self.long_phrases_to_search = [
+            f'{random.choice(self.long_words_to_search)} {random.choice(self.long_words_to_search)}' for _ in range(self.count_substring_ops)]
