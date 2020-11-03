@@ -168,25 +168,36 @@ class P4Print():
              Output: text content.<br/>
              Metric: number of queries per second.<br/>
              '''),
-            ('Random Reads: Find up to 10,000 Docs containing a Word',
+            ('Random Reads: Find up to 10,000 Docs containing a Short Word',
              '''
-             Input: 1 randomly selected word.<br/>
+             Input: 1 randomly selected word (under 9 letters).<br/>
              Output: up to 10,000 documents IDs containing it.<br/>
              Metric: number of queries per second.<br/>
              '''),
-            ('Random Reads: Find up to 20 Docs containing a Word',
+            ('Random Reads: Find up to 20 Docs containing a Short Word',
              '''
-             Input: 1 randomly selected word.<br/>
+             Input: 1 randomly selected word (under 9 letters).<br/>
              Output: up to 20 documents IDs containing it.<br/>
              Metric: number of queries per second.<br/>
              '''),
-            ('Random Reads: Find up to 20 Docs with Bigram',
+            ('Random Reads: Find up to 20 Docs with Short Phrases',
              '''
-             Input: a combination of randomly selected words.<br/>
-             Output: all documents IDs containing it.<br/>
+             Input: a combination of randomly selected short words (under 9 letters).<br/>
+             Output: up to 20 documents IDs containing it.<br/>
              Metric: number of queries per second.<br/>
              '''),
-        ]
+            ('Random Reads: Find up to 20 Docs containing a Long Word',
+             '''
+             Input: 1 randomly selected word (over 9 letters).<br/>
+             Output: up to 20 documents IDs containing it.<br/>
+             Metric: number of queries per second.<br/>
+             '''),
+            ('Random Reads: Find up to 20 Docs with Long Phrases',
+             '''
+             Input: a combination of randomly selected short words (over 9 letters).<br/>
+             Output: up to 20 documents IDs containing it.<br/>
+             Metric: number of queries per second.<br/>
+             '''), ]
         # for regex_template in P3TasksSampler.__regex_templates__:
         #     read_op = 'Random Reads: Find a RegEx ({})'.format(
         #         regex_template['Name'])
