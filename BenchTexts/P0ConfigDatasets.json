@@ -6,7 +6,7 @@
         "docs": 45941,
         "sections": 1604649,
         "size_mb": 1700,
-        "enabled": true
+        "enabled": false
     },
     {
         "name": "PoliticalTweetsIndia",
@@ -15,7 +15,7 @@
         "docs": 12488144,
         "sections": 12488144,
         "size_mb": 2300,
-        "enabled": false
+        "enabled": true
     },
     {
         "name": "EnglishWikipedia",
