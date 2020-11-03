@@ -57,17 +57,17 @@ Every datascience project starts by importing the data.
 Let's see how long it will take to load every dataset into each DB.
 
 
-|               |  Covid19   |    Gains    |
-| :------------ | :--------: | :---------: |
-| MongoDB       |   398.40   |     1x      |
-| ElasticSearch |  5,915.53  |   14.85x    |
-| Unum.TextDB   | 142,575.07 | **357.87x** |
+|  | Covid19 | PoliticalTweetsIndia | Gains |
+| :--- | :---: | :---: | :---: |
+| MongoDB | 398.40 | 3,301.61 | 1x |
+| ElasticSearch | 5,915.53 | 10,262.29 | 8.98x |
+| Unum.TextDB | 142,575.07 | 930,285.22 | **319.82x** |
 
-|               |     Covid19     |
-| :------------ | :-------------: |
-| MongoDB       | 1 hours, 7 mins |
-| ElasticSearch | 4 mins, 31 secs |
-| Unum.TextDB   | 0 mins, 11 secs |
+|  | Covid19 | PoliticalTweetsIndia |
+| :--- | :---: | :---: |
+| MongoDB | 1 hours, 7 mins | 50 mins, 29 secs |
+| ElasticSearch | 4 mins, 31 secs | 16 mins, 14 secs |
+| Unum.TextDB | 0 mins, 11 secs | 0 mins, 13 secs |
 
 Those benchmarks only tell half of the story. 
 We should not only consider performance, but also the used disk space and the affect on the hardware lifetime, as SSDs don't last too long.
@@ -76,11 +76,11 @@ MongoDB generally performs well across different benchmarks, but it failed to im
 I suspect a bug in the implementation of the text index, as some batch import operations took over 10 mins for a modest batch size of 10,000 docs.
 
 
-|               | Covid19 | PoliticalTweetsIndia | EnglishWikipedia |
-| :------------ | :-----: | :------------------: | :--------------: |
-| MongoDB       | 1,9 GB  |        3,2 GB        | Expected 60,7 GB |
-| ElasticSearch | 2,5 GB  |        2,9 GB        |     33,5 GB      |
-| Unum.TextDB   |    1    |          1           |        1         |
+|  | Covid19 | PoliticalTweetsIndia | EnglishWikipedia |
+| :--- | :---: | :---: | :---: |
+| MongoDB | 1,9 GB | 3,2 GB | Expected 60,7 GB |
+| ElasticSearch | 2,5 GB | 2,9 GB | 33,5 GB |
+| Unum.TextDB | 1 | 1 | 1 |
 
 ![Import Overhead - Total Bytes Written](Import_Overhead_-_Total_Bytes_Written.svg)
 
@@ -127,11 +127,11 @@ Output: text content.<br/>
 Metric: number of queries per second.<br/>
 
 
-|               | Covid19  |   Gains   |
-| :------------ | :------: | :-------: |
-| MongoDB       | 1,717.84 |    1x     |
-| ElasticSearch |  760.71  |   0.44x   |
-| Unum.TextDB   | 1,819.77 | **1.06x** |
+|  | Covid19 | PoliticalTweetsIndia | Gains |
+| :--- | :---: | :---: | :---: |
+| MongoDB | 1,717.84 | 1,147.71 | 1x |
+| ElasticSearch | 760.71 | 615.10 | 0.49x |
+| Unum.TextDB | 1,819.77 | 1,277.94 | **1.09x** |
 
 ### Random Reads: Find up to 10,000 Docs containing a Word
 
@@ -141,11 +141,11 @@ Output: up to 10,000 documents IDs containing it.<br/>
 Metric: number of queries per second.<br/>
 
 
-|               | Covid19 | Gains |
-| :------------ | :-----: | :---: |
-| MongoDB       |  2.02   |  1x   |
-| ElasticSearch |  1.67   | 0.83x |
-| Unum.TextDB   |  1.75   | 0.87x |
+|  | Covid19 | PoliticalTweetsIndia | Gains |
+| :--- | :---: | :---: | :---: |
+| MongoDB | 2.02 | 4.28 | 1x |
+| ElasticSearch | 1.67 | 0.85 | 0.51x |
+| Unum.TextDB | 1.75 | 1.86 | 0.65x |
 
 ### Random Reads: Find up to 20 Docs containing a Word
 
@@ -155,11 +155,11 @@ Output: up to 20 documents IDs containing it.<br/>
 Metric: number of queries per second.<br/>
 
 
-|               | Covid19 |   Gains   |
-| :------------ | :-----: | :-------: |
-| MongoDB       | 156.62  |    1x     |
-| ElasticSearch | 404.58  | **2.58x** |
-| Unum.TextDB   | 151.47  |   0.97x   |
+|  | Covid19 | PoliticalTweetsIndia | Gains |
+| :--- | :---: | :---: | :---: |
+| MongoDB | 156.62 | 59.15 | 1x |
+| ElasticSearch | 404.58 | 368.70 | **4.41x** |
+| Unum.TextDB | 151.47 | 31.31 | 0.75x |
 
 ### Random Reads: Find up to 20 Docs with Bigram
 
@@ -169,11 +169,11 @@ Output: all documents IDs containing it.<br/>
 Metric: number of queries per second.<br/>
 
 
-|               | Covid19 |     Gains     |
-| :------------ | :-----: | :-----------: |
-| MongoDB       |  0.21   |      1x       |
-| ElasticSearch | 364.08  | **1,767.30x** |
-| Unum.TextDB   |  6.89   |    33.44x     |
+|  | Covid19 | PoliticalTweetsIndia | Gains |
+| :--- | :---: | :---: | :---: |
+| MongoDB | 0.21 | 0.29 | 1x |
+| ElasticSearch | 364.08 | 481.67 | **1,714.98x** |
+| Unum.TextDB | 6.89 | 8.31 | 31.06x |
 
 ![Read Amplification - Read Bytes Per Benchmark](Read_Amplification_-_Read_Bytes_Per_Benchmark.svg)
 
@@ -193,11 +193,11 @@ Output: success/failure indicator.<br/>
 Metric: number inserted docs per second.<br/>
 
 
-|               | Covid19  |   Gains   |
-| :------------ | :------: | :-------: |
-| MongoDB       |  230.38  |    1x     |
-| ElasticSearch |  28.80   |   0.13x   |
-| Unum.TextDB   | 1,062.47 | **4.61x** |
+|  | Covid19 | PoliticalTweetsIndia | Gains |
+| :--- | :---: | :---: | :---: |
+| MongoDB | 230.38 | 963.17 | 1x |
+| ElasticSearch | 28.80 | 26.33 | 0.08x |
+| Unum.TextDB | 1,062.47 | 937.12 | **2.79x** |
 
 ### Random Writes: Upsert Docs Batch
 
@@ -207,11 +207,11 @@ Output: 500 success/failure indicators.<br/>
 Metric: number inserted docs per second.<br/>
 
 
-|               | Covid19  |   Gains   |
-| :------------ | :------: | :-------: |
-| MongoDB       |  232.33  |    1x     |
-| ElasticSearch |  45.80   |   0.20x   |
-| Unum.TextDB   | 1,122.76 | **4.83x** |
+|  | Covid19 | PoliticalTweetsIndia | Gains |
+| :--- | :---: | :---: | :---: |
+| MongoDB | 232.33 | 2,127.89 | 1x |
+| ElasticSearch | 45.80 | 45.90 | 0.11x |
+| Unum.TextDB | 1,122.76 | 1,011.04 | **2.65x** |
 
 ### Random Writes: Remove Doc
 
@@ -221,11 +221,11 @@ Output: success/failure indicator.<br/>
 Metric: number removed docs per second.<br/>
 
 
-|               | Covid19  |   Gains    |
-| :------------ | :------: | :--------: |
-| MongoDB       |  56.65   |     1x     |
-| ElasticSearch |  24.47   |   0.43x    |
-| Unum.TextDB   | 1,045.84 | **18.46x** |
+|  | Covid19 | PoliticalTweetsIndia | Gains |
+| :--- | :---: | :---: | :---: |
+| MongoDB | 56.65 | 271.21 | 1x |
+| ElasticSearch | 24.47 | 22.36 | 0.26x |
+| Unum.TextDB | 1,045.84 | 935.42 | **10.95x** |
 
 ### Random Writes: Remove Docs Batch
 
@@ -235,11 +235,11 @@ Output: 500 success/failure indicators.<br/>
 Metric: number removed docs per second.<br/>
 
 
-|               | Covid19  |   Gains   |
-| :------------ | :------: | :-------: |
-| MongoDB       |  226.21  |    1x     |
-| ElasticSearch |  42.55   |   0.19x   |
-| Unum.TextDB   | 1,101.05 | **4.87x** |
+|  | Covid19 | PoliticalTweetsIndia | Gains |
+| :--- | :---: | :---: | :---: |
+| MongoDB | 226.21 | 2,575.94 | 1x |
+| ElasticSearch | 42.55 | 44.84 | 0.10x |
+| Unum.TextDB | 1,101.05 | 1,005.76 | **2.63x** |
 
 ![Write Amplification - Written Bytes Per Benchmark](Write_Amplification_-_Written_Bytes_Per_Benchmark.svg)
 
