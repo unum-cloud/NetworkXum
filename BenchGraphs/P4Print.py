@@ -1,8 +1,6 @@
-import platform
 import glob
 import re
 
-import psutil
 from pystats2md.stats_file import StatsFile
 from pystats2md.stats_subset import StatsSubset
 from pystats2md.report import Report
@@ -179,37 +177,37 @@ class P4Print():
              '''
              Input: 2 vertex identifiers (order is important).<br/>
              Output: edge that connects them in given direction.<br/>
-             Metric: number of such edges returned per second.<br/>
+             Metric: number of queries per second.<br/>
              '''),
             ('Random Reads: Find Connected Edges',
              '''
              Input: 1 vertex identifier.<br/>
              Output: all edges attached to it.<br/>
-             Metric: number of such edges returned per second.<br/>
+             Metric: number of queries per second.<br/>
              '''),
             ('Random Reads: Find Ingoing Edges',
              '''
              Input: 1 vertex identifier.<br/>
              Output: all edges incoming into it.<br/>
-             Metric: number of such edges returned per second.<br/>
+             Metric: number of queries per second.<br/>
              '''),
             ('Random Reads: Find Friends',
              '''
              Input: 1 vertex identifier.<br/>
              Output: the identifiers of all unique vertexes that share an edge with the input.<br/>
-             Metric: number of neighbor identiefiers returned per second.<br/>
+             Metric: number of queries per second.<br/>
              '''),
             ('Random Reads: Count Friends',
              '''
              Input: 1 vertex identifier.<br/>
              Output: the total number of attached edges and their accumulated weight.<br/>
-             Metric: number queries per second.<br/>
+             Metric: number of queries per second.<br/>
              '''),
             ('Random Reads: Count Followers',
              '''
              Input: 1 vertex identifier.<br/>
              Output: the total number of incoming edges and their accumulated weight.<br/>
-             Metric: number queries per second.<br/>
+             Metric: number of queries per second.<br/>
              ''')
         ]
 

@@ -66,7 +66,7 @@ class MongoDB(BaseAPI):
         }, projection=proj)
         if max_matches:
             dicts = dicts.limit(max_matches)
-        return map(self.parse_match, dicts)
+        return list(map(self.parse_match, dicts))
 
     def find_regex(
         self,
@@ -87,7 +87,7 @@ class MongoDB(BaseAPI):
         }, projection=proj)
         if max_matches:
             dicts = dicts.limit(max_matches)
-        return map(self.parse_match, dicts)
+        return list(map(self.parse_match, dicts))
 
 # region Random Writes
 

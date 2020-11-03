@@ -58,8 +58,9 @@ class P0Config(object):
         class_ = getattr(module, database['class_name'])
         instance = class_(url=url)
 
-        if hasattr(instance, 'index_recompute'):
-            instance.index_recompute()
+        if hasattr(instance, 'index_compact'):
+            print('Recomputing the ', instance)
+            instance.index_compact()
 
         return instance
 
