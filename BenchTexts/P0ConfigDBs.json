@@ -1,13 +1,5 @@
 [
     {
-        "module_name": "pynum",
-        "class_name": "TextDB",
-        "name": "Unum.TextDB",
-        "url_variable_name": "URI_UNUMDB_TEXT",
-        "url_default": "/Users/av/DBs/UnumDB/Articles/${DATASET_NAME}",
-        "enabled": true
-    },
-    {
         "module_name": "PyWrappedTexts.ElasticSearch",
         "class_name": "ElasticSearch",
         "name": "ElasticSearch",
@@ -21,6 +13,14 @@
         "name": "MongoDB",
         "url_variable_name": "URI_MONGODB",
         "url_default": "mongodb://0.0.0.0:27017/${DATASET_NAME}",
+        "enabled": true
+    },
+    {
+        "module_name": "pynum",
+        "class_name": "TextDB",
+        "name": "Unum.TextDB",
+        "url_variable_name": "URI_UNUMDB_TEXT",
+        "url_default": "/Users/av/DBs/UnumDB/Articles/${DATASET_NAME}",
         "enabled": true
     }
 ]

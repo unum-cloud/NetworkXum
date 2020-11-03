@@ -189,7 +189,7 @@ class P3Bench(object):
     def remove_text(self) -> int:
         cnt = 0
         for doc in self.tasks.docs_to_change_by_one:
-            self.tdb.remove(doc)
+            self.tdb.remove(doc._id)
             cnt += 1
         return cnt
 
@@ -203,7 +203,7 @@ class P3Bench(object):
     def remove_texts(self) -> int:
         cnt = 0
         for docs in self.tasks.docs_to_change_batched:
-            self.tdb.remove(docs)
+            self.tdb.remove(list([doc._id for doc in docs]))
             cnt += len(docs)
         return cnt
 

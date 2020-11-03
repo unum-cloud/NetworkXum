@@ -1,7 +1,6 @@
-import platform
+import re
 import glob
 
-import psutil
 from pystats2md.stats_file import StatsFile
 from pystats2md.stats_subset import StatsSubset
 from pystats2md.stats_table import StatsTable
@@ -29,12 +28,12 @@ class P4Print():
         out = Report()
         dbs = [
             'MongoDB', 'ElasticSearch',
-            # 'Unum.TextDB',
+            'Unum.TextDB',
         ]  # ins.subset().unique('database')
         dataset_names = [
             'Covid19',
-            'PoliticalTweetsIndia',
-            'EnglishWikipedia',
+            # 'PoliticalTweetsIndia',
+            # 'EnglishWikipedia',
         ]  # ins.subset().unique('dataset')
         dataset_for_comparison = 'Covid19'
 
@@ -109,6 +108,24 @@ class P4Print():
             ['1', '1', '1'],
         ]))
 
+        out.add(
+            StatsSubset(ins).filtered(
+                device_name=device_name,
+                benchmark_name='Sequential Writes: Import CSV',
+            ).table(
+                cell_content_property='write_bytes',
+                row_name_property='database',
+                col_name_property='dataset',
+                col_names=dataset_names,
+                row_names=dbs,
+            ).plot(
+                title='Import Overhead - Total Bytes Written',
+                print_height=True,
+                print_rows_names=True,
+                print_cols_names=True,
+            )
+        )
+
         # Read Queries.
         out.add('## Read Queries')
         out.add('''
@@ -149,25 +166,25 @@ class P4Print():
              '''
              Input: 1 document identifier.<br/>
              Output: text content.<br/>
-             Metric: number of such queries returned per second.<br/>
+             Metric: number of queries per second.<br/>
              '''),
             ('Random Reads: Find up to 10,000 Docs containing a Word',
              '''
              Input: 1 randomly selected word.<br/>
              Output: up to 10,000 documents IDs containing it.<br/>
-             Metric: number of such queries returned per second.<br/>
+             Metric: number of queries per second.<br/>
              '''),
             ('Random Reads: Find up to 20 Docs containing a Word',
              '''
              Input: 1 randomly selected word.<br/>
              Output: up to 20 documents IDs containing it.<br/>
-             Metric: number of such queries returned per second.<br/>
+             Metric: number of queries per second.<br/>
              '''),
             ('Random Reads: Find up to 20 Docs with Bigram',
              '''
              Input: a combination of randomly selected words.<br/>
              Output: all documents IDs containing it.<br/>
-             Metric: number of such queries returned per second.<br/>
+             Metric: number of queries per second.<br/>
              '''),
         ]
         # for regex_template in P3TasksSampler.__regex_templates__:
@@ -176,7 +193,7 @@ class P4Print():
         #     description = '''
         #         Input: a regular expression: `{}`.<br/>
         #         Output: all documents IDs containing it.<br/>
-        #         Metric: number of such queries returned per second.<br/>
+        #         Metric: number of queries per second.<br/>
         #         Match Example: `{}`.<br/>
         #     '''.format(regex_template['Template'], regex_template['Example'])
         #     read_ops.append([read_ops, description])
@@ -195,6 +212,24 @@ class P4Print():
                 row_names=dbs,
                 col_names=dataset_names
             ).add_gains())
+
+        # Add a chart showing the number of total read bytes during random read operations.
+        out.add(
+            StatsSubset(ins).filtered(
+                device_name=device_name,
+                benchmark_name=re.compile('Random Reads: Find.*'),
+            ).table(
+                cell_content_property='read_bytes',
+                row_name_property='database',
+                col_name_property='benchmark_name',
+                row_names=dbs,
+            ).plot(
+                title='Read Amplification - Read Bytes Per Benchmark',
+                print_height=True,
+                print_rows_names=True,
+                print_cols_names=True,
+            )
+        )
 
         # Write Operations.
         out.add('## Write Operations')
@@ -246,6 +281,24 @@ class P4Print():
                 row_names=dbs,
                 col_names=dataset_names
             ).add_gains())
+
+        # Add a chart showing the number of total read and written bytes during write operations.
+        out.add(
+            StatsSubset(ins).filtered(
+                device_name=device_name,
+                benchmark_name=re.compile('Random Writes.*'),
+            ).table(
+                cell_content_property='write_bytes',
+                row_name_property='database',
+                col_name_property='benchmark_name',
+                row_names=dbs,
+            ).plot(
+                title='Write Amplification - Written Bytes Per Benchmark',
+                print_height=True,
+                print_rows_names=True,
+                print_cols_names=True,
+            )
+        )
 
         out.print_to(f'BenchTexts/{device_name}/README.md')
 

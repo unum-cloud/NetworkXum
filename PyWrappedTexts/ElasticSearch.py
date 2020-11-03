@@ -127,7 +127,7 @@ class ElasticSearch(BaseAPI):
         #
         result = self.elastic.search(index=self.db_name, body=query_dict)
         dicts = result.get('hits', {}).get('hits', [])
-        return map(self.parse_match, dicts)
+        return list(map(self.parse_match, dicts))
 
     def find_regex(
         self,
@@ -157,7 +157,7 @@ class ElasticSearch(BaseAPI):
         #
         result = self.elastic.search(index=self.db_name, body=query_dict)
         dicts = result.get('hits', {}).get('hits', [])
-        return map(self.parse_match, dicts)
+        return list(map(self.parse_match, dicts))
 
 # region Bulk Reads
 
