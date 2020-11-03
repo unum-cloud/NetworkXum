@@ -70,7 +70,7 @@ class P3TasksSampler(object):
         self._buffer_texts = []
 
     def number_of_needed_samples(self) -> int:
-        return self.count_changes
+        return self.count_changes * 10
 
     def sample_file(self, filename: str) -> int:
         self.clear()
@@ -84,13 +84,14 @@ class P3TasksSampler(object):
         all_ids = [t._id for t in self._buffer_texts]
         self.doc_ids_to_query = sample_reservoir(all_ids, self.count_changes)
 
-        cnt_wanted = self.count_substring_ops
         all_words = flatten([t.content.split() for t in self._buffer_texts])
         all_words = filter(lambda x: (len(x) > 4) and x.isalnum(), all_words)
         all_words = list([x.lower() for x in all_words])
+        cnt_wanted = min(self.count_substring_ops, len(all_words))
         self.words_to_search = sample_reservoir(all_words, cnt_wanted)
-        self.docs_to_change_by_one = self._buffer_texts
-        self.docs_to_change_batched = list(chunks(self._buffer_texts, 500))
+        self.docs_to_change_by_one = self._buffer_texts[:self.count_changes]
+        self.docs_to_change_batched = list(
+            chunks(self._buffer_texts[:self.count_changes], 500))
 
         # We add random words to avoid cache matches.
         self.regexs_to_search = type(self).__regex_templates__
