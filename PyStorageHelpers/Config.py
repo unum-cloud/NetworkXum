@@ -6,7 +6,7 @@ ram_limit = (2 ** 30)  # 1 GB
 performance_over_reliability = True
 
 unumdb_purpose = '''
-    At [Unum](https://unum.xyz) we develop a neuro-symbolic AI, which means combining discrete structural representations of data and semi-continuous neural representations.
+    At [Unum](https://unum.am) we develop a neuro-symbolic AI, which means combining discrete structural representations of data and semi-continuous neural representations.
     The common misconception is that CPU/GPU power is the bottleneck for designing AGI, but we would argue that it's the storage layer (unless you want to train on the same data over and over again).
 
     * CPU ⇌ RAM bandwidth ([DDR4](https://en.wikipedia.org/wiki/DDR4_SDRAM)): ~100 GB/s.

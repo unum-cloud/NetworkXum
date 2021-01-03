@@ -1,7 +1,7 @@
 # How well can different DBs handle graphs (networks)?
 
 
-At [Unum](https://unum.xyz) we develop a neuro-symbolic AI, which means combining discrete structural representations of data and semi-continuous neural representations.
+At [Unum](https://unum.am) we develop a neuro-symbolic AI, which means combining discrete structural representations of data and semi-continuous neural representations.
 The common misconception is that CPU/GPU power is the bottleneck for designing AGI, but we would argue that it's the storage layer (unless you want to train on the same data over and over again).
 
 * CPU ⇌ RAM bandwidth ([DDR4](https://en.wikipedia.org/wiki/DDR4_SDRAM)): ~100 GB/s.
@@ -26,7 +26,7 @@ That's why it's crucial for us to store the data in the most capable database!
 * [PostgreSQL](https://www.postgresql.org) is the 2nd most popular Open-Source DB.
 * [MongoDB](https://www.sqlite.org/index.html) is the most popular NoSQL database. `$MDB` is values at aound $10 Bln.
 * [Neo4J](https://neo4j.com) was designed specifically for graphs storage, but crashes consistently, so it was removed from comparison.
-* [UnumDB](https://unum.xyz/db) is our in-house solution.
+* [UnumDB](https://unum.am/db) is our in-house solution.
 
 Databases were configured to use 512 MB of RAM for cache and 4 cores for query execution.
 Links: [The Most Popular Open Source Databases 2020](https://www.percona.com/blog/2020/04/22/the-state-of-the-open-source-database-industry-in-2020-part-three/).
