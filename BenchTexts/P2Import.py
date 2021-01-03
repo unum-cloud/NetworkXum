@@ -5,7 +5,7 @@ import importlib
 from pystats2md.micro_bench import MicroBench
 from pystats2md.helpers import metric2str, bytes2str
 
-from PyWrappedHelpers import *
+from PyStorageHelpers import *
 from P0Config import P0Config
 
 

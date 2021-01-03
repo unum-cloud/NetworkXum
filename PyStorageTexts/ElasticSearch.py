@@ -3,8 +3,8 @@ import copy
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
 
-from PyWrappedTexts.BaseAPI import BaseAPI
-from PyWrappedHelpers import *
+from PyStorageTexts.BaseAPI import BaseAPI
+from PyStorageHelpers import *
 
 
 class ElasticSearch(BaseAPI):

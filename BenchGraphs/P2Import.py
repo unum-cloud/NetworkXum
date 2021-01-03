@@ -6,8 +6,8 @@ from pystats2md.micro_bench import MicroBench
 from pystats2md.helpers import metric2str, bytes2str
 import pynum
 
-from PyWrappedGraph.BaseAPI import BaseAPI
-from PyWrappedHelpers import *
+from PyStorageGraph.BaseAPI import BaseAPI
+from PyStorageHelpers import *
 from P0Config import P0Config
 
 

@@ -8,18 +8,18 @@ with open("README.md", "r") as fh:
 __version__ = '0.3.0'
 
 setup(
-    name='PyWrappedDBs',
+    name='PyStorageDBs',
     version=__version__,
     author='Ashot Vardanian',
     author_email='ashvardanian@gmail.com',
-    url='https://github.com/ashvardanian/PyWrappedDBs',
+    url='https://github.com/ashvardanian/PyStorageDBs',
     description='''
     A set of database wrappers with OOP-like interfaces.
     Graph structures are backed by SQLite, MySQL, PostgreSQL, MongoDB and Neo4J and compatiable with NetworkX. 
     Document collections are backed by SQLite, MySQL, PostgreSQL, MongoDB and Lucene.
     ''',
     long_description=long_description,
-    packages=['PyWrappedGraph', 'PyWrappedTexts', 'PyWrappedHelpers'],
+    packages=['PyStorageGraph', 'PyStorageTexts', 'PyStorageHelpers'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

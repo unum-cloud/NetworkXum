@@ -1,7 +1,7 @@
 import random
 from typing import List
 
-from PyWrappedHelpers import *
+from PyStorageHelpers import *
 from pynum import sample_edges
 
 from P0Config import P0Config

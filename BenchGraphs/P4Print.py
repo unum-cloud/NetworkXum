@@ -6,7 +6,7 @@ from pystats2md.stats_subset import StatsSubset
 from pystats2md.report import Report
 
 from P0Config import P0Config
-from PyWrappedHelpers import *
+from PyStorageHelpers import *
 
 
 class P4Print():
@@ -25,7 +25,7 @@ class P4Print():
 
         out = Report()
         dbs = [
-            'PostgreSQL', 'MySQL', 'SQLite', 'MongoDB', 'Unum.GraphDB',
+            'PostgreSQL', 'MySQL', 'SQLite', 'MongoDB', 'UnumDB',
         ]  # ins.subset().unique('database')
         dataset_names = [
             'PatentCitations', 'MouseGenes', 'HumanBrain',
@@ -44,7 +44,7 @@ class P4Print():
         * [PostgreSQL](https://www.postgresql.org) is the 2nd most popular Open-Source DB.
         * [MongoDB](https://www.sqlite.org/index.html) is the most popular NoSQL database. `$MDB` is values at aound $10 Bln.
         * [Neo4J](https://neo4j.com) was designed specifically for graphs storage, but crashes consistently, so it was removed from comparison.
-        * [Unum.GraphDB](https://unum.xyz/db) is our in-house solution.
+        * [UnumDB](https://unum.xyz/db) is our in-house solution.
 
         Databases were configured to use 512 MB of RAM for cache and 4 cores for query execution.
         Links: [The Most Popular Open Source Databases 2020](https://www.percona.com/blog/2020/04/22/the-state-of-the-open-source-database-industry-in-2020-part-three/).

@@ -72,7 +72,7 @@
         "write_requests_per_second": 770.6875727144459
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 11.254758834838867,
@@ -108,7 +108,7 @@
         "write_requests_per_second": 389.25756333744863
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Random Reads: Lookup Doc by ID",
         "time_elapsed": 0.54952073097229,
@@ -720,7 +720,7 @@
         "write_requests_per_second": 2192.949314555781
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Random Reads: Find up to 10,000 Docs containing a Word",
         "time_elapsed": 30.834381103515625,
@@ -756,7 +756,7 @@
         "write_requests_per_second": 427.57465946014423
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Random Reads: Find up to 20 Docs containing a Word",
         "time_elapsed": 30.052379846572876,
@@ -792,7 +792,7 @@
         "write_requests_per_second": 83.52083970768246
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Random Reads: Find up to 20 Docs with Bigram",
         "time_elapsed": 30.04869294166565,
@@ -828,7 +828,7 @@
         "write_requests_per_second": 12.812537328908483
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Random Writes: Remove Doc",
         "time_elapsed": 0.956171989440918,
@@ -864,7 +864,7 @@
         "write_requests_per_second": 1562.4804078119405
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Random Writes: Upsert Doc",
         "time_elapsed": 0.9412062168121338,
@@ -900,7 +900,7 @@
         "write_requests_per_second": 2197.1805573111465
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Random Writes: Remove Docs Batch",
         "time_elapsed": 0.9082231521606445,
@@ -936,7 +936,7 @@
         "write_requests_per_second": 127.72191473432311
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Random Writes: Upsert Docs Batch",
         "time_elapsed": 0.8906652927398682,
@@ -1044,7 +1044,7 @@
         "write_requests_per_second": 610.6172726540643
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Sequential Writes: Import CSV",
         "time_elapsed": 13.423994779586792,
@@ -1656,7 +1656,7 @@
         "write_requests_per_second": 248.96305533430402
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Lookup Doc by ID",
         "time_elapsed": 0.7825069427490234,
@@ -1692,7 +1692,7 @@
         "write_requests_per_second": 215.972524673438
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 10,000 Docs containing a Word",
         "time_elapsed": 30.678935050964355,
@@ -1728,7 +1728,7 @@
         "write_requests_per_second": 82.10845636640892
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 20 Docs containing a Word",
         "time_elapsed": 30.18323302268982,
@@ -1764,7 +1764,7 @@
         "write_requests_per_second": 18.42082322930863
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 20 Docs with Bigram",
         "time_elapsed": 30.096825122833252,
@@ -1800,7 +1800,7 @@
         "write_requests_per_second": 13.29043838901586
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Writes: Remove Doc",
         "time_elapsed": 1.0690391063690186,
@@ -1836,7 +1836,7 @@
         "write_requests_per_second": 1452.7064452064342
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Writes: Upsert Doc",
         "time_elapsed": 1.0671019554138184,
@@ -1872,7 +1872,7 @@
         "write_requests_per_second": 2019.4883807183153
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Writes: Remove Docs Batch",
         "time_elapsed": 0.9942729473114014,
@@ -1908,7 +1908,7 @@
         "write_requests_per_second": 1151.5952466535246
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Writes: Upsert Docs Batch",
         "time_elapsed": 0.9890828132629395,
@@ -2304,7 +2304,7 @@
         "write_requests_per_second": 10.671597296857104
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Random Reads: Find up to 10,000 Docs containing a Short Word",
         "time_elapsed": 30.11376690864563,
@@ -2340,7 +2340,7 @@
         "write_requests_per_second": 781.3369902004804
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Random Reads: Find up to 20 Docs containing a Short Word",
         "time_elapsed": 30.002339839935303,
@@ -2376,7 +2376,7 @@
         "write_requests_per_second": 984.3232280400596
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Random Reads: Find up to 20 Docs with Short Phrases",
         "time_elapsed": 30.075275897979736,
@@ -2412,7 +2412,7 @@
         "write_requests_per_second": 49.50910525479241
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Random Reads: Find up to 20 Docs containing a Long Word",
         "time_elapsed": 30.00568699836731,
@@ -2448,7 +2448,7 @@
         "write_requests_per_second": 121.84356919403088
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "Covid19",
         "benchmark_name": "Random Reads: Find up to 20 Docs with Long Phrases",
         "time_elapsed": 30.02279806137085,
@@ -2844,7 +2844,7 @@
         "write_requests_per_second": 38.60299129053855
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 10,000 Docs containing a Short Word",
         "time_elapsed": 30.263299226760864,
@@ -2880,7 +2880,7 @@
         "write_requests_per_second": 68.82924377782545
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 20 Docs containing a Short Word",
         "time_elapsed": 30.080742359161377,
@@ -2916,7 +2916,7 @@
         "write_requests_per_second": 19.87982852483936
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 20 Docs with Short Phrases",
         "time_elapsed": 30.126322031021118,
@@ -2952,7 +2952,7 @@
         "write_requests_per_second": 803.7489599648709
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 20 Docs containing a Long Word",
         "time_elapsed": 30.062605142593384,
@@ -2988,7 +2988,7 @@
         "write_requests_per_second": 36.789892118597336
     },
     {
-        "database": "Unum.TextDB",
+        "database": "UnumDB",
         "dataset": "PoliticalTweetsIndia",
         "benchmark_name": "Random Reads: Find up to 20 Docs with Long Phrases",
         "time_elapsed": 30.079029083251953,

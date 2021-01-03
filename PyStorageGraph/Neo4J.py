@@ -6,8 +6,8 @@ from urllib.parse import urlparse
 from neo4j import GraphDatabase
 from neo4j import BoltStatementResult
 
-from PyWrappedHelpers import *
-from PyWrappedGraph.BaseAPI import BaseAPI
+from PyStorageHelpers import *
+from PyStorageGraph.BaseAPI import BaseAPI
 
 
 class Neo4J(BaseAPI):

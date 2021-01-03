@@ -1,4 +1,4 @@
-# Benchmarking DBs on Textual Workloads with PyWrappedDBs
+# Benchmarking DBs on Textual Workloads with PyStorageDBs
 
 The intention of benchmarks was to see, how well various DBs can handle textual workloads, such as: substring search and RegEx pattern matching.
 Most DBs have text indexing capabilities, but the performance and space consumption differs a lot.

@@ -3,7 +3,7 @@ from typing import Sequence, Optional, Dict, Generator, Set, Tuple, Sequence
 import concurrent.futures
 import collections
 
-from PyWrappedHelpers import *
+from PyStorageHelpers import *
 
 
 class BaseAPI(object):
