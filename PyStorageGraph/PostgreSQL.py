@@ -1,4 +1,4 @@
-from PyWrappedGraph.BaseSQL import *
+from PyStorageGraph.BaseSQL import *
 
 
 class PostgreSQL(BaseSQL):

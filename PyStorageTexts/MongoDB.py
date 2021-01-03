@@ -4,8 +4,8 @@ import pymongo
 from pymongo import MongoClient
 from pymongo import UpdateOne, DeleteOne
 
-from PyWrappedTexts.BaseAPI import BaseAPI
-from PyWrappedHelpers import *
+from PyStorageTexts.BaseAPI import BaseAPI
+from PyStorageHelpers import *
 
 
 class MongoDB(BaseAPI):

@@ -11,8 +11,8 @@ from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy import text
 from sqlalchemy import Index, Table
 
-from PyWrappedTexts.BaseAPI import BaseAPI
-from PyWrappedHelpers import *
+from PyStorageTexts.BaseAPI import BaseAPI
+from PyStorageHelpers import *
 
 DeclarativeDocsSQL = declarative_base()
 

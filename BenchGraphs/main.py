@@ -6,7 +6,7 @@ from P4Print import P4Print
 
 
 if __name__ == "__main__":
-    print('Welcome to PyWrappedDBs Graphs Benchmark!')
+    print('Welcome to PyStorageDBs Graphs Benchmark!')
     conf = P0Config.shared()
     try:
         print('- Testing DBs!')

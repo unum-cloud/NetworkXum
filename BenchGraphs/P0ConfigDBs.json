@@ -2,13 +2,13 @@
     {
         "module_name": "pynum",
         "class_name": "GraphDB",
-        "name": "Unum.GraphDB",
+        "name": "UnumDB",
         "url_variable_name": "URI_UNUMDB_GRAPH",
         "url_default": "/Users/av/DBs/UnumDB/Graphs/${DATASET_NAME}",
         "enabled": false
     },
     {
-        "module_name": "PyWrappedGraph.MongoDB",
+        "module_name": "PyStorageGraph.MongoDB",
         "class_name": "MongoDB",
         "name": "MongoDB",
         "url_variable_name": "URI_MONGODB",
@@ -16,7 +16,7 @@
         "enabled": true
     },
     {
-        "module_name": "PyWrappedGraph.SQLite",
+        "module_name": "PyStorageGraph.SQLite",
         "class_name": "SQLite",
         "name": "SQLite",
         "url_variable_name": "URI_SQLITE",
@@ -24,7 +24,7 @@
         "enabled": true
     },
     {
-        "module_name": "PyWrappedGraph.SQLite",
+        "module_name": "PyStorageGraph.SQLite",
         "class_name": "SQLiteMem",
         "name": "SQLite (In-Memory)",
         "url_variable_name": "URI_SQLITE_RAM",
@@ -32,7 +32,7 @@
         "enabled": false
     },
     {
-        "module_name": "PyWrappedGraph.MySQL",
+        "module_name": "PyStorageGraph.MySQL",
         "class_name": "MySQL",
         "name": "MySQL",
         "url_variable_name": "URI_MYSQL",
@@ -40,7 +40,7 @@
         "enabled": true
     },
     {
-        "module_name": "PyWrappedGraph.PostgreSQL",
+        "module_name": "PyStorageGraph.PostgreSQL",
         "class_name": "PostgreSQL",
         "name": "PostgreSQL",
         "url_variable_name": "URI_POSTGRESQL",
@@ -48,7 +48,7 @@
         "enabled": true
     },
     {
-        "module_name": "PyWrappedGraph.Neo4J",
+        "module_name": "PyStorageGraph.Neo4J",
         "class_name": "Neo4J",
         "name": "Neo4J",
         "url_variable_name": "URI_NEO4J",

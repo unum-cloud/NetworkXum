@@ -1,6 +1,6 @@
-from PyWrappedHelpers import *
-from PyWrappedGraph.BaseAPI import BaseAPI
-from PyWrappedGraph.BaseSQL import BaseSQL
+from PyStorageHelpers import *
+from PyStorageGraph.BaseAPI import BaseAPI
+from PyStorageGraph.BaseSQL import BaseSQL
 
 
 class Cayley(BaseAPI):

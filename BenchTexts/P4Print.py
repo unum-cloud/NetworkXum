@@ -8,7 +8,7 @@ from pystats2md.report import Report
 
 from P0Config import P0Config
 from P3TasksSampler import P3TasksSampler
-from PyWrappedHelpers import *
+from PyStorageHelpers import *
 
 
 class P4Print():
@@ -28,7 +28,7 @@ class P4Print():
         out = Report()
         dbs = [
             'MongoDB', 'ElasticSearch',
-            'Unum.TextDB',
+            'UnumDB',
         ]  # ins.subset().unique('database')
         dataset_names = [
             'Covid19',
@@ -101,7 +101,7 @@ class P4Print():
         out.add(StatsTable(header_row=[
             'Covid19', 'PoliticalTweetsIndia', 'EnglishWikipedia',
         ], header_col=[
-            'MongoDB', 'ElasticSearch', 'Unum.TextDB',
+            'MongoDB', 'ElasticSearch', 'UnumDB',
         ], content=[
             ['1,9 GB', '3,2 GB', 'Expected 60,7 GB'],
             ['2,5 GB', '2,9 GB', '33,5 GB'],

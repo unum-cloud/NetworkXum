@@ -1,5 +1,5 @@
-from PyWrappedGraph.BaseAPI import BaseAPI
-from PyWrappedHelpers import *
+from PyStorageGraph.BaseAPI import BaseAPI
+from PyStorageHelpers import *
 
 from P0Config import P0Config
 

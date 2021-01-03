@@ -1,6 +1,6 @@
 [
     {
-        "module_name": "PyWrappedTexts.ElasticSearch",
+        "module_name": "PyStorageTexts.ElasticSearch",
         "class_name": "ElasticSearch",
         "name": "ElasticSearch",
         "url_variable_name": "URI_ELASTIC_SEARCH",
@@ -8,7 +8,7 @@
         "enabled": true
     },
     {
-        "module_name": "PyWrappedTexts.MongoDB",
+        "module_name": "PyStorageTexts.MongoDB",
         "class_name": "MongoDB",
         "name": "MongoDB",
         "url_variable_name": "URI_MONGODB",
@@ -18,7 +18,7 @@
     {
         "module_name": "pynum",
         "class_name": "TextDB",
-        "name": "Unum.TextDB",
+        "name": "UnumDB",
         "url_variable_name": "URI_UNUMDB_TEXT",
         "url_default": "/Users/av/DBs/UnumDB/Articles/${DATASET_NAME}",
         "enabled": true

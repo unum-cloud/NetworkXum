@@ -1,4 +1,4 @@
-# Benchmarking DBs on Graph Workloads with PyWrappedDBs
+# Benchmarking DBs on Graph Workloads with PyStorageDBs
 
 The intention of benchmarks was to see, how well various DBs can handle graph workloads.
 If you are not familiar with graphs, its just a mathematical term to describe relations between different points.

@@ -6,8 +6,8 @@ import pymongo
 from pymongo import MongoClient
 from pymongo import UpdateOne
 
-from PyWrappedGraph.BaseAPI import BaseAPI
-from PyWrappedHelpers import *
+from PyStorageGraph.BaseAPI import BaseAPI
+from PyStorageHelpers import *
 
 
 class MongoDB(BaseAPI):
