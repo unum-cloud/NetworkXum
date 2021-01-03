@@ -44,7 +44,7 @@ class P4Print():
         * [PostgreSQL](https://www.postgresql.org) is the 2nd most popular Open-Source DB.
         * [MongoDB](https://www.sqlite.org/index.html) is the most popular NoSQL database. `$MDB` is values at aound $10 Bln.
         * [Neo4J](https://neo4j.com) was designed specifically for graphs storage, but crashes consistently, so it was removed from comparison.
-        * [UnumDB](https://unum.xyz/db) is our in-house solution.
+        * [UnumDB](https://unum.am/db) is our in-house solution.
 
         Databases were configured to use 512 MB of RAM for cache and 4 cores for query execution.
         Links: [The Most Popular Open Source Databases 2020](https://www.percona.com/blog/2020/04/22/the-state-of-the-open-source-database-industry-in-2020-part-three/).

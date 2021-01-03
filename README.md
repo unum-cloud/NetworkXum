@@ -5,7 +5,7 @@ A library (and a set of benchmarks) of DB wrappers, which hide their unique inte
 * Graphs (Networks) - modeled after NetworkX interface,
 * Textual Documents - modeled after ElasticSearch interface.
 
-The intention of this project was to find the best storage layer for [Unum](https://unum.xyz) neuro-symbolic AI models, so we compared all kinds of DBs: SQL & NoSQL, distributed & single-node, embedded databases & full scale servers. This library was tested with following backends: 
+The intention of this project was to find the best storage layer for [Unum](https://unum.am) neuro-symbolic AI models, so we compared all kinds of DBs: SQL & NoSQL, distributed & single-node, embedded databases & full scale servers. This library was tested with following backends: 
 
 * [MongoDB](#mongodb) - modern (yet mature) distributed document DB with good performance in most workloads,
 * [ElasticSearch](#elasticsearch) - extremely popular text-indexing software, 
@@ -16,11 +16,11 @@ The intention of this project was to find the best storage layer for [Unum](http
 
 ## Project Structure
 
-* [PyWrappedGraph](PyWrappedGraph) - Python wrappers for Graph (Network) datastructures backed by persistent DBs.
-* [PyStoragehs](BenPyStorage - benchmarking tools and performance results for [PyWrappedGraph](PyWrappedGraph).
-* [PyWrappedTexts](PyWrappedTexts) - Python wrappers for search-able containersPyStoragegs backPyStoragesistent DBs.
-* [PyStorages](BencPyStorage benchmarking tools and performance results for [PyWrappedTexts](PyWrappedTexts).
-PyStoragePyStorage
+* [PyStorageGraph](PyStorageGraph) - Python wrappers for Graph (Network) datastructures backed by persistent DBs.
+* [BenchGraph](BenchGraph) - benchmarking tools and performance results for [PyStorageGraph](PyStorageGraph).
+* [PyStorageTexts](PyStorageTexts) - Python wrappers for search-able containersPyStoragegs backPyStoragesistent DBs.
+* [BenchTexts](BenchTexts) benchmarking tools and performance results for [PyStorageTexts](PyStorageTexts).
+
 ## Implementation Details & Included DBs
 
 Some common databases have licences that prohibit sharing of benchmark results, so they were excluded from comparisons.
@@ -70,7 +70,7 @@ Some common databases have licences that prohibit sharing of benchmark results, 
 
 ## Performance Considerations
 
-After months-long analysis on different datasets and hardware - we decided to write a new high-performance database from scratch ([UnumDB](https://unum.xyz/db)). Below are some of the bottlenecks we have identified in most modern DBs. If you decide to write your own, those are the points to consider. 
+After months-long analysis on different datasets and hardware - we decided to write a new high-performance database from scratch ([UnumDB](https://unum.am/db)). Below are some of the bottlenecks we have identified in most modern DBs. If you decide to write your own, those are the points to consider. 
 
 |                           |            Common Solutions             |            What we use in UnumDB            |                **Result**                | Device |
 | :------------------------ | :-------------------------------------: | :-----------------------------------------: | :--------------------------------------: | :----: |
@@ -85,7 +85,7 @@ After months-long analysis on different datasets and hardware - we decided to wr
 | Inter-node communications |                 TCP/IP                  |    DMA or Infiniband RDMA (in a cluster)    |      Faster sharing between servers      |   📡    |
 | Data exchange format      |           Plain text or JSON            |                   Binary                    |     No serialization overhead on CPU     |   🧠    |
 
-Or just use [UnumDB](https://unum.xyz/db), it's free. **Currently you can expect 5x-100x better DB performance across the board**. We are on track to implement a lot more optimizations than listed above. If you decide to switch to a more mature DB later on - you will only have to change 1 line in your code.
+Or just use [UnumDB](https://unum.am/db), it's free. **Currently you can expect 5x-100x better DB performance across the board**. We are on track to implement a lot more optimizations than listed above. If you decide to switch to a more mature DB later on - you will only have to change 1 line in your code.
 
 ## TODO
 
