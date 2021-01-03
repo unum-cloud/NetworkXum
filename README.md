@@ -1,10 +1,9 @@
-# PyWrappedDBs
+# PyStorage
 
-A library (and set of benchmarks) of DB wrappers, which hide their unique interfaces behind simple-to-use purpose-specific wrappers for:
+A library (and a set of benchmarks) of DB wrappers, which hide their unique interfaces behind simple-to-use purpose-specific wrappers for:
 
-* Graphs (Networks),
-* Textual Documents,
-* Time Series.
+* Graphs (Networks) - modeled after NetworkX interface,
+* Textual Documents - modeled after ElasticSearch interface.
 
 The intention of this project was to find the best storage layer for [Unum](https://unum.xyz) neuro-symbolic AI models, so we compared all kinds of DBs: SQL & NoSQL, distributed & single-node, embedded databases & full scale servers. This library was tested with following backends: 
 
