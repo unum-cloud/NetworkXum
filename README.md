@@ -5,12 +5,12 @@ A library (and a set of benchmarks) of DB wrappers, which hide their unique inte
 * Graphs (Networks) - modeled after NetworkX interface,
 * Textual Documents - modeled after ElasticSearch interface.
 
-The intention of this project was to find the best storage layer for [Unum](https://unum.am) neuro-symbolic AI models, so we compared all kinds of DBs: SQL & NoSQL, distributed & single-node, embedded databases & full scale servers. This library was tested with following backends: 
+The intention of this project was to find the best storage layer for [Unum](https://unum.am) neuro-symbolic AI models, so we compared all kinds of DBs: SQL & NoSQL, distributed & single-node, embedded databases & full scale servers. This library was tested with following backends:
 
-* [MongoDB](#mongodb) - modern (yet mature) distributed document DB with good performance in most workloads,
-* [ElasticSearch](#elasticsearch) - extremely popular text-indexing software, 
-* [Neo4J](#neo4j) - disturbingly slow and unstable DB positioned as the go-to Graph database, 
-* [SQLite3](#sqlite3) - ubiquitous compact relation DB with basic `SQL` support, 
+* [MongoDB](#mongodb) - modern (yet mature) distributed document DB with good performance in most workloads
+* [ElasticSearch](#elasticsearch) - extremely popular text-indexing software,
+* [Neo4J](#neo4j) - disturbingly slow and unstable DB positioned as the go-to Graph database,
+* [SQLite3](#sqlite3) - ubiquitous compact relation DB with basic `SQL` support,
 * [PostgreSQL](#postgresql) - most feature-rich open-source relational DB,
 * [MySQL](#mysql) - the most commonly-used relational DB.
 
