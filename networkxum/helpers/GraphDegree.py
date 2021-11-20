@@ -7,4 +7,4 @@ class GraphDegree:
     weight: float = 0
 
     def __int__(self):
-        return count
+        return self.count
