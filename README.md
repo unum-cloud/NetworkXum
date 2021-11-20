@@ -1,25 +1,21 @@
-# PyStorage
+# NetworkXum
 
-A library (and a set of benchmarks) of DB wrappers, which hide their unique interfaces behind simple-to-use purpose-specific wrappers for:
-
-* Graphs (Networks) - modeled after NetworkX interface,
-* Textual Documents - modeled after ElasticSearch interface.
-
-The intention of this project was to find the best storage layer for [Unum](https://unum.am) neuro-symbolic AI models, so we compared all kinds of DBs: SQL & NoSQL, distributed & single-node, embedded databases & full scale servers. This library was tested with following backends:
+NetworkXum is [NetworkX](https://github.com/networkx/networkx)-like interface for large persistent graphs stored inside DBMS. This lets you upscale from Megabyte-Gigabyte graphs to Terabyte-Petabyte graphs (that won't fit into RAM), without changing your code. We provide wrappers for following DBs:
 
 * [MongoDB](#mongodb) - modern (yet mature) distributed document DB with good performance in most workloads
-* [ElasticSearch](#elasticsearch) - extremely popular text-indexing software,
-* [Neo4J](#neo4j) - disturbingly slow and unstable DB positioned as the go-to Graph database,
-* [SQLite3](#sqlite3) - ubiquitous compact relation DB with basic `SQL` support,
+* [Neo4J](#neo4j) - disturbingly slow and unstable DBMS positioned as the go-to Graph database,
+* [SQLite3](#sqlite3) - ubiquitous compact relational DBMS with basic `SQL` support,
 * [PostgreSQL](#postgresql) - most feature-rich open-source relational DB,
 * [MySQL](#mysql) - the most commonly-used relational DB.
 
 ## Project Structure
 
-* [PyStorageGraph](PyStorageGraph) - Python wrappers for Graph (Network) datastructures backed by persistent DBs.
-* [BenchGraph](BenchGraph) - benchmarking tools and performance results for [PyStorageGraph](PyStorageGraph).
-* [PyStorageTexts](PyStorageTexts) - Python wrappers for search-able containersPyStoragegs backPyStoragesistent DBs.
-* [BenchTexts](BenchTexts) benchmarking tools and performance results for [PyStorageTexts](PyStorageTexts).
+* [networkxum](networkxum) - Python wrappers for Graph (Network) datastructures backed by persistent DBs.
+* [benchmarks](benchmarks) - benchmarking tools and performance results.
+* [assets](assets) - tiny datasets for testing purposes.
+* [regexum](PyStorageTexts) - Python wrappers for search-able containers backed by persistent DBs.
+* [benchmarks](benchmarks) - benchmarking tools and performance results.
+* [assets](assets) - tiny datasets for testing purposes.
 
 ## Implementation Details & Included DBs
 
@@ -35,7 +31,7 @@ Some common databases have licences that prohibit sharing of benchmark results, 
 
 ### MongoDB
 
-* A distributed ACID document store. 
+* A distributed ACID document store.
 * Internally uses the `BSON` binary format.
 * Very popular open-source project backed by the `$MDB` [publicly traded company](https://finance.yahoo.com/quote/MDB).
 * Provides bindings for most programming languages (including [PyMongo](https://pymongo.readthedocs.io) for Python).
@@ -68,29 +64,9 @@ Some common databases have licences that prohibit sharing of benchmark results, 
 * There are some compatiability issues between API versions 3.5 and 4.
 * In our experience, Neo4J is extremely unstable and doesn't scale beyond tiny datasets. Generally crashes due to Java VM heap management issues.
 
-## Performance Considerations
-
-After months-long analysis on different datasets and hardware - we decided to write a new high-performance database from scratch ([UnumDB](https://unum.am/db)). Below are some of the bottlenecks we have identified in most modern DBs. If you decide to write your own, those are the points to consider. 
-
-|                           |            Common Solutions             |            What we use in UnumDB            |                **Result**                | Device |
-| :------------------------ | :-------------------------------------: | :-----------------------------------------: | :--------------------------------------: | :----: |
-| Data layout               |          Row-wise or columnar           |          Optimal for each datatype          |         Less random jumps on SSD         |   💾    |
-| Compression               |    Generic, but slow (Snappy, zlib)     | Newly invented algorithms for each datatype |   Writes/reads less bytes to/from SSD    |   💾    |
-| Integrated Analytics      |     Integrating 3rd party libraries     |           Co-designed algorithms            | Optimal use of search indexes & metadata |   🧠    |
-| Computations              |               Sequential                |              SIMD-Accelerated               |   Processing more bytes per CPU cycle    |   🧠    |
-| Query language            |   SQL-like with big parsing overhead    |           Simple Python-interface           |   Lower latency for simple operations    |   🧠    |
-| Memory management         |      Garbage collecting languages       |       Modern C++ with smart pointers        |     Reusing RAM & avoiding GC stalls     |   🐏    |
-| In-Memory copies          | 1+ per read/write + DB cache + OS cache |      1 per write + DB cache + OS cache      |     Fitting more data-points in RAM      |   🐏    |
-| Parallelism               |            Multi-processing             |        Asynchronous multi-threading         |     Faster sharing between CPU cores     |   🧠    |
-| Inter-node communications |                 TCP/IP                  |    DMA or Infiniband RDMA (in a cluster)    |      Faster sharing between servers      |   📡    |
-| Data exchange format      |           Plain text or JSON            |                   Binary                    |     No serialization overhead on CPU     |   🧠    |
-
-Or just use [UnumDB](https://unum.am/db), it's free. **Currently you can expect 5x-100x better DB performance across the board**. We are on track to implement a lot more optimizations than listed above. If you decide to switch to a more mature DB later on - you will only have to change 1 line in your code.
-
 ## TODO
 
 * [x] Benchmark on small & mid graphs.
 * [x] Session management in SQL and Neo4J.
-* [x] Durration constraints for benchmarks.
+* [x] Duration constraints for benchmarks.
 * [ ] Mixed Multithreaded Read/Write benchmarks.
-* [ ] Time Series benchmarks.
