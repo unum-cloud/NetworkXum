@@ -4,8 +4,7 @@ from pathlib import Path
 import sys
 import os.path
 
-from PyStorageHelpers.Edge import Edge
-from PyStorageHelpers.Text import Text
+from .Edge import Edge
 
 
 def allow_big_csv_fields():
