@@ -3,7 +3,8 @@ from typing import Sequence, Optional, Dict, Generator, Set, Tuple, Sequence
 import concurrent.futures
 import collections
 
-from PyStorageHelpers import *
+from .helpers import Edge, GraphDegree, Node
+from .helpers.Algorithms import is_sequence_of, chunks
 
 
 class BaseAPI(object):
@@ -176,10 +177,10 @@ class BaseAPI(object):
         return result
 
     def __iter__(self) -> Sequence[Node]:
-        return nodes
+        return self.nodes
 
     def __contains__(self, n) -> bool:
-        return has_node(n) is not None
+        return self.has_node(n) is not None
 
     def get_edge_data(self, u, v, key=None, default=None) -> dict:
         """
