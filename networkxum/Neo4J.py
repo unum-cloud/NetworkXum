@@ -1,13 +1,13 @@
 import os
 import shutil
-from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence
+from typing import List, Set, Sequence
 from urllib.parse import urlparse
 
-from neo4j import GraphDatabase
-from neo4j import BoltStatementResult
+from neo4j import GraphDatabase, Result as Neo4jResult
 
-from PyStorageHelpers import *
-from PyStorageGraph.BaseAPI import BaseAPI
+from .helpers.Edge import Edge
+from .BaseAPI import BaseAPI
+from .helpers.Algorithms import chunks, extract_database_name
 
 
 class Neo4J(BaseAPI):
@@ -67,19 +67,17 @@ class Neo4J(BaseAPI):
         url_clean = '{x.scheme}://{x.hostname}:{x.port}/'.format(x=url_obj)
         self.driver = GraphDatabase.driver(
             url_clean,
-            encrypted=False,
-            user=url_obj.username,
-            password=url_obj.password,
+            auth=(url_obj.username, url_obj.password),
         )
         self.session = self.driver.session()
 
         # Resolve the name (for CAUTION 2):
         name = str()
-        for _, c in extract_database_name(url):
-            if (c in "qwertyuiopasdfghjklzxcvbnm") or\
-                (c in "QWERTYUIOPAFGHJKLZXCVBNM") or\
-                    (c in "1234567890"):
-                name += c
+        _, c = extract_database_name(url)
+        if (c in "qwertyuiopasdfghjklzxcvbnm") or\
+            (c in "QWERTYUIOPAFGHJKLZXCVBNM") or\
+                (c in "1234567890"):
+            name += c
         self._v = 'v' + name
         self._e = 'e' + name
         # Create constraints if needed.
@@ -97,18 +95,18 @@ class Neo4J(BaseAPI):
                     self.create_constraint_edges()
 
     def get_constraints(self) -> List[str]:
-        cs = list(self.session.run('CALL db.constraints').records())
+        cs = list(self.session.run('CALL db.constraints'))
         names = [c.get('name', '') for c in cs]
         return names
 
     def get_indexes(self) -> List[str]:
-        cs = list(self.session.run('CALL db.indexes').records())
+        cs = list(self.session.run('CALL db.indexes'))
         names = [c.get('name', '') for c in cs]
         return names
 
     def create_index_nodes(self):
         # Docs for CYPHER direct syntax:
-        # https://neo4j.com/docs/cypher-manual/current/administration/indexes-for-search-performance/index.html#administration-indexes-syntax
+        # https://neo4j.com/docs/cypher-manual/current/indexes-for-search-performance/#administration-indexes-syntax
         task = 'CREATE INDEX indexVERTEX FOR (v:VERTEX) ON (v._id)'
         # Older version didn't have index names.
         # Docs for `db.` operations.
@@ -119,7 +117,7 @@ class Neo4J(BaseAPI):
         return self.session.run(task)
 
     def create_constraint_nodes(self):
-        # Existing uniqness constraint means,
+        # Existing uniqueness constraint means,
         # that we don't have to create a separate index.
         # Docs: https://neo4j.com/docs/cypher-manual/current/administration/constraints/
         task = f'''
@@ -152,7 +150,7 @@ class Neo4J(BaseAPI):
 
     # Relatives
 
-    def has_edge(self, first: int, second: int) -> Optional[Edge]:
+    def has_edge(self, first: int, second: int, **kwargs) -> List[Edge]:
         if self.directed:
             pattern = '''
             MATCH (first:VERTEX {_id: %d})-[e:EDGE]->(second:VERTEX {_id: %d})
@@ -222,7 +220,7 @@ class Neo4J(BaseAPI):
         task = pattern % (group_members, group_members)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
-        return {int(r['_id']) for r in self.session.run(task).records()}
+        return {int(r['_id']) for r in self.session.run(task)}
 
     def neighbors(self, v: int) -> Set[int]:
         pattern = '''
@@ -232,7 +230,7 @@ class Neo4J(BaseAPI):
         task = pattern % (v)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
-        return {int(r['_id']) for r in self.session.run(task).records()}
+        return {int(r['_id']) for r in self.session.run(task)}
 
     def neighbors_of_neighbors(self, v: int, include_related=False) -> Set[int]:
         if include_related:
@@ -253,7 +251,7 @@ class Neo4J(BaseAPI):
             task = pattern % v
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
-        return {int(r['_id']) for r in self.session.run(task).records()}
+        return {int(r['_id']) for r in self.session.run(task)}
 
     def shortest_path(self, first, second) -> (List[int], float):
         pattern = '''
@@ -263,9 +261,10 @@ class Neo4J(BaseAPI):
         MATCH (v_on_path:Loc) WHERE id(v_on_path) = nodeId
         RETURN v_on_path._id AS _id, weight
         '''
+        task = pattern % (first, second)
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
-        rs = list(self.session.run(task).records())
+        rs = list(self.session.run(task))
         path = [int(r['_id']) for r in rs]
         weight = sum([float(r['weight']) for r in rs])
         return path, weight
@@ -280,7 +279,7 @@ class Neo4J(BaseAPI):
         '''
         return int(self._first_record(self.session.run(task), 'result'))
 
-    def reduce_edges(self) -> int:
+    def reduce_edges(self, **kwargs) -> int:
         task = f'''
         MATCH ()-[e:{self._e}]->()
         WITH count(e) as result
@@ -297,7 +296,7 @@ class Neo4J(BaseAPI):
         task = pattern % v
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
-        rs = list(self.session.run(task).records())
+        rs = list(self.session.run(task))
         c = int(self._first_record(rs, 'c'))
         s = float(self._first_record(rs, 's'))
         return c, s
@@ -311,7 +310,7 @@ class Neo4J(BaseAPI):
         task = pattern % v
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
-        rs = list(self.session.run(task).records())
+        rs = list(self.session.run(task))
         c = int(self._first_record(rs, 'c'))
         s = float(self._first_record(rs, 's'))
         return c, s
@@ -325,7 +324,7 @@ class Neo4J(BaseAPI):
         task = pattern % v
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
-        rs = list(self.session.run(task).records())
+        rs = list(self.session.run(task))
         c = int(self._first_record(rs, 'c'))
         s = float(self._first_record(rs, 's'))
         return c, s
@@ -339,12 +338,12 @@ class Neo4J(BaseAPI):
         '''
         task = task.replace('VERTEX', self._v)
         task = task.replace('EDGE', self._e)
-        rs = list(self.session.run(task).records())
+        rs = list(self.session.run(task))
         if len(rs) == 0:
             return 0
         return int(self._first_record(rs, '_id'))
 
-    def add(self, e: Edge) -> bool:
+    def add(self, e: Edge, **kwargs) -> bool:
         """
             CAUTION: True Upserting is too slow, if indexing isn't enabled,
             as we need to perform full scans to match each edge ID!
@@ -379,8 +378,8 @@ class Neo4J(BaseAPI):
     def insert_edges(self, es: List[Edge]) -> int:
         vs = set()
         for e in es:
-            vs.insert(e.first)
-            vs.insert(e.second)
+            vs.add(e.first)
+            vs.add(e.second)
         task = str()
         # First upsert all the nodes.
         for v in vs:
@@ -449,7 +448,7 @@ class Neo4J(BaseAPI):
         if f'constraint{self._e}' in cs:
             self.session.run(f'DROP CONSTRAINT constraint{self._e}')
 
-    def add_stream(self, stream) -> int:
+    def add_stream(self, stream, **kwargs) -> int:
         chunk_len = Neo4J.__max_batch_size__
         count_edges_added = 0
         for es in chunks(stream, chunk_len):
@@ -571,13 +570,13 @@ class Neo4J(BaseAPI):
     # ---
 
     def _records_to_edges(self, records) -> List[Edge]:
-        if isinstance(records, BoltStatementResult):
-            records = list(records.records())
+        if isinstance(records, Neo4jResult):
+            records = list(records)
         return [Edge(r['first._id'], r['second._id'], r['e.weight']) for r in records]
 
     def _first_record(self, records, key):
-        if isinstance(records, BoltStatementResult):
-            records = list(records.records())
+        if isinstance(records, Neo4jResult):
+            records = list(records)
         if len(records) == 0:
             return None
         return records[0][key]

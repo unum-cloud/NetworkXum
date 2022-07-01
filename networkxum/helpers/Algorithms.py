@@ -8,7 +8,7 @@ from pathlib import Path
 import collections
 
 
-from PyStorageHelpers.Edge import Edge
+from .Edge import Edge
 
 
 def is_sequence_of(objs, expected_class) -> bool:
