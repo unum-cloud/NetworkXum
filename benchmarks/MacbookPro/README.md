@@ -24,7 +24,7 @@ That's why it's crucial for us to store the data in the most capable database!
 * [SQLite](https://www.sqlite.org) is the most minimalistic SQL database. 
 * [MySQL](https://www.mysql.com) is the most widely used Open-Source DB in the world. 
 * [PostgreSQL](https://www.postgresql.org) is the 2nd most popular Open-Source DB.
-* [MongoDB](https://www.sqlite.org/index.html) is the most popular NoSQL database. `$MDB` is values at aound $10 Bln.
+* [MongoDB](https://www.mongodb.com) is the most popular NoSQL database. `$MDB` is valued at around $10 Bln.
 * [Neo4J](https://neo4j.com) was designed specifically for graphs storage, but crashes consistently, so it was removed from comparison.
 * [UnumDB](https://unum.am/db) is our in-house solution.
 
