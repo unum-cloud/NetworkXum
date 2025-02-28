@@ -6,8 +6,11 @@ import pymongo
 from pymongo import MongoClient
 from pymongo import UpdateOne
 
-from networkxternal.BaseAPI import BaseAPI
-from networkxternal.helpers import *
+from networkxternal.base_api import BaseAPI
+from networkxternal.helpers.edge import Edge
+from networkxternal.helpers.node import Node
+from networkxternal.helpers.graph_degree import GraphDegree
+from networkxternal.helpers.algorithms import is_sequence_of, extract_database_name
 
 
 class MongoDB(BaseAPI):

@@ -5,7 +5,7 @@ import random
 import collections
 
 
-from networkxternal.helpers.Edge import Edge
+from networkxternal.helpers.edge import Edge
 
 
 def is_sequence_of(objs, expected_class) -> bool:

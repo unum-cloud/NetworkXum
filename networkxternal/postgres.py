@@ -1,4 +1,4 @@
-from networkxternal.BaseSQL import *
+from networkxternal.base_sql import BaseSQL, EdgeSQL
 
 
 class PostgreSQL(BaseSQL):
@@ -53,7 +53,8 @@ class PostgreSQL(BaseSQL):
             INSERT INTO {EdgeSQL.__tablename__}
             SELECT * FROM {source_name}
             ON CONFLICT (_id) DO UPDATE SET
-            (first, second, weight, attributes_json) = (EXCLUDED.first, EXCLUDED.second, EXCLUDED.weight, EXCLUDED.attributes_json);
+            (first, second, weight, attributes_json) =
+            (EXCLUDED.first, EXCLUDED.second, EXCLUDED.weight, EXCLUDED.attributes_json);
         """
         with self.get_session() as s:
             s.execute(migration)

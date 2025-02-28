@@ -1,4 +1,4 @@
-from networkxternal.BaseSQL import *
+from networkxternal.base_sql import BaseSQL, EdgeSQL
 
 
 class SQLiteMem(BaseSQL):

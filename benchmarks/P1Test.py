@@ -1,5 +1,6 @@
-from networkxternal.BaseAPI import BaseAPI
-from networkxternal.helpers import *
+from networkxternal.helpers.edge import Edge
+from networkxternal.helpers.graph_degree import GraphDegree
+from networkxternal.helpers.parsing import import_graph
 
 from P0Config import P0Config
 
@@ -36,12 +37,12 @@ class P1Test(object):
     def run_one(self, gdb):
         print(f"-- Starting testing of: {class_name(gdb)}")
 
-        print(f"--- Cleaning")
+        print("--- Cleaning")
         gdb.clear()
         self.validate_empty_edges(gdb)
         self.validate_empty_nodes(gdb)
 
-        print(f"--- Single Operations")
+        print("--- Single Operations")
         for e in self.edges:
             gdb.add(e)
         self.validate_contents(gdb)
@@ -49,21 +50,21 @@ class P1Test(object):
             gdb.remove(e)
         self.validate_empty_edges(gdb)
 
-        print(f"--- Batch Operations")
+        print("--- Batch Operations")
         gdb.add(self.edges)
         self.validate_contents(gdb)
         gdb.remove(self.edges)
         self.validate_empty_edges(gdb)
 
         gdb.clear()
-        print(f"--- Bulk Insert")
+        print("--- Bulk Insert")
         import_graph(gdb, self.conf.test_dataset["path"])
         self.validate_contents(gdb)
         gdb.clear()
         self.validate_empty_edges(gdb)
         self.validate_empty_nodes(gdb)
 
-        print(f"--- Passed All!")
+        print("--- Passed All!")
 
     def validate_empty_edges(self, gdb):
         assert (

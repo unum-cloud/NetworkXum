@@ -1,8 +1,8 @@
-from typing import Generator
 import csv
 import sys
+from typing import Generator
 
-from networkxternal.helpers.Edge import Edge
+from networkxternal.helpers.edge import Edge
 
 
 def allow_big_csv_fields():
@@ -24,7 +24,9 @@ def allow_big_csv_fields():
 
 
 def yield_edges_from_csv(
-    filepath: str, edge_type: type = Edge, is_directed=True
+    filepath: str,
+    edge_type: type = Edge,
+    is_directed: bool = True,
 ) -> Generator[Edge, None, None]:
     with open(filepath, "r") as f:
         reader = csv.reader(f, delimiter=",")

@@ -1,19 +1,24 @@
 from abc import abstractmethod
 from contextlib import contextmanager
+from typing import Sequence, Optional, Set
+import collections
 import json
 
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, BigInteger, Text, Float, Boolean
+from sqlalchemy import Column, Integer, BigInteger, Float, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy import or_, and_
 from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy import text
-from sqlalchemy import Index, Table
+from sqlalchemy import Index
 
-from networkxternal.BaseAPI import *
-from networkxternal.helpers import *
+from networkxternal.base_api import BaseAPI
+from networkxternal.helpers.node import Node
+from networkxternal.helpers.edge import Edge
+from networkxternal.helpers.graph_degree import GraphDegree
+from networkxternal.helpers.algorithms import is_sequence_of, chunks
 
 DeclarativeSQL = declarative_base()
 
@@ -27,9 +32,9 @@ class NodeSQL(DeclarativeSQL, Node):
 
     def __init__(self, *args, **kwargs):
         DeclarativeSQL.__init__(self)
-        subdict = kwargs.pop("payload", {})
-        if len(subdict):
-            self.payload_json = json.dumps(subdict)
+        sub_dict = kwargs.pop("payload", {})
+        if len(sub_dict):
+            self.payload_json = json.dumps(sub_dict)
         Node.__init__(self, *args, **kwargs)
 
 
@@ -45,9 +50,9 @@ class EdgeSQL(DeclarativeSQL, Edge):
 
     def __init__(self, *args, **kwargs):
         DeclarativeSQL.__init__(self)
-        subdict = kwargs.pop("payload", {})
-        if len(subdict):
-            self.payload_json = json.dumps(subdict)
+        sub_dict = kwargs.pop("payload", {})
+        if len(sub_dict):
+            self.payload_json = json.dumps(sub_dict)
         Edge.__init__(self, *args, **kwargs)
 
 
@@ -71,9 +76,9 @@ class EdgeNewSQL(DeclarativeSQL, Edge):
     # https://stackoverflow.com/a/60840921/2766161
     def __init__(self, *args, **kwargs):
         DeclarativeSQL.__init__(self)
-        subdict = kwargs.pop("payload", {})
-        if len(subdict):
-            self.payload_json = json.dumps(subdict)
+        sub_dict = kwargs.pop("payload", {})
+        if len(sub_dict):
+            self.payload_json = json.dumps(sub_dict)
         Edge.__init__(self, *args, **kwargs)
 
 
@@ -86,8 +91,7 @@ class BaseSQL(BaseAPI):
     *   MySQL,
     *   Oracle,
     *   MS-SQL,
-    *   Firebird,
-    *   Sybase.
+    *   Firebird.
     Other dialects are published as external projects.
     This wrapper does not only emit the query results,
     but can export the serialized query itself to be used
@@ -182,15 +186,17 @@ class BaseSQL(BaseAPI):
     @property
     def out_edges(self) -> Sequence[Edge]:
         with self.get_session() as s:
-            return s.query(EdgeSQL).filter(EdgeSQL.is_directed == True).all()
+            return (
+                s.query(EdgeSQL).filter(EdgeSQL.is_directed == True).all()  # noqa: E712
+            )  # noqa: E712
         return []
 
     @property
     def mentioned_nodes_ids(self) -> Sequence[int]:
         with self.get_session() as s:
-            all_froms = s.query(EdgeSQL.first).distinct().all()
-            all_tos = s.query(EdgeSQL.second).distinct().all()
-            result = set(all_froms).union(all_tos)
+            all_from = s.query(EdgeSQL.first).distinct().all()
+            all_to = s.query(EdgeSQL.second).distinct().all()
+            result = set(all_from).union(all_to)
             return result
         return []
 
@@ -253,7 +259,7 @@ class BaseSQL(BaseAPI):
                 ):
                     new_dict = new_dicts.pop(each._id)
                     for k, v in new_dict.items():
-                        if k is not "_id":
+                        if k != "_id":
                             setattr(each, k, v)
                     s.merge(each)
             # Only add those posts which did not exist in the database

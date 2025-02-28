@@ -1,8 +1,10 @@
 from abc import abstractmethod
 from typing import Sequence, Optional, Set
 
-from networkxternal.helpers import Edge, GraphDegree, Node
-from networkxternal.helpers.Algorithms import is_sequence_of, chunks
+from networkxternal.helpers.edge import Edge
+from networkxternal.helpers.node import Node
+from networkxternal.helpers.graph_degree import GraphDegree
+from networkxternal.helpers.algorithms import is_sequence_of, chunks
 
 
 class BaseAPI(object):

@@ -1,4 +1,4 @@
-from networkxternal.BaseSQL import *
+from networkxternal.base_sql import BaseSQL
 
 
 class MySQL(BaseSQL):
@@ -19,7 +19,7 @@ class MySQL(BaseSQL):
             # We often flush the temporary table after bulk imports.
             # https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_file_per_table
             "SET GLOBAL innodb_file_per_table=1;"
-            # Don't use 0 as node or edge ID, unless prespecified.
+            # Don't use 0 as node or edge ID, unless pre-specified.
             # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_insert_id
             # 'SET SESSION insert_id=1;'
             "SET SESSION sql_mode=NO_AUTO_VALUE_ON_ZERO",
@@ -31,7 +31,7 @@ class MySQL(BaseSQL):
             # Choosing performance over data integrity.
             # https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_doublewrite
             #'SET GLOBAL innodb_doublewrite=1;',
-            # NVME SSDs work well with multi-threaded accesses.
+            # NVMe SSDs work well with multi-threaded accesses.
             # https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html#sysvar_innodb_read_io_threads
             # 'SET GLOBAL innodb_read_io_threads=16;'
             # https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_flush_method

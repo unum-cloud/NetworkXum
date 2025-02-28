@@ -5,36 +5,36 @@ from urllib.parse import urlparse
 
 from neo4j import GraphDatabase, Result as Neo4jResult
 
-from .helpers.Edge import Edge
-from .BaseAPI import BaseAPI
-from .helpers.Algorithms import chunks, extract_database_name
+from networkxternal.base_api import BaseAPI
+from networkxternal.helpers.edge import Edge
+from networkxternal.helpers.algorithms import chunks, extract_database_name
 
 
 class Neo4J(BaseAPI):
     """
     Uses Cypher DSL and Bolt API to access Neo4J graph database.
 
-    CAUTION 1:
+    ! WARNING 1:
     This is a suboptimal implementation in terms of space,
     as we can't overwrite the native node IDs with ours and have
-    to index verticies by that artificial `_id` property.
+    to index vertices by that artificial `_id` property.
     Furthermore, indexing edge properties is only available in
     enterprise edition, so querying edges by their ID can be even
     less then performant than searching them by connected node IDS.
 
-    CAUTION 2:
+    ! WARNING 2:
     Neo4J doesn't have easy switching mechanism between different
     databases on the same server. That's why we have to use "labels"
     to distinguish nodes and edges belonging to disjoint datasets,
     but mixed into the same pot.
 
-    CAUTION 3:
+    ! WARNING 3:
     Neo4J is written in Java (unlike most other DBs) and is very
     rude to other processes running on the same machine :)
     The CPU utilization is often 10-20x higher than in other DBs.
     To import 30 MB CSV file it allocated 1.4 GB of RAM!!!
 
-    CAUTION 4:
+    ! WARNING 4:
     It constantly crashes with different codes and included query
     profiler outputs inconsistent results. Examples:
     *   `neobolt.exceptions.TransientError:`
@@ -55,7 +55,7 @@ class Neo4J(BaseAPI):
         self,
         url="bolt://localhost:7687/graph",
         enterprise_edition=False,
-        import_directory="/Users/av/Library/Application Support/Neo4J Desktop/Application/neo4jDatabases/database-b5d1180d-a778-47d2-84e6-4169343543ea/installation-4.0.3/import",
+        import_directory="~/import",
         use_full_name_for_label=False,
         use_indexes_over_constraints=True,
         **kwargs,
@@ -72,7 +72,7 @@ class Neo4J(BaseAPI):
         )
         self.session = self.driver.session()
 
-        # Resolve the name (for CAUTION 2):
+        # ! Resolve the name (for WARNING 2):
         name = str()
         _, c = extract_database_name(url)
         if (
@@ -86,8 +86,8 @@ class Neo4J(BaseAPI):
         # Create constraints if needed.
         self.use_indexes_over_constraints = use_indexes_over_constraints
         if use_indexes_over_constraints:
-            idxs = self.get_indexes()
-            if f"index{self._v}" not in idxs:
+            indexes = self.get_indexes()
+            if f"index{self._v}" not in indexes:
                 self.create_index_nodes()
         else:
             cs = self.get_constraints()
@@ -133,7 +133,7 @@ class Neo4J(BaseAPI):
         return self.session.run(task)
 
     def create_constraint_edges(self):
-        # Edge uniqueness constrains are only availiable to Enterprise Edition customers.
+        # Edge uniqueness constrains are only available to Enterprise Edition customers.
         # https://neo4j.com/docs/cypher-manual/current/administration/constraints/#administration-constraints-syntax
         task = """
         CREATE CONSTRAINT uniqueEDGE
@@ -290,7 +290,7 @@ class Neo4J(BaseAPI):
         """
         return int(self._first_record(self.session.run(task), "result"))
 
-    def degree_neighbors(self, v: int) -> (int, float):
+    def degree_neighbors(self, v: int) -> int | float:
         pattern = """
         MATCH (v:VERTEX {_id: %d})-[e:EDGE]-()
         WITH count(e) as c, sum(e.weight) as s
@@ -304,7 +304,7 @@ class Neo4J(BaseAPI):
         s = float(self._first_record(rs, "s"))
         return c, s
 
-    def degree_predecessors(self, v: int) -> (int, float):
+    def degree_predecessors(self, v: int) -> int | float:
         pattern = """
         MATCH (:VERTEX)-[e:EDGE]->(v:VERTEX {_id: %d})
         WITH count(e) as c, sum(e.weight) as s
@@ -318,7 +318,7 @@ class Neo4J(BaseAPI):
         s = float(self._first_record(rs, "s"))
         return c, s
 
-    def degree_successors(self, v: int) -> (int, float):
+    def degree_successors(self, v: int) -> int | float:
         pattern = """
         MATCH (v:VERTEX {_id: %d})-[e:EDGE]->(:VERTEX)
         WITH count(e) as c, sum(e.weight) as s
@@ -348,7 +348,7 @@ class Neo4J(BaseAPI):
 
     def add(self, e: Edge, **kwargs) -> bool:
         """
-        CAUTION: True Upserting is too slow, if indexing isn't enabled,
+        WARNING: True "upserting" is too slow, if indexing isn't enabled,
         as we need to perform full scans to match each edge ID!
         So for the non-enterprise version - we strongly recommend
         using `insert_edge()`
@@ -461,12 +461,12 @@ class Neo4J(BaseAPI):
         """
         This function may be tricky to use!
 
-        CAUTION 1: This operation makes a temporary copy of the entire dump
-        and places it into pre-specified `import_directory`:
-        https://neo4j.com/docs/operations-manual/4.0/configuration/file-locations/
+        ! WARNING 1: This operation makes a temporary copy of the entire dump
+        ! and places it into pre-specified `import_directory`:
+        ! https://neo4j.com/docs/operations-manual/4.0/configuration/file-locations/
 
-        CAUTION 2: This frequently fails with following error:
-        `neobolt.exceptions.DatabaseError`: "Java heap space".
+        ! WARNING 2: This frequently fails with following error:
+        ! `neobolt.exceptions.DatabaseError`: "Java heap space".
         """
         cnt = self.number_of_edges()
         current_id = self.biggest_edge_id() + 1
@@ -506,12 +506,12 @@ class Neo4J(BaseAPI):
         """
         This function may be tricky to use!
 
-        CAUTION 1: This operation makes a temporary copy of the entire dump
-        and places it into pre-specified `import_directory`:
-        https://neo4j.com/docs/operations-manual/4.0/configuration/file-locations/
+        ! WARNING 1: This operation makes a temporary copy of the entire dump
+        ! and places it into pre-specified `import_directory`:
+        ! https://neo4j.com/docs/operations-manual/4.0/configuration/file-locations/
 
-        CAUTION 2: This frequently fails with following error:
-        `neobolt.exceptions.DatabaseError`: "Java heap space".
+        ! WARNING 2: This frequently fails with following error:
+        ! `neobolt.exceptions.DatabaseError`: "Java heap space".
         """
         cnt = self.number_of_edges()
         current_id = self.biggest_edge_id() + 1
