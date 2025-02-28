@@ -1,18 +1,17 @@
-from typing import List, Optional, Dict, Generator, Set, Tuple, Sequence, Generator
-from itertools import groupby, count, filterfalse, chain
-import csv
+from typing import Generator, Tuple, Sequence
+from itertools import filterfalse, chain
 from urllib.parse import urlparse
 import random
-from random import SystemRandom
-from pathlib import Path
 import collections
 
 
-from .Edge import Edge
+from networkxternal.helpers.Edge import Edge
 
 
 def is_sequence_of(objs, expected_class) -> bool:
-    return isinstance(objs, collections.Sequence) and all([isinstance(obj, expected_class) for obj in objs])
+    return isinstance(objs, collections.Sequence) and all(
+        [isinstance(obj, expected_class) for obj in objs]
+    )
 
 
 def map_compact(func, os: Sequence[object]) -> Sequence[object]:
@@ -40,6 +39,7 @@ def remove_duplicate_edges(es: Sequence[Edge]) -> Sequence[Edge]:
             ids.insert(e._id)
             return True
         return False
+
     return filterfalse(false_if_exists, es)
 
 
@@ -54,15 +54,15 @@ def chunks(iterable, size) -> Generator[list, None, None]:
         yield current
 
 
-def extract_database_name(url: str, default='graph') -> Tuple[str, str]:
+def extract_database_name(url: str, default="graph") -> Tuple[str, str]:
     url = urlparse(url)
-    address = f'{url.scheme}://{url.netloc}'
+    address = f"{url.scheme}://{url.netloc}"
 
-    path_parts = url.path.split('/')
-    path_parts = [v for v in path_parts if (v != '/' and v != '')]
+    path_parts = url.path.split("/")
+    path_parts = [v for v in path_parts if (v != "/" and v != "")]
     if len(path_parts) >= 1:
         if len(path_parts) > 1:
-            print('Will avoid remaining url parts:', path_parts[2:])
+            print("Will avoid remaining url parts:", path_parts[2:])
         return address, path_parts[0].lower()
     else:
         return address, default

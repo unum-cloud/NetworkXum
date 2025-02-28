@@ -13,11 +13,11 @@ from networkxternal.helpers import *
 
 class P3Bench(object):
     """
-        Benchmarks groups of operations in following order:
-        2. Edge lookups and simple queries.
-        3. A few complex analytical queries.
-        4. Modifications: removing and restoring same objects.
-        5. Clearing all the data (if needed).
+    Benchmarks groups of operations in following order:
+    2. Edge lookups and simple queries.
+    3. A few complex analytical queries.
+    4. Modifications: removing and restoring same objects.
+    5. Clearing all the data (if needed).
     """
 
     def __init__(self, max_seconds_per_query=60):
@@ -28,9 +28,9 @@ class P3Bench(object):
     def run(self, repeat_existing=False):
         self.repeat_existing = repeat_existing
         for dataset in self.conf.datasets:
-            if not dataset['enabled']:
+            if not dataset["enabled"]:
                 continue
-            dataset_path = self.conf.normalize_path(dataset['path'])
+            dataset_path = self.conf.normalize_path(dataset["path"])
             self.tasks.sample_file(dataset_path)
 
             for db in self.conf.databases:
@@ -46,16 +46,14 @@ class P3Bench(object):
         is_in_ram = bool(type(self.gdb).__in_memory__)
         if (self.gdb.number_of_edges() == 0) and (not is_in_ram):
             return
-        print('- Benchmarking: {} @ {}'.format(
-            self.dataset['name'],
-            self.database['name']
-        ))
+        print(
+            "- Benchmarking: {} @ {}".format(
+                self.dataset["name"], self.database["name"]
+            )
+        )
 
         if is_in_ram:
-            self.bench_task(
-                name='Sequential Writes: Import CSV',
-                func=self.import_bulk
-            )
+            self.bench_task(name="Sequential Writes: Import CSV", func=self.import_bulk)
 
         # Streaming edges.
         # self.bench_task(
@@ -68,65 +66,33 @@ class P3Bench(object):
         # )
 
         # Queries returning collections.
+        self.bench_task(name="Random Reads: Find Specific Edge", func=self.find_e)
+        self.bench_task(name="Random Reads: Find Ingoing Edges", func=self.find_es_to)
         self.bench_task(
-            name='Random Reads: Find Specific Edge',
-            func=self.find_e
+            name="Random Reads: Find Connected Edges", func=self.find_es_related
         )
-        self.bench_task(
-            name='Random Reads: Find Ingoing Edges',
-            func=self.find_es_to
-        )
-        self.bench_task(
-            name='Random Reads: Find Connected Edges',
-            func=self.find_es_related
-        )
-        self.bench_task(
-            name='Random Reads: Find Friends',
-            func=self.find_vs_related
-        )
+        self.bench_task(name="Random Reads: Find Friends", func=self.find_vs_related)
 
         # Queries returning stats.
+        self.bench_task(name="Random Reads: Count Friends", func=self.count_v_related)
         self.bench_task(
-            name='Random Reads: Count Friends',
-            func=self.count_v_related
-        )
-        self.bench_task(
-            name='Random Reads: Count Followers',
-            func=self.count_v_followers
+            name="Random Reads: Count Followers", func=self.count_v_followers
         )
 
         # Reversable write operations.
-        self.bench_task(
-            name='Random Writes: Remove Edge',
-            func=self.remove_e
-        )
-        self.bench_task(
-            name='Random Writes: Upsert Edge',
-            func=self.upsert_e
-        )
-        self.bench_task(
-            name='Random Writes: Remove Edges Batch',
-            func=self.remove_es
-        )
-        self.bench_task(
-            name='Random Writes: Upsert Edges Batch',
-            func=self.upsert_es
-        )
+        self.bench_task(name="Random Writes: Remove Edge", func=self.remove_e)
+        self.bench_task(name="Random Writes: Upsert Edge", func=self.upsert_e)
+        self.bench_task(name="Random Writes: Remove Edges Batch", func=self.remove_es)
+        self.bench_task(name="Random Writes: Upsert Edges Batch", func=self.upsert_es)
 
         if remove_all_afterwards:
-            self.bench_task(
-                name='Random Writes: Remove Vertex',
-                func=self.remove_v
-            )
-            self.bench_task(
-                name='Sequential Writes: Remove All',
-                func=self.remove_bulk
-            )
+            self.bench_task(name="Random Writes: Remove Vertex", func=self.remove_v)
+            self.bench_task(name="Sequential Writes: Remove All", func=self.remove_bulk)
 
     def bench_task(self, name, func):
-        dataset_name = self.dataset['name']
-        db_name = self.database['name']
-        print(f'--- {db_name}: {name} @ {dataset_name}')
+        dataset_name = self.dataset["name"]
+        db_name = self.database["name"]
+        print(f"--- {db_name}: {name} @ {dataset_name}")
         counter = MicroBench(
             benchmark_name=name,
             func=func,
@@ -141,14 +107,14 @@ class P3Bench(object):
 
         if not self.repeat_existing:
             if self.conf.default_stats_file.contains(counter):
-                print('--- Skipping!')
+                print("--- Skipping!")
                 return
-        print('---- Running!')
+        print("---- Running!")
         counter.run()
         if counter.count_operations == 0:
-            print('---- Didn\'t measure!')
+            print("---- Didn't measure!")
             return
-        print('---- Importing new stats!')
+        print("---- Importing new stats!")
 
     # ---
     # Operations
@@ -177,7 +143,7 @@ class P3Bench(object):
             dt = time() - t0
             if dt > self.max_seconds_per_query:
                 break
-        print(f'---- {cnt} ops: {cnt_found} undirected matches')
+        print(f"---- {cnt} ops: {cnt_found} undirected matches")
         return cnt
 
     def find_es_related(self) -> int:
@@ -191,7 +157,7 @@ class P3Bench(object):
             dt = time() - t0
             if dt > self.max_seconds_per_query:
                 break
-        print(f'---- {cnt} ops: {cnt_found} edges found')
+        print(f"---- {cnt} ops: {cnt_found} edges found")
         return cnt
 
     def find_es_from(self) -> int:
@@ -205,7 +171,7 @@ class P3Bench(object):
             dt = time() - t0
             if dt > self.max_seconds_per_query:
                 break
-        print(f'---- {cnt} ops: {cnt_found} edges found')
+        print(f"---- {cnt} ops: {cnt_found} edges found")
         return cnt
 
     def find_es_to(self) -> int:
@@ -219,7 +185,7 @@ class P3Bench(object):
             dt = time() - t0
             if dt > self.max_seconds_per_query:
                 break
-        print(f'---- {cnt} ops: {cnt_found} edges found')
+        print(f"---- {cnt} ops: {cnt_found} edges found")
         return cnt
 
     def find_vs_related(self) -> int:
@@ -233,7 +199,7 @@ class P3Bench(object):
             dt = time() - t0
             if dt > self.max_seconds_per_query:
                 break
-        print(f'---- {cnt} ops: {cnt_found} related nodes')
+        print(f"---- {cnt} ops: {cnt_found} related nodes")
         return cnt
 
     def count_v_related(self) -> int:
@@ -280,7 +246,7 @@ class P3Bench(object):
             dt = time() - t0
             if dt > self.max_seconds_per_query:
                 break
-        print(f'---- {cnt} ops: {cnt_found} related to related nodes')
+        print(f"---- {cnt} ops: {cnt_found} related to related nodes")
         return cnt
 
     def remove_e(self) -> int:
@@ -328,7 +294,7 @@ class P3Bench(object):
 
 
 if __name__ == "__main__":
-    c = P0Config(device_name='MacbookPro')
+    c = P0Config(device_name="MacbookPro")
     try:
         P3Bench().run()
     finally:

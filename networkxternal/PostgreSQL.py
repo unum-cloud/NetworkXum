@@ -3,13 +3,13 @@ from networkxternal.BaseSQL import *
 
 class PostgreSQL(BaseSQL):
     """
-        Extends BaseSQL functionality with optimized operations:
-        *   Bulk imports and exports via:
-            https://github.com/jmcarp/sqlalchemy-postgres-copy
-        *   Async operations through less mature ORM: Gino (only PostgreSQL).
-            https://github.com/python-gino/gino
-        *   Allows natively quering JSON subproperties via:
-            https://sqlalchemy-utils.readthedocs.io/en/latest/data_types.html#module-sqlalchemy_utils.types.json        
+    Extends BaseSQL functionality with optimized operations:
+    *   Bulk imports and exports via:
+        https://github.com/jmcarp/sqlalchemy-postgres-copy
+    *   Async operations through less mature ORM: Gino (only PostgreSQL).
+        https://github.com/python-gino/gino
+    *   Allows natively querying JSON sub-properties via:
+        https://sqlalchemy-utils.readthedocs.io/en/latest/data_types.html#module-sqlalchemy_utils.types.json
     """
 
     def __init__(self, url, **kwargs):
@@ -49,12 +49,12 @@ class PostgreSQL(BaseSQL):
 
     def upsert_table(self, source_name: str):
         # https://stackoverflow.com/a/17267423/2766161
-        migration = f'''
+        migration = f"""
             INSERT INTO {EdgeSQL.__tablename__}
             SELECT * FROM {source_name}
             ON CONFLICT (_id) DO UPDATE SET
             (first, second, weight, attributes_json) = (EXCLUDED.first, EXCLUDED.second, EXCLUDED.weight, EXCLUDED.attributes_json);
-        '''
+        """
         with self.get_session() as s:
             s.execute(migration)
             s.commit()

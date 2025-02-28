@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from contextlib import contextmanager
 import json
 
@@ -19,7 +19,7 @@ DeclarativeSQL = declarative_base()
 
 
 class NodeSQL(DeclarativeSQL, Node):
-    __tablename__ = 'main_nodes'
+    __tablename__ = "main_nodes"
     _id = Column(BigInteger, primary_key=True)
     weight = Column(Float)
     label = Column(Integer)
@@ -27,14 +27,14 @@ class NodeSQL(DeclarativeSQL, Node):
 
     def __init__(self, *args, **kwargs):
         DeclarativeSQL.__init__(self)
-        subdict = kwargs.pop('payload', {})
+        subdict = kwargs.pop("payload", {})
         if len(subdict):
             self.payload_json = json.dumps(subdict)
         Node.__init__(self, *args, **kwargs)
 
 
 class EdgeSQL(DeclarativeSQL, Edge):
-    __tablename__ = 'main_edges'
+    __tablename__ = "main_edges"
     _id = Column(BigInteger, primary_key=True)
     first = Column(BigInteger)
     second = Column(BigInteger)
@@ -45,20 +45,20 @@ class EdgeSQL(DeclarativeSQL, Edge):
 
     def __init__(self, *args, **kwargs):
         DeclarativeSQL.__init__(self)
-        subdict = kwargs.pop('payload', {})
+        subdict = kwargs.pop("payload", {})
         if len(subdict):
             self.payload_json = json.dumps(subdict)
         Edge.__init__(self, *args, **kwargs)
 
 
-index_first = Index('index_first', EdgeSQL.first, unique=False)
-index_second = Index('index_second', EdgeSQL.second, unique=False)
-index_label = Index('index_label', EdgeSQL.label, unique=False)
-index_directed = Index('index_directed', EdgeSQL.is_directed, unique=False)
+index_first = Index("index_first", EdgeSQL.first, unique=False)
+index_second = Index("index_second", EdgeSQL.second, unique=False)
+index_label = Index("index_label", EdgeSQL.label, unique=False)
+index_directed = Index("index_directed", EdgeSQL.is_directed, unique=False)
 
 
 class EdgeNewSQL(DeclarativeSQL, Edge):
-    __tablename__ = 'new_edges'
+    __tablename__ = "new_edges"
     _id = Column(BigInteger, primary_key=True)
     first = Column(BigInteger)
     second = Column(BigInteger)
@@ -71,7 +71,7 @@ class EdgeNewSQL(DeclarativeSQL, Edge):
     # https://stackoverflow.com/a/60840921/2766161
     def __init__(self, *args, **kwargs):
         DeclarativeSQL.__init__(self)
-        subdict = kwargs.pop('payload', {})
+        subdict = kwargs.pop("payload", {})
         if len(subdict):
             self.payload_json = json.dumps(subdict)
         Edge.__init__(self, *args, **kwargs)
@@ -79,46 +79,47 @@ class EdgeNewSQL(DeclarativeSQL, Edge):
 
 class BaseSQL(BaseAPI):
     """
-        A generic SQL-compatiable wrapper for Graph-shaped data.
-        It's built on top of SQLAlchemy which supports following engines:
-        *   SQLite,
-        *   PostgreSQL,
-        *   MySQL,
-        *   Oracle,
-        *   MS-SQL,
-        *   Firebird,
-        *   Sybase.
-        Other dialects are published as external projects.
-        This wrapper does not only emit the query results,
-        but can export the serialized quaery itself to be used
-        with other SQL-compatible systems.
-        Docs: https://docs.python.org/3/library/sqlite3.html
+    A generic SQL-compatible wrapper for Graph-shaped data.
+    It's built on top of SQLAlchemy which supports following engines:
+    *   SQLite,
+    *   PostgreSQL,
+    *   MySQL,
+    *   Oracle,
+    *   MS-SQL,
+    *   Firebird,
+    *   Sybase.
+    Other dialects are published as external projects.
+    This wrapper does not only emit the query results,
+    but can export the serialized query itself to be used
+    with other SQL-compatible systems.
+    Docs: https://docs.python.org/3/library/sqlite3.html
 
-        CAUTION:
-        Implementations of analytical queries are suboptimal,
-        as implementing them in SQL dialects is troublesome and
-        often results in excessive memory consumption,
-        when temporary tables are created.
+    CAUTION:
+    Implementations of analytical queries are suboptimal,
+    as implementing them in SQL dialects is troublesome and
+    often results in excessive memory consumption,
+    when temporary tables are created.
 
-        CAUTION:
-        Queries can be exported without execution with `str(query)`,
-        but if you want to compile them for a specific dialect use following snippet:
-        >>> str(query.statement.compile(dialect=postgresql.dialect()))
-        Source: http://nicolascadou.com/blog/2014/01/printing-actual-sqlalchemy-queries/
+    CAUTION:
+    Queries can be exported without execution with `str(query)`,
+    but if you want to compile them for a specific dialect use following snippet:
+    >>> str(query.statement.compile(dialect=postgresql.dialect()))
+    Source: http://nicolascadou.com/blog/2014/01/printing-actual-sqlalchemy-queries/
 
-        CAUTION:
-        Using ORM can be very costly in some cases. Benchmarking with `pyinstrument`
-        revealed that ORM mapping takes 2x more time than `bulk_save_objects()`
-        in case of in-memory SQLite instance.
-        Replacing it with `bulk_insert_mappings()` reduced import time by 70%!
-        https://docs.sqlalchemy.org/en/13/faq/performance.html#result-fetching-slowness-core
+    CAUTION:
+    Using ORM can be very costly in some cases. Benchmarking with `pyinstrument`
+    revealed that ORM mapping takes 2x more time than `bulk_save_objects()`
+    in case of in-memory SQLite instance.
+    Replacing it with `bulk_insert_mappings()` reduced import time by 70%!
+    https://docs.sqlalchemy.org/en/13/faq/performance.html#result-fetching-slowness-core
     """
+
     __is_concurrent__ = True
     __max_batch_size__ = 1000000
     __edge_type__ = EdgeSQL
     __in_memory__ = False
 
-    def __init__(self, url='sqlite:///:memory:', **kwargs):
+    def __init__(self, url="sqlite:///:memory:", **kwargs):
         BaseAPI.__init__(self, **kwargs)
         # https://stackoverflow.com/a/51184173
         if not database_exists(url):
@@ -127,7 +128,7 @@ class BaseSQL(BaseAPI):
         DeclarativeSQL.metadata.create_all(self.engine)
         self.session_maker = sessionmaker(bind=self.engine)
 
-# region Metadata
+    # region Metadata
 
     def reduce_nodes(self) -> GraphDegree:
         result = (0, 0)
@@ -164,7 +165,7 @@ class BaseSQL(BaseAPI):
                 result = biggest[0]
         return result
 
-# region Bulk Reads
+    # region Bulk Reads
 
     @property
     def nodes(self) -> Sequence[Node]:
@@ -193,7 +194,7 @@ class BaseSQL(BaseAPI):
             return result
         return []
 
-# region Random Reads
+    # region Random Reads
 
     def has_node(self, n) -> Optional[Node]:
         n = self.make_node_id(n)
@@ -212,18 +213,24 @@ class BaseSQL(BaseAPI):
     def neighbors_of_group(self, vs: Sequence[int]) -> Set[int]:
         result = set()
         with self.get_session() as s:
-            edges = s.query(EdgeSQL).filter(or_(
-                EdgeSQL.first.in_(vs),
-                EdgeSQL.second.in_(vs),
-            )).all()
+            edges = (
+                s.query(EdgeSQL)
+                .filter(
+                    or_(
+                        EdgeSQL.first.in_(vs),
+                        EdgeSQL.second.in_(vs),
+                    )
+                )
+                .all()
+            )
             for e in edges:
-                if (e.first not in vs):
+                if e.first not in vs:
                     result.add(e.first)
-                elif (e.second not in vs):
+                elif e.second not in vs:
                     result.add(e.second)
         return result
 
-# region Random Writes
+    # region Random Writes
 
     def add(self, obj, upsert=True) -> int:
         if isinstance(obj, DeclarativeSQL):
@@ -241,10 +248,12 @@ class BaseSQL(BaseAPI):
         with self.get_session() as s:
             # Only merge those entries which already exist in the database
             if upsert:
-                for each in s.query(target_class).filter(target_class._id.in_(all_ids)).all():
+                for each in (
+                    s.query(target_class).filter(target_class._id.in_(all_ids)).all()
+                ):
                     new_dict = new_dicts.pop(each._id)
                     for k, v in new_dict.items():
-                        if k is not '_id':
+                        if k is not "_id":
                             setattr(each, k, v)
                     s.merge(each)
             # Only add those posts which did not exist in the database
@@ -263,30 +272,37 @@ class BaseSQL(BaseAPI):
             # Edge
             if isinstance(obj, Edge):
                 if obj._id < 0:
-                    return s.query(EdgeSQL).filter_by(
-                        first=obj.first,
-                        second=obj.second,
-                        is_directed=obj.is_directed,
-                    ).delete()
+                    return (
+                        s.query(EdgeSQL)
+                        .filter_by(
+                            first=obj.first,
+                            second=obj.second,
+                            is_directed=obj.is_directed,
+                        )
+                        .delete()
+                    )
                 else:
-                    return s.query(EdgeSQL).filter_by(
-                        _id=obj._id
-                    ).delete()
+                    return s.query(EdgeSQL).filter_by(_id=obj._id).delete()
             # Node
             elif isinstance(obj, Node):
-                return s.query(EdgeSQL).filter(or_(
-                    EdgeSQL.first == obj._id,
-                    EdgeSQL.second == obj._id,
-                )).delete() + s.query(NodeSQL).filter_by(
-                    _id=obj._id
-                ).delete()
+                return (
+                    s.query(EdgeSQL)
+                    .filter(
+                        or_(
+                            EdgeSQL.first == obj._id,
+                            EdgeSQL.second == obj._id,
+                        )
+                    )
+                    .delete()
+                    + s.query(NodeSQL).filter_by(_id=obj._id).delete()
+                )
 
         return super().remove(obj)
 
     def remove_node(self, n) -> int:
         return self.remove(self.make_node(n))
 
-# region Bulk Writes
+    # region Bulk Writes
 
     def clear_edges(self) -> int:
         result = 0
@@ -326,14 +342,16 @@ class BaseSQL(BaseAPI):
         result = self.number_of_edges() - cnt
         return result
 
-# region Helpers
+    # region Helpers
 
     def insert_table(self, source_name: str):
         with self.get_session() as s:
-            migration = text(f'''
+            migration = text(
+                f"""
                 INSERT INTO {EdgeSQL.__tablename__}
                 SELECT * FROM {source_name};
-            ''')
+            """
+            )
             s.execute(migration)
 
     @abstractmethod
@@ -348,15 +366,17 @@ class BaseSQL(BaseAPI):
             # INTO {EdgeSQL.__tablename__} (_id, first, second, weight, payload_json)
             # ''')
             # But this syntax isn't globally supported.
-            migration = text(f'''
+            migration = text(
+                f"""
                 REPLACE INTO {EdgeSQL.__tablename__}
                 SELECT * FROM {source_name};
-            ''')
+            """
+            )
             s.execute(migration)
 
     def clear_table(self, table_name: str):
         with self.get_session() as s:
-            s.execute(text(f'DELETE FROM {table_name};'))
+            s.execute(text(f"DELETE FROM {table_name};"))
 
     @contextmanager
     def get_session(self):
@@ -373,10 +393,12 @@ class BaseSQL(BaseAPI):
             session.close()
 
     def filter_edges_containing(self, q, n):
-        return q.filter(or_(
-            EdgeSQL.first == n,
-            EdgeSQL.second == n,
-        ))
+        return q.filter(
+            or_(
+                EdgeSQL.first == n,
+                EdgeSQL.second == n,
+            )
+        )
 
     def filter_edges_members(self, q, u, v):
         u = self.make_node_id(u)
@@ -395,24 +417,28 @@ class BaseSQL(BaseAPI):
                 if u == v:
                     return self.filter_edges_containing(q, u)
                 else:
-                    return q.filter(and_(
-                        EdgeSQL.first == u,
-                        EdgeSQL.second == v,
-                    ))
-            else:
-                if u == v:
-                    return self.filter_edges_containing(q, u)
-                else:
-                    return q.filter(or_(
-                        and_(
-                            EdgeSQL.first == v,
-                            EdgeSQL.second == u,
-                        ),
+                    return q.filter(
                         and_(
                             EdgeSQL.first == u,
                             EdgeSQL.second == v,
                         )
-                    ))
+                    )
+            else:
+                if u == v:
+                    return self.filter_edges_containing(q, u)
+                else:
+                    return q.filter(
+                        or_(
+                            and_(
+                                EdgeSQL.first == v,
+                                EdgeSQL.second == u,
+                            ),
+                            and_(
+                                EdgeSQL.first == u,
+                                EdgeSQL.second == v,
+                            ),
+                        )
+                    )
 
     def filter_edges_label(self, q, key):
         key = self.make_label(key)

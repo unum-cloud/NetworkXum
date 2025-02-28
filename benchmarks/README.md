@@ -1,20 +1,20 @@
-# Benchmarking DBs on Graph Workloads with PyStorageDBs
+# Graph Processing Benchmarks
 
 The intention of benchmarks was to see, how well various DBs can handle graph workloads.
 If you are not familiar with graphs, its just a mathematical term to describe relations between different points.
-The only thing you need to know from terminology is that `point=node=vertex` and `edge=relation`.
+The only thing you need to know from terminology is that *point* ~ *node* ~ *vertex*  and *edge* ~ *relation*.
 
-Some DBs were originally designed for faster queries over complex graphs, but it doesnt mean they are good at it.
+Some DBs were originally designed for faster queries over complex graphs, but it doesn't mean they are good at it.
 Feel free to replicate and share the results!
 
 ## Stages
 
 The application is split into multiple stages, each with it's own file, so you can each stage separately as a script.
 
-* [P1Test.py](P1Test.py) - Validates if connections can be established, basic operations work as intended and dump file paths are accessible.
-* [P2Import.py](P2Import.py) - Bulk-loads data into DBs for future analysis. Files must be CSVs with a header row: `first,second,weight`.
-* [P3Bench.py](P3Bench.py) - Benchmarks simple `GET`, `PUT` for single nodes/edges and batches of them.
-* [P4Print.py](P4Print.py) - Exports stats about each type of operations from `stats.json` into a single `stats.md` report.
+- [P1Test.py](P1Test.py) - Validates if connections can be established, basic operations work as intended and dump file paths are accessible.
+- [P2Import.py](P2Import.py) - Bulk-loads data into DBs for future analysis. Files must be CSVs with a header row: `first,second,weight`.
+- [P3Bench.py](P3Bench.py) - Benchmarks simple `GET`, `PUT` for single nodes/edges and batches of them.
+- [P4Print.py](P4Print.py) - Exports stats about each type of operations from `stats.json` into a single `stats.md` report.
 
 ## Setup
 

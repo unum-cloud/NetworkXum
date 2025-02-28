@@ -69,6 +69,10 @@ Some common databases have licenses that prohibit sharing of benchmark results, 
 For `pytest`, the `-r` flag can be used to display a "short test summary info" at the end of the test session, making it easy to get a clear picture of all failures in large test suites.
 The `-ra` variant limits the summary only to failed tests, avoiding "passed" and "passed with outputs" messages.
 
+```sh
+uv build
+```
+
 For `uv`, the `--no-sync` flag prevents `uv` from creating a `uv.lock` file or modifying an existing `.venv` folder.
 To extend the current list of dependencies, update the `requirements.in` file and run `uv sync` to update the environment.
 
