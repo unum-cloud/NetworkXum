@@ -1,8 +1,12 @@
 # NetworkXternal
 
-NetworkXternal is [NetworkX](https://github.com/networkx/networkx)-like interface for large persistent graphs stored inside DBMS.
+![NetworkXternal thumbnail](https://github.com/ashvardanian/ashvardanian/raw/master/repositories/NetworkXternal.jpg?raw=true)
+
+NetworkXternal is [NetworkX](https://github.com/networkx/networkx)-like interface for external memory graphs persisted in various databases.
 This lets you upscale from Megabyte-Gigabyte graphs to Terabyte-Petabyte graphs (that won't fit into RAM), without changing your code.
-We provide wrappers for following DBs:
+It's not a silver bullet, as it comes with a performance penalty, but it can be a good place to start.
+
+The library was designed to be compatible with the following databases:
 
 - [MongoDB](#mongodb) - modern (yet mature) distributed document DB,
 - [Neo4J](#neo4j) - disturbingly slow and unstable DBMS positioned as the go-to Graph database,
@@ -12,21 +16,20 @@ We provide wrappers for following DBs:
 
 ## Project Structure
 
-- [networkxternal](networkxternal) - Python wrappers for Graph (Network) backed by persistent DBs.
+- [networkxternal](networkxternal) - `Graph`-like DBMS client wrappers.
 - [benchmarks](benchmarks) - benchmarking tools and performance results.
-- [assets](assets) - tiny datasets for testing purposes.
+- [assets](assets) - toy datasets for testing purposes.
 
-### Implementation Details & Included DBs
+### Compared DBs
 
 Some common databases have licenses that prohibit sharing of benchmark results, so they were excluded from comparisons.
 
-| Name          |             Purpose | Implementation Language | Lines of Code (in `/src/`) |
-| :------------ | ------------------: | ----------------------: | -------------------------: |
-| MongoDB       |           Documents |                     C++ |                  3'900'000 |
-| Postgres      |              Tables |                       C |                  1'300'000 |
-| Neo4J         |              Graphs |                    Java |                    800'000 |
-| ElasticSearch |                Text |                    Java |                    730'000 |
-| Unum          | Graphs, Table, Text |                     C++ |                     80'000 |
+| Name     |             Purpose | Implementation | Code Length in `/src/**` |
+| :------- | ------------------: | -------------: | -----------------------: |
+| MongoDB  |           Documents |            C++ |          3'900'000 lines |
+| Postgres |              Tables |              C |          1'300'000 lines |
+| Neo4J    |              Graphs |           Java |            800'000 lines |
+| UStore   | Graphs, Table, Text |            C++ |             80'000 lines |
 
 #### MongoDB
 
@@ -61,7 +64,9 @@ Some common databases have licenses that prohibit sharing of benchmark results, 
 - [x] Benchmark on small & mid graphs.
 - [x] Session management in SQL and Neo4J.
 - [x] Duration constraints for benchmarks.
-- [ ] Mixed Multithreaded Read/Write benchmarks.
+- [ ] Testing suite.
+- [ ] Refactor benchmarks and include MemGraph.
+- [ ] Mixed multithreaded Read/Write benchmarks in GIL-less Python 3.13.
 
 
 ## Building
