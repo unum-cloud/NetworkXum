@@ -1,0 +1,7 @@
+# Core dependencies
+pytest
+
+# Databases
+sqlalchemy
+pymongo
+neo4j

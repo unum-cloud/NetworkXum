@@ -62,3 +62,17 @@ Some common databases have licenses that prohibit sharing of benchmark results, 
 - [x] Session management in SQL and Neo4J.
 - [x] Duration constraints for benchmarks.
 - [ ] Mixed Multithreaded Read/Write benchmarks.
+
+
+## Building
+
+For `pytest`, the `-r` flag can be used to display a "short test summary info" at the end of the test session, making it easy to get a clear picture of all failures in large test suites.
+The `-ra` variant limits the summary only to failed tests, avoiding "passed" and "passed with outputs" messages.
+
+For `uv`, the `--no-sync` flag prevents `uv` from creating a `uv.lock` file or modifying an existing `.venv` folder.
+To extend the current list of dependencies, update the `requirements.in` file and run `uv sync` to update the environment.
+
+```sh
+uv pip compile requirements.in --universal --output-file requirements.txt
+uv pip sync requirements.txt
+```
