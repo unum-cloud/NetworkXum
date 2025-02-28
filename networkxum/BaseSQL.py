@@ -12,8 +12,8 @@ from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy import text
 from sqlalchemy import Index, Table
 
-from networkxum.BaseAPI import *
-from networkxum.helpers import *
+from networkxternal.BaseAPI import *
+from networkxternal.helpers import *
 
 DeclarativeSQL = declarative_base()
 

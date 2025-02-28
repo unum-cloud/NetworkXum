@@ -4,11 +4,11 @@ from time import time
 from pystats2md.stats_file import StatsFile
 from pystats2md.micro_bench import MicroBench
 
-from networkxum.BaseAPI import BaseAPI
+from networkxternal.BaseAPI import BaseAPI
 
 from P0Config import P0Config
 from P3TasksSampler import P3TasksSampler
-from networkxum.helpers import *
+from networkxternal.helpers import *
 
 
 class P3Bench(object):

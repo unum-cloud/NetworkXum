@@ -6,8 +6,8 @@ from pystats2md.micro_bench import MicroBench
 from pystats2md.helpers import metric2str, bytes2str
 import pynum
 
-from networkxum.BaseAPI import BaseAPI
-from networkxum.helpers import *
+from networkxternal.BaseAPI import BaseAPI
+from networkxternal.helpers import *
 from P0Config import P0Config
 
 

@@ -4,7 +4,7 @@ import json
 import importlib
 
 from pystats2md.stats_file import StatsFile
-from networkxum.helpers import *
+from networkxternal.helpers import *
 
 
 class P0Config(object):

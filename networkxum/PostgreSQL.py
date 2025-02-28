@@ -1,4 +1,4 @@
-from networkxum.BaseSQL import *
+from networkxternal.BaseSQL import *
 
 
 class PostgreSQL(BaseSQL):

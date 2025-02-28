@@ -1,6 +1,6 @@
-from networkxum.helpers import *
-from networkxum.BaseAPI import BaseAPI
-from networkxum.BaseSQL import BaseSQL
+from networkxternal.helpers import *
+from networkxternal.BaseAPI import BaseAPI
+from networkxternal.BaseSQL import BaseSQL
 
 
 class Cayley(BaseAPI):

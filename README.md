@@ -1,6 +1,6 @@
-# NetworkXum
+# NetworkXternal
 
-NetworkXum is [NetworkX](https://github.com/networkx/networkx)-like interface for large persistent graphs stored inside DBMS. This lets you upscale from Megabyte-Gigabyte graphs to Terabyte-Petabyte graphs (that won't fit into RAM), without changing your code. We provide wrappers for following DBs:
+NetworkXternal is [NetworkX](https://github.com/networkx/networkx)-like interface for large persistent graphs stored inside DBMS. This lets you upscale from Megabyte-Gigabyte graphs to Terabyte-Petabyte graphs (that won't fit into RAM), without changing your code. We provide wrappers for following DBs:
 
 * [MongoDB](#mongodb) - modern (yet mature) distributed document DB with good performance in most workloads
 * [Neo4J](#neo4j) - disturbingly slow and unstable DBMS positioned as the go-to Graph database,
@@ -10,10 +10,9 @@ NetworkXum is [NetworkX](https://github.com/networkx/networkx)-like interface fo
 
 ## Project Structure
 
-* [networkxum](networkxum) - Python wrappers for Graph (Network) datastructures backed by persistent DBs.
+* [networkxternal](networkxternal) - Python wrappers for Graph (Network) datastructures backed by persistent DBs.
 * [benchmarks](benchmarks) - benchmarking tools and performance results.
 * [assets](assets) - tiny datasets for testing purposes.
-* [regexum](PyStorageTexts) - Python wrappers for search-able containers backed by persistent DBs.
 * [benchmarks](benchmarks) - benchmarking tools and performance results.
 * [assets](assets) - tiny datasets for testing purposes.
 

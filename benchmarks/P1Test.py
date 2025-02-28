@@ -1,5 +1,5 @@
-from networkxum.BaseAPI import BaseAPI
-from networkxum.helpers import *
+from networkxternal.BaseAPI import BaseAPI
+from networkxternal.helpers import *
 
 from P0Config import P0Config
 

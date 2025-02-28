@@ -3,8 +3,8 @@ from typing import Sequence, Optional, Dict, Generator, Set, Tuple, Sequence
 import concurrent.futures
 import collections
 
-from networkxum.helpers import Edge, GraphDegree, Node
-from networkxum.helpers.Algorithms import is_sequence_of, chunks
+from networkxternal.helpers import Edge, GraphDegree, Node
+from networkxternal.helpers.Algorithms import is_sequence_of, chunks
 
 
 class BaseAPI(object):
